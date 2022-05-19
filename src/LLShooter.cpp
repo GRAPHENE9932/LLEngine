@@ -1,7 +1,9 @@
+#include <cstring>
+#include <stdexcept>
+
 #include "utils/utils.hpp"
 #include "objects/DrawableObject.hpp"
 #include "LLShooter.hpp"
-#include <iostream>
 
 void LLShooter::run_game() {
     init_window();
@@ -53,12 +55,12 @@ void LLShooter::init_game() {
     camera->backward_speed = 10.0f;
 
     // Init objects.
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec2> uvs;
+    std::vector<glm::vec3> normals;
+    utils::load_wavefront_obj("Bibizana.obj", vertices, uvs, normals);
     DrawableObject* triangle = new DrawableObject();
-    triangle->vertex_buf = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
-    };
+    triangle->vertex_buf = vertices;
     triangle->init_vertex_buf();
     drawable_objects.push_back(triangle);
 }
@@ -96,7 +98,7 @@ void LLShooter::main_loop() {
             );
 
             glUniformMatrix4fv(mvp_matrix_id, 1, GL_FALSE, &camera_mvp[0][0]);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawArrays(GL_TRIANGLES, 0, drawable_objects[i]->vertex_buf.size());
         }
 
         glfwSwapBuffers(window);

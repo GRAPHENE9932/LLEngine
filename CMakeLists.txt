@@ -10,7 +10,9 @@ src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
 src/objects/Camera.cpp
 src/objects/ControllableCamera.cpp
-src/utils/shader_loader.cpp)
+src/utils/shader_loader.cpp
+src/utils/model_loader.cpp
+)
 
 # GLFW.
 find_package(glfw3 REQUIRED)
