@@ -1,0 +1,13 @@
+# Builds.
+debug/
+release/
+build/
+
+# Caches.
+.cache/
+
+# Project files.
+.kdev4/
+*.kdev4
+.vscode/
+*.kateproject
