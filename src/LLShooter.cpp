@@ -2,7 +2,6 @@
 #include <stdexcept>
 
 #include "utils/utils.hpp"
-#include "objects/DrawableObject.hpp"
 #include "LLShooter.hpp"
 
 void LLShooter::run_game() {
@@ -40,9 +39,14 @@ void LLShooter::init_window() {
 }
 
 void LLShooter::init_game() {
+    // Create the VAO.
     GLuint vertex_array_id;
     glGenVertexArrays(1, &vertex_array_id);
     glBindVertexArray(vertex_array_id);
+
+    // Enable depth test.
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     // Init camera.
     camera = std::make_unique<ControllableCamera>(
@@ -58,16 +62,24 @@ void LLShooter::init_game() {
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals;
-    utils::load_wavefront_obj("Bibizana.obj", vertices, uvs, normals);
-    DrawableObject* triangle = new DrawableObject();
+    utils::load_wavefront_obj("/home/artem/Desktop/Bibizana.obj", vertices, uvs, normals);
+    MonochromeDrawableObject* triangle = new MonochromeDrawableObject(glm::vec3(0.0f, 1.0f, 0.0f));
     triangle->vertex_buf = vertices;
+    triangle->normals_buf = normals;
     triangle->init_vertex_buf();
-    drawable_objects.push_back(triangle);
+    triangle->init_normals_buf();
+    monochrome_objects.push_back(triangle);
 }
 
 void LLShooter::main_loop() {
-    GLuint program_id = utils::load_shaders("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
-    mvp_matrix_id = glGetUniformLocation(program_id, "mvp");
+    // Init the monochrome shaders.
+    GLuint monochrome_program_id = utils::load_shaders(
+        "res/shaders/vertex.glsl",
+        "res/shaders/monochrome_fragment.glsl"
+    );
+    GLuint mc_mvp_matrix_id = glGetUniformLocation(monochrome_program_id, "MVP");
+    GLuint mc_color_id = glGetUniformLocation(monochrome_program_id, "COLOR");
+
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
@@ -79,36 +91,40 @@ void LLShooter::main_loop() {
         float delta = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
 
         camera->update(delta);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(program_id);
-        glEnableVertexAttribArray(0);
-
         auto camera_mvp = camera->compute_mvp_matrix();
 
-        for (int i = 0; i < drawable_objects.size(); i++) {
-            glBindBuffer(GL_ARRAY_BUFFER, drawable_objects[i]->vertex_buf_id);
-            glVertexAttribPointer(
-                0,
-                3,
-                GL_FLOAT,
-                GL_FALSE,
-                0,
-                0
-            );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glUniformMatrix4fv(mvp_matrix_id, 1, GL_FALSE, &camera_mvp[0][0]);
-            glDrawArrays(GL_TRIANGLES, 0, drawable_objects[i]->vertex_buf.size());
+        // BEGIN draw monochrome objects.
+        glUseProgram(monochrome_program_id);
+
+        for (int i = 0; i < monochrome_objects.size(); i++) {
+            // Vertices.
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->vertex_buf_id);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+            // Normals.
+            glEnableVertexAttribArray(1);
+            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->normals_buf_id);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+            glUniformMatrix4fv(mc_mvp_matrix_id, 1, GL_FALSE, &camera_mvp[0][0]);
+            glUniform3fv(mc_color_id, 1, &monochrome_objects[i]->color[0]);
+            glDrawArrays(GL_TRIANGLES, 0, monochrome_objects[i]->vertex_buf.size());
+
+            glDisableVertexAttribArray(0);
+            glDisableVertexAttribArray(1);
         }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        glDisableVertexAttribArray(0);
+
     } while (!glfwWindowShouldClose(window));
 }
 
 LLShooter::~LLShooter() {
-    for (DrawableObject* obj : drawable_objects)
+    for (DrawableObject* obj : monochrome_objects)
         delete obj;
 }
