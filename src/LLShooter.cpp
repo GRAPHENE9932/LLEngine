@@ -12,6 +12,7 @@ void LLShooter::start() {
 }
 
 void LLShooter::init() {
+    fps_meter = std::make_unique<FPSMeter>(1.0f);
     rendering_server = std::make_unique<RenderingServer>(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // Create the camera.
@@ -27,13 +28,12 @@ void LLShooter::init() {
     // Continue initialization of the rendering server.
     rendering_server->camera = camera.get();
     rendering_server->set_update_callback(
-        [this](float delta){ update(delta); }
+        [this](float delta) {
+            update(delta);
+            fps_meter->frame();
+        }
     );
     rendering_server->light_direction = glm::vec3(0.0f, -0.2f, 1.0f);
-    //std::function<void(float)> cb = std::bind(&LLShooter::update, this, std::placeholders::_1);
-    //rendering_server->set_update_callback(
-    //    (){}
-    //);
 }
 
 void LLShooter::update(float delta) {

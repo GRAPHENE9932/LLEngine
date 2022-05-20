@@ -7,6 +7,7 @@ add_executable(LLShooter
 src/main.cpp
 src/LLShooter.cpp
 src/RenderingServer.cpp
+src/FPSMeter.cpp
 src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
 src/objects/MonochromeDrawableObject.cpp
