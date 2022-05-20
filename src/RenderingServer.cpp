@@ -56,6 +56,9 @@ void RenderingServer::init_gl() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    // Enable backface culling.
+    glEnable(GL_CULL_FACE);
+
     // Init objects.
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> uvs;
