@@ -18,7 +18,16 @@ void ControllableCamera::update(float delta) noexcept {
     glfwSetCursorPos(window, center_x, center_y);
     // Set rotation.
     y_rotation += static_cast<float>(mouse_sensivity * delta * (center_x - cur_x));
+    if (y_rotation < 0.0f)
+        y_rotation += glm::radians(360.0f);
+    else if (y_rotation > glm::radians(360.0f))
+        y_rotation -= glm::radians(360.0f);
+
     x_rotation += static_cast<float>(mouse_sensivity * delta * (center_y - cur_y));
+    if (x_rotation > MAX_X_ROTATION)
+        x_rotation = MAX_X_ROTATION;
+    else if (x_rotation < MIN_X_ROTATION)
+        x_rotation = MIN_X_ROTATION;
 
     recompute_direction();
     if (glfwGetKey(window, FORWARD_KEY) == GLFW_PRESS) {

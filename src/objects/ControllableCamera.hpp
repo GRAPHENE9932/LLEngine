@@ -1,11 +1,15 @@
 #pragma once
 
+#include <glm/trigonometric.hpp>
 #include <GLFW/glfw3.h>
 
 #include "Camera.hpp"
 
 class ControllableCamera : public Camera {
 public:
+    static constexpr float MAX_X_ROTATION = glm::radians(90.0f - 0.5f);
+    static constexpr float MIN_X_ROTATION = glm::radians(-90.0f + 0.5f);
+
     static const int FORWARD_KEY = GLFW_KEY_W;
     static const int BACKWARD_KEY = GLFW_KEY_S;
     static const int RIGHT_KEY = GLFW_KEY_D;
