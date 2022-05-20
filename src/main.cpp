@@ -6,7 +6,7 @@
 int main(int argc, char** argv) {
     try {
         std::unique_ptr<LLShooter> game = std::make_unique<LLShooter>();
-        game->run_game();
+        game->start();
     }
     catch (const std::exception& e) {
         std::cerr << "Exception caught: \"" << e.what() << '\"' << std::endl;

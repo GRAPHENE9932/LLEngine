@@ -22,6 +22,7 @@ public:
     ControllableCamera(glm::vec3 position, float fov, int screen_size_x,
                        int screen_size_y, GLFWwindow* window);
 
+    void set_window(GLFWwindow* window);
     void update(float delta) noexcept;
 
 private:

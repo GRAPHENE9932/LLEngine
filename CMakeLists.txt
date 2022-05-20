@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(LLShooter
 src/main.cpp
 src/LLShooter.cpp
+src/RenderingServer.cpp
 src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
 src/objects/MonochromeDrawableObject.cpp

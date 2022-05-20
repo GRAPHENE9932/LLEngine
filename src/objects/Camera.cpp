@@ -9,10 +9,10 @@ Camera::Camera(glm::vec3 position, float fov, float display_ratio) : translation
     recompute_direction();
 }
 
-glm::mat4 Camera::compute_mvp_matrix() {
-    glm::mat4 view_matrix = glm::lookAt(translation,
-                                        translation + direction,
-                                        UP);
+glm::mat4 Camera::compute_mvp_matrix(glm::mat4& view_matrix) {
+    view_matrix = glm::lookAt(translation,
+                              translation + direction,
+                              UP);
 
     return proj_matrix * view_matrix;
 }

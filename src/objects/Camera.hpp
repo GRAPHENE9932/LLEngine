@@ -10,7 +10,7 @@ public:
 
     Camera(glm::vec3 position, float fov, float display_ratio);
 
-    glm::mat4 compute_mvp_matrix();
+    glm::mat4 compute_mvp_matrix(glm::mat4& view_matrix);
 
 protected:
     glm::mat4 proj_matrix;

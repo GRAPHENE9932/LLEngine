@@ -3,9 +3,9 @@
 ControllableCamera::ControllableCamera(glm::vec3 position, float fov, int screen_size_x,
                                        int screen_size_y, GLFWwindow* window) :
 
+                                       Camera(position, fov, static_cast<float>(screen_size_x) / screen_size_y),
                                        center_x(screen_size_x / 2.0), center_y(screen_size_y / 2.0),
                                        prev_mouse_x(center_x), prev_mouse_y(center_y),
-                                       Camera(position, fov, static_cast<float>(screen_size_x) / screen_size_y),
                                        window(window) {
 
 }
