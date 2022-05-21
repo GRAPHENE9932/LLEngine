@@ -7,7 +7,8 @@ add_executable(LLShooter
 src/main.cpp
 src/LLShooter.cpp
 src/RenderingServer.cpp
-src/FPSMeter.cpp
+src/common/FPSMeter.cpp
+src/common/Mesh.cpp
 src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
 src/objects/MonochromeDrawableObject.cpp
@@ -33,4 +34,5 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(LLShooter OpenGL)
 
 # Copy resources to the binary directory.
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/res" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/res")

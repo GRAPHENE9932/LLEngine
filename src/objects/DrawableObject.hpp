@@ -1,15 +1,14 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include <GL/glew.h>
 
+#include "../common/Mesh.hpp"
 #include "SpatialObject.hpp"
 
 class DrawableObject : public SpatialObject {
 public:
-    GLuint vertex_buf_id;
-    std::vector<glm::vec3> vertex_buf;
-
-    void init_vertex_buf();
+    std::shared_ptr<Mesh> mesh;
 };

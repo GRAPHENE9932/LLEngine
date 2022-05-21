@@ -18,6 +18,10 @@ GLFWwindow* RenderingServer::get_window() {
     return window;
 }
 
+void RenderingServer::add_textured_drawable_object(TexturedDrawableObject* obj) {
+    textured_objects.push_back(obj);
+}
+
 void RenderingServer::init_window(int window_width, int window_height) {
     int glfw_init_res = glfwInit();
     if (!glfw_init_res) {
@@ -58,26 +62,6 @@ void RenderingServer::init_gl() {
 
     // Enable backface culling.
     glEnable(GL_CULL_FACE);
-
-    // Init objects.
-    GLuint texture_id = utils::load_dds("/home/artem/Desktop/map_close.dds");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec2> uvs;
-    std::vector<glm::vec3> normals;
-    utils::load_wavefront_obj("/home/artem/Desktop/map_close.obj", vertices, uvs, normals);
-    TexturedDrawableObject* triangle = new TexturedDrawableObject(texture_id);
-    triangle->vertex_buf = vertices;
-    triangle->uvs_buf = uvs;
-    triangle->normals_buf = normals;
-    triangle->init_vertex_buf();
-    triangle->init_uvs_buf();
-    triangle->init_normals_buf();
-    triangle->rotation = glm::quat({0.0f, 0.0f, 0.0f});
-    triangle->translation = glm::vec3(0.0f, 0.0f, 0.0f);
-    triangle->scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    textured_objects.push_back(triangle);
 }
 
 void RenderingServer::init_shaders() {
@@ -124,12 +108,12 @@ void RenderingServer::main_loop() {
         for (int i = 0; i < monochrome_objects.size(); i++) {
             // Vertices.
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->vertex_buf_id);
+            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->mesh->vertices_id);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
             // Normals.
             glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->normals_buf_id);
+            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->mesh->normals_id);
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
             // Uniforms.
@@ -139,7 +123,7 @@ void RenderingServer::main_loop() {
             glUniformMatrix4fv(mc_camera_matrix_id, 1, GL_FALSE, &view_matrix[0][0]);
             glUniform3fv(mc_color_id, 1, &monochrome_objects[i]->color[0]);
             glUniform3fv(mc_light_direction_id, 1, &light_direction[0]);
-            glDrawArrays(GL_TRIANGLES, 0, monochrome_objects[i]->vertex_buf.size());
+            glDrawArrays(GL_TRIANGLES, 0, monochrome_objects[i]->mesh->vertices.size());
 
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
@@ -151,17 +135,17 @@ void RenderingServer::main_loop() {
         for (int i = 0; i < textured_objects.size(); i++) {
             // Vertices.
             glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->vertex_buf_id);
+            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->mesh->vertices_id);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
             // UVs.
             glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->uvs_buf_id);
+            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->mesh->uvs_id);
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
             // Normals.
             glEnableVertexAttribArray(2);
-            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->normals_buf_id);
+            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->mesh->normals_id);
             glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
             // Bind textures.
@@ -174,7 +158,7 @@ void RenderingServer::main_loop() {
             glUniformMatrix4fv(tx_camera_matrix_id, 1, GL_FALSE, &view_matrix[0][0]);
             glUniform3fv(tx_light_direction_id, 1, &light_direction[0]);
 
-            glDrawArrays(GL_TRIANGLES, 0, textured_objects[i]->vertex_buf.size());
+            glDrawArrays(GL_TRIANGLES, 0, textured_objects[i]->mesh->vertices.size());
 
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);

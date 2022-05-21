@@ -103,5 +103,9 @@ GLuint utils::load_dds(std::string file_path) {
         height /= 2;
     }
 
+    // Set nearest neighbor interpolation.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
     return texture_id.release();
 }

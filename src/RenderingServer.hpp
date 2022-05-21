@@ -22,6 +22,8 @@ public:
 
     void set_update_callback(std::function<void(float)> func);
     GLFWwindow* get_window();
+    void add_textured_drawable_object(TexturedDrawableObject* obj);
+
     void main_loop();
 
 private:

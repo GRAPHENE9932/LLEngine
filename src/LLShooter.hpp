@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FPSMeter.hpp"
+#include "common/FPSMeter.hpp"
 #include "RenderingServer.hpp"
 #include "objects/ControllableCamera.hpp"
 
@@ -17,4 +17,6 @@ private:
 
     void init();
     void update(float delta);
+
+    void load_map_close();
 };
