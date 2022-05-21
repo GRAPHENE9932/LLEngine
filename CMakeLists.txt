@@ -11,10 +11,12 @@ src/FPSMeter.cpp
 src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
 src/objects/MonochromeDrawableObject.cpp
+src/objects/TexturedDrawableObject.cpp
 src/objects/Camera.cpp
 src/objects/ControllableCamera.cpp
 src/utils/shader_loader.cpp
 src/utils/model_loader.cpp
+src/utils/texture_loader.cpp
 )
 
 # GLFW.

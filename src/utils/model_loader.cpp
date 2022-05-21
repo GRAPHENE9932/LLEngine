@@ -5,7 +5,8 @@
 #include "utils.hpp"
 
 void utils::load_wavefront_obj(std::string file_path, std::vector<glm::vec3>& vertices_out,
-                               std::vector<glm::vec2>& uvs_out, std::vector<glm::vec3>& normals_out) {
+                               std::vector<glm::vec2>& uvs_out, std::vector<glm::vec3>& normals_out,
+                               bool invert_tex_v) {
     std::ifstream stream(file_path, std::ios::in);
     if (!stream)
         throw std::runtime_error("Failed to read the .obj file. File path: " + file_path);
@@ -58,6 +59,8 @@ void utils::load_wavefront_obj(std::string file_path, std::vector<glm::vec3>& ve
                     "error on texture coordinates parsing.\n"
                     "File path: " + file_path
                 );
+            if (invert_tex_v)
+                cur_uv.y = 1.0f - cur_uv.y;
             uvs.push_back(cur_uv);
         }
         // Vertex normals.

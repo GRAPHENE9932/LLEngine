@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "objects/MonochromeDrawableObject.hpp"
+#include "objects/TexturedDrawableObject.hpp"
 #include "objects/Camera.hpp"
 
 class RenderingServer {
@@ -35,7 +36,14 @@ private:
     GLuint mc_camera_matrix_id;
     GLuint mc_light_direction_id;
 
+    GLuint textured_program_id;
+    GLuint tx_mvp_matrix_id;
+    GLuint tx_object_matrix_id;
+    GLuint tx_camera_matrix_id;
+    GLuint tx_light_direction_id;
+
     std::vector<MonochromeDrawableObject*> monochrome_objects;
+    std::vector<TexturedDrawableObject*> textured_objects;
 
     void init_window(int window_width, int window_height);
     void init_gl();

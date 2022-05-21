@@ -60,6 +60,32 @@ namespace utils {
         bool released = false;
     };
 
+    struct ManagedTextureID {
+    public:
+        GLuint texture_id;
+
+        ManagedTextureID(GLuint orig_texture_id = 0) noexcept : texture_id(orig_texture_id) {
+
+        }
+
+        ~ManagedTextureID() {
+            if (!released)
+                glDeleteTextures(1, &texture_id);
+        }
+
+        operator GLuint() const noexcept {
+            return texture_id;
+        }
+
+        GLuint release() noexcept {
+            released = true;
+            return texture_id;
+        }
+
+    private:
+        bool released = false;
+    };
+
     GLuint load_shaders(std::string vertex_shader_path, std::string fragment_shader_path);
     ManagedShaderID load_vertex_shader(std::string& vertex_shader_path);
     ManagedShaderID load_fragment_shader(std::string& fragment_shader_path);
@@ -75,5 +101,12 @@ namespace utils {
     ///  - Objects and groups are ignored.
     ///  - Smooth shading option is ignored.
     void load_wavefront_obj(std::string file_path, std::vector<glm::vec3>& vertices_out,
-                            std::vector<glm::vec2>& uvs_out, std::vector<glm::vec3>& normals_out);
+                            std::vector<glm::vec2>& uvs_out, std::vector<glm::vec3>& normals_out,
+                            bool invert_tex_v = true);
+
+    /// Load the DDS texture (limited).
+    /// Limitations:
+    ///  - Only DXT1, DXT3, DXT5 compression formats supported
+    ///    (uncompressed don't supported too.
+    GLuint load_dds(std::string file_path);
 }
