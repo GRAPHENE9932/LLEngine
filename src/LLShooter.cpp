@@ -40,9 +40,10 @@ void LLShooter::init() {
     physics_server->flat_floors.push_back(
         FloorObject(Rect({-20.0f, -20.0f}, {40.0f, 40.0f}), 0.0f)
     );
-    physics_server->rectangular_walls.push_back(
-        RectangularWall(Rect({-12.0f, 4.0f}, {8.0f, 8.0f}))
-    );
+    physics_server->rectangular_walls.push_back(RectangularWall(Rect({-12.0f, 4.0f}, {8.0f, 8.0f})));
+    physics_server->rectangular_walls.push_back(RectangularWall(Rect({4.0f, 4.0f}, {8.0f, 8.0f})));
+    physics_server->rectangular_walls.push_back(RectangularWall(Rect({4.0f, -12.0f}, {8.0f, 8.0f})));
+    physics_server->rectangular_walls.push_back(RectangularWall(Rect({-12.0f, -12.0f}, {8.0f, 8.0f})));
     physics_server->left_bound = -20.0f;
     physics_server->right_bound = 20.0f;
     physics_server->bottom_bound = -20.0f;
