@@ -46,8 +46,6 @@ void RenderingServer::init_window(int window_width, int window_height) {
             std::string("Failed to initialize GLEW. Error code: " + std::to_string(glew_init_res))
         );
     }
-
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 }
 
 void RenderingServer::init_gl() {
@@ -88,7 +86,7 @@ void RenderingServer::init_shaders() {
 }
 
 void RenderingServer::main_loop() {
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
     do {
@@ -158,7 +156,9 @@ void RenderingServer::main_loop() {
             glUniformMatrix4fv(tx_camera_matrix_id, 1, GL_FALSE, &view_matrix[0][0]);
             glUniform3fv(tx_light_direction_id, 1, &light_direction[0]);
 
-            glDrawArrays(GL_TRIANGLES, 0, textured_objects[i]->mesh->vertices.size());
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textured_objects[i]->mesh->indices_id);
+            glDrawElements(GL_TRIANGLES, textured_objects[i]->mesh->indices.size(), GL_UNSIGNED_SHORT, 0);
+            //glDrawArrays(GL_TRIANGLES, 0, textured_objects[i]->mesh->vertices.size());
 
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);

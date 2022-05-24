@@ -1,7 +1,8 @@
 #include "utils/utils.hpp"
+#include "objects/Camera.hpp"
 #include "LLShooter.hpp"
 
-const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 1200, WINDOW_HEIGHT = 900;
 
 LLShooter::~LLShooter() {
 
@@ -15,16 +16,37 @@ void LLShooter::start() {
 void LLShooter::init() {
     fps_meter = std::make_unique<FPSMeter>(1.0f);
     rendering_server = std::make_unique<RenderingServer>(WINDOW_WIDTH, WINDOW_HEIGHT);
+    physics_server = std::make_unique<PhysicsServer>();
 
     // Create the camera.
-    camera = std::make_unique<ControllableCamera>(
-        glm::vec3(0.0f, 0.0f, 4.0f), glm::radians(70.0f),
-        WINDOW_WIDTH, WINDOW_HEIGHT, rendering_server->get_window()
+    camera = std::make_unique<Camera>(
+        glm::vec3(0.0f, 0.0f, 0.0f), glm::radians(90.0f),
+        static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT
     );
-    camera->mouse_sensivity = 0.25f;
-    camera->forward_speed = 20.0f;
-    camera->strafe_speed = 10.0f;
-    camera->backward_speed = 10.0f;
+    // Create the player.
+    player = std::make_unique<ControllableCylinder>(
+        camera.get(), rendering_server->get_window(),
+        glm::vec3(0.0f, 1.0f, 0.0f), 2.0f, 0.4f
+    );
+
+    player->mouse_sensivity = 0.25f;
+    player->forward_speed = 20.0f;
+    player->strafe_speed = 10.0f;
+    player->backward_speed = 10.0f;
+    player->jump_force = 0.5f;
+
+    // Continue initialization of the physics server.
+    physics_server->player = player.get();
+    physics_server->flat_floors.push_back(
+        FloorObject(Rect({-20.0f, -20.0f}, {40.0f, 40.0f}), 0.0f)
+    );
+    physics_server->rectangular_walls.push_back(
+        RectangularWall(Rect({-12.0f, 4.0f}, {8.0f, 8.0f}))
+    );
+    physics_server->left_bound = -20.0f;
+    physics_server->right_bound = 20.0f;
+    physics_server->bottom_bound = -20.0f;
+    physics_server->top_bound = 20.0f;
 
     // Continue initialization of the rendering server.
     rendering_server->camera = camera.get();
@@ -49,7 +71,7 @@ void LLShooter::init() {
 
 void LLShooter::update(float delta) {
     fps_meter->frame();
-    camera->update(delta);
+    physics_server->update(delta);
 }
 
 void LLShooter::load_map_close() {

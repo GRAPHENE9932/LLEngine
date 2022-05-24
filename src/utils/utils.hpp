@@ -109,4 +109,12 @@ namespace utils {
     ///  - Only DXT1, DXT3, DXT5 compression formats supported
     ///    (uncompressed don't supported too.
     GLuint load_dds(std::string file_path);
+
+    void index_vbo(std::vector<glm::vec3>& in_vertices,
+                   std::vector<glm::vec2>& in_uvs,
+                   std::vector<glm::vec3>& in_normals,
+                   std::vector<uint16_t>& indices,
+                   std::vector<glm::vec3>& out_vertices,
+                   std::vector<glm::vec2>& out_uvs,
+                   std::vector<glm::vec3>& out_normals);
 }

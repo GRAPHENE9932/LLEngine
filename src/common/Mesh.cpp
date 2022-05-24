@@ -3,7 +3,17 @@
 #include "Mesh.hpp"
 
 Mesh::Mesh(std::string mesh_path) {
-    utils::load_wavefront_obj(mesh_path, vertices, uvs, normals);
+    std::vector<glm::vec3> unindexed_vertices;
+    std::vector<glm::vec2> unindexed_uvs;
+    std::vector<glm::vec3> unindexed_normals;
+
+    utils::load_wavefront_obj(mesh_path, unindexed_vertices, unindexed_uvs, unindexed_normals);
+    utils::index_vbo(unindexed_vertices, unindexed_uvs, unindexed_normals,
+                     indices, vertices, uvs, normals);
+
+    glGenBuffers(1, &indices_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint16_t), indices.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &vertices_id);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
@@ -19,6 +29,7 @@ Mesh::Mesh(std::string mesh_path) {
 }
 
 Mesh::~Mesh() {
+    glDeleteBuffers(1, &indices_id);
     glDeleteBuffers(1, &vertices_id);
     glDeleteBuffers(1, &uvs_id);
     glDeleteBuffers(1, &normals_id);

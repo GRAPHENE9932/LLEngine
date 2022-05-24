@@ -2,7 +2,7 @@
 
 #include "common/FPSMeter.hpp"
 #include "RenderingServer.hpp"
-#include "objects/ControllableCamera.hpp"
+#include "PhysicsServer.hpp"
 
 class LLShooter {
 public:
@@ -12,7 +12,9 @@ public:
 
 private:
     std::unique_ptr<RenderingServer> rendering_server;
-    std::unique_ptr<ControllableCamera> camera;
+    std::unique_ptr<PhysicsServer> physics_server;
+    std::unique_ptr<ControllableCylinder> player;
+    std::unique_ptr<Camera> camera;
     std::unique_ptr<FPSMeter> fps_meter;
 
     void init();

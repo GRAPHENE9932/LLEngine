@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(LLShooter)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -7,6 +7,7 @@ add_executable(LLShooter
 src/main.cpp
 src/LLShooter.cpp
 src/RenderingServer.cpp
+src/PhysicsServer.cpp
 src/common/FPSMeter.cpp
 src/common/Mesh.cpp
 src/objects/SpatialObject.cpp
@@ -14,10 +15,15 @@ src/objects/DrawableObject.cpp
 src/objects/MonochromeDrawableObject.cpp
 src/objects/TexturedDrawableObject.cpp
 src/objects/Camera.cpp
-src/objects/ControllableCamera.cpp
+src/objects/ControllableCylinder.cpp
+src/objects/FloorObject.cpp
+src/objects/RectangularWall.cpp
+src/structs/Rect.cpp
+src/structs/Cylinder.cpp
 src/utils/shader_loader.cpp
 src/utils/model_loader.cpp
 src/utils/texture_loader.cpp
+src/utils/vbo_indexer.cpp
 )
 
 # GLFW.

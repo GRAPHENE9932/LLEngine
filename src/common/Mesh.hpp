@@ -9,11 +9,12 @@
 
 class Mesh {
 public:
+    std::vector<uint16_t> indices;
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals;
 
-    GLuint vertices_id, uvs_id, normals_id;
+    GLuint indices_id, vertices_id, uvs_id, normals_id;
 
     explicit Mesh(std::string mesh_path);
     ~Mesh();
