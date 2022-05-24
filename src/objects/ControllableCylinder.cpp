@@ -12,11 +12,8 @@ ControllableCylinder::ControllableCylinder(Camera* camera, GLFWwindow* window,
     center_y = window_height / 2.0;
 }
 
-#include <iostream> //TODO
-
 void ControllableCylinder::update(float delta) {
     glm::vec3 moving_direction = glm::vec3(camera->direction.x, 0.0f, camera->direction.z);
-    std::cout << moving_direction.x << ' ' << moving_direction.z << std::endl;
 
     camera->recompute_direction();
     if (glfwGetKey(window, FORWARD_KEY) == GLFW_PRESS) {
