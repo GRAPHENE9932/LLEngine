@@ -24,6 +24,7 @@ src/utils/shader_loader.cpp
 src/utils/model_loader.cpp
 src/utils/texture_loader.cpp
 src/utils/vbo_indexer.cpp
+src/utils/math.cpp
 )
 
 # GLFW.

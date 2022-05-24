@@ -7,6 +7,8 @@
 
 #include <GL/glew.h>
 
+#include "../structs/Rect.hpp"
+
 namespace utils {
     struct ManagedShaderID {
     public:
@@ -117,4 +119,6 @@ namespace utils {
                    std::vector<glm::vec3>& out_vertices,
                    std::vector<glm::vec2>& out_uvs,
                    std::vector<glm::vec3>& out_normals);
+
+    glm::vec2 closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, float radius);
 }
