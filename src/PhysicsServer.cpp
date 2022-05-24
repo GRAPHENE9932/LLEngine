@@ -41,5 +41,19 @@ void PhysicsServer::update(float delta) {
         }
     }
 
+    // Consider cuboid objects.
+    for (const auto& cuboid : cuboid_objects) {
+        if (cuboid.cylinder_intersects(player->cylinder)) {
+            bool is_above;
+            player->cylinder.position =
+                cuboid.push_cylinder_out(player->cylinder, is_above);
+
+            if (is_above) {
+                player->zero_out_vertical_velocity();
+                player->landed();
+            }
+        }
+    }
+
     player->update_camera(delta);
 }

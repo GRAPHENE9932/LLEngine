@@ -2,7 +2,7 @@
 #include "objects/Camera.hpp"
 #include "LLShooter.hpp"
 
-const int WINDOW_WIDTH = 1200, WINDOW_HEIGHT = 900;
+const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
 
 LLShooter::~LLShooter() {
 
@@ -44,6 +44,13 @@ void LLShooter::init() {
     physics_server->rectangular_walls.push_back(RectangularWall(Rect({4.0f, 4.0f}, {8.0f, 8.0f})));
     physics_server->rectangular_walls.push_back(RectangularWall(Rect({4.0f, -12.0f}, {8.0f, 8.0f})));
     physics_server->rectangular_walls.push_back(RectangularWall(Rect({-12.0f, -12.0f}, {8.0f, 8.0f})));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({1.0f, -6.5f}, {3.0f, 3.0f}), 0.0f, 3.0f));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({12.0f, -9.98912f}, {3.0f, 3.0f}), 0.0f, 3.0f));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({-20.0284f, -16.5f}, {3.0f, 3.0f}), 0.0f, 3.0f));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({-20.0284f, -13.5f}, {3.0f, 3.0f}), 0.0f, 3.0f));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({-20.0284f, -16.5f}, {3.0f, 3.0f}), 3.0f, 6.0f));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({-10.0f, 11.9519f}, {3.0f, 3.0f}), 0.0f, 3.0f));
+    physics_server->cuboid_objects.push_back(CuboidObject(Rect({-10.0f, 11.9519f}, {3.0f, 3.0f}), 3.0f, 6.0f));
     physics_server->left_bound = -20.0f;
     physics_server->right_bound = 20.0f;
     physics_server->bottom_bound = -20.0f;
