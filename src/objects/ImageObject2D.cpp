@@ -30,7 +30,8 @@ GLuint ImageObject2D::vertices_id;
 GLuint ImageObject2D::uvs_id;
 GLuint ImageObject2D::matrix_uniform_id;
 
-ImageObject2D::ImageObject2D(GLuint texture_id, const Rect& rect, bool is_transparent) :
+ImageObject2D::ImageObject2D(std::shared_ptr<utils::ManagedTextureID> texture_id, const Rect& rect,
+    bool is_transparent) :
     is_transparent(is_transparent) {
     change_rect(rect);
     change_texture(texture_id);
@@ -41,7 +42,7 @@ void ImageObject2D::change_rect(const Rect& new_rect) {
         glm::scale(glm::vec3(new_rect.size.x, new_rect.size.y, 0.0f));
 }
 
-void ImageObject2D::change_texture(GLuint texture_id) {
+void ImageObject2D::change_texture(std::shared_ptr<utils::ManagedTextureID> texture_id) {
     this->texture_id = texture_id;
 }
 
@@ -90,7 +91,7 @@ void ImageObject2D::draw() const {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind textures.
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id->texture_id);
 
     // Uniforms.
     glUniformMatrix4fv(matrix_uniform_id, 1, GL_FALSE, &matrix[0][0]);

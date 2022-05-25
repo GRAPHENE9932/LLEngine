@@ -1,14 +1,16 @@
 #pragma once
 
+#include "../utils/utils.hpp"
 #include "DrawableObject.hpp"
 
 class TexturedDrawableObject : public DrawableObject {
 public:
     static GLuint program_id;
 
-    GLuint texture_id;
+    std::shared_ptr<utils::ManagedTextureID> texture_id;
 
-    TexturedDrawableObject(GLuint texture_id, std::shared_ptr<Mesh> mesh);
+    TexturedDrawableObject(std::shared_ptr<utils::ManagedTextureID> texture_id,
+        std::shared_ptr<Mesh> mesh);
     ~TexturedDrawableObject();
 
     static void pre_init();

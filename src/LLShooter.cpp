@@ -48,7 +48,7 @@ void LLShooter::init() {
     );
 
     // Create the crosshair.
-    GLuint crosshair_texture_id = utils::load_dds("res/textures/crosshair.dds");
+    auto crosshair_texture_id = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/crosshair.dds"));
     ImageObject2D* crosshair = new ImageObject2D(
         crosshair_texture_id,
         utils::window_space_to_opengl_space(

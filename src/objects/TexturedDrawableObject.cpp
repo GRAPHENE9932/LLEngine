@@ -1,4 +1,3 @@
-#include "../utils/utils.hpp"
 #include "TexturedDrawableObject.hpp"
 
 GLuint TexturedDrawableObject::program_id;
@@ -7,7 +6,8 @@ GLuint TexturedDrawableObject::object_matrix_uniform_id;
 GLuint TexturedDrawableObject::camera_matrix_uniform_id;
 GLuint TexturedDrawableObject::light_direction_uniform_id;
 
-TexturedDrawableObject::TexturedDrawableObject(GLuint texture_id, std::shared_ptr<Mesh> mesh) :
+TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<utils::ManagedTextureID> texture_id,
+    std::shared_ptr<Mesh> mesh) :
     texture_id(texture_id) {
     this->mesh = mesh;
 }
@@ -47,7 +47,7 @@ void TexturedDrawableObject::draw(GLfloat* camera_mvp, GLfloat* view_matrix, GLf
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind textures.
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id->texture_id);
 
     // Uniforms.
     glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);

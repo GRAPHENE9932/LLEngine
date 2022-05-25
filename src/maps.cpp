@@ -6,8 +6,8 @@
 #include "maps.hpp"
 
 void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
-    GLuint map_texture = utils::load_dds("res/textures/map_close.dds");
-    GLuint box_texture = utils::load_dds("res/textures/wooden_box.dds");
+    auto map_texture = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/map_close.dds"));
+    auto box_texture = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/wooden_box.dds"));
 
     std::shared_ptr<Mesh> map_mesh = std::make_shared<Mesh>("res/meshes/map_close.obj");
     std::shared_ptr<Mesh> box_mesh = std::make_shared<Mesh>("res/meshes/cube.obj");

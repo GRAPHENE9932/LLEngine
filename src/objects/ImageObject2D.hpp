@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
@@ -11,13 +12,13 @@ class ImageObject2D {
 public:
     static GLuint program_id;
 
-    ImageObject2D(GLuint texture_id, const Rect& rect, bool is_transparent);
+    ImageObject2D(std::shared_ptr<utils::ManagedTextureID> texture_id, const Rect& rect, bool is_transparent);
 
     static void pre_init();
     static void clean_up();
 
     void change_rect(const Rect& new_rect);
-    void change_texture(GLuint texture_id);
+    void change_texture(std::shared_ptr<utils::ManagedTextureID> texture_id);
 
     void draw() const;
 private:
@@ -25,6 +26,6 @@ private:
         matrix_uniform_id;
 
     glm::mat4 matrix;
-    GLuint texture_id;
+    std::shared_ptr<utils::ManagedTextureID> texture_id;
     bool is_transparent;
 };
