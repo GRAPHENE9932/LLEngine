@@ -7,7 +7,7 @@
 RenderingServer::RenderingServer(int window_width, int window_height) {
     init_window(window_width, window_height);
     init_gl();
-    init_shaders();
+    init_object_types();
 }
 
 void RenderingServer::set_update_callback(std::function<void(float)> func) {
@@ -62,6 +62,7 @@ void RenderingServer::init_gl() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    // Set blend function.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Enable backface culling.
@@ -70,27 +71,9 @@ void RenderingServer::init_gl() {
     ImageObject2D::pre_init();
 }
 
-void RenderingServer::init_shaders() {
-    // Init the monochrome shaders.
-    monochrome_program_id = utils::load_shaders(
-        "res/shaders/monochrome_vertex.glsl",
-        "res/shaders/monochrome_fragment.glsl"
-    );
-    mc_mvp_matrix_id = glGetUniformLocation(monochrome_program_id, "MVP");
-    mc_color_id = glGetUniformLocation(monochrome_program_id, "COLOR");
-    mc_object_matrix_id = glGetUniformLocation(monochrome_program_id, "OBJECT_MATRIX");
-    mc_camera_matrix_id = glGetUniformLocation(monochrome_program_id, "CAMERA_MATRIX");
-    mc_light_direction_id = glGetUniformLocation(monochrome_program_id, "LIGHT_DIRECTION");
-
-    // Init the textured shaders.
-    textured_program_id = utils::load_shaders(
-        "res/shaders/textured_vertex.glsl",
-        "res/shaders/textured_fragment.glsl"
-    );
-    tx_mvp_matrix_id = glGetUniformLocation(textured_program_id, "MVP");
-    tx_object_matrix_id = glGetUniformLocation(textured_program_id, "OBJECT_MATRIX");
-    tx_camera_matrix_id = glGetUniformLocation(textured_program_id, "CAMERA_MATRIX");
-    tx_light_direction_id = glGetUniformLocation(textured_program_id, "LIGHT_DIRECTION");
+void RenderingServer::init_object_types() {
+    TexturedDrawableObject::pre_init();
+    ImageObject2D::pre_init();
 }
 
 void RenderingServer::main_loop() {
@@ -98,88 +81,28 @@ void RenderingServer::main_loop() {
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
     do {
+        // Measure time.
         auto now = std::chrono::high_resolution_clock::now();
         auto duration = now - prev_frame_time;
         prev_frame_time = now;
         float delta = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
 
         update_callback(delta);
+
         glm::mat4 view_matrix;
         auto camera_mvp = camera->compute_mvp_matrix(view_matrix);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // BEGIN draw monochrome objects.
-        glUseProgram(monochrome_program_id);
-        for (int i = 0; i < monochrome_objects.size(); i++) {
-            // Vertices.
-            glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->mesh->vertices_id);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        // Draw textured objects.
+        glUseProgram(TexturedDrawableObject::program_id);
+        for (int i = 0; i < textured_objects.size(); i++)
+            textured_objects[i]->draw(&camera_mvp[0][0], &view_matrix[0][0], &light_direction[0]);
 
-            // Normals.
-            glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, monochrome_objects[i]->mesh->normals_id);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            // Uniforms.
-            glUniformMatrix4fv(mc_mvp_matrix_id, 1, GL_FALSE, &camera_mvp[0][0]);
-            auto obj_matrix = monochrome_objects[i]->compute_matrix();
-            glUniformMatrix4fv(mc_object_matrix_id, 1, GL_FALSE, &obj_matrix[0][0]);
-            glUniformMatrix4fv(mc_camera_matrix_id, 1, GL_FALSE, &view_matrix[0][0]);
-            glUniform3fv(mc_color_id, 1, &monochrome_objects[i]->color[0]);
-            glUniform3fv(mc_light_direction_id, 1, &light_direction[0]);
-            glDrawArrays(GL_TRIANGLES, 0, monochrome_objects[i]->mesh->vertices.size());
-
-            glDisableVertexAttribArray(0);
-            glDisableVertexAttribArray(1);
-        }
-        // END draw monochrome objects.
-
-        // BEGIN draw textured objects.
-        glUseProgram(textured_program_id);
-        for (int i = 0; i < textured_objects.size(); i++) {
-            // Vertices.
-            glEnableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->mesh->vertices_id);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            // UVs.
-            glEnableVertexAttribArray(1);
-            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->mesh->uvs_id);
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-            // Normals.
-            glEnableVertexAttribArray(2);
-            glBindBuffer(GL_ARRAY_BUFFER, textured_objects[i]->mesh->normals_id);
-            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-            // Bind textures.
-            glBindTexture(GL_TEXTURE_2D, textured_objects[i]->texture_id);
-
-            // Uniforms.
-            glUniformMatrix4fv(tx_mvp_matrix_id, 1, GL_FALSE, &camera_mvp[0][0]);
-            auto obj_matrix = textured_objects[i]->compute_matrix();
-            glUniformMatrix4fv(tx_object_matrix_id, 1, GL_FALSE, &obj_matrix[0][0]);
-            glUniformMatrix4fv(tx_camera_matrix_id, 1, GL_FALSE, &view_matrix[0][0]);
-            glUniform3fv(tx_light_direction_id, 1, &light_direction[0]);
-
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textured_objects[i]->mesh->indices_id);
-            glDrawElements(GL_TRIANGLES, textured_objects[i]->mesh->indices.size(), GL_UNSIGNED_SHORT, 0);
-            //glDrawArrays(GL_TRIANGLES, 0, textured_objects[i]->mesh->vertices.size());
-
-            glDisableVertexAttribArray(0);
-            glDisableVertexAttribArray(1);
-            glDisableVertexAttribArray(2);
-        }
-        // END draw textured objects.
-
-        // BEGIN draw 2D images.
+        // Draw Image2D objects.
         glUseProgram(ImageObject2D::program_id);
-        for (int i = 0; i < image_2d_objects.size(); i++) {
+        for (int i = 0; i < image_2d_objects.size(); i++)
             image_2d_objects[i]->draw();
-        }
-        // END draw 2D images.
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -187,12 +110,11 @@ void RenderingServer::main_loop() {
 }
 
 RenderingServer::~RenderingServer() {
-    for (DrawableObject* obj : monochrome_objects)
-        delete obj;
     for (DrawableObject* obj : textured_objects)
         delete obj;
     for (ImageObject2D* obj : image_2d_objects)
         delete obj;
 
+    TexturedDrawableObject::clean_up();
     ImageObject2D::clean_up();
 }
