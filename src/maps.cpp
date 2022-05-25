@@ -8,7 +8,6 @@
 void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
     GLuint map_texture = utils::load_dds("res/textures/map_close.dds");
     GLuint box_texture = utils::load_dds("res/textures/wooden_box.dds");
-    GLuint texture_id = utils::load_dds("res/textures/crosshair.dds");
 
     std::shared_ptr<Mesh> map_mesh = std::make_shared<Mesh>("res/meshes/map_close.obj");
     std::shared_ptr<Mesh> box_mesh = std::make_shared<Mesh>("res/meshes/cube.obj");
@@ -62,9 +61,6 @@ void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
     rs.add_textured_drawable_object(wooden_box_7);
 
     rs.light_direction = glm::vec3(0.4f, 0.5f, 1.0f);
-
-    ImageObject2D* crosshair = new ImageObject2D(texture_id, Rect({0.0f, 0.0f}, {0.1f, 0.1f}), true);
-    rs.add_image_2d_object(crosshair);
 
     ps.flat_floors.push_back(
         FloorObject(Rect({-20.0f, -20.0f}, {40.0f, 40.0f}), 0.0f)

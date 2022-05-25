@@ -121,4 +121,5 @@ namespace utils {
                    std::vector<glm::vec3>& out_normals);
 
     glm::vec2 closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, float radius);
+    Rect window_space_to_opengl_space(Rect rect, glm::vec2 window_size);
 }
