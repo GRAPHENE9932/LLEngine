@@ -19,6 +19,7 @@ src/objects/ControllableCylinder.cpp
 src/objects/FloorObject.cpp
 src/objects/RectangularWall.cpp
 src/objects/CuboidObject.cpp
+src/objects/ImageObject2D.cpp
 src/structs/Rect.cpp
 src/structs/Cylinder.cpp
 src/utils/shader_loader.cpp

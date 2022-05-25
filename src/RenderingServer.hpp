@@ -10,6 +10,7 @@
 
 #include "objects/MonochromeDrawableObject.hpp"
 #include "objects/TexturedDrawableObject.hpp"
+#include "objects/ImageObject2D.hpp"
 #include "objects/Camera.hpp"
 
 class RenderingServer {
@@ -23,6 +24,7 @@ public:
     void set_update_callback(std::function<void(float)> func);
     GLFWwindow* get_window();
     void add_textured_drawable_object(TexturedDrawableObject* obj);
+    void add_image_2d_object(ImageObject2D* obj);
 
     void main_loop();
 
@@ -46,6 +48,7 @@ private:
 
     std::vector<MonochromeDrawableObject*> monochrome_objects;
     std::vector<TexturedDrawableObject*> textured_objects;
+    std::vector<ImageObject2D*> image_2d_objects;
 
     void init_window(int window_width, int window_height);
     void init_gl();

@@ -9,6 +9,7 @@ struct Rect {
     glm::vec2 position;
     glm::vec2 size;
 
+    Rect() = default;
     Rect(glm::vec2 position, glm::vec2 size);
 
     inline bool contains(const glm::vec2 point) const noexcept {

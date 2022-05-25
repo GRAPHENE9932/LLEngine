@@ -22,6 +22,10 @@ void RenderingServer::add_textured_drawable_object(TexturedDrawableObject* obj) 
     textured_objects.push_back(obj);
 }
 
+void RenderingServer::add_image_2d_object(ImageObject2D* obj) {
+    image_2d_objects.push_back(obj);
+}
+
 void RenderingServer::init_window(int window_width, int window_height) {
     int glfw_init_res = glfwInit();
     if (!glfw_init_res) {
@@ -58,8 +62,12 @@ void RenderingServer::init_gl() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Enable backface culling.
     glEnable(GL_CULL_FACE);
+
+    ImageObject2D::pre_init();
 }
 
 void RenderingServer::init_shaders() {
@@ -166,6 +174,13 @@ void RenderingServer::main_loop() {
         }
         // END draw textured objects.
 
+        // BEGIN draw 2D images.
+        glUseProgram(ImageObject2D::program_id);
+        for (int i = 0; i < image_2d_objects.size(); i++) {
+            image_2d_objects[i]->draw();
+        }
+        // END draw 2D images.
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     } while (!glfwWindowShouldClose(window));
@@ -176,4 +191,8 @@ RenderingServer::~RenderingServer() {
         delete obj;
     for (DrawableObject* obj : textured_objects)
         delete obj;
+    for (ImageObject2D* obj : image_2d_objects)
+        delete obj;
+
+    ImageObject2D::clean_up();
 }
