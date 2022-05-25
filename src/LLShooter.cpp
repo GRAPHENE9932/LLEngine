@@ -47,6 +47,7 @@ void LLShooter::init() {
         }
     );
 
+    // Create the crosshair.
     GLuint crosshair_texture_id = utils::load_dds("res/textures/crosshair.dds");
     ImageObject2D* crosshair = new ImageObject2D(
         crosshair_texture_id,
@@ -57,7 +58,11 @@ void LLShooter::init() {
     );
     rendering_server->add_image_2d_object(crosshair);
 
+    // Create map.
     maps::prepare_map_close(*rendering_server, *physics_server);
+
+    // Hide cursor.
+    glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void LLShooter::update(float delta) {
