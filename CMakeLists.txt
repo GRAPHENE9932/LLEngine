@@ -12,7 +12,6 @@ src/common/FPSMeter.cpp
 src/common/Mesh.cpp
 src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
-src/objects/MonochromeDrawableObject.cpp
 src/objects/TexturedDrawableObject.cpp
 src/objects/Camera.cpp
 src/objects/ControllableCylinder.cpp

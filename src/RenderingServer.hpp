@@ -8,7 +8,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "objects/MonochromeDrawableObject.hpp"
 #include "objects/TexturedDrawableObject.hpp"
 #include "objects/ImageObject2D.hpp"
 #include "objects/Camera.hpp"
