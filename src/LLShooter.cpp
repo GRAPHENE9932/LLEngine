@@ -128,6 +128,6 @@ void LLShooter::load_map_close() {
     rendering_server->add_textured_drawable_object(wooden_box_7);
 
     GLuint texture_id = utils::load_dds("res/textures/crosshair.dds");
-    ImageObject2D* crosshair = new ImageObject2D(texture_id, Rect({0.0f, 0.0f}, {0.1f, 0.1f}));
+    ImageObject2D* crosshair = new ImageObject2D(texture_id, Rect({0.0f, 0.0f}, {0.1f, 0.1f}), true);
     rendering_server->add_image_2d_object(crosshair);
 }

@@ -11,7 +11,7 @@ class ImageObject2D {
 public:
     static GLuint program_id;
 
-    ImageObject2D(GLuint texture_id, const Rect& rect);
+    ImageObject2D(GLuint texture_id, const Rect& rect, bool is_transparent);
 
     static void pre_init();
     static void clean_up();
@@ -26,4 +26,5 @@ private:
 
     glm::mat4 matrix;
     GLuint texture_id;
+    bool is_transparent;
 };

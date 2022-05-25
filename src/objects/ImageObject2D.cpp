@@ -30,7 +30,8 @@ GLuint ImageObject2D::vertices_id;
 GLuint ImageObject2D::uvs_id;
 GLuint ImageObject2D::matrix_uniform_id;
 
-ImageObject2D::ImageObject2D(GLuint texture_id, const Rect& rect) {
+ImageObject2D::ImageObject2D(GLuint texture_id, const Rect& rect, bool is_transparent) :
+    is_transparent(is_transparent) {
     change_rect(rect);
     change_texture(texture_id);
 }
@@ -75,7 +76,8 @@ void ImageObject2D::clean_up() {
 }
 
 void ImageObject2D::draw() const {
-    glEnable(GL_BLEND);
+    if (is_transparent)
+        glEnable(GL_BLEND);
 
     // Vertices.
     glEnableVertexAttribArray(0);
@@ -99,5 +101,6 @@ void ImageObject2D::draw() const {
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 
-    glDisable(GL_BLEND);
+    if (is_transparent)
+        glDisable(GL_BLEND);
 }
