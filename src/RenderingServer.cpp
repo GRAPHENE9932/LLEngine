@@ -102,14 +102,14 @@ void RenderingServer::main_loop() {
         // Draw textured objects.
         glUseProgram(TexturedDrawableObject::program_id);
         for (int i = 0; i < textured_objects.size(); i++)
-            textured_objects[i]->draw(&camera_mvp[0][0], &view_matrix[0][0], &light_direction[0]);
+            textured_objects[i]->draw(&camera_mvp[0][0], &camera->direction[0], &light_direction[0]);
 
         // Overlay time.
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Draw textured objects.
         for (int i = 0; i < textured_objects_overlay.size(); i++)
-            textured_objects_overlay[i]->draw(&proj_matrix[0][0], &view_matrix[0][0], &light_direction_camera_space[0]);
+            textured_objects_overlay[i]->draw(&proj_matrix[0][0], &camera->direction[0], &light_direction_camera_space[0]);
 
         // Draw Image2D objects.
         glUseProgram(ImageObject2D::program_id);

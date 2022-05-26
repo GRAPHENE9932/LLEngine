@@ -7,7 +7,6 @@ out vec3 vertex_normal_worldspace;
 out vec2 uv;
 
 uniform mat4 MVP;
-uniform mat4 CAMERA_MATRIX;
 uniform mat4 OBJECT_MATRIX;
 
 void main() {

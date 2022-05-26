@@ -3,7 +3,7 @@
 GLuint TexturedDrawableObject::program_id;
 GLuint TexturedDrawableObject::mvp_matrix_uniform_id;
 GLuint TexturedDrawableObject::object_matrix_uniform_id;
-GLuint TexturedDrawableObject::camera_matrix_uniform_id;
+GLuint TexturedDrawableObject::camera_direction_uniform_id;
 GLuint TexturedDrawableObject::light_direction_uniform_id;
 
 TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<utils::ManagedTextureID> texture_id,
@@ -22,7 +22,7 @@ void TexturedDrawableObject::pre_init() {
                                      "res/shaders/textured_fragment.glsl");
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     object_matrix_uniform_id = glGetUniformLocation(program_id, "OBJECT_MATRIX");
-    camera_matrix_uniform_id = glGetUniformLocation(program_id, "CAMERA_MATRIX");
+    camera_direction_uniform_id = glGetUniformLocation(program_id, "CAMERA_DIRECTION");
     light_direction_uniform_id = glGetUniformLocation(program_id, "LIGHT_DIRECTION");
 }
 
@@ -30,7 +30,7 @@ void TexturedDrawableObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-void TexturedDrawableObject::draw(GLfloat* camera_mvp, GLfloat* view_matrix, GLfloat* light_direction) {
+void TexturedDrawableObject::draw(GLfloat* camera_mvp, GLfloat* camera_dir, GLfloat* light_direction) {
     // Vertices.
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertices_id);
@@ -53,7 +53,7 @@ void TexturedDrawableObject::draw(GLfloat* camera_mvp, GLfloat* view_matrix, GLf
     glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);
     auto obj_matrix = compute_matrix();
     glUniformMatrix4fv(object_matrix_uniform_id, 1, GL_FALSE, &obj_matrix[0][0]);
-    glUniformMatrix4fv(camera_matrix_uniform_id, 1, GL_FALSE, view_matrix);
+    glUniformMatrix4fv(camera_direction_uniform_id, 1, GL_FALSE, &camera_dir[0]);
     glUniform3fv(light_direction_uniform_id, 1, light_direction);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_id);

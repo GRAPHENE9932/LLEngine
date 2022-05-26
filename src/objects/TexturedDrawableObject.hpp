@@ -20,5 +20,5 @@ public:
 
 private:
     static GLuint mvp_matrix_uniform_id, object_matrix_uniform_id,
-        camera_matrix_uniform_id, light_direction_uniform_id;
+        camera_direction_uniform_id, light_direction_uniform_id;
 };
