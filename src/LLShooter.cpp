@@ -61,6 +61,15 @@ void LLShooter::init() {
     // Create map.
     maps::prepare_map_close(*rendering_server, *physics_server);
 
+    // Add the weapon.
+    auto glock_texture_id = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/glock.dds"));
+    auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
+    TexturedDrawableObject* glock_obj = new TexturedDrawableObject(glock_texture_id, glock_mesh);
+    glock_obj->translation = {1.0f, -0.5f, -1.0f};
+    glock_obj->rotation = glm::quat();
+    glock_obj->scale = {1.0f, 1.0f, 1.0f};
+    rendering_server->add_textured_drawable_object(glock_obj, true);
+
     // Hide cursor.
     glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
