@@ -18,8 +18,11 @@ GLFWwindow* RenderingServer::get_window() {
     return window;
 }
 
-void RenderingServer::add_textured_drawable_object(TexturedDrawableObject* obj) {
-    textured_objects.push_back(obj);
+void RenderingServer::add_textured_drawable_object(TexturedDrawableObject* obj, bool overlay) {
+    if (overlay)
+        textured_objects_overlay.push_back(obj);
+    else
+        textured_objects.push_back(obj);
 }
 
 void RenderingServer::add_image_2d_object(ImageObject2D* obj) {
@@ -89,15 +92,24 @@ void RenderingServer::main_loop() {
 
         update_callback(delta);
 
-        glm::mat4 view_matrix;
-        auto camera_mvp = camera->compute_mvp_matrix(view_matrix);
+        glm::mat4 view_matrix = camera->compute_view_matrix();
+        glm::mat4 proj_matrix = camera->get_proj_matrix();
+        glm::mat4 camera_mvp = proj_matrix * view_matrix;
+        glm::vec3 light_direction_camera_space = glm::vec4(light_direction, 0.0f) * camera_mvp;
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         // Draw textured objects.
         glUseProgram(TexturedDrawableObject::program_id);
         for (int i = 0; i < textured_objects.size(); i++)
             textured_objects[i]->draw(&camera_mvp[0][0], &view_matrix[0][0], &light_direction[0]);
+
+        // Overlay time.
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // Draw textured objects.
+        for (int i = 0; i < textured_objects_overlay.size(); i++)
+            textured_objects_overlay[i]->draw(&proj_matrix[0][0], &view_matrix[0][0], &light_direction_camera_space[0]);
 
         // Draw Image2D objects.
         glUseProgram(ImageObject2D::program_id);

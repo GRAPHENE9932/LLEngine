@@ -11,7 +11,8 @@ public:
 
     Camera(glm::vec3 position, float fov, float display_ratio);
 
-    glm::mat4 compute_mvp_matrix(glm::mat4& view_matrix);
+    glm::mat4 compute_view_matrix() const;
+    glm::mat4 get_proj_matrix() const noexcept;
     void recompute_direction() noexcept;
 
 protected:

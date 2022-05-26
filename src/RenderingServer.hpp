@@ -23,7 +23,7 @@ public:
     void set_update_callback(std::function<void(float)> func);
     GLFWwindow* get_window();
 
-    void add_textured_drawable_object(TexturedDrawableObject* obj);
+    void add_textured_drawable_object(TexturedDrawableObject* obj, bool overlay = false);
     void add_image_2d_object(ImageObject2D* obj);
 
     void main_loop();
@@ -34,6 +34,7 @@ private:
     std::chrono::high_resolution_clock::time_point prev_frame_time;
 
     std::vector<TexturedDrawableObject*> textured_objects;
+    std::vector<TexturedDrawableObject*> textured_objects_overlay;
     std::vector<ImageObject2D*> image_2d_objects;
 
     void init_window(int window_width, int window_height);
