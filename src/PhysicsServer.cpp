@@ -3,7 +3,7 @@
 void PhysicsServer::update(float delta) {
 
     // Apply gravity.
-    player->add_vertical_velocity(gravity * delta);
+    player->add_vertical_velocity(GRAVITY * delta);
 
     player->update(delta);
 

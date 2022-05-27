@@ -34,7 +34,7 @@ void ControllableCylinder::update(float delta) {
         jump();
     }
 
-    cylinder.position.y += vertical_velocity;
+    cylinder.position.y += vertical_velocity * delta;
 }
 
 void ControllableCylinder::update_camera(float delta) {
@@ -61,13 +61,13 @@ void ControllableCylinder::update_camera_orientation(float delta) {
     // Reset mouse position.
     glfwSetCursorPos(window, center_x, center_y);
     // Set rotation.
-    camera->y_rotation += static_cast<float>(mouse_sensivity * delta * (center_x - cur_x));
+    camera->y_rotation += static_cast<float>(mouse_sensivity * (center_x - cur_x));
     if (camera->y_rotation < 0.0f)
         camera->y_rotation += glm::radians(360.0f);
     else if (camera->y_rotation > glm::radians(360.0f))
         camera->y_rotation -= glm::radians(360.0f);
 
-    camera->x_rotation += static_cast<float>(mouse_sensivity * delta * (center_y - cur_y));
+    camera->x_rotation += static_cast<float>(mouse_sensivity * (center_y - cur_y));
     if (camera->x_rotation > MAX_X_ROTATION)
         camera->x_rotation = MAX_X_ROTATION;
     else if (camera->x_rotation < MIN_X_ROTATION)

@@ -9,7 +9,7 @@
 
 class PhysicsServer {
 public:
-    static constexpr float gravity = -0.98f;
+    static constexpr float GRAVITY = -98.0f;
 
     ControllableCylinder* player;
     std::vector<FloorObject> flat_floors;
