@@ -65,7 +65,7 @@ void LLShooter::init() {
     auto glock_texture_id = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/glock.dds"));
     auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
     TexturedDrawableObject* glock_obj = new TexturedDrawableObject(glock_texture_id, glock_mesh);
-    glock_obj->translation = {1.0f, -0.5f, -1.0f};
+    glock_obj->translation = {1.0f, -0.75f, -1.2f};
     glock_obj->rotation = glm::quat();
     glock_obj->scale = {1.0f, 1.0f, 1.0f};
     rendering_server->add_textured_drawable_object(glock_obj, true);

@@ -3,6 +3,7 @@
 #include "utils/utils.hpp"
 #include "common/Mesh.hpp"
 #include "objects/TexturedDrawableObject.hpp"
+#include "objects/UnshadedDrawableObject.hpp"
 #include "maps.hpp"
 
 void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
@@ -60,7 +61,38 @@ void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
     wooden_box_7->scale = glm::vec3(3.0f, 3.0f, 3.0f);
     rs.add_textured_drawable_object(wooden_box_7);
 
-    rs.light_direction = glm::vec3(0.4f, 0.5f, 1.0f);
+    UnshadedDrawableObject* lamp_1 = new UnshadedDrawableObject(box_mesh, {1.0f, 1.0f, 1.0f});
+    lamp_1->translation = {3.0f, 8.0f, 5.0f};
+    lamp_1->rotation = glm::quat();
+    lamp_1->scale = {1.0f, 1.0f, 1.0f};
+    rs.add_unshaded_drawable_object(lamp_1);
+
+    UnshadedDrawableObject* lamp_2 = new UnshadedDrawableObject(box_mesh, {1.0f, 1.0f, 1.0f});
+    lamp_2->translation = {-19.0f, 8.0f, -19.0f};
+    lamp_2->rotation = glm::quat();
+    lamp_2->scale = {1.0f, 1.0f, 1.0f};
+    rs.add_unshaded_drawable_object(lamp_2);
+
+    UnshadedDrawableObject* lamp_3 = new UnshadedDrawableObject(box_mesh, {1.0f, 1.0f, 1.0f});
+    lamp_3->translation = {-19.0f, 8.0f, 19.0f};
+    lamp_3->rotation = glm::quat();
+    lamp_3->scale = {1.0f, 1.0f, 1.0f};
+    rs.add_unshaded_drawable_object(lamp_3);
+
+    UnshadedDrawableObject* lamp_4 = new UnshadedDrawableObject(box_mesh, {1.0f, 1.0f, 1.0f});
+    lamp_4->translation = {19.0f, 8.0f, -19.0f};
+    lamp_4->rotation = glm::quat();
+    lamp_4->scale = {1.0f, 1.0f, 1.0f};
+    rs.add_unshaded_drawable_object(lamp_4);
+
+    rs.point_lights[0] = PointLight({3.0f, 8.0f, 5.0f}, {1.0f, 1.0f, 1.0f},
+                                    1.0f, 0.002f, 0.001f);
+    rs.point_lights[1] = PointLight({-19.0f, 8.0f, -19.0f}, {1.0f, 1.0f, 1.0f},
+                                    1.0f, 0.002f, 0.001f);
+    rs.point_lights[2] = PointLight({-19.0f, 8.0f, 19.0f}, {1.0f, 1.0f, 1.0f},
+                                    1.0f, 0.002f, 0.001f);
+    rs.point_lights[3] = PointLight({19.0f, 8.0f, -19.0f}, {1.0f, 1.0f, 1.0f},
+                                    1.0f, 0.002f, 0.001f);
 
     ps.flat_floors.push_back(
         FloorObject(Rect({-20.0f, -20.0f}, {40.0f, 40.0f}), 0.0f)

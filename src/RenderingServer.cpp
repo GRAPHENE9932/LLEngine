@@ -25,6 +25,10 @@ void RenderingServer::add_textured_drawable_object(TexturedDrawableObject* obj, 
         textured_objects.push_back(obj);
 }
 
+void RenderingServer::add_unshaded_drawable_object(UnshadedDrawableObject* obj) {
+    unshaded_objects.push_back(obj);
+}
+
 void RenderingServer::add_image_2d_object(ImageObject2D* obj) {
     image_2d_objects.push_back(obj);
 }
@@ -46,6 +50,7 @@ void RenderingServer::init_window(int window_width, int window_height) {
         throw std::runtime_error("Failed to create window.");
 
     glfwMakeContextCurrent(window);
+    //glfwSwapInterval(0);
 
     int glew_init_res = glewInit();
     if (glew_init_res != GLEW_OK) {
@@ -70,12 +75,11 @@ void RenderingServer::init_gl() {
 
     // Enable backface culling.
     glEnable(GL_CULL_FACE);
-
-    ImageObject2D::pre_init();
 }
 
 void RenderingServer::init_object_types() {
     TexturedDrawableObject::pre_init();
+    UnshadedDrawableObject::pre_init();
     ImageObject2D::pre_init();
 }
 
@@ -95,21 +99,29 @@ void RenderingServer::main_loop() {
         glm::mat4 view_matrix = camera->compute_view_matrix();
         glm::mat4 proj_matrix = camera->get_proj_matrix();
         glm::mat4 camera_mvp = proj_matrix * view_matrix;
-        glm::vec3 light_direction_camera_space = glm::vec4(light_direction, 0.0f) * camera_mvp;
 
-        glClear(GL_DEPTH_BUFFER_BIT);
+        std::array<PointLight, TX_DRW_POINT_LIGHTS_AMOUNT> overlay_point_lights = point_lights;
+        for (GLuint i = 0; i < TX_DRW_POINT_LIGHTS_AMOUNT; i++)
+            overlay_point_lights[i].position = view_matrix * glm::vec4(point_lights[i].position, 1.0f);
+
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+        // Draw unshaded objects.
+        glUseProgram(UnshadedDrawableObject::program_id);
+        for (int i = 0; i < unshaded_objects.size(); i++)
+            unshaded_objects[i]->draw(&camera_mvp[0][0]);
 
         // Draw textured objects.
         glUseProgram(TexturedDrawableObject::program_id);
         for (int i = 0; i < textured_objects.size(); i++)
-            textured_objects[i]->draw(&camera_mvp[0][0], &camera->direction[0], &light_direction[0]);
+            textured_objects[i]->draw(&camera_mvp[0][0], &camera->direction[0], point_lights);
 
         // Overlay time.
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Draw textured objects.
         for (int i = 0; i < textured_objects_overlay.size(); i++)
-            textured_objects_overlay[i]->draw(&proj_matrix[0][0], &camera->direction[0], &light_direction_camera_space[0]);
+            textured_objects_overlay[i]->draw(&proj_matrix[0][0], &camera->direction[0], overlay_point_lights);
 
         // Draw Image2D objects.
         glUseProgram(ImageObject2D::program_id);

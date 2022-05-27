@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <array>
 #include <chrono>
 #include <functional>
 
@@ -9,13 +10,15 @@
 #include <GLFW/glfw3.h>
 
 #include "objects/TexturedDrawableObject.hpp"
+#include "objects/UnshadedDrawableObject.hpp"
 #include "objects/ImageObject2D.hpp"
+#include "objects/PointLight.hpp"
 #include "objects/Camera.hpp"
 
 class RenderingServer {
 public:
     Camera* camera;
-    glm::vec3 light_direction;
+    std::array<PointLight, TX_DRW_POINT_LIGHTS_AMOUNT> point_lights;
 
     RenderingServer(int window_width, int window_height);
     ~RenderingServer();
@@ -24,6 +27,7 @@ public:
     GLFWwindow* get_window();
 
     void add_textured_drawable_object(TexturedDrawableObject* obj, bool overlay = false);
+    void add_unshaded_drawable_object(UnshadedDrawableObject* obj);
     void add_image_2d_object(ImageObject2D* obj);
 
     void main_loop();
@@ -35,6 +39,7 @@ private:
 
     std::vector<TexturedDrawableObject*> textured_objects;
     std::vector<TexturedDrawableObject*> textured_objects_overlay;
+    std::vector<UnshadedDrawableObject*> unshaded_objects;
     std::vector<ImageObject2D*> image_2d_objects;
 
     void init_window(int window_width, int window_height);
