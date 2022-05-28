@@ -8,8 +8,8 @@ ControllableCylinder::ControllableCylinder(Camera* camera, GLFWwindow* window,
     // Set center_x and center_y.
     int window_width, window_height;
     glfwGetWindowSize(window, &window_width, &window_height);
-    center_x = window_width / 2.0;
-    center_y = window_height / 2.0;
+    center_x = window_width / 2;
+    center_y = window_height / 2;
 }
 
 void ControllableCylinder::update(float delta) {
