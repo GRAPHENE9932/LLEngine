@@ -31,6 +31,16 @@ src/utils/math.cpp
 src/maps.cpp
 )
 
+# Try to enable link time optimization.
+include(CheckIPOSupported)
+check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_ERROR)
+if (IPO_SUPPORTED)
+    message(STATUS "IPO/LTO supported and enabled")
+    set_property(TARGET LLShooter PROPERTY INTERPROCERUDAL_OPTIMIZATION TRUE)
+else()
+    message(STATUS "IPO/LTO is not supported and disabled")
+endif()
+
 # GLFW.
 find_package(glfw3 REQUIRED)
 target_link_libraries(LLShooter glfw)
