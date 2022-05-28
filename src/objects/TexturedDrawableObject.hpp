@@ -2,21 +2,20 @@
 
 #include <array>
 
-#include "../utils/utils.hpp"
+#include "../common/Texture.hpp"
 #include "PointLight.hpp"
 #include "DrawableObject.hpp"
 
 // Also, change src/shaders/textured_fragment.glsl:TX_DRW_POINT_LIGHTS_AMOUNT
-constexpr GLuint TX_DRW_POINT_LIGHTS_AMOUNT = 4;
+constexpr GLuint TX_DRW_POINT_LIGHTS_AMOUNT = 2;
 
 class TexturedDrawableObject : public DrawableObject {
 public:
     static GLuint program_id;
 
-    std::shared_ptr<utils::ManagedTextureID> texture_id;
+    std::shared_ptr<Texture> texture;
 
-    TexturedDrawableObject(std::shared_ptr<utils::ManagedTextureID> texture_id,
-        std::shared_ptr<Mesh> mesh);
+    TexturedDrawableObject(std::shared_ptr<Texture> texture, std::shared_ptr<Mesh> mesh);
     ~TexturedDrawableObject();
 
     static void pre_init();

@@ -35,6 +35,7 @@ void RenderingServer::add_image_2d_object(ImageObject2D* obj) {
 
 void RenderingServer::init_window(int window_width, int window_height) {
     int glfw_init_res = glfwInit();
+
     if (!glfw_init_res) {
         throw std::runtime_error(
             std::string("Failed to initialize GLFW. Error code: ") + std::to_string(glfw_init_res)

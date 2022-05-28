@@ -1,3 +1,4 @@
+#include "../utils/utils.hpp"
 #include "TexturedDrawableObject.hpp"
 
 GLuint TexturedDrawableObject::program_id;
@@ -8,9 +9,9 @@ GLuint TexturedDrawableObject::camera_direction_uniform_id;
 GLuint TexturedDrawableObject::light_position_uniform_id;
 std::array<PointLight::Uniforms, TX_DRW_POINT_LIGHTS_AMOUNT> TexturedDrawableObject::point_light_uniforms;
 
-TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<utils::ManagedTextureID> texture_id,
+TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<Texture> texture,
     std::shared_ptr<Mesh> mesh) :
-    texture_id(texture_id) {
+    texture(texture) {
     this->mesh = mesh;
 }
 
@@ -55,7 +56,7 @@ void TexturedDrawableObject::draw(GLfloat* camera_mvp, GLfloat* camera_dir,
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind textures.
-    glBindTexture(GL_TEXTURE_2D, texture_id->texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture->get_id());
 
     // Uniforms.
     glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);

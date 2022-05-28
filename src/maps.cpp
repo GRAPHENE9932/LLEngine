@@ -2,13 +2,14 @@
 
 #include "utils/utils.hpp"
 #include "common/Mesh.hpp"
+#include "common/Texture.hpp"
 #include "objects/TexturedDrawableObject.hpp"
 #include "objects/UnshadedDrawableObject.hpp"
 #include "maps.hpp"
 
 void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
-    auto map_texture = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/map_close.dds"));
-    auto box_texture = std::make_shared<utils::ManagedTextureID>(utils::load_dds("res/textures/wooden_box.dds"));
+    std::shared_ptr map_texture = std::make_shared<Texture>("res/textures/map_close.dds");
+    std::shared_ptr box_texture = std::make_shared<Texture>("res/textures/wooden_box.dds");
 
     std::shared_ptr<Mesh> map_mesh = std::make_shared<Mesh>("res/meshes/map_close.obj");
     std::shared_ptr<Mesh> box_mesh = std::make_shared<Mesh>("res/meshes/cube.obj");
@@ -89,10 +90,10 @@ void maps::prepare_map_close(RenderingServer& rs, PhysicsServer& ps) {
                                     1.0f, 0.002f, 0.001f);
     rs.point_lights[1] = PointLight({-19.0f, 8.0f, -19.0f}, {1.0f, 1.0f, 1.0f},
                                     1.0f, 0.002f, 0.001f);
-    rs.point_lights[2] = PointLight({-19.0f, 8.0f, 19.0f}, {1.0f, 1.0f, 1.0f},
+    /*rs.point_lights[2] = PointLight({-19.0f, 8.0f, 19.0f}, {1.0f, 1.0f, 1.0f},
                                     1.0f, 0.002f, 0.001f);
     rs.point_lights[3] = PointLight({19.0f, 8.0f, -19.0f}, {1.0f, 1.0f, 1.0f},
-                                    1.0f, 0.002f, 0.001f);
+                                    1.0f, 0.002f, 0.001f);*/
 
     ps.flat_floors.push_back(
         FloorObject(Rect({-20.0f, -20.0f}, {40.0f, 40.0f}), 0.0f)

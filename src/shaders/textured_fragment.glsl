@@ -14,7 +14,7 @@ struct PointLight {
     float const_coeff, linear_coeff, quadratic_coeff;
 };
 
-const int TX_DRW_POINT_LIGHTS_AMOUNT = 4;
+const int TX_DRW_POINT_LIGHTS_AMOUNT = 2;
 
 uniform PointLight POINT_LIGHTS[TX_DRW_POINT_LIGHTS_AMOUNT];
 uniform vec3 CAMERA_DIRECTION;

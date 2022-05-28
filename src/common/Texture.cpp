@@ -1,10 +1,35 @@
 #include <array>
-#include <cstring>
 #include <fstream>
+#include <cstring>
 #include <memory>
 
-#include "utils.hpp"
+#include "Texture.hpp"
 
+Texture::Texture(GLuint texture_id) noexcept :
+    texture_id(texture_id) {
+
+}
+
+Texture::Texture(std::string file_path) {
+    load_from_dds(file_path);
+}
+
+Texture::~Texture() {
+    glDeleteTextures(1, &texture_id);
+}
+
+void Texture::set_id(GLuint new_id) {
+    if (texture_id != 0)
+        glDeleteTextures(1, &texture_id);
+
+    texture_id = new_id;
+}
+
+GLuint Texture::get_id() {
+    return texture_id;
+}
+
+// BEGIN DDS loading.
 constexpr uint32_t FOURCC_DXT1 = 0x31545844;
 constexpr uint32_t FOURCC_DXT3 = 0x33545844;
 constexpr uint32_t FOURCC_DXT5 = 0x35545844;
@@ -37,7 +62,7 @@ struct DDSHeader {
     uint32_t reserved_2;
 };
 
-GLuint utils::load_dds(std::string file_path) {
+void Texture::load_from_dds(std::string file_path) {
     // Open the file.
     std::ifstream stream(file_path, std::ios::binary);
     if (!stream)
@@ -83,9 +108,9 @@ GLuint utils::load_dds(std::string file_path) {
     }
 
     // Create the texture.
-    ManagedTextureID texture_id; // Using managed texture ID in case of error.
-    glGenTextures(1, &texture_id.texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    GLuint new_texture_id;
+    glGenTextures(1, &new_texture_id);
+    glBindTexture(GL_TEXTURE_2D, new_texture_id);
 
     // Load the mipmaps.
     uint32_t width = header.width;
@@ -107,5 +132,6 @@ GLuint utils::load_dds(std::string file_path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-    return texture_id.release();
+    set_id(new_texture_id);
 }
+// END DDS loading.
