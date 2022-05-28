@@ -1,6 +1,6 @@
-#include "maps.hpp"
 #include "utils/utils.hpp"
 #include "objects/Camera.hpp"
+#include "common/Map.hpp"
 #include "LLShooter.hpp"
 
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
@@ -37,7 +37,7 @@ void LLShooter::init() {
     player->jump_force = 25.0f;
 
     // Continue initialization of the physics server.
-    physics_server->player = player.get();
+    physics_server->set_player(player);;
 
     // Continue initialization of the rendering server.
     rendering_server->camera = camera.get();
@@ -49,7 +49,7 @@ void LLShooter::init() {
 
     // Create the crosshair.
     auto crosshair_texture_id = std::make_shared<Texture>("res/textures/crosshair.dds");
-    ImageObject2D* crosshair = new ImageObject2D(
+    auto crosshair = std::make_shared<ImageObject2D>(
         crosshair_texture_id,
         utils::window_space_to_opengl_space(
             Rect({WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f}, {16.0f, 16.0f}), {WINDOW_WIDTH, WINDOW_HEIGHT}
@@ -59,12 +59,16 @@ void LLShooter::init() {
     rendering_server->add_image_2d_object(crosshair);
 
     // Create map.
-    maps::prepare_map_close(*rendering_server, *physics_server);
+    load_map("res/maps/map_close.llmap", *rendering_server, *physics_server);
+
+    // Initialize lights.
+    rendering_server->point_lights[0] = PointLight({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
+    rendering_server->point_lights[1] = PointLight({0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
 
     // Add the weapon.
     auto glock_texture_id = std::make_shared<Texture>("res/textures/glock.dds");
     auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
-    TexturedDrawableObject* glock_obj = new TexturedDrawableObject(glock_texture_id, glock_mesh);
+    auto glock_obj = std::make_shared<TexturedDrawableObject>(glock_texture_id, glock_mesh);
     glock_obj->translation = {1.0f, -0.75f, -1.2f};
     glock_obj->rotation = glm::quat();
     glock_obj->scale = {1.0f, 1.0f, 1.0f};
@@ -75,6 +79,41 @@ void LLShooter::init() {
 }
 
 void LLShooter::update(float delta) {
+    // Make light to follow player.
+    rendering_server->point_lights[0].position = player->cylinder.position;
+
     fps_meter->frame();
     physics_server->update(delta);
+}
+
+void LLShooter::load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps) {
+    Map map(file_path);
+
+    // Spawn textured drawable objects.
+    for (uint16_t i = 0; i < map.tex_draw_objects.size(); i++)
+        rs.add_textured_drawable_object(map.tex_draw_objects[i]);
+
+    // Spawn unshaded drawable objects.
+    for (uint16_t i = 0; i < map.unsh_draw_objects.size(); i++)
+        rs.add_unshaded_drawable_object(map.unsh_draw_objects[i]);
+
+    // Spawn floors.
+    for (uint16_t i = 0; i < map.flat_floors.size(); i++)
+        ps.add_flat_floor(map.flat_floors[i]);
+
+    // Spawn rectangular walls.
+    for (uint16_t i = 0; i < map.rect_walls.size(); i++)
+        ps.add_rectangular_wall(map.rect_walls[i]);
+
+    // Spawn cuboid objects.
+    for (uint16_t i = 0; i < map.cuboid_objects.size(); i++)
+        ps.add_cuboid_object(map.cuboid_objects[i]);
+
+    // Set vertical bounds.
+    ps.set_bounds(
+        map.left_bound,
+        map.right_bound,
+        map.top_bound,
+        map.bottom_bound
+    );
 }

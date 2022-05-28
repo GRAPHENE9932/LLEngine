@@ -13,7 +13,8 @@ public:
         return rect.distance_from({cylinder.position.x, cylinder.position.z}) < cylinder.radius;
     }
 
-    glm::vec3 force_point_distance(glm::vec3 point, float distance) const;
+    glm::vec3 force_point_distance(glm::vec3 point, float distance,
+                                   float* const min_distance_out = nullptr) const;
 
 private:
     glm::vec3 force_point_distance_center_inside(glm::vec3 point, float distance) const;

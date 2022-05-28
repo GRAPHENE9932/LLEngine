@@ -10,6 +10,7 @@ src/RenderingServer.cpp
 src/PhysicsServer.cpp
 src/common/FPSMeter.cpp
 src/common/Mesh.cpp
+src/common/Map.cpp
 src/common/Texture.cpp
 src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
@@ -28,7 +29,6 @@ src/utils/shader_loader.cpp
 src/utils/model_loader.cpp
 src/utils/vbo_indexer.cpp
 src/utils/math.cpp
-src/maps.cpp
 )
 
 # Try to enable link time optimization.

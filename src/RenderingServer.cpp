@@ -18,18 +18,18 @@ GLFWwindow* RenderingServer::get_window() {
     return window;
 }
 
-void RenderingServer::add_textured_drawable_object(TexturedDrawableObject* obj, bool overlay) {
+void RenderingServer::add_textured_drawable_object(std::shared_ptr<TexturedDrawableObject> obj, bool overlay) {
     if (overlay)
         textured_objects_overlay.push_back(obj);
     else
         textured_objects.push_back(obj);
 }
 
-void RenderingServer::add_unshaded_drawable_object(UnshadedDrawableObject* obj) {
+void RenderingServer::add_unshaded_drawable_object(std::shared_ptr<UnshadedDrawableObject> obj) {
     unshaded_objects.push_back(obj);
 }
 
-void RenderingServer::add_image_2d_object(ImageObject2D* obj) {
+void RenderingServer::add_image_2d_object(std::shared_ptr<ImageObject2D> obj) {
     image_2d_objects.push_back(obj);
 }
 
@@ -135,11 +135,6 @@ void RenderingServer::main_loop() {
 }
 
 RenderingServer::~RenderingServer() {
-    for (DrawableObject* obj : textured_objects)
-        delete obj;
-    for (ImageObject2D* obj : image_2d_objects)
-        delete obj;
-
     TexturedDrawableObject::clean_up();
     ImageObject2D::clean_up();
 }

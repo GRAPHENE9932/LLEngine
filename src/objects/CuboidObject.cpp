@@ -4,11 +4,13 @@
 #include "CuboidObject.hpp"
 
 CuboidObject::CuboidObject(const Rect& rect, float bottom_y, float top_y) :
-    rect(rect), bottom_y(bottom_y), top_y(top_y) {
-
+    bottom_y(bottom_y), top_y(top_y) {
+    this->rect.position = rect.position - rect.size * 0.5f;
+    this->rect.size = rect.size;
 }
 
-glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, bool& is_above) const {
+glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, bool& is_above,
+                                          float* const min_distance_out) const {
     // Case 1: push it to the top side of cuboid.
     glm::vec3 result_1 = cylinder.position;
     result_1.y = top_y + cylinder.height * 0.5f;
@@ -28,6 +30,10 @@ glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, bool& is_abo
     float distance_2 = glm::distance(result_2, cylinder.position);
     float distance_3 = glm::distance(result_3, cylinder.position);
     float min = std::min({distance_1, distance_2, distance_3});
+
+    if (min_distance_out != nullptr)
+        *min_distance_out = min;
+
     if (min == distance_1) {
         is_above = true;
         return result_1;

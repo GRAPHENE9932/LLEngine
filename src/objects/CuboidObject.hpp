@@ -15,5 +15,6 @@ public:
             rect.distance_from({cylinder.position.x, cylinder.position.z}) < cylinder.radius;
     }
 
-    glm::vec3 push_cylinder_out(const Cylinder& cylinder, bool& is_above) const;
+    glm::vec3 push_cylinder_out(const Cylinder& cylinder, bool& is_above,
+                                float* const min_distance_out = nullptr) const;
 };
