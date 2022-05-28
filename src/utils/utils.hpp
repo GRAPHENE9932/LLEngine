@@ -109,7 +109,7 @@ namespace utils {
     /// Load the DDS texture (limited).
     /// Limitations:
     ///  - Only DXT1, DXT3, DXT5 compression formats supported
-    ///    (uncompressed don't supported too.
+    ///    (uncompressed don't supported too).
     GLuint load_dds(std::string file_path);
 
     void index_vbo(std::vector<glm::vec3>& in_vertices,
