@@ -1,17 +1,12 @@
 #pragma once
 
-#include "../structs/Rect.hpp"
-#include "../structs/Cylinder.hpp"
+#include "RectangularPhysicsObject.hpp"
 
-class RectangularWall {
+class RectangularWall : public RectangularPhysicsObject {
 public:
-    Rect rect;
-
     RectangularWall(Rect rect);
 
-    inline bool cylinder_intersects(const Cylinder& cylinder) const noexcept {
-        return rect.distance_from({cylinder.position.x, cylinder.position.z}) < cylinder.radius;
-    }
+    bool cylinder_intersects(const Cylinder& cylinder) const override;
 
     glm::vec3 force_point_distance(glm::vec3 point, float distance,
                                    float* const min_distance_out = nullptr) const;

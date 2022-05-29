@@ -16,6 +16,7 @@ src/objects/SpatialObject.cpp
 src/objects/DrawableObject.cpp
 src/objects/TexturedDrawableObject.cpp
 src/objects/UnshadedDrawableObject.cpp
+src/objects/RectangularPhysicsObject.cpp
 src/objects/Camera.cpp
 src/objects/ControllableCylinder.cpp
 src/objects/FloorObject.cpp

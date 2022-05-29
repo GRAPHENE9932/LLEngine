@@ -6,8 +6,12 @@
 #include "../utils/utils.hpp"
 #include "RectangularWall.hpp"
 
-RectangularWall::RectangularWall(Rect rect) : rect(rect) {
+RectangularWall::RectangularWall(Rect rect) {
+    this->rect = rect;
+}
 
+bool RectangularWall::cylinder_intersects(const Cylinder& cylinder) const {
+    return rect.distance_from({cylinder.position.x, cylinder.position.z}) < cylinder.radius;
 }
 
 glm::vec3 RectangularWall::force_point_distance(glm::vec3 point, float distance,
