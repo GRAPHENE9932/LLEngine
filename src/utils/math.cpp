@@ -69,7 +69,8 @@ inline glm::vec2 closest_point_to_arc(glm::vec2 point, glm::vec2 center, float r
     return glm::vec2(std::cos(angle) * radius, std::sin(angle) * radius) + center;
 }
 
-glm::vec2 utils::closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, float radius) {
+glm::vec2 utils::closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, float radius,
+                                                    float* const min_distance_out) {
     // 7-0-4
     // 3   1
     // 6-2-5
@@ -115,6 +116,9 @@ glm::vec2 utils::closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, 
             closest_point = closest_points[i];
         }
     }
+
+    if (min_distance_out != nullptr)
+        *min_distance_out = min_distance;
 
     return closest_point;
 }
