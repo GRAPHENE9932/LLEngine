@@ -87,8 +87,4 @@ namespace utils {
                    std::vector<glm::vec3>& out_vertices,
                    std::vector<glm::vec2>& out_uvs,
                    std::vector<glm::vec3>& out_normals);
-
-    glm::vec2 closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, float radius,
-                                                 float* const min_distance_out = nullptr);
-    Rect window_space_to_opengl_space(Rect rect, glm::vec2 window_size);
 }

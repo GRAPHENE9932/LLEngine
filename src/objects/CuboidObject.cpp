@@ -1,6 +1,6 @@
 #include <glm/geometric.hpp>
 
-#include "../utils/utils.hpp"
+#include "../utils/math.hpp"
 #include "CuboidObject.hpp"
 
 CuboidObject::CuboidObject(const Rect& rect, float bottom_y, float top_y) :

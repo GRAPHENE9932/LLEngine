@@ -4,11 +4,11 @@
 #include <glm/trigonometric.hpp>
 #include <glm/geometric.hpp>
 
-#include "utils.hpp"
+#include "math.hpp"
 
 constexpr float ASSERT_THRESHOLD = 0.00001f;
 
-inline glm::vec2 closest_point_to_hor_line_segment(glm::vec2 point, float point_a_x, float point_b_x, float point_a_b_y) {
+glm::vec2 utils::closest_point_to_hor_line_segment(glm::vec2 point, float point_a_x, float point_b_x, float point_a_b_y) {
     assert(point_a_x < point_b_x);
     //      *---------*
     //   ^       ^       ^
@@ -29,7 +29,7 @@ inline glm::vec2 closest_point_to_hor_line_segment(glm::vec2 point, float point_
     }
 }
 
-inline glm::vec2 closest_point_to_ver_line_segment(glm::vec2 point, float point_a_y, float point_b_y, float point_a_b_x) {
+glm::vec2 utils::closest_point_to_ver_line_segment(glm::vec2 point, float point_a_y, float point_b_y, float point_a_b_x) {
     assert(point_a_y < point_b_y);
     //   < 2
     // *
@@ -54,7 +54,7 @@ inline glm::vec2 closest_point_to_ver_line_segment(glm::vec2 point, float point_
     }
 }
 
-inline glm::vec2 closest_point_to_arc(glm::vec2 point, glm::vec2 center, float radius, float min_angle, float max_angle) {
+glm::vec2 utils::closest_point_to_arc(glm::vec2 point, glm::vec2 center, float radius, float min_angle, float max_angle) {
     assert(max_angle > min_angle);
     assert(min_angle >= -M_PI - ASSERT_THRESHOLD && min_angle <= M_PI + ASSERT_THRESHOLD);
     assert(max_angle >= -M_PI - ASSERT_THRESHOLD && max_angle <= M_PI + ASSERT_THRESHOLD);

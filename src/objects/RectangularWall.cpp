@@ -3,7 +3,7 @@
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 
-#include "../utils/utils.hpp"
+#include "../utils/math.hpp"
 #include "RectangularWall.hpp"
 
 RectangularWall::RectangularWall(Rect rect) {
