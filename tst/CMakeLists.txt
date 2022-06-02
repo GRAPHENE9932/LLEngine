@@ -3,6 +3,7 @@ include(GoogleTest)
 add_executable(${CMAKE_PROJECT_NAME}_tst
     main.cpp
     closest_point.cpp
+    rect.cpp
 )
 
 find_package(GTest)
