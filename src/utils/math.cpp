@@ -54,14 +54,6 @@ glm::vec2 utils::closest_point_to_ver_line_segment(glm::vec2 point, float point_
     }
 }
 
-inline float modulo(const float a, const float b) {
-    if (b < 0.0f)
-        return modulo(-a, -b);
-
-    const float result = std::fmod(a, b);
-    return result >= 0.0f ? result : result + b;
-}
-
 /// Returns angle in range.
 inline float normalize_angle(const float angle) {
     return std::fmod(angle + M_PIf, 2.0f * M_PIf) - M_PIf;
