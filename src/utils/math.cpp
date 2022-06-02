@@ -54,6 +54,30 @@ glm::vec2 utils::closest_point_to_ver_line_segment(glm::vec2 point, float point_
     }
 }
 
+inline float modulo(const float a, const float b) {
+    if (b < 0.0f)
+        return modulo(-a, -b);
+
+    const float result = std::fmod(a, b);
+    return result >= 0.0f ? result : result + b;
+}
+
+/// Returns angle in range.
+inline float normalize_angle(const float angle) {
+    return std::fmod(angle + M_PIf, 2.0f * M_PIf) - M_PIf;
+}
+
+/// Accepts angles from -PI to PI.
+inline float clamp_angle(const float angle, const float min, const float max) {
+    if (angle < max && angle > min)
+        return angle;
+
+    if (std::abs(normalize_angle(angle - min)) < std::abs(normalize_angle(angle - max)))
+        return min;
+    else
+        return max;
+}
+
 glm::vec2 utils::closest_point_to_arc(glm::vec2 point, glm::vec2 center, float radius, float min_angle, float max_angle) {
     assert(max_angle > min_angle);
     assert(min_angle >= -M_PI - ASSERT_THRESHOLD && min_angle <= M_PI + ASSERT_THRESHOLD);
@@ -64,7 +88,7 @@ glm::vec2 utils::closest_point_to_arc(glm::vec2 point, glm::vec2 center, float r
 
     glm::vec2 point_on_trigonometric_circle = point / glm::length(point);
     float angle = std::atan2(point_on_trigonometric_circle.y, point_on_trigonometric_circle.x);
-    angle = std::clamp(angle, min_angle, max_angle);
+    angle = clamp_angle(angle, min_angle, max_angle);
 
     return glm::vec2(std::cos(angle) * radius, std::sin(angle) * radius) + center;
 }
