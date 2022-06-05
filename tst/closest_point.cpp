@@ -4,10 +4,7 @@
 #include <glm/trigonometric.hpp>
 
 #include "utils/math.hpp"
-
-#define EXPECT_NEAR_V2(vec_1, vec_2, error_abs)\
-    EXPECT_NEAR(vec_1.x, vec_2.x, error_abs);\
-    EXPECT_NEAR(vec_1.y, vec_2.y, error_abs);
+#include "macros.hpp"
 
 namespace {
     constexpr float THRESHOLD = 0.0001f;
