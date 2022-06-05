@@ -22,6 +22,8 @@ set(SOURCES
     structs/QuadrantArc.cpp
     structs/Rect.cpp
     structs/Cylinder.cpp
+    structs/HorLine.cpp
+    structs/VertLine.cpp
     utils/shader_loader.cpp
     utils/model_loader.cpp
     utils/vbo_indexer.cpp

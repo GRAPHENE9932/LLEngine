@@ -4,55 +4,11 @@
 #include <glm/trigonometric.hpp>
 #include <glm/geometric.hpp>
 
+#include "../structs/HorLine.hpp"
+#include "../structs/VertLine.hpp"
 #include "math.hpp"
 
 constexpr float ASSERT_THRESHOLD = 0.00001f;
-
-glm::vec2 utils::closest_point_to_hor_line_segment(glm::vec2 point, float point_a_x, float point_b_x, float point_a_b_y) {
-    assert(point_a_x < point_b_x);
-    //      *---------*
-    //   ^       ^       ^
-    //   2       1       3
-
-    // Case 1.
-    if (point.x >= point_a_x && point.x <= point_b_x) {
-        point.y = point_a_b_y;
-        return point;
-    }
-    // Case 2.
-    else if (point.x < point_a_x) {
-        return glm::vec2(point_a_x, point_a_b_y);
-    }
-    // Case 3.
-    else {
-        return glm::vec2(point_b_x, point_a_b_y);
-    }
-}
-
-glm::vec2 utils::closest_point_to_ver_line_segment(glm::vec2 point, float point_a_y, float point_b_y, float point_a_b_x) {
-    assert(point_a_y < point_b_y);
-    //   < 2
-    // *
-    // |
-    // | < 1
-    // |
-    // *
-    //   < 3
-
-    // Case 1.
-    if (point.y >= point_a_y && point.y <= point_b_y) {
-        point.x = point_a_b_x;
-        return point;
-    }
-    // Case 2.
-    else if (point.y < point_a_y) {
-        return glm::vec2(point_a_b_x, point_a_y);
-    }
-    // Case 3.
-    else {
-        return glm::vec2(point_a_b_x, point_b_y);
-    }
-}
 
 /// Returns angle in range.
 inline float normalize_angle(const float angle) {
@@ -92,14 +48,12 @@ glm::vec2 utils::closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, 
     // 6-2-5
     std::array<glm::vec2, 8> closest_points;
 
-    closest_points[0] = closest_point_to_hor_line_segment(
-        point, rect.position.x, rect.position.x + rect.size.x,
-        rect.position.y - radius
-    );
-    closest_points[1] = closest_point_to_ver_line_segment(
-        point, rect.position.y, rect.position.y + rect.size.y,
-        rect.position.x + rect.size.x + radius
-    );
+    HorLine hor_line {rect.position.x, rect.position.x + rect.size.x, rect.position.y - radius};
+    closest_points[0] = hor_line.closest_point(point);
+
+    VertLine vert_line {rect.position.y, rect.position.y + rect.size.y, rect.position.x + rect.size.x + radius};
+    closest_points[1] = vert_line.closest_point(point);
+    
     closest_points[2] = closest_points[0];
     closest_points[2].y += rect.size.y + radius + radius;
     closest_points[3] = closest_points[1];

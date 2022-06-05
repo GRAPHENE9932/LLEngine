@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include <glm/trigonometric.hpp>
 
+#include "structs/HorLine.hpp"
+#include "structs/VertLine.hpp"
 #include "utils/math.hpp"
 #include "macros.hpp"
 
@@ -10,56 +12,48 @@ namespace {
     constexpr float THRESHOLD = 0.0001f;
 
     TEST(math_test, closest_point_to_hor_line_segment) {
-        glm::vec2 result = utils::closest_point_to_hor_line_segment(
-            {1.0f, 2.0f}, 0.0f, 2.0f, 1.0f
-        );
+        // {lower_x, higher_x, y}.
+        HorLine hor_line {0.0f, 2.0f, 1.0f};
+        auto result = hor_line.closest_point({1.0f, 2.0f});
         EXPECT_EQ(result, glm::vec2(1.0f, 1.0f));
 
-        result = utils::closest_point_to_hor_line_segment(
-            {-4.0f, -5.0f}, -5.0f, -1.0f, -4.0f
-        );
+        hor_line = {-5.0f, -1.0f, -4.0f};
+        result = hor_line.closest_point({-4.0f, -5.0f});
         EXPECT_EQ(result, glm::vec2(-4.0f, -4.0f));
 
-        result = utils::closest_point_to_hor_line_segment(
-            {-8.0f, -2.0f}, -1.0f, 2.0f, -2.0f
-        );
+        hor_line = {-1.0f, 2.0f, -2.0f};
+        result = hor_line.closest_point({-8.0f, -2.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, -2.0f));
 
-        result = utils::closest_point_to_hor_line_segment(
-            {-2.0f, -4.0f}, -1.0f, 2.0f, -2.0f
-        );
+        hor_line = {-1.0f, 2.0f, -2.0f};
+        result = hor_line.closest_point({-2.0f, -4.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, -2.0f));
 
-        result = utils::closest_point_to_hor_line_segment(
-            {3.0f, -1.0f}, -1.0f, 2.0f, -2.0f
-        );
+        hor_line = {-1.0f, 2.0f, -2.0f};
+        result = hor_line.closest_point({3.0f, -1.0f});
         EXPECT_EQ(result, glm::vec2(2.0f, -2.0f));
     }
 
     TEST(math_test, closest_point_to_ver_line_segment) {
-        glm::vec2 result = utils::closest_point_to_ver_line_segment(
-            {3.0f, -1.0f}, -2.0f, 1.0f, -1.0f
-        );
+        // {lower_y, higher_y, x}.
+        VertLine vert_line {-2.0f, 1.0f, -2.0f};
+        auto result = vert_line.closest_point({3.0f, -1.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, -1.0f));
 
-        result = utils::closest_point_to_ver_line_segment(
-            {-2.0f, 0.0f}, -2.0f, 1.0f, -1.0f
-        );
+        vert_line = {-2.0f, 1.0f, -1.0f};
+        result = vert_line.closest_point({-2.0f, 0.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, 0.0f));
 
-        result = utils::closest_point_to_ver_line_segment(
-            {-1.0f, 3.0f}, -2.0f, 1.0f, -1.0f
-        );
+        vert_line = {-2.0f, 1.0f, -1.0f};
+        result = vert_line.closest_point({-1.0f, 3.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, 1.0f));
 
-        result = utils::closest_point_to_ver_line_segment(
-            {0.0f, -4.0f}, -2.0f, 1.0f, -1.0f
-        );
+        vert_line = {-2.0f, 1.0f, -1.0f};
+        result = vert_line.closest_point({0.0f, -4.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, -2.0f));
 
-        result = utils::closest_point_to_ver_line_segment(
-            {-1.0f, -1.0f}, -2.0f, 1.0f, -1.0f
-        );
+        vert_line = {-2.0f, 1.0f, -1.0f};
+        result = vert_line.closest_point({-1.0f, -1.0f});
         EXPECT_EQ(result, glm::vec2(-1.0f, -1.0f));
     }
 
