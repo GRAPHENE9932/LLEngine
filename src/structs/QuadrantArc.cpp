@@ -1,5 +1,7 @@
 #include <cmath>
 
+#include <glm/geometric.hpp>
+
 #include "QuadrantArc.hpp"
 
 inline bool is_in_quadrant(const glm::vec2& center, const glm::vec2& point, const uint8_t& quadrant) noexcept {
@@ -29,7 +31,7 @@ inline bool unordered_equal(const T& a_1, const T& b_1, const T& a_2, const T& b
 /// Basically, this function finds the intersection points of the two given circles
 /// and then filters out intersection points that doesn't lie on the both arcs.
 IntersectionCount QuadrantArc::intersection_points(const QuadrantArc& other,
-                                                   glm::vec2& point_1, glm::vec2& point_2) {
+                                                   glm::vec2& point_1, glm::vec2& point_2) const {
     assert(quadrant >= 1 && quadrant <= 4);
     assert(other.quadrant >= 1 && other.quadrant <= 4);
     assert(circle.radius == other.circle.radius);
@@ -86,4 +88,44 @@ IntersectionCount QuadrantArc::intersection_points(const QuadrantArc& other,
                 return IntersectionCount::TWO_POINTS;
             }
     } // switch.
+}
+
+/// Returns angle in range from -PI to PI.
+inline float normalize_angle(const float angle) {
+    return std::fmod(angle + M_PIf, 2.0f * M_PIf) - M_PIf;
+}
+
+/// Accepts min and max angles from -PI to PI.
+inline float clamp_angle(const float angle, const float min, const float max) {
+    if (angle < max && angle > min)
+        return angle;
+
+    if (std::abs(normalize_angle(angle - min)) < std::abs(normalize_angle(angle - max)))
+        return min;
+    else
+        return max;
+}
+
+inline float clamp_quadrant_angle(const float angle, const uint8_t quadrant) {
+    switch (quadrant) {
+        case 1:
+            return clamp_angle(angle, 0.0f, M_PI_2f);
+        case 2:
+            return clamp_angle(angle, M_PI_2f, M_PIf);
+        case 3:
+            return clamp_angle(angle, -M_PIf, -M_PI_2f);
+        default: // 4.
+            return clamp_angle(angle, -M_PI_2, 0.0f);
+    }
+}
+
+glm::vec2 QuadrantArc::closest_point(glm::vec2 point) const {
+    // Going to the circle center space.
+    point -= circle.center;
+
+    glm::vec2 point_on_trigonometric_circle = point / glm::length(point);
+    float angle = std::atan2(point_on_trigonometric_circle.y, point_on_trigonometric_circle.x);
+    angle = clamp_quadrant_angle(angle, quadrant);
+
+    return glm::vec2(std::cos(angle) * circle.radius, std::sin(angle) * circle.radius) + circle.center;
 }

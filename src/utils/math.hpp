@@ -3,7 +3,6 @@
 #include "../structs/Rect.hpp"
 
 namespace utils {
-    glm::vec2 closest_point_to_arc(glm::vec2 point, glm::vec2 center, float radius, float min_angle, float max_angle);
     glm::vec2 closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, float radius,
                                                  float* const min_distance_out = nullptr);
 

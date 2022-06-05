@@ -5,6 +5,7 @@
 
 #include "structs/HorLine.hpp"
 #include "structs/VertLine.hpp"
+#include "structs/QuadrantArc.hpp"
 #include "utils/math.hpp"
 #include "macros.hpp"
 
@@ -36,52 +37,48 @@ namespace {
 
     TEST(math_test, closest_point_to_ver_line_segment) {
         // {lower_y, higher_y, x}.
-        VertLine vert_line {-2.0f, 1.0f, -2.0f};
+        VertLine vert_line {-2.0f, 1.0f, -1.0f};
         auto result = vert_line.closest_point({3.0f, -1.0f});
-        EXPECT_EQ(result, glm::vec2(-1.0f, -1.0f));
+        EXPECT_NEAR_V2(result, glm::vec2(-1.0f, -1.0f), THRESHOLD);
 
         vert_line = {-2.0f, 1.0f, -1.0f};
         result = vert_line.closest_point({-2.0f, 0.0f});
-        EXPECT_EQ(result, glm::vec2(-1.0f, 0.0f));
+        EXPECT_NEAR_V2(result, glm::vec2(-1.0f, 0.0f), THRESHOLD);
 
         vert_line = {-2.0f, 1.0f, -1.0f};
         result = vert_line.closest_point({-1.0f, 3.0f});
-        EXPECT_EQ(result, glm::vec2(-1.0f, 1.0f));
+        EXPECT_NEAR_V2(result, glm::vec2(-1.0f, 1.0f), THRESHOLD);
 
         vert_line = {-2.0f, 1.0f, -1.0f};
         result = vert_line.closest_point({0.0f, -4.0f});
-        EXPECT_EQ(result, glm::vec2(-1.0f, -2.0f));
+        EXPECT_NEAR_V2(result, glm::vec2(-1.0f, -2.0f), THRESHOLD);
 
         vert_line = {-2.0f, 1.0f, -1.0f};
         result = vert_line.closest_point({-1.0f, -1.0f});
-        EXPECT_EQ(result, glm::vec2(-1.0f, -1.0f));
+        EXPECT_NEAR_V2(result, glm::vec2(-1.0f, -1.0f), THRESHOLD);
     }
 
     TEST(math_test, closest_point_to_arc) {
-        glm::vec2 result = utils::closest_point_to_arc(
-            {2.0f, -6.0f}, {4.0f, -3.0f}, 2.0f, glm::radians(-150.0f), glm::radians(-90.0f)
-        );
+        // {{{center.x, center.y}, radius}, quadrant}.
+        QuadrantArc arc {{{4.0f, -3.0f}, 2.0f}, 3};
+        auto result = arc.closest_point({2.0f, -6.0f});
         EXPECT_NEAR_V2(result, glm::vec2(2.89059960755f, -4.664100588676), THRESHOLD);
 
-        result = utils::closest_point_to_arc(
-            {3.5f, -6.0f}, {4.0f, -3.0f}, 2.0f, glm::radians(-150.0f), glm::radians(-90.0f)
-        );
+        arc = {{{4.0f, -3.0f}, 2.0f}, 3};
+        result = arc.closest_point({3.5f, -6.0f});
         EXPECT_NEAR_V2(result, glm::vec2(3.671202025389f, -4.972787847664f), THRESHOLD);
 
-        result = utils::closest_point_to_arc(
-            {3.83333333f, -4.0f}, {4.0f, -3.0f}, 2.0f, glm::radians(-150.0f), glm::radians(-90.0f)
-        );
+        arc = {{{4.0f, -3.0f}, 2.0f}, 3};
+        result = arc.closest_point({3.83333333f, -4.0f});
         EXPECT_NEAR_V2(result, glm::vec2(3.671202025389f, -4.972787847664f), THRESHOLD);
 
-        result = utils::closest_point_to_arc(
-            {5.5f, -5.5f}, {4.0f, -3.0f}, 2.0f, glm::radians(-150.0f), glm::radians(-90.0f)
-        );
+        arc = {{{4.0f, -3.0f}, 2.0f}, 3};
+        result = arc.closest_point({5.5f, -5.5f});
         EXPECT_NEAR_V2(result, glm::vec2(4.0f, -5.0f), THRESHOLD);
 
-        result = utils::closest_point_to_arc(
-            {3.5f, -2.5f}, {4.0f, -3.0f}, 2.0f, glm::radians(-150.0f), glm::radians(-90.0f)
-        );
-        EXPECT_NEAR_V2(result, glm::vec2(2.267949192431f, -4.0f), THRESHOLD);
+        arc = {{{4.0f, -3.0f}, 2.0f}, 3};
+        result = arc.closest_point({3.5f, -2.5f});
+        EXPECT_NEAR_V2(result, glm::vec2(2.0f, -3.0f), THRESHOLD);
     }
 
     TEST(math_test, closest_point_to_rounded_rectangle) {
