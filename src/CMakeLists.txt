@@ -40,6 +40,13 @@ else()
     message(STATUS "IPO/LTO is not supported and disabled")
 endif()
 
+# Enable warnings.
+if (MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    add_compile_options(-Wall -Wextra -pedantic)
+endif()
+
 # GLFW.
 find_package(glfw3 REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib glfw)
