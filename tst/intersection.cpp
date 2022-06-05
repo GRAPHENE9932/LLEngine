@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "structs/Circle.hpp"
+#include "structs/HorLine.hpp"
+#include "structs/VertLine.hpp"
 #include "structs/QuadrantArc.hpp"
+#include "utils/math.hpp"
 #include "macros.hpp"
 
 namespace {
@@ -90,5 +93,26 @@ namespace {
         count = arc_1.intersection_points(arc_2, point_1, point_2);
         EXPECT_EQ(count, IntersectionCount::ONE_POINT);
         EXPECT_NEAR_V2(point_1, glm::vec2(-3.0f, 4.0), THRESHOLD);
+    }
+
+    TEST(math_test, hor_and_vert_line_intersection_point) {
+        glm::vec2 point_1;
+
+        HorLine hor_line {-3.0f, 1.0f, -1.0f};
+        VertLine vert_line {-2.0f, 3.0f, -1.0f};
+        auto count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(-1.0f, -1.0f), THRESHOLD);
+
+        hor_line = {-3.0f, 1.0f, -1.0f};
+        vert_line = {-2.0f, 3.0f, 1.0f};
+        count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(1.0f, -1.0f), THRESHOLD);
+
+        hor_line = {-3.0f, 1.0f, -1.0f};
+        vert_line = {-2.0f, 0.0f, 2.0f};
+        count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
     }
 }
