@@ -18,6 +18,8 @@ set(SOURCES
     objects/CuboidObject.cpp
     objects/ImageObject2D.cpp
     objects/PointLight.cpp
+    structs/Circle.cpp
+    structs/QuadrantArc.cpp
     structs/Rect.cpp
     structs/Cylinder.cpp
     utils/shader_loader.cpp
