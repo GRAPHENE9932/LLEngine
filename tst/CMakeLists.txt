@@ -4,6 +4,7 @@ add_executable(${CMAKE_PROJECT_NAME}_tst
     main.cpp
     closest_point.cpp
     rect.cpp
+    intersection.cpp
 )
 
 find_package(GTest)

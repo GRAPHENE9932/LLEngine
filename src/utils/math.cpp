@@ -139,6 +139,119 @@ glm::vec2 utils::closest_point_to_rounded_rectangle(glm::vec2 point, Rect rect, 
     return closest_point;
 }
 
+utils::IntersectionCount utils::two_circles_intersection_points(const glm::vec2 center_1, const glm::vec2 center_2,
+                                                                const float radius, glm::vec2& point_1, glm::vec2& point_2) {
+    if (center_1 == center_2)
+        return IntersectionCount::INFINITE_POINTS;
+
+    glm::vec2 vector_a = (center_2 - center_1) * 0.5f;
+    float vector_a_len = glm::length(vector_a);
+
+    if (vector_a_len > radius)
+        return IntersectionCount::NO_INTERSECTION;
+
+    float vector_b_len = std::sqrt(radius * radius - vector_a_len * vector_a_len);
+    glm::vec2 vector_b {
+        glm::vec2(-vector_a.y, vector_a.x) / vector_a_len * vector_b_len
+    };
+    point_1 = vector_b + center_1 + vector_a;
+
+    if (vector_a_len == radius)
+        return IntersectionCount::ONE_POINT;
+
+    point_2 = -vector_b + center_1 + vector_a;
+    return IntersectionCount::TWO_POINTS;
+}
+
+inline bool is_in_quadrant(const glm::vec2& center, const glm::vec2& point, const uint8_t& quadrant) noexcept {
+    switch (quadrant) {
+        case 1:
+            return point.x >= center.x && point.y >= center.y;
+        case 2:
+            return point.x < center.x && point.y >= center.y;
+        case 3:
+            return point.x < center.x && point.y < center.y;
+        default: // 4.
+            return point.x >= center.x && point.y < center.y;
+    }
+}
+
+inline bool are_quadrants_neighbor(const uint8_t quadrant_1, const uint8_t quadrant_2) {
+    return std::abs(quadrant_2 - quadrant_1) == 1 ||
+        (quadrant_1 == 1 && quadrant_2 == 4) ||
+        (quadrant_1 == 4 && quadrant_2 == 1);
+}
+
+template<typename T>
+inline bool unordered_equal(const T& a_1, const T& b_1, const T& a_2, const T& b_2) {
+    return (a_1 == a_2 && b_1 == b_2) || (a_1 == b_2 && b_1 == a_2);
+}
+
+// Basically, this function finds the intersection points of the two given circles
+// and then filters out intersection points that doesn't lie on the both arcs.
+utils::IntersectionCount utils::two_arcs_intersection_points(const glm::vec2 center_1, const uint8_t arc_quadrant_1,
+                                                             const glm::vec2 center_2, const uint8_t arc_quadrant_2,
+                                                             const float radius, glm::vec2& point_1, glm::vec2& point_2) {
+    assert(arc_quadrant_1 >= 1 && arc_quadrant_1 <= 4);
+    assert(arc_quadrant_2 >= 1 && arc_quadrant_2 <= 4);
+
+    IntersectionCount circles_inter = two_circles_intersection_points(center_1, center_2,
+                                                                      radius, point_1, point_2);
+
+    switch (circles_inter) {
+        case IntersectionCount::NO_INTERSECTION:
+            // There is no need to filter out the intersection points if there is no
+            // intersection points.
+            return IntersectionCount::NO_INTERSECTION;
+        case IntersectionCount::INFINITE_POINTS:
+            // Special case. Even if the circles are the same, arcs still can intersect
+            // in only one point, infinite points or without intersection at all.
+            if (arc_quadrant_1 == arc_quadrant_2) {
+                return IntersectionCount::INFINITE_POINTS;
+            }
+            else if (are_quadrants_neighbor(arc_quadrant_1, arc_quadrant_2)) {
+                if (unordered_equal<uint8_t>(arc_quadrant_1, arc_quadrant_2, 1, 2))
+                    point_1 = glm::vec2(center_1.x, center_1.y + radius);
+                else if (unordered_equal<uint8_t>(arc_quadrant_1, arc_quadrant_2, 2, 3))
+                    point_1 = glm::vec2(center_1.x - radius, center_1.y);
+                else if (unordered_equal<uint8_t>(arc_quadrant_1, arc_quadrant_2, 3, 4))
+                    point_1 = glm::vec2(center_1.x, center_1.y - radius);
+                else
+                    point_1 = glm::vec2(center_1.x + radius, center_1.y);
+
+                return IntersectionCount::ONE_POINT;
+            }
+            else {
+                return IntersectionCount::NO_INTERSECTION;
+            }
+        default:
+            bool point_1_valid = is_in_quadrant(center_1, point_1, arc_quadrant_1) && is_in_quadrant(center_2, point_1, arc_quadrant_2);
+
+            if (circles_inter == IntersectionCount::ONE_POINT && point_1_valid)
+                return IntersectionCount::ONE_POINT;
+
+            bool point_2_valid = is_in_quadrant(center_1, point_2, arc_quadrant_1) && is_in_quadrant(center_2, point_2, arc_quadrant_2);
+
+            if (point_1_valid && !point_2_valid) {
+                return IntersectionCount::ONE_POINT;
+            }
+            else if (!point_1_valid && point_2_valid) {
+                point_1 = point_2;
+                return IntersectionCount::ONE_POINT;
+            }
+            else if (!point_1_valid && !point_2_valid) {
+                return IntersectionCount::NO_INTERSECTION;
+            }
+            else {
+                return IntersectionCount::TWO_POINTS;
+            }
+    } // switch.
+}
+
+void utils::rounded_rectangle_intersection_points(Rect rect_1, Rect rect_2, float radius) {
+
+}
+
 Rect utils::window_space_to_opengl_space(Rect rect, glm::vec2 window_size) {
     rect.position = rect.position / window_size * 2.0f;
     rect.position.y *= -1;
