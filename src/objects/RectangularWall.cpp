@@ -3,7 +3,7 @@
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 
-#include "../utils/math.hpp"
+#include "../structs/RoundedRectangle.hpp"
 #include "RectangularWall.hpp"
 
 RectangularWall::RectangularWall(Rect rect) {
@@ -16,9 +16,8 @@ bool RectangularWall::cylinder_intersects(const Cylinder& cylinder) const {
 
 glm::vec3 RectangularWall::force_point_distance(glm::vec3 point, float distance,
                                                 float* const min_distance_out) const {
-    glm::vec2 result = utils::closest_point_to_rounded_rectangle(
-        glm::vec2(point.x, point.z), rect, distance, min_distance_out
-    );
+    RoundedRectangle rounded_rect {rect, distance};
+    glm::vec2 result = rounded_rect.closest_point({point.x, point.z}, min_distance_out);
 
     return glm::vec3(result.x, point.y, result.y);
 }

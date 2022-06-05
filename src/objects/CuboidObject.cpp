@@ -1,6 +1,6 @@
 #include <glm/geometric.hpp>
 
-#include "../utils/math.hpp"
+#include "../structs/RoundedRectangle.hpp"
 #include "CuboidObject.hpp"
 
 CuboidObject::CuboidObject(const Rect& rect, float bottom_y, float top_y) :
@@ -25,9 +25,8 @@ glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, bool& is_abo
     result_2.y = bottom_y - cylinder.height * 0.5f;
 
     // Case 3: push it to the side sides of cuboid.
-    glm::vec2 calc_res = utils::closest_point_to_rounded_rectangle(
-        {cylinder.position.x, cylinder.position.z}, rect, cylinder.radius
-    );
+    RoundedRectangle rounded_rect {rect, cylinder.radius};
+    glm::vec2 calc_res = rounded_rect.closest_point({cylinder.position.x, cylinder.position.z});
     glm::vec3 result_3 = {calc_res.x, cylinder.position.y, calc_res.y};
 
     // Take the closest one.

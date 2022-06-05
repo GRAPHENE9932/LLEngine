@@ -24,6 +24,7 @@ set(SOURCES
     structs/Cylinder.cpp
     structs/HorLine.cpp
     structs/VertLine.cpp
+    structs/RoundedRectangle.cpp
     utils/shader_loader.cpp
     utils/model_loader.cpp
     utils/vbo_indexer.cpp

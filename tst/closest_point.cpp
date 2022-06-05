@@ -6,6 +6,7 @@
 #include "structs/HorLine.hpp"
 #include "structs/VertLine.hpp"
 #include "structs/QuadrantArc.hpp"
+#include "structs/RoundedRectangle.hpp"
 #include "utils/math.hpp"
 #include "macros.hpp"
 
@@ -83,50 +84,44 @@ namespace {
 
     TEST(math_test, closest_point_to_rounded_rectangle) {
         float distance { std::numeric_limits<float>().quiet_NaN() };
-        glm::vec2 result = utils::closest_point_to_rounded_rectangle(
-            {-2.0f, 12.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, &distance
-        );
+
+        RoundedRectangle rect {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        auto result = rect.closest_point({-2.0f, 12.0f}, &distance);
         EXPECT_NEAR_V2(result, glm::vec2(-2.0f, 14.0f), THRESHOLD);
         EXPECT_NEAR(distance, 2.0f, THRESHOLD);
 
         distance = std::numeric_limits<float>().quiet_NaN();
-        result = utils::closest_point_to_rounded_rectangle(
-            {-11.0f, 8.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, &distance
-        );
+        rect = {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        result = rect.closest_point({-11.0f, 8.0f}, &distance);
         EXPECT_NEAR_V2(result, glm::vec2(-14.0f, 8.0f), THRESHOLD);
         EXPECT_NEAR(distance, 3.0f, THRESHOLD);
 
         distance = std::numeric_limits<float>().quiet_NaN();
-        result = utils::closest_point_to_rounded_rectangle(
-            {12.0f, -4.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, &distance
-        );
+        rect = {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        result = rect.closest_point({12.0f, -4.0f}, &distance);
         EXPECT_NEAR_V2(result, glm::vec2(12.0f, -4.0f), THRESHOLD);
         EXPECT_NEAR(distance, 0.0f, THRESHOLD);
 
         distance = std::numeric_limits<float>().quiet_NaN();
-        result = utils::closest_point_to_rounded_rectangle(
-            {-11.0f, -11.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, &distance
-        );
+        rect = {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        result = rect.closest_point({-11.0f, -11.0f}, &distance);
         EXPECT_NEAR_V2(result, glm::vec2(-12.82842712474619f, -12.82842712474619f), THRESHOLD);
         EXPECT_NEAR(distance, 2.585786438f, THRESHOLD);
 
         distance = std::numeric_limits<float>().quiet_NaN();
-        result = utils::closest_point_to_rounded_rectangle(
-            {6.0f, 9.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, &distance
-        );
+        rect = {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        result = rect.closest_point({6.0f, 9.0f}, &distance);
         EXPECT_NEAR_V2(result, glm::vec2(6.0f, 14.0f), THRESHOLD);
         EXPECT_NEAR(distance, 5.0f, THRESHOLD);
 
         distance = std::numeric_limits<float>().quiet_NaN();
-        result = utils::closest_point_to_rounded_rectangle(
-            {9.0f, 12.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, &distance
-        );
+        rect = {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        result = rect.closest_point({9.0f, 12.0f}, &distance);
         EXPECT_NEAR_V2(result, glm::vec2(9.788854381999831f, 13.577708763999663f), THRESHOLD);
         EXPECT_NEAR(distance, 1.76393202250021f, THRESHOLD);
 
-        result = utils::closest_point_to_rounded_rectangle(
-            {-2.0f, 12.0f}, Rect({-10.0f, -10.0f}, {18.0f, 20.0f}), 4.0f, nullptr
-        );
+        rect = {{{-10.0f, -10.0f}, {18.0f, 20.0f}}, 4.0f};
+        result = rect.closest_point({-2.0f, 12.0f}, nullptr);
         EXPECT_NEAR_V2(result, glm::vec2(-2.0f, 14.0f), THRESHOLD);
     }
 }
