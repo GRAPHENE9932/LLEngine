@@ -115,4 +115,74 @@ namespace {
         count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
         EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
     }
+
+    TEST(math_test, two_hor_line_segments_intersection_points) {
+        glm::vec2 point_1;
+
+        HorLine line_1 {-1.0f, 2.0f, 1.0f};
+        HorLine line_2 {1.0f, 3.0f, 0.0f};
+        auto count = line_1.intersection_points(line_2, point_1, true);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {1.0f, 3.0f, 0.0f};
+        count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {1.0f, 3.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, true);
+        EXPECT_EQ(count, IntersectionCount::INFINITE_POINTS);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {1.0f, 3.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::INFINITE_POINTS);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {-2.0f, -1.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, true);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(-1.0f, 1.0f), THRESHOLD);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {-2.0f, -1.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+    }
+
+    TEST(math_test, two_vert_line_segments_intersection_points) {
+        glm::vec2 point_1;
+
+        VertLine line_1 {-1.0f, 2.0f, 1.0f};
+        VertLine line_2 {1.0f, 3.0f, 0.0f};
+        auto count = line_1.intersection_points(line_2, point_1, true);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {1.0f, 3.0f, 0.0f};
+        count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {1.0f, 3.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, true);
+        EXPECT_EQ(count, IntersectionCount::INFINITE_POINTS);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {1.0f, 3.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::INFINITE_POINTS);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {-2.0f, -1.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, true);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(1.0f, -1.0f), THRESHOLD);
+
+        line_1 = {-1.0f, 2.0f, 1.0f};
+        line_2 = {-2.0f, -1.0f, 1.0f};
+        count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+    }
 }

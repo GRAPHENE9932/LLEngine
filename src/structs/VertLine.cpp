@@ -24,3 +24,28 @@ glm::vec2 VertLine::closest_point(glm::vec2 point) const {
         return glm::vec2(x, higher_y);
     }
 }
+
+IntersectionCount VertLine::intersection_points(const VertLine& other,
+    glm::vec2& point_1, const bool include_edges) const {
+    assert(lower_y <= higher_y);
+    assert(other.lower_y <= other.higher_y);
+
+    if (x != other.x)
+        return IntersectionCount::NO_INTERSECTION;
+
+    if (lower_y < other.higher_y && higher_y > other.lower_y)
+        return IntersectionCount::INFINITE_POINTS;
+
+    if (include_edges) {
+        if (lower_y == other.higher_y) {
+            point_1 = {x, lower_y};
+            return IntersectionCount::ONE_POINT;
+        }
+        else if (higher_y == other.lower_y) {
+            point_1 = {x, higher_y};
+            return IntersectionCount::ONE_POINT;
+        }
+    }
+
+    return IntersectionCount::NO_INTERSECTION;
+}
