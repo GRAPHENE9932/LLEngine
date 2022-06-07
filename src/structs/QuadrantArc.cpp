@@ -39,55 +39,116 @@ IntersectionCount QuadrantArc::intersection_points(const QuadrantArc& other,
     IntersectionCount circles_inter = circle.intersection_points(other.circle, point_1, point_2);
 
     switch (circles_inter) {
-        case IntersectionCount::NO_INTERSECTION:
-            // There is no need to filter out the intersection points if there is no
-            // intersection points.
+    case IntersectionCount::NO_INTERSECTION:
+        // There is no need to filter out the intersection points if there is no
+        // intersection points.
+        return IntersectionCount::NO_INTERSECTION;
+    case IntersectionCount::INFINITE_POINTS:
+        // Special case. Even if the circles are the same, arcs still can intersect
+        // in only one point, infinite points or without intersection at all.
+        if (quadrant == other.quadrant) {
+            return IntersectionCount::INFINITE_POINTS;
+        }
+        else if (are_quadrants_neighbor(quadrant, other.quadrant)) {
+            if (unordered_equal<uint8_t>(quadrant, other.quadrant, 1, 2))
+                point_1 = glm::vec2(circle.center.x, circle.center.y + circle.radius);
+            else if (unordered_equal<uint8_t>(quadrant, other.quadrant, 2, 3))
+                point_1 = glm::vec2(circle.center.x - circle.radius, circle.center.y);
+            else if (unordered_equal<uint8_t>(quadrant, other.quadrant, 3, 4))
+                point_1 = glm::vec2(circle.center.x, circle.center.y - circle.radius);
+            else
+                point_1 = glm::vec2(circle.center.x + circle.radius, circle.center.y);
+
+            return IntersectionCount::ONE_POINT;
+        }
+        else {
             return IntersectionCount::NO_INTERSECTION;
-        case IntersectionCount::INFINITE_POINTS:
-            // Special case. Even if the circles are the same, arcs still can intersect
-            // in only one point, infinite points or without intersection at all.
-            if (quadrant == other.quadrant) {
-                return IntersectionCount::INFINITE_POINTS;
-            }
-            else if (are_quadrants_neighbor(quadrant, other.quadrant)) {
-                if (unordered_equal<uint8_t>(quadrant, other.quadrant, 1, 2))
-                    point_1 = glm::vec2(circle.center.x, circle.center.y + circle.radius);
-                else if (unordered_equal<uint8_t>(quadrant, other.quadrant, 2, 3))
-                    point_1 = glm::vec2(circle.center.x - circle.radius, circle.center.y);
-                else if (unordered_equal<uint8_t>(quadrant, other.quadrant, 3, 4))
-                    point_1 = glm::vec2(circle.center.x, circle.center.y - circle.radius);
-                else
-                    point_1 = glm::vec2(circle.center.x + circle.radius, circle.center.y);
+        }
+    default:
+        bool point_1_valid = is_in_quadrant(circle.center, point_1, quadrant) &&
+            is_in_quadrant(other.circle.center, point_1, other.quadrant);
 
-                return IntersectionCount::ONE_POINT;
-            }
-            else {
-                return IntersectionCount::NO_INTERSECTION;
-            }
-        default:
-            bool point_1_valid = is_in_quadrant(circle.center, point_1, quadrant) &&
-                is_in_quadrant(other.circle.center, point_1, other.quadrant);
+        if (circles_inter == IntersectionCount::ONE_POINT && point_1_valid)
+            return IntersectionCount::ONE_POINT;
 
-            if (circles_inter == IntersectionCount::ONE_POINT && point_1_valid)
-                return IntersectionCount::ONE_POINT;
+        bool point_2_valid = is_in_quadrant(circle.center, point_2, quadrant) &&
+            is_in_quadrant(other.circle.center, point_2, other.quadrant);
 
-            bool point_2_valid = is_in_quadrant(circle.center, point_2, quadrant) &&
-                is_in_quadrant(other.circle.center, point_2, other.quadrant);
-
-            if (point_1_valid && !point_2_valid) {
-                return IntersectionCount::ONE_POINT;
-            }
-            else if (!point_1_valid && point_2_valid) {
-                point_1 = point_2;
-                return IntersectionCount::ONE_POINT;
-            }
-            else if (!point_1_valid && !point_2_valid) {
-                return IntersectionCount::NO_INTERSECTION;
-            }
-            else {
-                return IntersectionCount::TWO_POINTS;
-            }
+        if (point_1_valid && !point_2_valid) {
+            return IntersectionCount::ONE_POINT;
+        }
+        else if (!point_1_valid && point_2_valid) {
+            point_1 = point_2;
+            return IntersectionCount::ONE_POINT;
+        }
+        else if (!point_1_valid && !point_2_valid) {
+            return IntersectionCount::NO_INTERSECTION;
+        }
+        else {
+            return IntersectionCount::TWO_POINTS;
+        }
     } // switch.
+}
+
+inline bool in_range(const float num, const float min, const float max) {
+    assert(min <= max);
+    return num >= min && num <= max;
+}
+
+IntersectionCount QuadrantArc::intersection_points(const HorLine& hor_line, glm::vec2& point_1) const {
+    assert(hor_line.lower_x <= hor_line.higher_x);
+
+    // Validate y.
+    if (quadrant == 1 || quadrant == 2) {
+        if (!in_range(hor_line.y, circle.center.y, circle.center.y + circle.radius))
+            return IntersectionCount::NO_INTERSECTION;
+    }
+    else {
+        if (!in_range(hor_line.y, circle.center.y - circle.radius, circle.center.y))
+            return IntersectionCount::NO_INTERSECTION;
+    }
+
+    // Compute x.
+    float cosine {std::cos(std::asin((hor_line.y - circle.center.y) / circle.radius))};
+    if (quadrant == 2 || quadrant == 3)
+        cosine = -cosine;
+    
+    float x_coord = cosine * circle.radius + circle.center.x;
+    if (!in_range(x_coord, hor_line.lower_x, hor_line.higher_x)) {
+        return IntersectionCount::NO_INTERSECTION;
+    }
+    else {
+        point_1 = {x_coord, hor_line.y};
+        return IntersectionCount::ONE_POINT;
+    }
+}
+
+IntersectionCount QuadrantArc::intersection_points(const VertLine& vert_line, glm::vec2& point_1) const {
+    assert(vert_line.lower_y <= vert_line.higher_y);
+
+    // Validate x.
+    if (quadrant == 1 || quadrant == 4) {
+        if (!in_range(vert_line.x, circle.center.x, circle.center.x + circle.radius))
+            return IntersectionCount::NO_INTERSECTION;
+    }
+    else {
+        if (!in_range(vert_line.x, circle.center.x - circle.radius, circle.center.x))
+            return IntersectionCount::NO_INTERSECTION;
+    }
+
+    // Compute y.
+    float sine {std::sin(std::acos((vert_line.x - circle.center.x) / circle.radius))};
+    if (quadrant == 3 || quadrant == 4)
+        sine = -sine;
+    
+    float y_coord = sine * circle.radius + circle.center.y;
+    if (!in_range(y_coord, vert_line.lower_y, vert_line.higher_y)) {
+        return IntersectionCount::NO_INTERSECTION;
+    }
+    else {
+        point_1 = {vert_line.x, y_coord};
+        return IntersectionCount::ONE_POINT;
+    }
 }
 
 /// Returns angle in range from -PI to PI.

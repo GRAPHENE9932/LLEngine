@@ -16,7 +16,7 @@ namespace {
         // {{center.x, center.y}, radius}.
         Circle circle_1 {{0.0f, 0.0f}, 2.0f};
         Circle circle_2 {{2.0f, 2.0f}, 2.0f};
-        auto count = circle_1.intersection_points(circle_2, point_1, point_2);
+        auto count {circle_1.intersection_points(circle_2, point_1, point_2)};
         EXPECT_EQ(count, IntersectionCount::TWO_POINTS);
         EXPECT_NEAR_2_UNORDERED_V2(point_1, point_2, glm::vec2(0.0f, 2.0f), glm::vec2(2.0f, 0.0f), THRESHOLD);
 
@@ -57,7 +57,7 @@ namespace {
         // {{{center.x, center.y}, radius}, quadrant}.
         QuadrantArc arc_1 {{{0.0f, 0.0f}, 2.0f}, 1};
         QuadrantArc arc_2 {{{2.0f, 3.0f}, 2.0f}, 3};
-        auto count = arc_1.intersection_points(arc_2, point_1, point_2);
+        auto count {arc_1.intersection_points(arc_2, point_1, point_2)};
         EXPECT_EQ(count, IntersectionCount::TWO_POINTS);
         EXPECT_NEAR_2_UNORDERED_V2(
             point_1, point_2,
@@ -95,12 +95,90 @@ namespace {
         EXPECT_NEAR_V2(point_1, glm::vec2(-3.0f, 4.0), THRESHOLD);
     }
 
+    TEST(math_test, arc_and_vert_line_intersection_points) {
+        glm::vec2 point_1;
+
+        // {{{center.x, center.y}, radius}, quadrant}.
+        QuadrantArc arc {{{2.0f, 1.0f}, 3.0f}, 4};
+        // {min_x, max_x, y}.
+        VertLine line {-1.0f, 5.0f, 2.0f};
+        auto count {arc.intersection_points(line, point_1)};
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+        
+        arc = {{{2.0f, 1.0f}, 3.0f}, 4};
+        line = {-1.0f, 2.0f, 4.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        arc = {{{2.0f, 1.0f}, 3.0f}, 4};
+        line = {-3.0f, -2.0f, 3.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        arc = {{{2.0f, 1.0f}, 3.0f}, 4};
+        line = {-3.0f, -0.5f, 3.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(3.0f, -1.82842712474619f), THRESHOLD);
+
+        arc = {{{2.0f, 1.0f}, 3.0f}, 4};
+        line = {-3.5f, -0.5f, 2.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(2.0f, -2.0f), THRESHOLD);
+
+        arc = {{{2.0f, 1.0f}, 3.0f}, 4};
+        line = {-3.0f, 2.0f, 5.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(5.0f, 1.0f), THRESHOLD);
+    }
+
+    TEST(math_test, arc_and_hor_line_intersection_points) {
+        glm::vec2 point_1;
+
+        // {{{center.x, center.y}, radius}, quadrant}.
+        QuadrantArc arc {{{1.0f, 2.0f}, 3.0f}, 2};
+        // {min_y, max_y, x}.
+        HorLine line {-1.0f, 3.0f, 2.0f};
+        auto count {arc.intersection_points(line, point_1)};
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        arc = {{{1.0f, 2.0f}, 3.0f}, 2};
+        line = {-1.0f, 2.0f, 4.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        arc = {{{1.0f, 2.0f}, 3.0f}, 2};
+        line = {-3.0f, -2.0f, 3.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+
+        arc = {{{1.0f, 2.0f}, 3.0f}, 2};
+        line = {-3.0f, -0.5f, 3.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(-1.82842712474619f, 3.0f), THRESHOLD);
+
+        arc = {{{1.0f, 2.0f}, 3.0f}, 2};
+        line = {-3.5f, -0.5f, 2.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(-2.0f, 2.0f), THRESHOLD);
+
+        arc = {{{1.0f, 2.0f}, 3.0f}, 2};
+        line = {-3.0f, 2.0f, 5.0f};
+        count = arc.intersection_points(line, point_1);
+        EXPECT_EQ(count, IntersectionCount::ONE_POINT);
+        EXPECT_NEAR_V2(point_1, glm::vec2(1.0f, 5.0f), THRESHOLD);
+    };
+
     TEST(math_test, hor_and_vert_line_intersection_point) {
         glm::vec2 point_1;
 
         HorLine hor_line {-3.0f, 1.0f, -1.0f};
         VertLine vert_line {-2.0f, 3.0f, -1.0f};
-        auto count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
+        auto count {utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1)};
         EXPECT_EQ(count, IntersectionCount::ONE_POINT);
         EXPECT_NEAR_V2(point_1, glm::vec2(-1.0f, -1.0f), THRESHOLD);
 
@@ -121,7 +199,7 @@ namespace {
 
         HorLine line_1 {-1.0f, 2.0f, 1.0f};
         HorLine line_2 {1.0f, 3.0f, 0.0f};
-        auto count = line_1.intersection_points(line_2, point_1, true);
+        auto count {line_1.intersection_points(line_2, point_1, true)};
         EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
 
         line_1 = {-1.0f, 2.0f, 1.0f};
@@ -156,7 +234,7 @@ namespace {
 
         VertLine line_1 {-1.0f, 2.0f, 1.0f};
         VertLine line_2 {1.0f, 3.0f, 0.0f};
-        auto count = line_1.intersection_points(line_2, point_1, true);
+        auto count {line_1.intersection_points(line_2, point_1, true)};
         EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
 
         line_1 = {-1.0f, 2.0f, 1.0f};
