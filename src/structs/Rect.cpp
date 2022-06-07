@@ -1,6 +1,5 @@
 #include "Rect.hpp"
 
-Rect::Rect(glm::vec2 position, glm::vec2 size) : position(position), size(size) {
-
+bool Rect::operator==(const Rect& other) const {
+    return this->position == other.position && this->size == other.size;
 }
-
