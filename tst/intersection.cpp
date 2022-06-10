@@ -4,6 +4,7 @@
 #include "structs/HorLine.hpp"
 #include "structs/VertLine.hpp"
 #include "structs/QuadrantArc.hpp"
+#include "structs/RoundedRectangle.hpp"
 #include "utils/math.hpp"
 #include "macros.hpp"
 
@@ -261,6 +262,50 @@ namespace {
         line_1 = {-1.0f, 2.0f, 1.0f};
         line_2 = {-2.0f, -1.0f, 1.0f};
         count = line_1.intersection_points(line_2, point_1, false);
+        EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
+    }
+
+    TEST(math_test, two_rounded_rectangles_intersection_points) {
+        std::array<glm::vec2, 4> points = {{{1.1f, 2.0f}, {3.0f, 4.0f}}};
+
+        RoundedRectangle rect_1({{-4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f);
+        RoundedRectangle rect_2({{4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f);
+        auto count {rect_1.intersection_points(rect_2, points)};
+        EXPECT_EQ(count, IntersectionCount::TWO_POINTS);
+        std::array<glm::vec2, 2> correct_2 {{{3.0f, -3.732050807568877f}, {3.0f, 9.732050807568877f}}};
+        EXPECT_NEAR_UNORDERED_V2_ARRAY(points, correct_2, 2, THRESHOLD);
+
+        rect_1 = {{{-4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f};
+        rect_2 = {{{-1.0f, 4.0f}, {4.0f, 10.0f}}, 2.0f};
+        count = rect_1.intersection_points(rect_2, points);
+        EXPECT_EQ(count, IntersectionCount::TWO_POINTS);
+        correct_2 = {{{-3.0f, 10.0f}, {4.0f, 2.267949192431122f}}};
+        EXPECT_NEAR_UNORDERED_V2_ARRAY(points, correct_2, 2, THRESHOLD);
+
+        rect_1 = {{{-4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f};
+        rect_2 = {{{-11.0f, -7.0f}, {4.0f, 10.0f}}, 2.0f};
+        count = rect_1.intersection_points(rect_2, points);
+        EXPECT_EQ(count, IntersectionCount::TWO_POINTS);
+        correct_2 = {{{-6.0f, 4.732050807568878f}, {-5.0f, -3.732050807568878f}}};
+        EXPECT_NEAR_UNORDERED_V2_ARRAY(points, correct_2, 2, THRESHOLD);
+
+        rect_1 = {{{-4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f};
+        rect_2 = {{{-10.0f, 2.0f}, {18.0f, 4.0f}}, 2.0f};
+        count = rect_1.intersection_points(rect_2, points);
+        EXPECT_EQ(count, IntersectionCount::FOUR_POINTS);
+        std::array<glm::vec2, 4> correct_4 {{{-6.0f, 8.0f}, {4.0f, 8.0f}, {-6.0f, 0.0f}, {4.0f, 0.0f}}};
+        EXPECT_NEAR_UNORDERED_V2_ARRAY(points, correct_4, 4, THRESHOLD);
+
+        rect_1 = {{{-4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f};
+        rect_2 = {{{-14.0f, 10.0f}, {7.0f, 3.0f}}, 2.0f};
+        count = rect_1.intersection_points(rect_2, points);
+        EXPECT_EQ(count, IntersectionCount::TWO_POINTS);
+        correct_2 = {{{-5.980384461415261f, 8.279423307877108f}, {-5.019615538584739f, 9.720576692122892f}}};
+        EXPECT_NEAR_UNORDERED_V2_ARRAY(points, correct_2, 2, THRESHOLD);
+
+        rect_1 = {{{-4.0f, -2.0f}, {6.0f, 10.0f}}, 2.0f};
+        rect_2 = {{{-14.0f, 11.0f}, {4.0f, 3.0f}}, 2.0f};
+        count = rect_1.intersection_points(rect_2, points);
         EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
     }
 }
