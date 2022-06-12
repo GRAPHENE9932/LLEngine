@@ -96,28 +96,6 @@ void RoundedRectangle::decompose() {
     };
 }
 
-inline IntersectionCount intersection_points(const HorLine& hor_line_1, const HorLine& hor_line_2,
-                                             std::vector<glm::vec2>& points, const bool include_edges = false) {
-    glm::vec2 point_1;
-    auto result = hor_line_1.intersection_points(hor_line_2, point_1, include_edges);
-
-    if (result == IntersectionCount::ONE_POINT)
-        points.push_back(point_1);
-    
-    return result;
-}
-
-inline IntersectionCount intersection_points(const HorLine& hor_line, const VertLine& vert_line,
-                                             std::vector<glm::vec2>& points, const bool include_edges = false) {
-    glm::vec2 point_1;
-    auto result = vert_line.intersection_points(hor_line, point_1, include_edges);
-
-    if (result == IntersectionCount::ONE_POINT)
-        points.push_back(point_1);
-
-    return result;
-}
-
 IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomposed& other,
                                                                     std::array<glm::vec2, 4>& points) const {
     uint8_t count {0};
