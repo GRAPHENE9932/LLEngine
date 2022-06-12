@@ -1,4 +1,19 @@
+#include <iostream>
+
+#include <glm/geometric.hpp>
+
+#include "structs/RoundedRectangle.hpp"
 #include "PhysicsServer.hpp"
+
+glm::vec2 closest_point(const std::array<glm::vec2, 4>& points, glm::vec2 point) {
+    glm::vec2 result = points[0];
+    for (std::size_t i = 0; i < 4; i++) {
+        if (glm::distance(result, point) > glm::distance(points[i], point)) {
+            result = points[i];
+        }
+    }
+    return result;
+}
 
 void PhysicsServer::update(float delta) {
     // Apply gravity.
@@ -41,15 +56,55 @@ void PhysicsServer::update(float delta) {
         }
     }
 
+    std::vector<CuboidObject*> vec;
     // Consider cuboid objects.
     for (const auto& cuboid : cuboid_objects) {
         if (cuboid->cylinder_intersects(player->cylinder)) {
+            vec.push_back(cuboid.get());
+        }
+    }
 
-            bool is_above;
+    if (vec.size() == 2) {
+        CuboidObject::RelativePos is_above_1;
+        glm::vec2 pushed_out_vec_1 {vec[0]->push_cylinder_out(player->cylinder, is_above_1).x, vec[0]->push_cylinder_out(player->cylinder, is_above_1).z};
+        Cylinder pushed_out_1 {player->cylinder};
+        pushed_out_1.position.x = pushed_out_vec_1.x;
+        pushed_out_1.position.z = pushed_out_vec_1.y;
+
+        CuboidObject::RelativePos is_above_2;
+        glm::vec2 pushed_out_vec_2 {vec[1]->push_cylinder_out(player->cylinder, is_above_2).x, vec[1]->push_cylinder_out(player->cylinder, is_above_2).z};
+        Cylinder pushed_out_2 {player->cylinder};
+        pushed_out_2.position.x = pushed_out_vec_2.x;
+        pushed_out_2.position.z = pushed_out_vec_2.y;
+
+        if (!vec[1]->cylinder_intersects(pushed_out_1)) {
+            player->cylinder = pushed_out_1;
+        }
+        else if (!vec[0]->cylinder_intersects(pushed_out_2)) {
+            player->cylinder = pushed_out_2;
+        }
+        else {
+            RoundedRectangle rect_1(vec[0]->rect, player->cylinder.radius);
+            RoundedRectangle rect_2(vec[1]->rect, player->cylinder.radius);
+
+            std::array<glm::vec2, 4> points {{
+                {INFINITY, INFINITY},
+                {INFINITY, INFINITY},
+                {INFINITY, INFINITY},
+                {INFINITY, INFINITY}
+            }};
+            auto point = closest_point(points, {player->cylinder.position.x, player->cylinder.position.z});
+            player->cylinder.position.x = point.x;
+            player->cylinder.position.z = point.y;
+        }
+    }
+    else {
+        for (int i = 0; i < vec.size(); i++) {
+            CuboidObject::RelativePos is_above;
             player->cylinder.position =
-                cuboid->push_cylinder_out(player->cylinder, is_above);
+                vec[i]->push_cylinder_out(player->cylinder, is_above);
 
-            if (is_above) {
+            if (is_above == CuboidObject::RelativePos::NEXT_TO) {
                 player->zero_out_vertical_velocity();
                 player->landed();
             }

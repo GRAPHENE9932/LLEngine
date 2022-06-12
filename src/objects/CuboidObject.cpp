@@ -14,7 +14,7 @@ bool CuboidObject::cylinder_intersects(const Cylinder& cylinder) const {
         rect.distance_from({cylinder.position.x, cylinder.position.z}) < cylinder.radius;
 }
 
-glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, bool& is_above,
+glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, RelativePos& pos,
                                           float* const min_distance_out) const {
     // Case 1: push it to the top side of cuboid.
     glm::vec3 result_1 = cylinder.position;
@@ -39,15 +39,15 @@ glm::vec3 CuboidObject::push_cylinder_out(const Cylinder& cylinder, bool& is_abo
         *min_distance_out = min;
 
     if (min == distance_1) {
-        is_above = true;
+        pos = RelativePos::ABOVE;
         return result_1;
     }
     else if (min == distance_2) {
-        is_above = false;
+        pos = RelativePos::UNDER;
         return result_2;
     }
     else {
-        is_above = false;
+        pos = RelativePos::NEXT_TO;
         return result_3;
     }
 }
