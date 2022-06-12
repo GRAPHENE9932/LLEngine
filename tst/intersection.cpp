@@ -179,19 +179,19 @@ namespace {
 
         HorLine hor_line {-3.0f, 1.0f, -1.0f};
         VertLine vert_line {-2.0f, 3.0f, -1.0f};
-        auto count {utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1)};
+        auto count {vert_line.intersection_points(vert_line, point_1)};
         EXPECT_EQ(count, IntersectionCount::ONE_POINT);
         EXPECT_NEAR_V2(point_1, glm::vec2(-1.0f, -1.0f), THRESHOLD);
 
         hor_line = {-3.0f, 1.0f, -1.0f};
         vert_line = {-2.0f, 3.0f, 1.0f};
-        count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
+        count = vert_line.intersection_points(hor_line, point_1);
         EXPECT_EQ(count, IntersectionCount::ONE_POINT);
         EXPECT_NEAR_V2(point_1, glm::vec2(1.0f, -1.0f), THRESHOLD);
 
         hor_line = {-3.0f, 1.0f, -1.0f};
         vert_line = {-2.0f, 0.0f, 2.0f};
-        count = utils::vert_and_hor_line_intersection_points(vert_line, hor_line, point_1);
+        count = vert_line.intersection_points(hor_line, point_1);
         EXPECT_EQ(count, IntersectionCount::NO_INTERSECTION);
     }
 
