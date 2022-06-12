@@ -93,6 +93,7 @@ void PhysicsServer::update(float delta) {
                 {INFINITY, INFINITY},
                 {INFINITY, INFINITY}
             }};
+            rect_1.intersection_points(rect_2, points);
             auto point = closest_point(points, {player->cylinder.position.x, player->cylinder.position.z});
             player->cylinder.position.x = point.x;
             player->cylinder.position.z = point.y;
