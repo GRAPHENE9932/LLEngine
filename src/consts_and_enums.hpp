@@ -1,8 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <stdint.h>
 
-enum class IntersectionCount : uint8_t {
-    NO_INTERSECTION, ONE_POINT, TWO_POINTS, THREE_POINTS, FOUR_POINTS,
-    INFINITE_POINTS
-};
+constexpr uint8_t INFINITE_POINTS = std::numeric_limits<uint8_t>::max(); 

@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <glm/trigonometric.hpp>
 
-#include "structs/HorLine.hpp"
-#include "structs/VertLine.hpp"
+#include "structs/HorLS.hpp"
+#include "structs/VertLS.hpp"
 #include "structs/QuadrantArc.hpp"
 #include "structs/RoundedRectangle.hpp"
 #include "utils/math.hpp"
@@ -15,7 +15,7 @@ namespace {
 
     TEST(math_test, closest_point_to_hor_line_segment) {
         // {lower_x, higher_x, y}.
-        HorLine hor_line {0.0f, 2.0f, 1.0f};
+        HorLS hor_line {0.0f, 2.0f, 1.0f};
         auto result = hor_line.closest_point({1.0f, 2.0f});
         EXPECT_EQ(result, glm::vec2(1.0f, 1.0f));
 
@@ -38,7 +38,7 @@ namespace {
 
     TEST(math_test, closest_point_to_ver_line_segment) {
         // {lower_y, higher_y, x}.
-        VertLine vert_line {-2.0f, 1.0f, -1.0f};
+        VertLS vert_line {-2.0f, 1.0f, -1.0f};
         auto result = vert_line.closest_point({3.0f, -1.0f});
         EXPECT_NEAR_V2(result, glm::vec2(-1.0f, -1.0f), THRESHOLD);
 

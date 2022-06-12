@@ -2,12 +2,12 @@
 
 #include "../utils/math.hpp"
 #include "QuadrantArc.hpp"
-#include "HorLine.hpp"
-#include "VertLine.hpp"
+#include "HorLS.hpp"
+#include "VertLS.hpp"
 #include "RoundedRectangle.hpp"
 
-IntersectionCount RoundedRectangle::intersection_points(RoundedRectangle& other,
-    std::array<glm::vec2, 4>& points) {
+uint8_t RoundedRectangle::intersection_points(RoundedRectangle& other,
+        std::array<glm::vec2, 4>& points) {
     return {get_decomposed().intersection_points(other.get_decomposed(), points)};
 }
 
@@ -17,10 +17,10 @@ glm::vec2 RoundedRectangle::closest_point(glm::vec2 point, float* const min_dist
     // 6-2-5
     std::array<glm::vec2, 8> closest_points;
 
-    HorLine hor_line {rect.position.x, rect.position.x + rect.size.x, rect.position.y - radius};
+    HorLS hor_line {rect.position.x, rect.position.x + rect.size.x, rect.position.y - radius};
     closest_points[0] = hor_line.closest_point(point);
 
-    VertLine vert_line {rect.position.y, rect.position.y + rect.size.y, rect.position.x + rect.size.x + radius};
+    VertLS vert_line {rect.position.y, rect.position.y + rect.size.y, rect.position.x + rect.size.x + radius};
     closest_points[1] = vert_line.closest_point(point);
     
     closest_points[2] = closest_points[0];
@@ -96,8 +96,8 @@ void RoundedRectangle::decompose() {
     };
 }
 
-IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomposed& other,
-                                                                    std::array<glm::vec2, 4>& points) const {
+uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& other,
+        std::array<glm::vec2, 4>& points) const {
     uint8_t count {0};
 
     // Arcs.
@@ -108,22 +108,22 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {arcs[i].intersection_points(other.arcs[j], point_1, point_2)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::TWO_POINTS:
+            case 2:
                 points[count] = point_1;
                 count++;
                 points[count] = point_2;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
 
@@ -133,14 +133,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {arcs[i].intersection_points(other.hor_lines[j], point_1)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
 
@@ -150,14 +150,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {arcs[i].intersection_points(other.vert_lines[j], point_1)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
     }
@@ -170,14 +170,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {other.arcs[j].intersection_points(vert_lines[i], point_1)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
 
@@ -187,14 +187,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {vert_lines[i].intersection_points(other.vert_lines[j], point_1, false)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
 
@@ -204,14 +204,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {vert_lines[i].intersection_points(other.hor_lines[j], point_1, false)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
     }
@@ -224,14 +224,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {other.arcs[j].intersection_points(hor_lines[i], point_1)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
 
@@ -241,14 +241,14 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {other.vert_lines[j].intersection_points(hor_lines[i], point_1, false)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
 
@@ -258,28 +258,17 @@ IntersectionCount RoundedRectangle::Decomposed::intersection_points(const Decomp
             auto res {hor_lines[i].intersection_points(other.hor_lines[j], point_1, false)};
 
             switch (res) {
-            case IntersectionCount::ONE_POINT:
+            case 1:
                 points[count] = point_1;
                 count++;
                 if (count >= 4)
-                    return IntersectionCount::FOUR_POINTS;
+                    return 4;
                 break;
-            case IntersectionCount::INFINITE_POINTS:
-                return IntersectionCount::INFINITE_POINTS;
+            case INFINITE_POINTS:
+                return INFINITE_POINTS;
             }
         }
     }
 
-    switch (count) {
-    case 0:
-        return IntersectionCount::NO_INTERSECTION;
-    case 1:
-        return IntersectionCount::ONE_POINT;
-    case 2:
-        return IntersectionCount::TWO_POINTS;
-    case 3:
-        return IntersectionCount::THREE_POINTS;
-    default: // 4.
-        return IntersectionCount::FOUR_POINTS;
-    }
+    return count;
 }

@@ -22,8 +22,8 @@ set(SOURCES
     structs/QuadrantArc.cpp
     structs/Rect.cpp
     structs/Cylinder.cpp
-    structs/HorLine.cpp
-    structs/VertLine.cpp
+    structs/HorLS.cpp
+    structs/VertLS.cpp
     structs/RoundedRectangle.cpp
     utils/shader_loader.cpp
     utils/model_loader.cpp

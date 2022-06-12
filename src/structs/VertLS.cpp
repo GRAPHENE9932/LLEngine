@@ -1,6 +1,6 @@
-#include "VertLine.hpp"
+#include "VertLS.hpp"
 
-glm::vec2 VertLine::closest_point(glm::vec2 point) const {
+glm::vec2 VertLS::closest_point(glm::vec2 point) const {
     assert(lower_y <= higher_y);
     //   < 2
     // *
@@ -25,33 +25,33 @@ glm::vec2 VertLine::closest_point(glm::vec2 point) const {
     }
 }
 
-IntersectionCount VertLine::intersection_points(const VertLine& other,
-    glm::vec2& point_1, const bool include_edges) const {
+uint8_t VertLS::intersection_points(const VertLS& other,
+        glm::vec2& point_1, const bool include_edges) const {
     assert(lower_y <= higher_y);
     assert(other.lower_y <= other.higher_y);
 
     if (x != other.x)
-        return IntersectionCount::NO_INTERSECTION;
+        return 0;
 
     if (lower_y < other.higher_y && higher_y > other.lower_y)
-        return IntersectionCount::INFINITE_POINTS;
+        return INFINITE_POINTS;
 
     if (include_edges) {
         if (lower_y == other.higher_y) {
             point_1 = {x, lower_y};
-            return IntersectionCount::ONE_POINT;
+            return 1;
         }
         else if (higher_y == other.lower_y) {
             point_1 = {x, higher_y};
-            return IntersectionCount::ONE_POINT;
+            return 1;
         }
     }
 
-    return IntersectionCount::NO_INTERSECTION;
+    return 0;
 }
 
-IntersectionCount VertLine::intersection_points(const HorLine& other,
-    glm::vec2& point_1, const bool include_edges) const {
+uint8_t VertLS::intersection_points(const HorLS& other,
+        glm::vec2& point_1, const bool include_edges) const {
     assert(lower_y <= higher_y);
     assert(other.lower_x <= other.higher_x);
 
@@ -63,14 +63,14 @@ IntersectionCount VertLine::intersection_points(const HorLine& other,
     if (include_edges && x >= other.lower_x && x <= other.higher_x &&
         other.y >= lower_y && other.y <= higher_y) {
         point_1 = {x, other.y};
-        return IntersectionCount::ONE_POINT;
+        return 1;
     }
     else if (!include_edges && x > other.lower_x && x < other.higher_x &&
         other.y > lower_y && other.y < higher_y) {
         point_1 = {x, other.y};
-        return IntersectionCount::ONE_POINT;
+        return 1;
     }
     else {
-        return IntersectionCount::NO_INTERSECTION;
+        return 0;
     }
 }

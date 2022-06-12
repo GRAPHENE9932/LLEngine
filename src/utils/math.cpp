@@ -4,8 +4,8 @@
 #include <glm/trigonometric.hpp>
 #include <glm/geometric.hpp>
 
-#include "../structs/HorLine.hpp"
-#include "../structs/VertLine.hpp"
+#include "../structs/HorLS.hpp"
+#include "../structs/VertLS.hpp"
 #include "../structs/QuadrantArc.hpp"
 #include "math.hpp"
 
