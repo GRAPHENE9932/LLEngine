@@ -1,6 +1,7 @@
 #include <glm/geometric.hpp>
 
 #include "../utils/math.hpp"
+#include "static_vector.hpp"
 #include "QuadrantArc.hpp"
 #include "HorLS.hpp"
 #include "VertLS.hpp"
@@ -96,9 +97,27 @@ void RoundedRectangle::decompose() {
     };
 }
 
+template<typename T, uint8_t C>
+inline void store_to_static_vector(static_vector<T, C>& sv, T obj_1, T obj_2, uint8_t amount) {
+    switch (amount) {
+    case 2:
+        sv.push_back(obj_2);
+        // Note that there is no break statement.
+    case 1:
+        sv.push_back(obj_1);
+        break;
+    }
+}
+
+template<typename T, uint8_t C>
+inline void store_to_static_vector(static_vector<T, C>& sv, T obj_1, uint8_t amount) {
+    if (amount == 1)
+        sv.push_back(obj_1);
+}
+
 uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& other,
         std::array<glm::vec2, 4>& points) const {
-    uint8_t count {0};
+    static_vector<glm::vec2, 4> result;
 
     // Arcs.
     for (uint8_t i = 0; i < 4; i++) {
@@ -107,24 +126,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1, point_2;
             auto res {arcs[i].intersection_points(other.arcs[j], point_1, point_2)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case 2:
-                points[count] = point_1;
-                count++;
-                points[count] = point_2;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, point_2, res);
         }
 
         // Arcs - horizontal line segments.
@@ -132,16 +136,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {arcs[i].intersection_points(other.hor_lines[j], point_1)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
 
         // Arcs - vertical line segments.
@@ -149,16 +146,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {arcs[i].intersection_points(other.vert_lines[j], point_1)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
     }
 
@@ -169,16 +159,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {other.arcs[j].intersection_points(vert_lines[i], point_1)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
 
         // Vertical line segments - vertical line segments.
@@ -186,16 +169,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {vert_lines[i].intersection_points(other.vert_lines[j], point_1, false)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
 
         // Vertical line segments - horizontal line segments.
@@ -203,16 +179,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {vert_lines[i].intersection_points(other.hor_lines[j], point_1, false)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
     }
 
@@ -223,16 +192,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {other.arcs[j].intersection_points(hor_lines[i], point_1)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
 
         // Horizontal line segments - vertical line segments.
@@ -240,16 +202,9 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {other.vert_lines[j].intersection_points(hor_lines[i], point_1, false)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
 
         // Horizontal line segments - horizontal line segments.
@@ -257,18 +212,12 @@ uint8_t RoundedRectangle::Decomposed::intersection_points(const Decomposed& othe
             glm::vec2 point_1;
             auto res {hor_lines[i].intersection_points(other.hor_lines[j], point_1, false)};
 
-            switch (res) {
-            case 1:
-                points[count] = point_1;
-                count++;
-                if (count >= 4)
-                    return 4;
-                break;
-            case INFINITE_POINTS:
+            if (res == INFINITE_POINTS)
                 return INFINITE_POINTS;
-            }
+            store_to_static_vector<glm::vec2, 4>(result, point_1, res);
         }
     }
 
-    return count;
+    points = result.get_array();
+    return result.size();
 }
