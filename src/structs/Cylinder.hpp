@@ -6,8 +6,6 @@ struct Cylinder {
     glm::vec3 position;
     float height, radius;
 
-    Cylinder(glm::vec3 position, float height, float radius);
-
     inline float lowest_y() const noexcept {
         return position.y + height * -0.5f;
     }
@@ -21,5 +19,4 @@ struct Cylinder {
     inline glm::vec3 highest_point() const noexcept {
         return position + glm::vec3(0.0f, height * 0.5f, 0.0f);
     }
-
 };
