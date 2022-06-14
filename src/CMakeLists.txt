@@ -21,7 +21,6 @@ set(SOURCES
     structs/Circle.cpp
     structs/QuadrantArc.cpp
     structs/Rect.cpp
-    structs/Cylinder.cpp
     structs/HorLS.cpp
     structs/VertLS.cpp
     structs/RoundedRectangle.cpp
