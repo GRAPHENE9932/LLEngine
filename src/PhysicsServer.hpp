@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 
+#include "structs/static_vector.hpp"
 #include "objects/ControllableCylinder.hpp"
 #include "objects/FloorObject.hpp"
 #include "objects/RectangularWall.hpp"
@@ -25,4 +26,13 @@ private:
     std::vector<std::shared_ptr<RectangularWall>> rectangular_walls;
     std::vector<std::shared_ptr<CuboidObject>> cuboid_objects;
     float left_bound, right_bound, top_bound, bottom_bound;
+
+    void consider_bounds();
+
+    void consider_floors();
+
+    void consider_rectangular_walls();
+
+    void consider_cuboid_objects();
+    void resolve_side_cuboids(const static_vector<std::pair<CuboidObject*, glm::vec3>, 2>& side_cuboids);
 };

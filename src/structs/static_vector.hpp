@@ -16,7 +16,13 @@ public:
         cur_size = 0;
     }
 
-    inline T& operator[](std::size_t index) const noexcept {
+    inline T& operator[](std::size_t index) noexcept {
+        assert(index < cur_size);
+
+        return array[index];
+    }
+
+    inline const T& operator[](std::size_t index) const noexcept {
         assert(index < cur_size);
 
         return array[index];
