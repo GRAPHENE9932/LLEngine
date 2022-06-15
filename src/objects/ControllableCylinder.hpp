@@ -33,7 +33,7 @@ public:
     void update(float delta);
     void update_camera(float delta);
     void add_vertical_velocity(float difference);
-    void zero_out_vertical_velocity();
+    float get_vertical_velocity() const noexcept;
     void landed();
 
 private:

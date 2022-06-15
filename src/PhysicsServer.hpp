@@ -34,5 +34,7 @@ private:
     void consider_rectangular_walls();
 
     void consider_cuboid_objects();
-    void resolve_side_cuboids(const static_vector<std::pair<CuboidObject*, glm::vec3>, 2>& side_cuboids);
+    void resolve_side_cuboids(const static_vector<std::pair<const CuboidObject*, glm::vec3>, 2>& side_cuboids);
+    void resolve_base_cuboid(const CuboidObject* base_cuboid,
+            const static_vector<std::pair<const CuboidObject*, glm::vec3>, 2>& side_cuboids);
 };

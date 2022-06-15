@@ -3,7 +3,7 @@
 ControllableCylinder::ControllableCylinder(Camera* camera, GLFWwindow* window,
                                            glm::vec3 position, float height, float radius) :
 
-                                           cylinder(position, height, radius),
+                                           cylinder {position, height, radius},
                                            camera(camera), window(window) {
     // Set center_x and center_y.
     int window_width, window_height;
@@ -46,11 +46,12 @@ void ControllableCylinder::add_vertical_velocity(float difference) {
     vertical_velocity += difference;
 }
 
-void ControllableCylinder::zero_out_vertical_velocity() {
-    vertical_velocity = 0.0f;
+float ControllableCylinder::get_vertical_velocity() const noexcept {
+    return vertical_velocity;
 }
 
 void ControllableCylinder::landed() {
+    vertical_velocity = std::max(0.0f, vertical_velocity);
     on_floor = true;
 }
 

@@ -1,5 +1,6 @@
 #include <utility>
 #include <array>
+#include <iostream>
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -10,6 +11,19 @@
 #include "PhysicsServer.hpp"
 
 constexpr float ALLOWABLE_ERROR = 0.00005f;
+
+/**
+ * +------+
+ * |      |
+ * |      |X
+ * +------+X <- player
+ *   +----|-|
+ *   |     ^|
+ *   |  MIN_LEDGE_LENGTH
+ *   +------+
+ * The minimum ledge length when player still can stay on it.
+ */
+constexpr float MIN_LEDGE_LENGTH = 0.05f;
 
 /// Looks for the closest point in the given array.
 /// @param points The array to find closest point from.
@@ -45,7 +59,6 @@ void PhysicsServer::consider_floors() {
         if (floor->circle_over_floor(flat_player_position, player->cylinder.radius)) {
             if (player->cylinder.lowest_y() < floor->height) {
                 player->cylinder.position.y = floor->height + player->cylinder.height * 0.5f;
-                player->zero_out_vertical_velocity();
                 player->landed();
             }
         }
@@ -66,7 +79,9 @@ void PhysicsServer::consider_cuboid_objects() {
     // These side cuboids are NEXT_TO the player cylinder.
     // To not call push_cylinder_out twice, the result of this
     // function for every cuboid stored in std::pair.
-    static_vector<std::pair<CuboidObject*, glm::vec3>, 2> side_cuboids;
+    static_vector<std::pair<const CuboidObject*, glm::vec3>, 2> side_cuboids;
+    // The cuboid player standing on.
+    const CuboidObject* base_cuboid = nullptr;
 
     for (const auto& cuboid : cuboid_objects) {
         if (cuboid->cylinder_intersects(player->cylinder)) {
@@ -75,25 +90,30 @@ void PhysicsServer::consider_cuboid_objects() {
 
             switch (rel_pos) {
             case CuboidObject::RelativePos::ABOVE:
-                player->zero_out_vertical_velocity();
-                player->landed();
+                base_cuboid = cuboid.get();
+                //if (player->get_vertical_velocity() <= 0.0f) 
+                //    player->landed();
                 // Note that there is no break statement.
             case CuboidObject::RelativePos::UNDER:
                 player->cylinder.position = push_res;
                 break;
             case CuboidObject::RelativePos::NEXT_TO:
-                side_cuboids.push_back(std::make_pair(cuboid.get(), push_res));
+                if (side_cuboids.size() < 2)
+                    side_cuboids.push_back(std::make_pair(cuboid.get(), push_res));
+
                 break;
             }
         }
     }
 
+    resolve_base_cuboid(base_cuboid, side_cuboids);
     resolve_side_cuboids(side_cuboids);
 }
 
-void PhysicsServer::resolve_side_cuboids(const static_vector<std::pair<CuboidObject*, glm::vec3>, 2>& side_cuboids) {
+void PhysicsServer::resolve_side_cuboids(const static_vector<std::pair<const CuboidObject*, glm::vec3>, 2>& side_cuboids) {
     if (side_cuboids.size() == 2) {
-        // Find out if one of the resolution cases 
+        // Find out if one of the resolution cases also automaticallu
+        // resolves other cuboid's resolution.
         Cylinder player_in_case_1 {player->cylinder};
         player_in_case_1.position = side_cuboids[0].second;
 
@@ -126,6 +146,41 @@ void PhysicsServer::resolve_side_cuboids(const static_vector<std::pair<CuboidObj
     else if (side_cuboids.size() == 1) {
         player->cylinder.position = side_cuboids[0].second;
     }
+}
+
+void PhysicsServer::resolve_base_cuboid(const CuboidObject* base_cuboid,
+        const static_vector<std::pair<const CuboidObject*, glm::vec3>, 2>& side_cuboids) {
+    if (base_cuboid == nullptr)
+        return;
+
+    if (player->get_vertical_velocity() > 0.0f)
+        return;
+    
+    if (side_cuboids.size() == 0) {
+        player->landed();
+        return;
+    }
+
+    // Calculate distances between side cuboids resolution resulting horizontal positions
+    // and base cuboid resolution resulting horizontal position. If the minimum distance
+    // is greater than MIN_LEDGE_LENGTH, then place base cuboid in priority and
+    // let play stay on it. Otherwise, ignore it.
+    const glm::vec2 player_hor_pos {player->cylinder.position.x, player->cylinder.position.z};
+
+    const RoundedRectangle rounded_rect_base(base_cuboid->rect, player->cylinder.radius);
+    const glm::vec2 hor_pos_base = rounded_rect_base.closest_point(player_hor_pos);
+
+    float min_distance2 {std::numeric_limits<float>().infinity()};
+    for (uint8_t i = 0; i < side_cuboids.size(); i++) {
+        const RoundedRectangle cur_rounded_rect(side_cuboids[i].first->rect, player->cylinder.radius);
+        const glm::vec2 cur_hor_pos {cur_rounded_rect.closest_point(player_hor_pos)};
+        const float cur_distance2 = glm::distance2(hor_pos_base, cur_hor_pos);
+        if (cur_distance2 < min_distance2)
+            min_distance2 = cur_distance2;
+    }
+    
+    if (min_distance2 > MIN_LEDGE_LENGTH * MIN_LEDGE_LENGTH)
+        player->landed();
 }
 
 void PhysicsServer::update(float delta) {
