@@ -53,7 +53,7 @@ void LLShooter::init() {
     auto crosshair = std::make_shared<ImageObject2D>(
         crosshair_texture_id,
         utils::window_space_to_opengl_space(
-            Rect({WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f}, {16.0f, 16.0f}), {WINDOW_WIDTH, WINDOW_HEIGHT}
+            Rect({WINDOW_WIDTH * 0.5f - 8.0f, WINDOW_HEIGHT * 0.5f - 8.0f}, {16.0f, 16.0f}), {WINDOW_WIDTH, WINDOW_HEIGHT}
         ),
         true
     );
