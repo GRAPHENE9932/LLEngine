@@ -16,6 +16,8 @@ public:
 
     void set_id(GLuint new_id);
     GLuint get_id();
+    bool get_is_compressed() const;
+
     /// Load the DDS texture (limited).
     /// Limitations:
     ///  - Only DXT1, DXT3, DXT5 compression formats supported
@@ -24,4 +26,5 @@ public:
 
 private:
     GLuint texture_id;
+    bool is_compressed;
 };

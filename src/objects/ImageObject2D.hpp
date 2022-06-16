@@ -23,8 +23,7 @@ public:
 
     void draw() const;
 private:
-    static GLuint indices_id, vertices_id, uvs_id,
-        matrix_uniform_id;
+    static GLuint vertices_id, uvs_id, uvs_inv_v_id, matrix_uniform_id;
 
     glm::mat4 matrix;
     std::shared_ptr<Texture> texture;

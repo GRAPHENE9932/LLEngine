@@ -29,6 +29,10 @@ GLuint Texture::get_id() {
     return texture_id;
 }
 
+bool Texture::get_is_compressed() const {
+    return is_compressed;
+}
+
 // BEGIN DDS loading.
 constexpr uint32_t FOURCC_DXT1 = 0x31545844;
 constexpr uint32_t FOURCC_DXT3 = 0x33545844;
@@ -86,7 +90,7 @@ void Texture::load_from_dds(std::string file_path) {
     // Handle the compression format.
     uint32_t block_size;
     GLint format;
-    bool is_compressed {true};
+    is_compressed = true;
     switch (header.pixel_format.four_cc) {
         case FOURCC_DXT1:
             block_size = 8;
