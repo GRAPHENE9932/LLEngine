@@ -21,7 +21,7 @@ ImageObject2D::ImageObject2D(std::shared_ptr<Texture> texture, const Rect& rect,
 
 void ImageObject2D::change_rect(const Rect& new_rect) {
     matrix = glm::translate(glm::vec3(new_rect.position.x, new_rect.position.y, 0.0f)) *
-        glm::scale(glm::vec3(new_rect.size.x * 2.0f, new_rect.size.y * 2.0f, 0.0f));
+        glm::scale(glm::vec3(new_rect.size.x, new_rect.size.y, 0.0f));
 }
 
 void ImageObject2D::change_texture(std::shared_ptr<Texture> texture) {
