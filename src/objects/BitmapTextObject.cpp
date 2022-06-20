@@ -27,8 +27,8 @@ BitmapTextObject::~BitmapTextObject() {
 
 void BitmapTextObject::pre_init() {
     // Init shaders.
-    program_id = utils::load_shaders("res/shaders/colored_text_2d_vertex.glsl",
-            "res/shaders/colored_text_2d_fragment.glsl");
+    program_id = utils::load_shaders("res/shaders/colored_text_vertex.glsl",
+            "res/shaders/colored_text_fragment.glsl");
     model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     color_uniform_id = glGetUniformLocation(program_id, "COLOR");

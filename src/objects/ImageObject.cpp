@@ -41,7 +41,8 @@ void ImageObject::pre_init() {
                  QUAD_UVS_INV_V.data(), GL_STATIC_DRAW);
 
     // Init shaders.
-    program_id = utils::load_shaders("res/shaders/2d_vertex.glsl", "res/shaders/2d_fragment.glsl");
+    program_id = utils::load_shaders("res/shaders/unshaded_textured_vertex.glsl",
+            "res/shaders/unshaded_textured_fragment.glsl");
     model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
 }
