@@ -19,19 +19,20 @@ constexpr std::array<float, 18> QUAD_VERTICES {
 };
 
 constexpr std::array<float, 12> QUAD_UVS {
-    0.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f
-};
-
-constexpr std::array<float, 12> QUAD_UVS_INV_V {
     0.0f, 1.0f,
     1.0f, 0.0f,
     0.0f, 0.0f,
     0.0f, 1.0f,
     1.0f, 1.0f,
     1.0f, 0.0f
+};
+
+/// QUAD_UVS but with inverted V (Y) values.
+constexpr std::array<float, 12> QUAD_UVS_INV_V {
+    0.0f, 0.0f,
+    1.0f, 1.0f,
+    0.0f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f
 };

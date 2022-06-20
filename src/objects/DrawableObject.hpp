@@ -1,14 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-
 #include <GL/glew.h>
 
-#include "../common/Mesh.hpp"
-#include "SpatialObject.hpp"
-
-class DrawableObject : public SpatialObject {
+class DrawableObject {
 public:
-    std::shared_ptr<Mesh> mesh;
+    virtual void draw(GLfloat* camera_mvp) = 0;
 };

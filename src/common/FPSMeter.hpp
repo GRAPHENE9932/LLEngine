@@ -6,12 +6,15 @@
 
 class FPSMeter {
 public:
-    /// @param interval means interval between the fps prints.
+    /// @param interval means interval between the fps updates.
     FPSMeter(float interval);
     ~FPSMeter();
 
     /// Call this function once on every frame.
     void frame() noexcept;
+    inline float get_fps() noexcept {
+        return cur_fps;
+    }
 
 private:
     uint32_t frames_count = 0;
@@ -20,6 +23,8 @@ private:
     std::mutex mutex;
     std::condition_variable cv;
     bool working = true;
+
+    float cur_fps = 0.0f;
 
     void measure_loop();
 };

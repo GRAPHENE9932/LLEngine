@@ -6,8 +6,8 @@ set(SOURCES
     common/Mesh.cpp
     common/Map.cpp
     common/Texture.cpp
+    common/BitmapFont.cpp
     objects/SpatialObject.cpp
-    objects/DrawableObject.cpp
     objects/TexturedDrawableObject.cpp
     objects/UnshadedDrawableObject.cpp
     objects/RectangularPhysicsObject.cpp
@@ -18,6 +18,7 @@ set(SOURCES
     objects/CuboidObject.cpp
     objects/ImageObject2D.cpp
     objects/PointLight.cpp
+    objects/BitmapTextObject2D.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp
     structs/Rect.cpp

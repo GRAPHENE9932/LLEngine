@@ -33,6 +33,10 @@ bool Texture::get_is_compressed() const {
     return is_compressed;
 }
 
+glm::u32vec2 Texture::get_size() const {
+    return tex_size;
+}
+
 // BEGIN DDS loading.
 constexpr uint32_t FOURCC_DXT1 = 0x31545844;
 constexpr uint32_t FOURCC_DXT3 = 0x33545844;
@@ -66,6 +70,23 @@ struct DDSHeader {
     uint32_t caps_4;
     uint32_t reserved_2;
 };
+
+inline GLuint pixel_format_flags_to_format(const uint32_t flags) {
+    switch (flags) {
+    case 0x00000041:
+        return GL_RGBA;
+    case 0x00000040:
+        return GL_RGB;
+    case 0x00000002:
+        return GL_ALPHA;
+    case 0x00020000:
+        return GL_LUMINANCE;
+    case 0x00020001:
+        return GL_LUMINANCE_ALPHA;
+    default:
+        return GL_RGBA;
+    }
+}
 
 void Texture::load_from_dds(std::string file_path) {
     // Open the file.
@@ -106,7 +127,7 @@ void Texture::load_from_dds(std::string file_path) {
             break;
         case FOURCC_NO_COMPR:
             block_size = 1;
-            format = GL_RGBA;
+            format = pixel_format_flags_to_format(header.pixel_format.flags);
             is_compressed = false;
             break;
         default:
@@ -124,29 +145,28 @@ void Texture::load_from_dds(std::string file_path) {
     glBindTexture(GL_TEXTURE_2D, new_texture_id);
 
     // Load the mipmaps.
-    uint32_t width = header.width;
-    uint32_t height = header.height;
+    tex_size = {header.width, header.height};
+    auto cur_tex_size = tex_size;
     for (GLint mipmap_level = 0;
-            mipmap_level < header.mip_map_count && width > 0 && height > 0;
+            mipmap_level < header.mip_map_count && cur_tex_size.x > 0 && cur_tex_size.y > 0;
             mipmap_level++) {
         uint32_t size;
         if (is_compressed)
-            size = ((width + 3) / 4) * ((height + 3) / 4) * block_size;
+            size = ((cur_tex_size.x + 3) / 4) * ((cur_tex_size.y + 3) / 4) * block_size;
         else
-            size = width * height * 4;
+            size = cur_tex_size.x * cur_tex_size.y * header.pixel_format.rgb_bit_count / 8;
 
         std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
         stream.read(buffer.get(), size);
 
         if (is_compressed)
-            glCompressedTexImage2D(GL_TEXTURE_2D, mipmap_level, format, width, height,
+            glCompressedTexImage2D(GL_TEXTURE_2D, mipmap_level, format, cur_tex_size.x, tex_size.y,
                     0, size, buffer.get());
         else
-            glTexImage2D(GL_TEXTURE_2D, mipmap_level, GL_RGBA, width, height,
+            glTexImage2D(GL_TEXTURE_2D, mipmap_level, GL_RGBA, cur_tex_size.x, cur_tex_size.y,
                     0, format, GL_UNSIGNED_BYTE, buffer.get());
 
-        width /= 2;
-        height /= 2;
+        cur_tex_size /= 2;
     }
 
     // Set nearest neighbor interpolation.

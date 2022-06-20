@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <glm/vec2.hpp>
 #include <GL/glew.h>
 
 class Texture {
@@ -17,14 +18,15 @@ public:
     void set_id(GLuint new_id);
     GLuint get_id();
     bool get_is_compressed() const;
+    glm::u32vec2 get_size() const;
 
     /// Load the DDS texture (limited).
     /// Limitations:
-    ///  - Only DXT1, DXT3, DXT5 compression formats supported
-    ///    (uncompressed don't supported too).
+    ///  - Only DXT1, DXT3, DXT5 compression formats supported (including uncompressed RGBA).
     void load_from_dds(std::string dds_path);
 
 private:
     GLuint texture_id;
     bool is_compressed;
+    glm::u32vec2 tex_size;
 };

@@ -1,8 +1,12 @@
 #pragma once
 
-#include "DrawableObject.hpp"
+#include <memory>
 
-class UnshadedDrawableObject : public DrawableObject {
+#include "common/Mesh.hpp"
+#include "DrawableObject.hpp"
+#include "SpatialObject.hpp"
+
+class UnshadedDrawableObject : public DrawableObject, public SpatialObject {
 public:
     static GLuint program_id;
 
@@ -13,6 +17,7 @@ public:
     static void clean_up();
 
     glm::vec3 color;
+    std::shared_ptr<Mesh> mesh;
 
     void draw(GLfloat* camera_mvp);
 

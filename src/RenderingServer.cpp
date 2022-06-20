@@ -19,6 +19,9 @@ GLFWwindow* RenderingServer::get_window() {
 }
 
 void RenderingServer::add_textured_drawable_object(std::shared_ptr<TexturedDrawableObject> obj, bool overlay) {
+    obj->camera = camera;
+    obj->lights = &point_lights;
+
     if (overlay)
         textured_objects_overlay.push_back(obj);
     else
@@ -31,6 +34,10 @@ void RenderingServer::add_unshaded_drawable_object(std::shared_ptr<UnshadedDrawa
 
 void RenderingServer::add_image_2d_object(std::shared_ptr<ImageObject2D> obj) {
     image_2d_objects.push_back(obj);
+}
+
+void RenderingServer::add_bitmap_text_object(std::shared_ptr<BitmapTextObject2D> obj) {
+    bm_text_objects.push_back(obj);
 }
 
 void RenderingServer::init_window(int window_width, int window_height) {
@@ -82,6 +89,7 @@ void RenderingServer::init_object_types() {
     TexturedDrawableObject::pre_init();
     UnshadedDrawableObject::pre_init();
     ImageObject2D::pre_init();
+    BitmapTextObject2D::pre_init();
 }
 
 void RenderingServer::main_loop() {
@@ -101,10 +109,6 @@ void RenderingServer::main_loop() {
         glm::mat4 proj_matrix = camera->get_proj_matrix();
         glm::mat4 camera_mvp = proj_matrix * view_matrix;
 
-        std::array<PointLight, TX_DRW_POINT_LIGHTS_AMOUNT> overlay_point_lights = point_lights;
-        for (GLuint i = 0; i < TX_DRW_POINT_LIGHTS_AMOUNT; i++)
-            overlay_point_lights[i].position = view_matrix * glm::vec4(point_lights[i].position, 1.0f);
-
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         // Draw unshaded objects.
@@ -115,19 +119,24 @@ void RenderingServer::main_loop() {
         // Draw textured objects.
         glUseProgram(TexturedDrawableObject::program_id);
         for (int i = 0; i < textured_objects.size(); i++)
-            textured_objects[i]->draw(&camera_mvp[0][0], &camera->direction[0], point_lights);
+            textured_objects[i]->draw(&camera_mvp[0][0]);
 
         // Overlay time.
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Draw textured objects.
         for (int i = 0; i < textured_objects_overlay.size(); i++)
-            textured_objects_overlay[i]->draw(&proj_matrix[0][0], &camera->direction[0], overlay_point_lights);
+            textured_objects_overlay[i]->draw(&proj_matrix[0][0]);
 
         // Draw Image2D objects.
         glUseProgram(ImageObject2D::program_id);
         for (int i = 0; i < image_2d_objects.size(); i++)
-            image_2d_objects[i]->draw();
+            image_2d_objects[i]->draw(&proj_matrix[0][0]);
+        
+        // Draw text.
+        glUseProgram(BitmapTextObject2D::get_program_id());
+        for (int i = 0; i < bm_text_objects.size(); i++)
+            bm_text_objects[i]->draw(&proj_matrix[0][0]);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -136,5 +145,7 @@ void RenderingServer::main_loop() {
 
 RenderingServer::~RenderingServer() {
     TexturedDrawableObject::clean_up();
+    UnshadedDrawableObject::clean_up();
     ImageObject2D::clean_up();
+    BitmapTextObject2D::clean_up();
 }

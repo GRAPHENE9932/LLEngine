@@ -1,7 +1,9 @@
 #include "utils/utils.hpp"
 #include "utils/math.hpp"
 #include "objects/Camera.hpp"
+#include "objects/BitmapTextObject2D.hpp"
 #include "common/Map.hpp"
+#include "common/BitmapFont.hpp"
 #include "LLShooter.hpp"
 
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
@@ -16,10 +18,63 @@ void LLShooter::start() {
 }
 
 void LLShooter::init() {
-    fps_meter = std::make_unique<FPSMeter>(20.0f);
+    fps_meter = std::make_unique<FPSMeter>(0.25f);
     rendering_server = std::make_unique<RenderingServer>(WINDOW_WIDTH, WINDOW_HEIGHT);
     physics_server = std::make_unique<PhysicsServer>();
 
+    add_camera_and_player();
+    add_crosshair();
+    add_lights();
+    add_weapon();
+    add_fps_display();
+
+    load_map("res/maps/map_close.llmap", *rendering_server, *physics_server);
+
+    // Hide cursor.
+    glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void LLShooter::add_weapon() {
+    auto glock_texture_id = std::make_shared<Texture>("res/textures/glock.dds");
+    auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
+    auto glock_obj = std::make_shared<TexturedDrawableObject>(glock_texture_id, glock_mesh);
+    glock_obj->translation = {1.0f, -0.75f, -1.2f};
+    glock_obj->rotation = glm::quat();
+    glock_obj->scale = {1.0f, 1.0f, 1.0f};
+    rendering_server->add_textured_drawable_object(glock_obj, true);
+}
+
+void LLShooter::add_crosshair() {
+    auto crosshair_texture_id = std::make_shared<Texture>("res/textures/crosshair.dds");
+    auto crosshair = std::make_shared<ImageObject2D>(crosshair_texture_id, true);
+
+    crosshair->set_in_center_of_screen({WINDOW_WIDTH, WINDOW_HEIGHT}, 0.0f);
+    crosshair->set_screen_space_scale({1.0f, 1.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    crosshair->rotation = glm::quat();
+
+    rendering_server->add_image_2d_object(crosshair);
+}
+
+void LLShooter::add_lights() {
+    rendering_server->point_lights[0] = PointLight({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
+    rendering_server->point_lights[1] = PointLight({0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
+}
+
+void LLShooter::add_fps_display() {
+    std::shared_ptr<BitmapFont> font {std::make_shared<BitmapFont>("res/fonts/default.llbmf")};
+    fps_display = std::make_shared<BitmapTextObject2D>(
+        font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT)
+    );
+
+    fps_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    fps_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    fps_display->rotation = glm::quat();
+
+    rendering_server->add_bitmap_text_object(fps_display);
+}
+
+void LLShooter::add_camera_and_player() {
     // Create the camera.
     camera = std::make_unique<Camera>(
         glm::vec3(0.0f, 0.0f, 0.0f), glm::radians(90.0f),
@@ -37,46 +92,15 @@ void LLShooter::init() {
     player->backward_speed = 10.0f;
     player->jump_force = 25.0f;
 
-    // Continue initialization of the physics server.
-    physics_server->set_player(player);;
+    // Add camera and player to the servers.
+    physics_server->set_player(player);
 
-    // Continue initialization of the rendering server.
     rendering_server->camera = camera.get();
     rendering_server->set_update_callback(
         [this](float delta) {
             update(delta);
         }
     );
-
-    // Create the crosshair.
-    auto crosshair_texture_id = std::make_shared<Texture>("res/textures/crosshair.dds");
-    auto crosshair = std::make_shared<ImageObject2D>(
-        crosshair_texture_id,
-        utils::window_space_to_opengl_space(
-            Rect({WINDOW_WIDTH * 0.5f - 8.0f, WINDOW_HEIGHT * 0.5f - 8.0f}, {16.0f, 16.0f}), {WINDOW_WIDTH, WINDOW_HEIGHT}
-        ),
-        true
-    );
-    rendering_server->add_image_2d_object(crosshair);
-
-    // Create map.
-    load_map("res/maps/map_close.llmap", *rendering_server, *physics_server);
-
-    // Initialize lights.
-    rendering_server->point_lights[0] = PointLight({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
-    rendering_server->point_lights[1] = PointLight({0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
-
-    // Add the weapon.
-    auto glock_texture_id = std::make_shared<Texture>("res/textures/glock.dds");
-    auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
-    auto glock_obj = std::make_shared<TexturedDrawableObject>(glock_texture_id, glock_mesh);
-    glock_obj->translation = {1.0f, -0.75f, -1.2f};
-    glock_obj->rotation = glm::quat();
-    glock_obj->scale = {1.0f, 1.0f, 1.0f};
-    rendering_server->add_textured_drawable_object(glock_obj, true);
-
-    // Hide cursor.
-    glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void LLShooter::update(float delta) {
@@ -84,6 +108,7 @@ void LLShooter::update(float delta) {
     rendering_server->point_lights[0].position = player->cylinder.position;
 
     fps_meter->frame();
+    fps_display->set_text("FPS: " + std::to_string(fps_meter->get_fps()));
     physics_server->update(delta);
 }
 

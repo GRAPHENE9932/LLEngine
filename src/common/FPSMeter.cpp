@@ -18,11 +18,9 @@ void FPSMeter::frame() noexcept {
 
 void FPSMeter::measure_loop() {
     while (working) {
-        uint32_t fps = static_cast<float>(frames_count / interval);
+        cur_fps = static_cast<float>(frames_count) / interval;
+
         frames_count = 0;
-
-        std::cout << "FPS: " << fps << std::endl;
-
         std::unique_lock<std::mutex> lock(mutex);
         cv.wait_for(lock, std::chrono::duration<float>(interval));
     }
