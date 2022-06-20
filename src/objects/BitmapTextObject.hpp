@@ -13,12 +13,12 @@
 #include "SpatialObject.hpp"
 #include "DrawableObject.hpp"
 
-class BitmapTextObject2D : public SpatialObject, public DrawableObject {
+class BitmapTextObject : public SpatialObject, public DrawableObject {
 public:
-    BitmapTextObject2D(const std::shared_ptr<BitmapFont>& font,
+    BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
             const std::string& text, const glm::vec3& color,
-            const glm::vec2 win_size);
-    ~BitmapTextObject2D();
+            const glm::vec2 win_size, const bool is_2d = true);
+    ~BitmapTextObject();
 
     static void pre_init();
     static void clean_up();
@@ -41,6 +41,7 @@ private:
     std::shared_ptr<BitmapFont> font;
 
     glm::vec3 color;
+    bool is_2d;
 
     std::vector<float> vertices;
     std::vector<float> uvs;

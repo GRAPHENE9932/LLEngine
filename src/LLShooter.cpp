@@ -1,7 +1,7 @@
 #include "utils/utils.hpp"
 #include "utils/math.hpp"
 #include "objects/Camera.hpp"
-#include "objects/BitmapTextObject2D.hpp"
+#include "objects/BitmapTextObject.hpp"
 #include "common/Map.hpp"
 #include "common/BitmapFont.hpp"
 #include "LLShooter.hpp"
@@ -62,16 +62,18 @@ void LLShooter::add_lights() {
 
 void LLShooter::add_fps_display() {
     std::shared_ptr<BitmapFont> font {std::make_shared<BitmapFont>("res/fonts/default.llbmf")};
-    fps_display = std::make_shared<BitmapTextObject2D>(
+    fps_display = std::make_shared<BitmapTextObject>(
         font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT)
     );
 
+    //fps_display->translation = {0.5f, 0.5f, 0.0f};
+    //fps_display->scale = {0.25f, 0.25f, 1.0f};
     fps_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     fps_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     fps_display->rotation = glm::quat();
 
-    rendering_server->add_bitmap_text_object(fps_display);
+    rendering_server->add_bitmap_text_object(fps_display, true);
 }
 
 void LLShooter::add_camera_and_player() {

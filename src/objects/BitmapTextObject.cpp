@@ -2,22 +2,22 @@
 
 #include "../utils/utils.hpp"
 #include "../utils/math.hpp"
-#include "BitmapTextObject2D.hpp"
+#include "BitmapTextObject.hpp"
 
-GLuint BitmapTextObject2D::program_id = 0;
-GLuint BitmapTextObject2D::model_matrix_uniform_id = 0;
-GLuint BitmapTextObject2D::mvp_matrix_uniform_id = 0;
-GLuint BitmapTextObject2D::color_uniform_id = 0;
+GLuint BitmapTextObject::program_id = 0;
+GLuint BitmapTextObject::model_matrix_uniform_id = 0;
+GLuint BitmapTextObject::mvp_matrix_uniform_id = 0;
+GLuint BitmapTextObject::color_uniform_id = 0;
 
-BitmapTextObject2D::BitmapTextObject2D(const std::shared_ptr<BitmapFont>& font,
+BitmapTextObject::BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
         const std::string& text, const glm::vec3& color,
-        const glm::vec2 win_size) :
-        color(color) {
+        const glm::vec2 win_size, const bool is_2d) :
+        color(color), is_2d(is_2d) {
     set_font(font);
     set_text(text);
 }
 
-BitmapTextObject2D::~BitmapTextObject2D() {
+BitmapTextObject::~BitmapTextObject() {
     // Delete the buffers if they exist.
     if (vertices_id != 0)
         glDeleteBuffers(1, &vertices_id);
@@ -25,7 +25,7 @@ BitmapTextObject2D::~BitmapTextObject2D() {
         glDeleteBuffers(1, &uvs_id);
 }
 
-void BitmapTextObject2D::pre_init() {
+void BitmapTextObject::pre_init() {
     // Init shaders.
     program_id = utils::load_shaders("res/shaders/colored_text_2d_vertex.glsl",
             "res/shaders/colored_text_2d_fragment.glsl");
@@ -34,22 +34,22 @@ void BitmapTextObject2D::pre_init() {
     color_uniform_id = glGetUniformLocation(program_id, "COLOR");
 }
 
-void BitmapTextObject2D::clean_up() {
+void BitmapTextObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-GLuint BitmapTextObject2D::get_program_id() {
+GLuint BitmapTextObject::get_program_id() {
     return program_id;
 }
 
-void BitmapTextObject2D::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
+void BitmapTextObject::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
     translation = glm::vec3(
         utils::scr_space_pos_to_gl_space(scr_space_pos, win_size),
         scr_space_pos.z
     );
 }
 
-void BitmapTextObject2D::set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size) {
+void BitmapTextObject::set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size) {
     scale = glm::vec3(
         utils::scr_space_scale_to_gl_space(
             static_cast<glm::vec2>(scr_space_scale),
@@ -59,12 +59,12 @@ void BitmapTextObject2D::set_screen_space_scale(const glm::vec3& scr_space_scale
     );
 }
 
-void BitmapTextObject2D::set_font(const std::shared_ptr<BitmapFont>& font) {
+void BitmapTextObject::set_font(const std::shared_ptr<BitmapFont>& font) {
     this->font = font;
     this->texture_id = font->get_texture_id();
 }
 
-void BitmapTextObject2D::set_text(const std::string& text) {
+void BitmapTextObject::set_text(const std::string& text) {
     const glm::vec2 char_size = font->get_char_size();
     const glm::vec2 spacing = font->get_spacing();
 
@@ -108,7 +108,7 @@ void BitmapTextObject2D::set_text(const std::string& text) {
     register_buffers();
 }
 
-void BitmapTextObject2D::draw(GLfloat* camera_mvp) {
+void BitmapTextObject::draw(GLfloat* camera_mvp) {
     glEnable(GL_BLEND);
 
     // Vertices.
@@ -127,8 +127,12 @@ void BitmapTextObject2D::draw(GLfloat* camera_mvp) {
     // Uniforms.
     auto matrix = compute_matrix();
     glUniformMatrix4fv(model_matrix_uniform_id, 1, GL_FALSE, &matrix[0][0]);
-    auto mvp = glm::mat4(1.0f);
-    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
+
+    if (is_2d)
+        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &MAT4_IDENTITY[0][0]);
+    else
+        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);
+
     glUniform3fv(color_uniform_id, 1, &color[0]);
 
     // Draw.
@@ -141,7 +145,7 @@ void BitmapTextObject2D::draw(GLfloat* camera_mvp) {
     glDisable(GL_BLEND);
 }
 
-void BitmapTextObject2D::register_buffers() {
+void BitmapTextObject::register_buffers() {
     // Delete the buffers if they already exist.
     if (vertices_id != 0)
         glDeleteBuffers(1, &vertices_id);

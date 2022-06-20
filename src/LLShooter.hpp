@@ -16,7 +16,7 @@ private:
     std::shared_ptr<ControllableCylinder> player;
     std::unique_ptr<Camera> camera;
     std::unique_ptr<FPSMeter> fps_meter;
-    std::shared_ptr<BitmapTextObject2D> fps_display;
+    std::shared_ptr<BitmapTextObject> fps_display;
 
     void init();
     void add_weapon();
