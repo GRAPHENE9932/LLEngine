@@ -5,24 +5,25 @@
 #include "../consts_and_enums.hpp"
 #include "../utils/utils.hpp"
 #include "../utils/math.hpp"
-#include "ImageObject2D.hpp"
+#include "ImageObject.hpp"
 
-GLuint ImageObject2D::program_id;
-GLuint ImageObject2D::vertices_id;
-GLuint ImageObject2D::uvs_id;
-GLuint ImageObject2D::uvs_inv_v_id;
-GLuint ImageObject2D::matrix_uniform_id;
+GLuint ImageObject::program_id;
+GLuint ImageObject::vertices_id;
+GLuint ImageObject::uvs_id;
+GLuint ImageObject::uvs_inv_v_id;
+GLuint ImageObject::model_matrix_uniform_id;
+GLuint ImageObject::mvp_matrix_uniform_id;
 
-ImageObject2D::ImageObject2D(std::shared_ptr<Texture> texture, bool is_transparent) :
-    is_transparent(is_transparent) {
+ImageObject::ImageObject(std::shared_ptr<Texture> texture, bool is_transparent, bool is_2d) :
+    is_transparent(is_transparent), is_2d(is_2d) {
     change_texture(texture);
 }
 
-void ImageObject2D::change_texture(std::shared_ptr<Texture> texture) {
+void ImageObject::change_texture(std::shared_ptr<Texture> texture) {
     this->texture = texture;
 }
 
-void ImageObject2D::pre_init() {
+void ImageObject::pre_init() {
     // Init buffers.
     glGenBuffers(1, &vertices_id);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
@@ -41,31 +42,32 @@ void ImageObject2D::pre_init() {
 
     // Init shaders.
     program_id = utils::load_shaders("res/shaders/2d_vertex.glsl", "res/shaders/2d_fragment.glsl");
-    matrix_uniform_id = glGetUniformLocation(program_id, "OBJECT_MATRIX");
+    model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
+    mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
 }
 
-void ImageObject2D::clean_up() {
+void ImageObject::clean_up() {
     glDeleteBuffers(1, &vertices_id);
     glDeleteBuffers(1, &uvs_id);
 
     glDeleteProgram(program_id);
 }
 
-void ImageObject2D::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
+void ImageObject::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
     translation = glm::vec3(
         utils::scr_space_pos_to_gl_space(scr_space_pos, win_size),
         scr_space_pos.z
     );
 }
 
-void ImageObject2D::set_in_center_of_screen(const glm::vec2 win_size, const float z_coord) {
+void ImageObject::set_in_center_of_screen(const glm::vec2 win_size, const float z_coord) {
     translation = glm::vec3(
         -static_cast<glm::vec2>(texture->get_size()) / win_size,
         z_coord
     );
 }
 
-void ImageObject2D::set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size) {
+void ImageObject::set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size) {
     scale = glm::vec3(
         utils::scr_space_scale_to_gl_space(
             static_cast<glm::vec2>(scr_space_scale) * static_cast<glm::vec2>(texture->get_size()),
@@ -75,7 +77,7 @@ void ImageObject2D::set_screen_space_scale(const glm::vec3& scr_space_scale, con
     );
 }
 
-void ImageObject2D::draw(GLfloat* camera_mvp) {
+void ImageObject::draw(GLfloat* camera_mvp) {
     if (is_transparent)
         glEnable(GL_BLEND);
 
@@ -97,7 +99,12 @@ void ImageObject2D::draw(GLfloat* camera_mvp) {
 
     // Uniforms.
     auto model_matrix = compute_matrix();
-    glUniformMatrix4fv(matrix_uniform_id, 1, GL_FALSE, &model_matrix[0][0]);
+    glUniformMatrix4fv(model_matrix_uniform_id, 1, GL_FALSE, &model_matrix[0][0]);
+
+    if (is_2d)
+        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &MAT4_IDENTITY[0][0]);
+    else
+        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, QUAD_VERTICES.size());

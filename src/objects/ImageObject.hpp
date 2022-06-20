@@ -11,11 +11,11 @@
 #include "SpatialObject.hpp"
 #include "DrawableObject.hpp"
 
-class ImageObject2D : public SpatialObject, public DrawableObject {
+class ImageObject : public SpatialObject, public DrawableObject {
 public:
     static GLuint program_id;
 
-    ImageObject2D(std::shared_ptr<Texture> texture, bool is_transparent);
+    ImageObject(std::shared_ptr<Texture> texture, bool is_transparent, bool is_2d = true);
 
     static void pre_init();
     static void clean_up();
@@ -28,8 +28,8 @@ public:
     void draw(GLfloat* camera_mvp) override;
 
 private:
-    static GLuint vertices_id, uvs_id, uvs_inv_v_id, matrix_uniform_id;
+    static GLuint vertices_id, uvs_id, uvs_inv_v_id, model_matrix_uniform_id, mvp_matrix_uniform_id;
 
     std::shared_ptr<Texture> texture;
-    bool is_transparent;
+    bool is_transparent, is_2d;
 };

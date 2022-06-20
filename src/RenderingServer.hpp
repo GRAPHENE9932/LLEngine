@@ -11,7 +11,7 @@
 
 #include "objects/TexturedDrawableObject.hpp"
 #include "objects/UnshadedDrawableObject.hpp"
-#include "objects/ImageObject2D.hpp"
+#include "objects/ImageObject.hpp"
 #include "objects/BitmapTextObject.hpp"
 #include "objects/PointLight.hpp"
 #include "objects/Camera.hpp"
@@ -29,7 +29,7 @@ public:
 
     void add_textured_drawable_object(std::shared_ptr<TexturedDrawableObject> obj, const bool overlay = false);
     void add_unshaded_drawable_object(std::shared_ptr<UnshadedDrawableObject> obj);
-    void add_image_2d_object(std::shared_ptr<ImageObject2D> obj);
+    void add_image_2d_object(std::shared_ptr<ImageObject> obj);
     void add_bitmap_text_object(std::shared_ptr<BitmapTextObject> obj, const bool overlay = false);
 
     void main_loop();
@@ -42,7 +42,7 @@ private:
     std::vector<std::shared_ptr<TexturedDrawableObject>> textured_objects;
     std::vector<std::shared_ptr<TexturedDrawableObject>> textured_objects_overlay;
     std::vector<std::shared_ptr<UnshadedDrawableObject>> unshaded_objects;
-    std::vector<std::shared_ptr<ImageObject2D>> image_2d_objects;
+    std::vector<std::shared_ptr<ImageObject>> image_2d_objects;
     std::vector<std::shared_ptr<BitmapTextObject>> bitmap_text_objects;
     std::vector<std::shared_ptr<BitmapTextObject>> bitmap_text_objects_overlay;
 

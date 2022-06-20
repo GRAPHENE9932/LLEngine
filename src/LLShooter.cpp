@@ -46,7 +46,7 @@ void LLShooter::add_weapon() {
 
 void LLShooter::add_crosshair() {
     auto crosshair_texture_id = std::make_shared<Texture>("res/textures/crosshair.dds");
-    auto crosshair = std::make_shared<ImageObject2D>(crosshair_texture_id, true);
+    auto crosshair = std::make_shared<ImageObject>(crosshair_texture_id, true);
 
     crosshair->set_in_center_of_screen({WINDOW_WIDTH, WINDOW_HEIGHT}, 0.0f);
     crosshair->set_screen_space_scale({1.0f, 1.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});

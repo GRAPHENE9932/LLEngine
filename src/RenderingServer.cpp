@@ -32,7 +32,7 @@ void RenderingServer::add_unshaded_drawable_object(std::shared_ptr<UnshadedDrawa
     unshaded_objects.push_back(obj);
 }
 
-void RenderingServer::add_image_2d_object(std::shared_ptr<ImageObject2D> obj) {
+void RenderingServer::add_image_2d_object(std::shared_ptr<ImageObject> obj) {
     image_2d_objects.push_back(obj);
 }
 
@@ -91,7 +91,7 @@ void RenderingServer::init_gl() {
 void RenderingServer::init_object_types() {
     TexturedDrawableObject::pre_init();
     UnshadedDrawableObject::pre_init();
-    ImageObject2D::pre_init();
+    ImageObject::pre_init();
     BitmapTextObject::pre_init();
 }
 
@@ -140,7 +140,7 @@ void RenderingServer::main_loop() {
             textured_objects_overlay[i]->draw(&proj_matrix[0][0]);
 
         // Draw Image2D objects.
-        glUseProgram(ImageObject2D::program_id);
+        glUseProgram(ImageObject::program_id);
         for (int i = 0; i < image_2d_objects.size(); i++)
             image_2d_objects[i]->draw(&identi[0][0]);
         
@@ -157,6 +157,6 @@ void RenderingServer::main_loop() {
 RenderingServer::~RenderingServer() {
     TexturedDrawableObject::clean_up();
     UnshadedDrawableObject::clean_up();
-    ImageObject2D::clean_up();
+    ImageObject::clean_up();
     BitmapTextObject::clean_up();
 }

@@ -16,7 +16,7 @@ set(SOURCES
     objects/FloorObject.cpp
     objects/RectangularWall.cpp
     objects/CuboidObject.cpp
-    objects/ImageObject2D.cpp
+    objects/ImageObject.cpp
     objects/PointLight.cpp
     objects/BitmapTextObject.cpp
     structs/Circle.cpp
