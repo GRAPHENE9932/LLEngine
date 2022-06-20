@@ -67,8 +67,6 @@ void LLShooter::add_fps_display() {
         glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT)
     );
 
-    //fps_display->translation = {0.5f, 0.5f, 0.0f};
-    //fps_display->scale = {0.25f, 0.25f, 1.0f};
     fps_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     fps_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     fps_display->rotation = glm::quat();
