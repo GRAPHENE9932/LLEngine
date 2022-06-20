@@ -5,7 +5,6 @@
 #include "BitmapTextObject.hpp"
 
 GLuint BitmapTextObject::program_id = 0;
-GLuint BitmapTextObject::model_matrix_uniform_id = 0;
 GLuint BitmapTextObject::mvp_matrix_uniform_id = 0;
 GLuint BitmapTextObject::color_uniform_id = 0;
 
@@ -29,7 +28,6 @@ void BitmapTextObject::pre_init() {
     // Init shaders.
     program_id = utils::load_shaders("res/shaders/colored_text_vertex.glsl",
             "res/shaders/colored_text_fragment.glsl");
-    model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     color_uniform_id = glGetUniformLocation(program_id, "COLOR");
 }
@@ -108,7 +106,7 @@ void BitmapTextObject::set_text(const std::string& text) {
     register_buffers();
 }
 
-void BitmapTextObject::draw(GLfloat* camera_mvp) {
+void BitmapTextObject::draw(const glm::mat4& vp) {
     glEnable(GL_BLEND);
 
     // Vertices.
@@ -125,13 +123,10 @@ void BitmapTextObject::draw(GLfloat* camera_mvp) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
     // Uniforms.
-    auto matrix = compute_matrix();
-    glUniformMatrix4fv(model_matrix_uniform_id, 1, GL_FALSE, &matrix[0][0]);
+    glm::mat4 model_matrix = compute_matrix();
+    glm::mat4 mvp = is_2d ? model_matrix : vp * model_matrix;
 
-    if (is_2d)
-        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &MAT4_IDENTITY[0][0]);
-    else
-        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);
+    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
 
     glUniform3fv(color_uniform_id, 1, &color[0]);
 

@@ -78,7 +78,7 @@ void ImageObject::set_screen_space_scale(const glm::vec3& scr_space_scale, const
     );
 }
 
-void ImageObject::draw(GLfloat* camera_mvp) {
+void ImageObject::draw(const glm::mat4& vp) {
     if (is_transparent)
         glEnable(GL_BLEND);
 
@@ -99,13 +99,10 @@ void ImageObject::draw(GLfloat* camera_mvp) {
     glBindTexture(GL_TEXTURE_2D, texture->get_id());
 
     // Uniforms.
-    auto model_matrix = compute_matrix();
-    glUniformMatrix4fv(model_matrix_uniform_id, 1, GL_FALSE, &model_matrix[0][0]);
+    glm::mat4 model_matrix = compute_matrix();
+    glm::mat4 mvp = is_2d ? model_matrix : vp * model_matrix;
 
-    if (is_2d)
-        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &MAT4_IDENTITY[0][0]);
-    else
-        glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);
+    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, QUAD_VERTICES.size());

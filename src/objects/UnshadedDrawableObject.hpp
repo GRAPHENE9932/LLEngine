@@ -19,8 +19,8 @@ public:
     glm::vec3 color;
     std::shared_ptr<Mesh> mesh;
 
-    void draw(GLfloat* camera_mvp);
+    void draw(const glm::mat4& vp);
 
 private:
-    static GLuint mvp_matrix_uniform_id, model_matrix_uniform_id, color_uniform_id;
+    static GLuint mvp_matrix_uniform_id, color_uniform_id;
 };

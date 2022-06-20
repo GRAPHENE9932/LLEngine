@@ -25,7 +25,7 @@ public:
     void set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size);
     void change_texture(std::shared_ptr<Texture> texture);
 
-    void draw(GLfloat* camera_mvp) override;
+    void draw(const glm::mat4& vp) override;
 
 private:
     static GLuint vertices_id, uvs_id, uvs_inv_v_id, model_matrix_uniform_id, mvp_matrix_uniform_id;

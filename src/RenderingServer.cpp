@@ -110,44 +110,42 @@ void RenderingServer::main_loop() {
 
         glm::mat4 view_matrix = camera->compute_view_matrix();
         glm::mat4 proj_matrix = camera->get_proj_matrix();
-        glm::mat4 camera_mvp = proj_matrix * view_matrix;
+        glm::mat4 camera_vp = proj_matrix * view_matrix;
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         // Draw unshaded objects.
         glUseProgram(UnshadedDrawableObject::program_id);
         for (int i = 0; i < unshaded_objects.size(); i++)
-            unshaded_objects[i]->draw(&camera_mvp[0][0]);
+            unshaded_objects[i]->draw(camera_vp);
 
         // Draw textured objects.
         glUseProgram(TexturedDrawableObject::program_id);
         for (int i = 0; i < textured_objects.size(); i++)
-            textured_objects[i]->draw(&camera_mvp[0][0]);
+            textured_objects[i]->draw(camera_vp);
         
         // Draw bitmap text.
         glUseProgram(BitmapTextObject::get_program_id());
         for (int i = 0; i < bitmap_text_objects.size(); i++)
-            bitmap_text_objects[i]->draw(&camera_mvp[0][0]);
+            bitmap_text_objects[i]->draw(camera_vp);
 
         // Overlay time.
         glClear(GL_DEPTH_BUFFER_BIT);
 
-
-        glm::mat4 identi = glm::mat4(1.0f);
         // Draw textured objects.
         glUseProgram(TexturedDrawableObject::program_id);
         for (int i = 0; i < textured_objects_overlay.size(); i++)
-            textured_objects_overlay[i]->draw(&proj_matrix[0][0]);
+            textured_objects_overlay[i]->draw(proj_matrix);
 
         // Draw Image2D objects.
         glUseProgram(ImageObject::program_id);
         for (int i = 0; i < image_2d_objects.size(); i++)
-            image_2d_objects[i]->draw(&identi[0][0]);
+            image_2d_objects[i]->draw(proj_matrix);
         
         // Draw text.
         glUseProgram(BitmapTextObject::get_program_id());
         for (int i = 0; i < bitmap_text_objects_overlay.size(); i++)
-            bitmap_text_objects_overlay[i]->draw(&proj_matrix[0][0]);
+            bitmap_text_objects_overlay[i]->draw(proj_matrix);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

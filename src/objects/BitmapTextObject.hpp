@@ -31,10 +31,10 @@ public:
     void set_font(const std::shared_ptr<BitmapFont>& font);
     void set_text(const std::string& text);
 
-    void draw(GLfloat* camera_mvp) override;
+    void draw(const glm::mat4& vp) override;
 
 private:
-    static GLuint program_id, model_matrix_uniform_id, color_uniform_id, mvp_matrix_uniform_id;
+    static GLuint program_id, color_uniform_id, mvp_matrix_uniform_id;
 
     GLuint vertices_id = 0, uvs_id = 0, texture_id = 0;
 

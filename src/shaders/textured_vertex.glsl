@@ -12,7 +12,7 @@ uniform mat4 MODEL_MATRIX;
 uniform mat4 NORMAL_MATRIX;
 
 void main() {
-    gl_Position = MVP * MODEL_MATRIX * vec4(vertex_pos_modelspace, 1.0);
+    gl_Position = MVP * vec4(vertex_pos_modelspace, 1.0);
 
     vec3 orig_normal_worldspace = (MODEL_MATRIX * vec4(vertex_normal_modelspace, 0.0)).xyz;
     normal_worldspace = (NORMAL_MATRIX * vec4(orig_normal_worldspace, 0.0)).xyz;

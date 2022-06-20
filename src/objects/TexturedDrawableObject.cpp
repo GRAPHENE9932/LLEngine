@@ -38,7 +38,7 @@ void TexturedDrawableObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-void TexturedDrawableObject::draw(GLfloat* camera_mvp) {
+void TexturedDrawableObject::draw(const glm::mat4& vp) {
     // Vertices.
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertices_id);
@@ -58,11 +58,16 @@ void TexturedDrawableObject::draw(GLfloat* camera_mvp) {
     glBindTexture(GL_TEXTURE_2D, texture->get_id());
 
     // Uniforms.
-    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, camera_mvp);
-    auto model_matrix = compute_matrix();
+    glm::mat4 model_matrix = compute_matrix();
+
+    glm::mat4 mvp = vp * model_matrix;
+    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
+
     glUniformMatrix4fv(model_matrix_uniform_id, 1, GL_FALSE, &model_matrix[0][0]);
-    auto normal_matrix = glm::transpose(glm::inverse(model_matrix));
+
+    glm::mat4 normal_matrix = glm::transpose(glm::inverse(model_matrix));
     glUniformMatrix4fv(normal_matrix_uniform_id, 1, GL_FALSE, &normal_matrix[0][0]);
+    
     glUniform3fv(camera_direction_uniform_id, 1, &(camera->direction[0]));
 
     for (GLuint i = 0; i < TX_DRW_POINT_LIGHTS_AMOUNT; i++)

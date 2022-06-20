@@ -28,7 +28,7 @@ public:
     static void pre_init();
     static void clean_up();
 
-    void draw(GLfloat* camera_mvp) override;
+    void draw(const glm::mat4& vp) override;
 
 private:
     static GLuint mvp_matrix_uniform_id, model_matrix_uniform_id,
