@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/FPSMeter.hpp"
+#include "objects/BitmapTextObject.hpp"
 #include "RenderingServer.hpp"
 #include "PhysicsServer.hpp"
 

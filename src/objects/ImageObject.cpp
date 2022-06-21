@@ -78,7 +78,15 @@ void ImageObject::set_screen_space_scale(const glm::vec3& scr_space_scale, const
     );
 }
 
-void ImageObject::draw(const glm::mat4& vp) {
+void ImageObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
+    if (program_id == 0)
+        pre_init();
+    
+    if (env_info.cur_shader != program_id) {
+        env_info.cur_shader = program_id;
+        glUseProgram(program_id);
+    }
+
     if (is_transparent)
         glEnable(GL_BLEND);
 

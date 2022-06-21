@@ -10,17 +10,12 @@
 #include "SpatialObject.hpp"
 #include "Camera.hpp"
 
-// Also, change src/shaders/textured_fragment.glsl:TX_DRW_POINT_LIGHTS_AMOUNT
-constexpr GLuint TX_DRW_POINT_LIGHTS_AMOUNT = 2;
-
 class TexturedDrawableObject : public DrawableObject, public SpatialObject {
 public:
     static GLuint program_id;
 
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Texture> texture;
-    const std::array<PointLight, TX_DRW_POINT_LIGHTS_AMOUNT>* lights;
-    const Camera* camera;
 
     TexturedDrawableObject(std::shared_ptr<Texture> texture, std::shared_ptr<Mesh> mesh);
     ~TexturedDrawableObject();
@@ -28,11 +23,14 @@ public:
     static void pre_init();
     static void clean_up();
 
-    void draw(const glm::mat4& vp) override;
+    void draw(const glm::mat4& vp, EnvironmentInfo& env_info) override;
+    GLuint get_program_id() const override {
+        return program_id;
+    }
 
 private:
     static GLuint mvp_matrix_uniform_id, model_matrix_uniform_id,
         normal_matrix_uniform_id, camera_direction_uniform_id,
         light_position_uniform_id;
-    static std::array<PointLight::Uniforms, TX_DRW_POINT_LIGHTS_AMOUNT> point_light_uniforms;
+    static std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> point_light_uniforms;
 };

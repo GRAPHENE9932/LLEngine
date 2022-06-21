@@ -2,12 +2,15 @@
 #include <stdexcept>
 
 #include "utils/utils.hpp"
+#include "objects/BitmapTextObject.hpp"
+#include "objects/UnshadedDrawableObject.hpp"
+#include "objects/TexturedDrawableObject.hpp"
+#include "objects/ImageObject.hpp"
 #include "RenderingServer.hpp"
 
 RenderingServer::RenderingServer(int window_width, int window_height) {
     init_window(window_width, window_height);
     init_gl();
-    init_object_types();
 }
 
 void RenderingServer::set_update_callback(std::function<void(float)> func) {
@@ -18,29 +21,17 @@ GLFWwindow* RenderingServer::get_window() {
     return window;
 }
 
-void RenderingServer::add_textured_drawable_object(std::shared_ptr<TexturedDrawableObject> obj, const bool overlay) {
-    obj->camera = camera;
-    obj->lights = &point_lights;
+void RenderingServer::add_drawable_object(std::shared_ptr<DrawableObject> obj, const bool overlay) {
+    auto& cur_vector {overlay ? drawable_objects_overlay : drawable_objects};
 
-    if (overlay)
-        textured_objects_overlay.push_back(obj);
-    else
-        textured_objects.push_back(obj);
-}
+    auto iter {std::lower_bound(
+        cur_vector.begin(), cur_vector.end(), obj,
+        [] (const std::shared_ptr<DrawableObject>& obj_1, const std::shared_ptr<DrawableObject>& obj_2) {
+            return obj_1->get_program_id() < obj_2->get_program_id();
+        }
+    )};
 
-void RenderingServer::add_unshaded_drawable_object(std::shared_ptr<UnshadedDrawableObject> obj) {
-    unshaded_objects.push_back(obj);
-}
-
-void RenderingServer::add_image_2d_object(std::shared_ptr<ImageObject> obj) {
-    image_2d_objects.push_back(obj);
-}
-
-void RenderingServer::add_bitmap_text_object(std::shared_ptr<BitmapTextObject> obj, const bool overlay) {
-    if (overlay)
-        bitmap_text_objects_overlay.push_back(obj);
-    else
-        bitmap_text_objects.push_back(obj);
+    cur_vector.insert(iter, obj);
 }
 
 void RenderingServer::init_window(int window_width, int window_height) {
@@ -88,14 +79,12 @@ void RenderingServer::init_gl() {
     glEnable(GL_CULL_FACE);
 }
 
-void RenderingServer::init_object_types() {
+void RenderingServer::main_loop() {
     TexturedDrawableObject::pre_init();
     UnshadedDrawableObject::pre_init();
     ImageObject::pre_init();
     BitmapTextObject::pre_init();
-}
 
-void RenderingServer::main_loop() {
     glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
@@ -108,53 +97,22 @@ void RenderingServer::main_loop() {
 
         update_callback(delta);
 
+        env_info.camera_direction = camera->direction;
         glm::mat4 view_matrix = camera->compute_view_matrix();
         glm::mat4 proj_matrix = camera->get_proj_matrix();
         glm::mat4 camera_vp = proj_matrix * view_matrix;
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        // Draw unshaded objects.
-        glUseProgram(UnshadedDrawableObject::program_id);
-        for (int i = 0; i < unshaded_objects.size(); i++)
-            unshaded_objects[i]->draw(camera_vp);
+        for (std::size_t i = 0; i < drawable_objects.size(); i++)
+            drawable_objects[i]->draw(camera_vp, env_info);
 
-        // Draw textured objects.
-        glUseProgram(TexturedDrawableObject::program_id);
-        for (int i = 0; i < textured_objects.size(); i++)
-            textured_objects[i]->draw(camera_vp);
-        
-        // Draw bitmap text.
-        glUseProgram(BitmapTextObject::get_program_id());
-        for (int i = 0; i < bitmap_text_objects.size(); i++)
-            bitmap_text_objects[i]->draw(camera_vp);
-
-        // Overlay time.
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        // Draw textured objects.
-        glUseProgram(TexturedDrawableObject::program_id);
-        for (int i = 0; i < textured_objects_overlay.size(); i++)
-            textured_objects_overlay[i]->draw(proj_matrix);
-
-        // Draw Image2D objects.
-        glUseProgram(ImageObject::program_id);
-        for (int i = 0; i < image_2d_objects.size(); i++)
-            image_2d_objects[i]->draw(proj_matrix);
-        
-        // Draw text.
-        glUseProgram(BitmapTextObject::get_program_id());
-        for (int i = 0; i < bitmap_text_objects_overlay.size(); i++)
-            bitmap_text_objects_overlay[i]->draw(proj_matrix);
+        for (std::size_t i = 0; i < drawable_objects_overlay.size(); i++)
+            drawable_objects_overlay[i]->draw(proj_matrix, env_info);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     } while (!glfwWindowShouldClose(window));
-}
-
-RenderingServer::~RenderingServer() {
-    TexturedDrawableObject::clean_up();
-    UnshadedDrawableObject::clean_up();
-    ImageObject::clean_up();
-    BitmapTextObject::clean_up();
 }

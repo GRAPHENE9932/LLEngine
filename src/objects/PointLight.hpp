@@ -2,6 +2,9 @@
 
 #include <glm/vec3.hpp>
 
+// Also, change src/shaders/textured_fragment.glsl:TX_DRW_POINT_LIGHTS_AMOUNT
+constexpr GLuint POINT_LIGHTS_AMOUNT = 2;
+
 struct PointLight {
     struct Uniforms {
         GLuint position_id, color_id, const_coeff_id, linear_coeff_id,

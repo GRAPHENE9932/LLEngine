@@ -22,7 +22,6 @@ public:
 
     static void pre_init();
     static void clean_up();
-    static GLuint get_program_id();
     
     void set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size);
     void set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size);
@@ -31,7 +30,10 @@ public:
     void set_font(const std::shared_ptr<BitmapFont>& font);
     void set_text(const std::string& text);
 
-    void draw(const glm::mat4& vp) override;
+    void draw(const glm::mat4& vp, EnvironmentInfo& env_info) override;
+    GLuint get_program_id() const override {
+        return program_id;
+    }
 
 private:
     static GLuint program_id, color_uniform_id, mvp_matrix_uniform_id;

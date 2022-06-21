@@ -27,7 +27,15 @@ void UnshadedDrawableObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-void UnshadedDrawableObject::draw(const glm::mat4& vp) {
+void UnshadedDrawableObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
+    if (program_id == 0)
+        pre_init();
+    
+    if (env_info.cur_shader != program_id) {
+        env_info.cur_shader = program_id;
+        glUseProgram(program_id);
+    }
+
     // Vertices.
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertices_id);

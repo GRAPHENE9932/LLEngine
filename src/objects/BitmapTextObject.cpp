@@ -36,10 +36,6 @@ void BitmapTextObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-GLuint BitmapTextObject::get_program_id() {
-    return program_id;
-}
-
 void BitmapTextObject::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
     translation = glm::vec3(
         utils::scr_space_pos_to_gl_space(scr_space_pos, win_size),
@@ -106,7 +102,15 @@ void BitmapTextObject::set_text(const std::string& text) {
     register_buffers();
 }
 
-void BitmapTextObject::draw(const glm::mat4& vp) {
+void BitmapTextObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
+    if (program_id == 0)
+        pre_init();
+    
+    if (env_info.cur_shader != program_id) {
+        env_info.cur_shader = program_id;
+        glUseProgram(program_id);
+    }
+
     glEnable(GL_BLEND);
 
     // Vertices.

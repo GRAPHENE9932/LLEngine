@@ -7,7 +7,7 @@ GLuint TexturedDrawableObject::model_matrix_uniform_id;
 GLuint TexturedDrawableObject::normal_matrix_uniform_id;
 GLuint TexturedDrawableObject::camera_direction_uniform_id;
 GLuint TexturedDrawableObject::light_position_uniform_id;
-std::array<PointLight::Uniforms, TX_DRW_POINT_LIGHTS_AMOUNT> TexturedDrawableObject::point_light_uniforms;
+std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> TexturedDrawableObject::point_light_uniforms;
 
 TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<Texture> texture,
     std::shared_ptr<Mesh> mesh) :
@@ -30,7 +30,7 @@ void TexturedDrawableObject::pre_init() {
     camera_direction_uniform_id = glGetUniformLocation(program_id, "CAMERA_DIRECTION");
     light_position_uniform_id = glGetUniformLocation(program_id, "LIGHT_POSITION");
 
-    for (GLuint i = 0; i < TX_DRW_POINT_LIGHTS_AMOUNT; i++)
+    for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
         point_light_uniforms[i] = PointLight::get_uniforms_id(program_id, "POINT_LIGHTS", i);
 }
 
@@ -38,7 +38,15 @@ void TexturedDrawableObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-void TexturedDrawableObject::draw(const glm::mat4& vp) {
+void TexturedDrawableObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
+    if (program_id == 0)
+        pre_init();
+    
+    if (env_info.cur_shader != program_id) {
+        env_info.cur_shader = program_id;
+        glUseProgram(program_id);
+    }
+
     // Vertices.
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vertices_id);
@@ -68,10 +76,10 @@ void TexturedDrawableObject::draw(const glm::mat4& vp) {
     glm::mat4 normal_matrix = glm::transpose(glm::inverse(model_matrix));
     glUniformMatrix4fv(normal_matrix_uniform_id, 1, GL_FALSE, &normal_matrix[0][0]);
     
-    glUniform3fv(camera_direction_uniform_id, 1, &(camera->direction[0]));
+    glUniform3fv(camera_direction_uniform_id, 1, &env_info.camera_direction[0]);
 
-    for (GLuint i = 0; i < TX_DRW_POINT_LIGHTS_AMOUNT; i++)
-        (*lights)[i].set_uniforms(point_light_uniforms[i]);
+    for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
+        env_info.point_lights[i].set_uniforms(point_light_uniforms[i]);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_id);
     glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_SHORT, 0);

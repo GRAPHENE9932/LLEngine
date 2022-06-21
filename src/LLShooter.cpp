@@ -2,6 +2,7 @@
 #include "utils/math.hpp"
 #include "objects/Camera.hpp"
 #include "objects/BitmapTextObject.hpp"
+#include "objects/ImageObject.hpp"
 #include "common/Map.hpp"
 #include "common/BitmapFont.hpp"
 #include "LLShooter.hpp"
@@ -41,7 +42,7 @@ void LLShooter::add_weapon() {
     glock_obj->translation = {1.0f, -0.75f, -1.2f};
     glock_obj->rotation = glm::quat();
     glock_obj->scale = {1.0f, 1.0f, 1.0f};
-    rendering_server->add_textured_drawable_object(glock_obj, true);
+    rendering_server->add_drawable_object(glock_obj, true);
 }
 
 void LLShooter::add_crosshair() {
@@ -52,12 +53,12 @@ void LLShooter::add_crosshair() {
     crosshair->set_screen_space_scale({1.0f, 1.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     crosshair->rotation = glm::quat();
 
-    rendering_server->add_image_2d_object(crosshair);
+    rendering_server->add_drawable_object(crosshair);
 }
 
 void LLShooter::add_lights() {
-    rendering_server->point_lights[0] = PointLight({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
-    rendering_server->point_lights[1] = PointLight({0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
+    rendering_server->env_info.point_lights[0] = PointLight({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
+    rendering_server->env_info.point_lights[1] = PointLight({0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
 }
 
 void LLShooter::add_fps_display() {
@@ -71,7 +72,7 @@ void LLShooter::add_fps_display() {
     fps_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     fps_display->rotation = glm::quat();
 
-    rendering_server->add_bitmap_text_object(fps_display, true);
+    rendering_server->add_drawable_object(fps_display, true);
 }
 
 void LLShooter::add_camera_and_player() {
@@ -105,7 +106,7 @@ void LLShooter::add_camera_and_player() {
 
 void LLShooter::update(float delta) {
     // Make light to follow player.
-    rendering_server->point_lights[0].position = player->cylinder.position;
+    rendering_server->env_info.point_lights[0].position = player->cylinder.position;
 
     fps_meter->frame();
     fps_display->set_text("FPS: " + std::to_string(fps_meter->get_fps()));
@@ -117,11 +118,11 @@ void LLShooter::load_map(const std::string& file_path, RenderingServer& rs, Phys
 
     // Spawn textured drawable objects.
     for (uint16_t i = 0; i < map.tex_draw_objects.size(); i++)
-        rs.add_textured_drawable_object(map.tex_draw_objects[i]);
+        rs.add_drawable_object(map.tex_draw_objects[i]);
 
     // Spawn unshaded drawable objects.
     for (uint16_t i = 0; i < map.unsh_draw_objects.size(); i++)
-        rs.add_unshaded_drawable_object(map.unsh_draw_objects[i]);
+        rs.add_drawable_object(map.unsh_draw_objects[i]);
 
     // Spawn floors.
     for (uint16_t i = 0; i < map.flat_floors.size(); i++)

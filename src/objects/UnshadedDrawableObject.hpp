@@ -19,7 +19,10 @@ public:
     glm::vec3 color;
     std::shared_ptr<Mesh> mesh;
 
-    void draw(const glm::mat4& vp);
+    void draw(const glm::mat4& vp, EnvironmentInfo& env_info);
+    GLuint get_program_id() const override {
+        return program_id;
+    }
 
 private:
     static GLuint mvp_matrix_uniform_id, color_uniform_id;
