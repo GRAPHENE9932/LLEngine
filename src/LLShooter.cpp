@@ -57,8 +57,12 @@ void LLShooter::add_crosshair() {
 }
 
 void LLShooter::add_lights() {
-    rendering_server->env_info.point_lights[0] = PointLight({0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
-    rendering_server->env_info.point_lights[1] = PointLight({0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 0.07f, 0.018f);
+    rendering_server->env_info.point_lights[0] = PointLight(
+        {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 1.0f, 0.07f, 0.018f
+    );
+    rendering_server->env_info.point_lights[1] = PointLight(
+        {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 1.0f, 0.07f, 0.018f
+    );
 }
 
 void LLShooter::add_fps_display() {

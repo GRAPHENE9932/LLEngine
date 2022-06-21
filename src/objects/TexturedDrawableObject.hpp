@@ -30,7 +30,6 @@ public:
 
 private:
     static GLuint mvp_matrix_uniform_id, model_matrix_uniform_id,
-        normal_matrix_uniform_id, camera_direction_uniform_id,
-        light_position_uniform_id;
+        normal_matrix_uniform_id, light_position_uniform_id;
     static std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> point_light_uniforms;
 };

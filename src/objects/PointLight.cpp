@@ -19,6 +19,10 @@ PointLight::Uniforms PointLight::get_uniforms_id(GLuint program_id, std::string 
     std::string color_string = var_name + '[' + std::to_string(index) + "].color";
     result.color_id = glGetUniformLocation(program_id, color_string.c_str());
 
+    // Diffuse strength.
+    std::string diffuse_strength_string {var_name + '[' + std::to_string(index) + "].diffuse_strength"};
+    result.diffuse_strength_id = glGetUniformLocation(program_id, diffuse_strength_string.c_str());
+
     // Constant coefficient.
     std::string const_coeff_string = var_name + '[' + std::to_string(index) + "].const_coeff";
     result.const_coeff_id = glGetUniformLocation(program_id, const_coeff_string.c_str());
@@ -34,16 +38,15 @@ PointLight::Uniforms PointLight::get_uniforms_id(GLuint program_id, std::string 
     return result;
 }
 
-PointLight::PointLight(glm::vec3 position, glm::vec3 color, float const_coeff,
-                       float linear_coeff, float quadratic_coeff) :
-    position(position), color(color), const_coeff(const_coeff),
-    linear_coeff(linear_coeff), quadratic_coeff(quadratic_coeff) {
-
-}
+PointLight::PointLight(glm::vec3 position, glm::vec3 color, float diffuse_strength,
+        float const_coeff, float linear_coeff, float quadratic_coeff) :
+        position(position), color(color), diffuse_strength(diffuse_strength),
+        const_coeff(const_coeff), linear_coeff(linear_coeff), quadratic_coeff(quadratic_coeff) {}
 
 void PointLight::set_uniforms(const PointLight::Uniforms& uniforms) const {
     glUniform3fv(uniforms.position_id, 1, &position[0]);
     glUniform3fv(uniforms.color_id, 1, &color[0]);
+    glUniform1fv(uniforms.diffuse_strength_id, 1, &diffuse_strength);
     glUniform1fv(uniforms.const_coeff_id, 1, &const_coeff);
     glUniform1fv(uniforms.linear_coeff_id, 1, &linear_coeff);
     glUniform1fv(uniforms.quadratic_coeff_id, 1, &quadratic_coeff);

@@ -9,38 +9,28 @@ struct PointLight {
     vec3 position;
     vec3 color;
     float diffuse_strength;
-    float specular_strength;
 
     float const_coeff, linear_coeff, quadratic_coeff;
 };
 
-const int TX_DRW_POINT_LIGHTS_AMOUNT = 2;
+const int POINT_LIGHTS_AMOUNT = 2;
 
-uniform PointLight POINT_LIGHTS[TX_DRW_POINT_LIGHTS_AMOUNT];
-uniform vec3 CAMERA_DIRECTION;
+uniform PointLight POINT_LIGHTS[POINT_LIGHTS_AMOUNT];
 uniform sampler2D TEXTURE_SAMPLER;
 
 const float AMBIENT_STRENGTH = 0.25;
 const vec3 AMBIENT_COLOR = vec3(1.0, 1.0, 1.0);
-const int SPECULAR_SHININESS = 4;
 
 vec3 point_light(PointLight light) {
-    light.diffuse_strength = 1.0;
-    light.specular_strength = 0.5;
-
     vec3 light_fragment_vec = fragment_pos_worldspace - light.position;
     float d = length(light_fragment_vec);
     vec3 light_direction = (fragment_pos_worldspace - light.position) / d;
     float diffuse = max(dot(normal_worldspace, -light_direction), 0.0);
     vec3 diffuse_color = light.diffuse_strength * diffuse * light.color;
 
-    vec3 reflect_dir = reflect(light_direction, normal_worldspace);
-    float specular = pow(max(dot(CAMERA_DIRECTION, reflect_dir), 0.0), SPECULAR_SHININESS);
-    vec3 specular_color = light.specular_strength * specular * light.color;
-
     float attenuation = 1.0 / (light.const_coeff + light.linear_coeff * d + light.quadratic_coeff * (d * d));
 
-    return (diffuse_color + specular_color) * attenuation;
+    return diffuse_color * attenuation;
 }
 
 void main() {
@@ -49,7 +39,7 @@ void main() {
     vec3 ambient_light = AMBIENT_COLOR * AMBIENT_STRENGTH * obj_color;
 
     vec3 light_coeff = ambient_light;
-    for (int i = 0; i < TX_DRW_POINT_LIGHTS_AMOUNT; i++) {
+    for (int i = 0; i < POINT_LIGHTS_AMOUNT; i++) {
         light_coeff += point_light(POINT_LIGHTS[i]);
     }
 

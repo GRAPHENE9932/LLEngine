@@ -5,7 +5,6 @@ GLuint TexturedDrawableObject::program_id;
 GLuint TexturedDrawableObject::mvp_matrix_uniform_id;
 GLuint TexturedDrawableObject::model_matrix_uniform_id;
 GLuint TexturedDrawableObject::normal_matrix_uniform_id;
-GLuint TexturedDrawableObject::camera_direction_uniform_id;
 GLuint TexturedDrawableObject::light_position_uniform_id;
 std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> TexturedDrawableObject::point_light_uniforms;
 
@@ -27,7 +26,6 @@ void TexturedDrawableObject::pre_init() {
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
     normal_matrix_uniform_id = glGetUniformLocation(program_id, "NORMAL_MATRIX");
-    camera_direction_uniform_id = glGetUniformLocation(program_id, "CAMERA_DIRECTION");
     light_position_uniform_id = glGetUniformLocation(program_id, "LIGHT_POSITION");
 
     for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
@@ -75,8 +73,6 @@ void TexturedDrawableObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info
 
     glm::mat4 normal_matrix = glm::transpose(glm::inverse(model_matrix));
     glUniformMatrix4fv(normal_matrix_uniform_id, 1, GL_FALSE, &normal_matrix[0][0]);
-    
-    glUniform3fv(camera_direction_uniform_id, 1, &env_info.camera_direction[0]);
 
     for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
         env_info.point_lights[i].set_uniforms(point_light_uniforms[i]);
