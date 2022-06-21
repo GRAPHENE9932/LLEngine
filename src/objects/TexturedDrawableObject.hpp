@@ -23,7 +23,7 @@ public:
     static void pre_init();
     static void clean_up();
 
-    void draw(const glm::mat4& vp, EnvironmentInfo& env_info) override;
+    void draw(DrawParameters& params) override;
     GLuint get_program_id() const override {
         return program_id;
     }

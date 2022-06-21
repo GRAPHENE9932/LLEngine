@@ -78,12 +78,12 @@ void ImageObject::set_screen_space_scale(const glm::vec3& scr_space_scale, const
     );
 }
 
-void ImageObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
+void ImageObject::draw(DrawParameters& params) {
     if (program_id == 0)
         pre_init();
     
-    if (env_info.cur_shader != program_id) {
-        env_info.cur_shader = program_id;
+    if (params.cur_shader != program_id) {
+        params.cur_shader = program_id;
         glUseProgram(program_id);
     }
 
@@ -108,7 +108,7 @@ void ImageObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
 
     // Uniforms.
     glm::mat4 model_matrix = compute_matrix();
-    glm::mat4 mvp = is_2d ? model_matrix : vp * model_matrix;
+    glm::mat4 mvp = is_2d ? model_matrix : params.view_proj_matrix * model_matrix;
 
     glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
 

@@ -25,7 +25,7 @@ public:
     void set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size);
     void change_texture(std::shared_ptr<Texture> texture);
 
-    void draw(const glm::mat4& vp, EnvironmentInfo& env_info) override;
+    void draw(DrawParameters& params) override;
     GLuint get_program_id() const override {
         return program_id;
     }

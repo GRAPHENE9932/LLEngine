@@ -57,10 +57,10 @@ void LLShooter::add_crosshair() {
 }
 
 void LLShooter::add_lights() {
-    rendering_server->env_info.point_lights[0] = PointLight(
+    rendering_server->draw_params.point_lights[0] = PointLight(
         {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 1.0f, 0.07f, 0.018f
     );
-    rendering_server->env_info.point_lights[1] = PointLight(
+    rendering_server->draw_params.point_lights[1] = PointLight(
         {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 1.0f, 0.07f, 0.018f
     );
 }
@@ -110,7 +110,7 @@ void LLShooter::add_camera_and_player() {
 
 void LLShooter::update(float delta) {
     // Make light to follow player.
-    rendering_server->env_info.point_lights[0].position = player->cylinder.position;
+    rendering_server->draw_params.point_lights[0].position = player->cylinder.position;
 
     fps_meter->frame();
     fps_display->set_text("FPS: " + std::to_string(fps_meter->get_fps()));

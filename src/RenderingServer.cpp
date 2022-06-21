@@ -89,28 +89,35 @@ void RenderingServer::main_loop() {
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
     do {
-        // Measure time.
+        // Measure time and callback.
         auto now = std::chrono::high_resolution_clock::now();
         auto duration = now - prev_frame_time;
         prev_frame_time = now;
         float delta = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
-
         update_callback(delta);
 
-        env_info.camera_direction = camera->direction;
-        glm::mat4 view_matrix = camera->compute_view_matrix();
-        glm::mat4 proj_matrix = camera->get_proj_matrix();
-        glm::mat4 camera_vp = proj_matrix * view_matrix;
+        // Prepare draw parameters.
+        draw_params.view_matrix = camera->compute_view_matrix();
+        const glm::mat4 proj_matrix = camera->get_proj_matrix();
+        draw_params.view_proj_matrix = proj_matrix * draw_params.view_matrix;
+        for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
+            draw_params.point_lights[i].overlay_position =
+                    draw_params.view_matrix * glm::vec4(draw_params.point_lights[i].position, 1.0f);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+        draw_params.overlay_mode = false;
         for (std::size_t i = 0; i < drawable_objects.size(); i++)
-            drawable_objects[i]->draw(camera_vp, env_info);
+            drawable_objects[i]->draw(draw_params);
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        // Overlay objects are already relative to view, so they don't
+        // need the view matrix in their model-view-projection matrix.
+        draw_params.view_proj_matrix = proj_matrix;
+        draw_params.overlay_mode = true;
         for (std::size_t i = 0; i < drawable_objects_overlay.size(); i++)
-            drawable_objects_overlay[i]->draw(proj_matrix, env_info);
+            drawable_objects_overlay[i]->draw(draw_params);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

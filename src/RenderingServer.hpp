@@ -16,7 +16,7 @@
 class RenderingServer {
 public:
     Camera* camera;
-    EnvironmentInfo env_info;
+    DrawParameters draw_params;
 
     RenderingServer(int window_width, int window_height);
 

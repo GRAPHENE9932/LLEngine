@@ -19,7 +19,7 @@ public:
     glm::vec3 color;
     std::shared_ptr<Mesh> mesh;
 
-    void draw(const glm::mat4& vp, EnvironmentInfo& env_info);
+    void draw(DrawParameters& params) override;
     GLuint get_program_id() const override {
         return program_id;
     }

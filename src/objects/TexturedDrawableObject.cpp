@@ -36,12 +36,12 @@ void TexturedDrawableObject::clean_up() {
     glDeleteProgram(program_id);
 }
 
-void TexturedDrawableObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info) {
+void TexturedDrawableObject::draw(DrawParameters& params) {
     if (program_id == 0)
         pre_init();
     
-    if (env_info.cur_shader != program_id) {
-        env_info.cur_shader = program_id;
+    if (params.cur_shader != program_id) {
+        params.cur_shader = program_id;
         glUseProgram(program_id);
     }
 
@@ -64,9 +64,9 @@ void TexturedDrawableObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info
     glBindTexture(GL_TEXTURE_2D, texture->get_id());
 
     // Uniforms.
-    glm::mat4 model_matrix = compute_matrix();
+    const glm::mat4 model_matrix = compute_matrix();
 
-    glm::mat4 mvp = vp * model_matrix;
+    const glm::mat4 mvp = params.view_proj_matrix * model_matrix;
     glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
 
     glUniformMatrix4fv(model_matrix_uniform_id, 1, GL_FALSE, &model_matrix[0][0]);
@@ -75,7 +75,7 @@ void TexturedDrawableObject::draw(const glm::mat4& vp, EnvironmentInfo& env_info
     glUniformMatrix4fv(normal_matrix_uniform_id, 1, GL_FALSE, &normal_matrix[0][0]);
 
     for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
-        env_info.point_lights[i].set_uniforms(point_light_uniforms[i]);
+        params.point_lights[i].set_uniforms(point_light_uniforms[i], params.overlay_mode);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_id);
     glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_SHORT, 0);

@@ -8,14 +8,15 @@
 
 #include "PointLight.hpp"
 
-struct EnvironmentInfo {
+struct DrawParameters {
     std::array<PointLight, POINT_LIGHTS_AMOUNT> point_lights;
-    glm::vec3 camera_direction;
+    glm::mat4 view_proj_matrix, view_matrix;
     GLuint cur_shader;
+    bool overlay_mode;
 };
 
 class DrawableObject {
 public:
-    virtual void draw(const glm::mat4& vp, EnvironmentInfo& env_info) = 0;
+    virtual void draw(DrawParameters& params) = 0;
     virtual GLuint get_program_id() const = 0;
 };

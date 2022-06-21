@@ -30,7 +30,7 @@ public:
     void set_font(const std::shared_ptr<BitmapFont>& font);
     void set_text(const std::string& text);
 
-    void draw(const glm::mat4& vp, EnvironmentInfo& env_info) override;
+    void draw(DrawParameters& params) override;
     GLuint get_program_id() const override {
         return program_id;
     }

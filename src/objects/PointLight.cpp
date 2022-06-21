@@ -43,8 +43,8 @@ PointLight::PointLight(glm::vec3 position, glm::vec3 color, float diffuse_streng
         position(position), color(color), diffuse_strength(diffuse_strength),
         const_coeff(const_coeff), linear_coeff(linear_coeff), quadratic_coeff(quadratic_coeff) {}
 
-void PointLight::set_uniforms(const PointLight::Uniforms& uniforms) const {
-    glUniform3fv(uniforms.position_id, 1, &position[0]);
+void PointLight::set_uniforms(const PointLight::Uniforms& uniforms, const bool overlay) const {
+    glUniform3fv(uniforms.position_id, 1, overlay ? &overlay_position[0] : &position[0]);
     glUniform3fv(uniforms.color_id, 1, &color[0]);
     glUniform1fv(uniforms.diffuse_strength_id, 1, &diffuse_strength);
     glUniform1fv(uniforms.const_coeff_id, 1, &const_coeff);
