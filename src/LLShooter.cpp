@@ -109,12 +109,13 @@ void LLShooter::add_camera_and_player() {
 }
 
 void LLShooter::update(float delta) {
+    physics_server->update(delta);
+
     // Make light to follow player.
     rendering_server->draw_params.point_lights[0].position = player->cylinder.position;
 
     fps_meter->frame();
     fps_display->set_text("FPS: " + std::to_string(fps_meter->get_fps()));
-    physics_server->update(delta);
 }
 
 void LLShooter::load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps) {
