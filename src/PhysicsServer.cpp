@@ -124,8 +124,8 @@ void PhysicsServer::resolve_side_cuboids(const static_vector<CuboidAndRes, 2>& s
             // If we got there, then there is no valid resolution if we take every cuboid separately.
             // So, I'll place the player in the closest intersection point of two rounded
             // rectangles, constructed from cuboid's rectangle and player's cylinder radius.
-            RoundedRectangle rect_1(side_cuboids[0].cuboid->rect, player->cylinder.radius);
-            RoundedRectangle rect_2(side_cuboids[1].cuboid->rect, player->cylinder.radius);
+            const RoundedRectangle& rect_1 {side_cuboids[0].cuboid->get_rounded_rect(player->cylinder.radius)};
+            const RoundedRectangle& rect_2 {side_cuboids[1].cuboid->get_rounded_rect(player->cylinder.radius)};
 
             std::array<glm::vec2, 4> intersection_points;
             auto amount = rect_1.intersection_points(rect_2, intersection_points);
@@ -162,12 +162,12 @@ void PhysicsServer::resolve_base_cuboid(const CuboidAndRes& base_cuboid,
     // let the player stay on it. Otherwise, ignore it.
     const glm::vec2 player_hor_pos {player->cylinder.position.x, player->cylinder.position.z};
 
-    const RoundedRectangle rounded_rect_base(base_cuboid.cuboid->rect, player->cylinder.radius);
+    const RoundedRectangle& rounded_rect_base {base_cuboid.cuboid->get_rounded_rect(player->cylinder.radius)};
     const glm::vec2 hor_pos_base {rounded_rect_base.closest_point(player_hor_pos)};
 
     float min_distance2 {std::numeric_limits<float>().infinity()};
     for (uint8_t i = 0; i < side_cuboids.size(); i++) {
-        const RoundedRectangle cur_rounded_rect(side_cuboids[i].cuboid->rect, player->cylinder.radius);
+        const RoundedRectangle& cur_rounded_rect {side_cuboids[i].cuboid->get_rounded_rect(player->cylinder.radius)};
         const glm::vec2 cur_hor_pos {cur_rounded_rect.closest_point(player_hor_pos)};
         const float cur_distance2 {glm::distance2(hor_pos_base, cur_hor_pos)};
         if (cur_distance2 < min_distance2)

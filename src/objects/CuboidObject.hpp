@@ -15,5 +15,5 @@ public:
     bool cylinder_intersects(const Cylinder& cylinder) const override;
 
     glm::vec3 push_cylinder_out(const Cylinder& cylinder, RelativePos& pos,
-                                float* const min_distance_out = nullptr) const;
+            float* const min_distance_out = nullptr) const;
 };

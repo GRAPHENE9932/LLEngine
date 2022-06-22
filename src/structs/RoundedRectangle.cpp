@@ -7,8 +7,8 @@
 #include "VertLS.hpp"
 #include "RoundedRectangle.hpp"
 
-uint8_t RoundedRectangle::intersection_points(RoundedRectangle& other,
-        std::array<glm::vec2, 4>& points) {
+uint8_t RoundedRectangle::intersection_points(const RoundedRectangle& other,
+        std::array<glm::vec2, 4>& points) const {
     return {get_decomposed().intersection_points(other.get_decomposed(), points)};
 }
 
@@ -59,7 +59,7 @@ glm::vec2 RoundedRectangle::closest_point(glm::vec2 point, float* const min_dist
     return closest_point;
 }
 
-const RoundedRectangle::Decomposed& RoundedRectangle::get_decomposed() {
+const RoundedRectangle::Decomposed& RoundedRectangle::get_decomposed() const {
     if (decomposed == nullptr)
         decompose();
 
@@ -70,7 +70,7 @@ bool RoundedRectangle::operator==(const RoundedRectangle& other) const {
     return this->rect == other.rect && this->radius == other.radius;
 }
 
-void RoundedRectangle::decompose() {
+void RoundedRectangle::decompose() const {
     decomposed = std::make_unique<Decomposed>();
 
     decomposed->arcs[0] = {{rect.position, radius}, 3};
