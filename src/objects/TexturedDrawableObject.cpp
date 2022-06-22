@@ -47,17 +47,17 @@ void TexturedDrawableObject::draw(DrawParameters& params) {
 
     // Vertices.
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->vertices_id);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // UVs.
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->uvs_id);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_uvs_id());
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Normals.
     glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->normals_id);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_normals_id());
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind textures.
@@ -77,8 +77,8 @@ void TexturedDrawableObject::draw(DrawParameters& params) {
     for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
         params.point_lights[i].set_uniforms(point_light_uniforms[i], params.overlay_mode);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indices_id);
-    glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
+    glDrawElements(GL_TRIANGLES, mesh->get_indices().size(), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
