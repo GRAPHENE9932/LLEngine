@@ -89,9 +89,8 @@ void PhysicsServer::consider_cuboid_objects() {
             switch (rel_pos) {
             case CuboidObject::RelativePos::ABOVE:
                 base_cuboid = {cuboid.get(), push_res};
-                // Note that there is no break statement.
+                break;
             case CuboidObject::RelativePos::UNDER:
-                //player->cylinder.set_position(push_res); HERE IT IS. THE REASON OF THE BUG.
                 break;
             case CuboidObject::RelativePos::NEXT_TO:
                 if (side_cuboids.size() < 2)
