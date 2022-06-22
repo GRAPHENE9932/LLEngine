@@ -20,9 +20,6 @@ public:
                 std::array<glm::vec2, 4>& points) const;
     };
 
-    Rect rect;
-    float radius;
-
     RoundedRectangle(const Rect& rect, const float radius) : rect(rect), radius(radius) {}
 
     uint8_t intersection_points(RoundedRectangle& other, std::array<glm::vec2, 4>& points);
@@ -32,7 +29,20 @@ public:
     bool operator==(const RoundedRectangle& other) const;
 
 private:
+    Rect rect;
+    float radius;
     std::unique_ptr<Decomposed> decomposed = nullptr;
 
     void decompose();
+    inline const Rect& get_rect() const {
+        return rect;
+    };
+    inline void set_rect(const Rect& new_rect) {
+        // Discard the cached decomposed rounded rectangle if
+        // the rounded rectangle itself is changed.
+        if (decomposed != nullptr && rect != new_rect)
+            decomposed = nullptr;
+
+        rect = new_rect;
+    }
 };
