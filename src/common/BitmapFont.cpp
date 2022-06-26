@@ -3,6 +3,7 @@
 #include <limits>
 
 #include "../consts_and_enums.hpp"
+#include "KTXTexture.hpp"
 #include "BitmapFont.hpp"
 
 BitmapFont::BitmapFont(const std::string& file_name) {
@@ -50,7 +51,7 @@ BitmapFont::BitmapFont(const std::string& file_name) {
     }
     
     // Load texture file.
-    texture = std::make_shared<Texture>(tex_file_name);
+    texture = std::make_shared<KTXTexture>(tex_file_name);
 }
 
 GLuint BitmapFont::get_texture_id() const {
@@ -97,7 +98,7 @@ void BitmapFont::get_uvs_for_char(const char glyph, std::span<float, QUAD_UVS.si
         static_cast<glm::vec2>(char_row_and_col) * (char_uv_size + spacing_uv)
     };
 
-    if (texture->get_is_compressed())
+    if (texture->get_is_v_inverted())
         std::copy(QUAD_UVS_INV_V.begin(), QUAD_UVS_INV_V.end(), uvs_out.begin());
     else
         std::copy(QUAD_UVS.begin(), QUAD_UVS.end(), uvs_out.begin());

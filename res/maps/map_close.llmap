@@ -1,8 +1,8 @@
 n map_close
 m 0 map_close.obj
 m 1 cube.obj
-t 0 map_close.dds
-t 1 wooden_box.dds
+t 0 map_close.ktx
+t 1 wooden_box.ktx
 o 0 0 0 0 0 1 1 1 0 0 0
 o 1 1 2.5 1.5 -5 3 3 3 0 0 0
 o 1 1 13.5 1.5 -5 3 3 3 0 0 0

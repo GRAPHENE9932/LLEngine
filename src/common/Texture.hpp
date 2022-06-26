@@ -1,32 +1,40 @@
 #pragma once
 
-#include <string>
-
 #include <glm/vec2.hpp>
 #include <GL/glew.h>
 
 class Texture {
 public:
-    Texture(GLuint texture_id = 0) noexcept;
-    Texture(std::string file_path);
-    ~Texture();
+    Texture() = default;
+    inline Texture(GLuint texture_id) noexcept :
+            texture_id(texture_id) {}
+    inline ~Texture() {
+        glDeleteTextures(1, &texture_id);
+    }
 
-    operator GLuint() const noexcept {
+    inline operator GLuint() const noexcept {
         return texture_id;
     }
 
-    void set_id(GLuint new_id);
-    GLuint get_id();
-    bool get_is_compressed() const;
-    glm::u32vec2 get_size() const;
+    inline void set_id(GLuint new_id) {
+        if (texture_id != 0)
+            glDeleteTextures(1, &texture_id);
 
-    /// Load the DDS texture (limited).
-    /// Limitations:
-    ///  - Only DXT1, DXT3, DXT5 compression formats supported (including uncompressed RGBA).
-    void load_from_dds(std::string dds_path);
+        texture_id = new_id;
+    }
 
-private:
+    inline GLuint get_id() const {
+        return texture_id;
+    }
+    inline bool get_is_v_inverted() const {
+        return is_v_inverted;
+    }
+    glm::u32vec2 get_size() const {
+        return tex_size;
+    }
+
+protected:
     GLuint texture_id;
-    bool is_compressed;
+    bool is_v_inverted;
     glm::u32vec2 tex_size;
 };

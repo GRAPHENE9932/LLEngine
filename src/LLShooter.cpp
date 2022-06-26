@@ -5,6 +5,7 @@
 #include "objects/ImageObject.hpp"
 #include "common/Map.hpp"
 #include "common/BitmapFont.hpp"
+#include "common/KTXTexture.hpp"
 #include "LLShooter.hpp"
 
 const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
@@ -36,7 +37,7 @@ void LLShooter::init() {
 }
 
 void LLShooter::add_weapon() {
-    auto glock_texture_id = std::make_shared<Texture>("res/textures/glock.dds");
+    auto glock_texture_id = std::make_shared<KTXTexture>("res/textures/glock.ktx");
     auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
     auto glock_obj = std::make_shared<TexturedDrawableObject>(glock_texture_id, glock_mesh);
     glock_obj->translation = {1.0f, -0.75f, -1.2f};
@@ -46,7 +47,7 @@ void LLShooter::add_weapon() {
 }
 
 void LLShooter::add_crosshair() {
-    auto crosshair_texture_id = std::make_shared<Texture>("res/textures/crosshair.dds");
+    auto crosshair_texture_id = std::make_shared<KTXTexture>("res/textures/crosshair.ktx");
     auto crosshair = std::make_shared<ImageObject>(crosshair_texture_id, true);
 
     crosshair->set_in_center_of_screen({WINDOW_WIDTH, WINDOW_HEIGHT}, 0.0f);

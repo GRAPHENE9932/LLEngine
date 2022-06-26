@@ -5,8 +5,9 @@ set(SOURCES
     common/FPSMeter.cpp
     common/Mesh.cpp
     common/Map.cpp
-    common/Texture.cpp
+    common/KTXTexture.cpp
     common/BitmapFont.cpp
+    common/VkFormatInfo.cpp
     objects/SpatialObject.cpp
     objects/TexturedDrawableObject.cpp
     objects/UnshadedDrawableObject.cpp

@@ -27,17 +27,17 @@ void ImageObject::pre_init() {
     // Init buffers.
     glGenBuffers(1, &vertices_id);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
-    glBufferData(GL_ARRAY_BUFFER, QUAD_VERTICES.size() * sizeof(glm::vec3),
+    glBufferData(GL_ARRAY_BUFFER, QUAD_VERTICES.size() * sizeof(float),
                  QUAD_VERTICES.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &uvs_id);
     glBindBuffer(GL_ARRAY_BUFFER, uvs_id);
-    glBufferData(GL_ARRAY_BUFFER, QUAD_UVS.size() * sizeof(glm::vec2),
+    glBufferData(GL_ARRAY_BUFFER, QUAD_UVS.size() * sizeof(float),
                  QUAD_UVS.data(), GL_STATIC_DRAW);
                  
     glGenBuffers(1, &uvs_inv_v_id);
     glBindBuffer(GL_ARRAY_BUFFER, uvs_inv_v_id);
-    glBufferData(GL_ARRAY_BUFFER, QUAD_UVS_INV_V.size() * sizeof(glm::vec2),
+    glBufferData(GL_ARRAY_BUFFER, QUAD_UVS_INV_V.size() * sizeof(float),
                  QUAD_UVS_INV_V.data(), GL_STATIC_DRAW);
 
     // Init shaders.
@@ -97,7 +97,7 @@ void ImageObject::draw(DrawParameters& params) {
 
     // UVs.
     glEnableVertexAttribArray(1);
-    if (texture->get_is_compressed())
+    if (texture->get_is_v_inverted())
         glBindBuffer(GL_ARRAY_BUFFER, uvs_inv_v_id);
     else
         glBindBuffer(GL_ARRAY_BUFFER, uvs_id);

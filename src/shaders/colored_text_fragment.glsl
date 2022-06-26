@@ -8,5 +8,5 @@ uniform vec3 COLOR;
 
 void main() {
     color.rgb = COLOR;
-    color.a = texture(TEXTURE_SAMPLER, uv).a;
+    color.a = texture(TEXTURE_SAMPLER, uv).r;
 }

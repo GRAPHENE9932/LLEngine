@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include "Map.hpp"
+#include "KTXTexture.hpp"
 
 Map::Map(const std::string& file_path) {
     from_file(file_path);
@@ -65,7 +66,7 @@ void Map::from_file(const std::string& file_path) {
             std::string file_name;
             stream >> index >> file_name;
             tmp_textures.insert(std::make_pair(
-                index, std::make_shared<Texture>(TEXTURES_PATH + file_name)
+                index, std::make_shared<KTXTexture>(TEXTURES_PATH + file_name)
             ));
         }
         else if (first_token == "o") {
