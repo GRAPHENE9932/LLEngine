@@ -98,10 +98,7 @@ void BitmapFont::get_uvs_for_char(const char glyph, std::span<float, QUAD_UVS.si
         static_cast<glm::vec2>(char_row_and_col) * (char_uv_size + spacing_uv)
     };
 
-    if (texture->get_is_v_inverted())
-        std::copy(QUAD_UVS_INV_V.begin(), QUAD_UVS_INV_V.end(), uvs_out.begin());
-    else
-        std::copy(QUAD_UVS.begin(), QUAD_UVS.end(), uvs_out.begin());
+    std::copy(QUAD_UVS.begin(), QUAD_UVS.end(), uvs_out.begin());
     for (std::size_t i = 0; i < QUAD_UVS.size(); i += 2) {
         uvs_out[i] *= char_uv_size.x;
         uvs_out[i + 1] *= char_uv_size.y;

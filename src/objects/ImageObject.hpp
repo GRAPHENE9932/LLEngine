@@ -31,7 +31,7 @@ public:
     }
 
 private:
-    static GLuint vertices_id, uvs_id, uvs_inv_v_id, model_matrix_uniform_id, mvp_matrix_uniform_id;
+    static GLuint vertices_id, uvs_id, model_matrix_uniform_id, mvp_matrix_uniform_id;
 
     std::shared_ptr<Texture> texture;
     bool is_transparent, is_2d;

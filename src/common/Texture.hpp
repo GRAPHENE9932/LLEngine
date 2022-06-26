@@ -26,15 +26,11 @@ public:
     inline GLuint get_id() const {
         return texture_id;
     }
-    inline bool get_is_v_inverted() const {
-        return is_v_inverted;
-    }
     glm::u32vec2 get_size() const {
         return tex_size;
     }
 
 protected:
     GLuint texture_id;
-    bool is_v_inverted;
     glm::u32vec2 tex_size;
 };

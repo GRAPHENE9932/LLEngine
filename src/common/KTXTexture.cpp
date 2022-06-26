@@ -200,5 +200,4 @@ KTXTexture::KTXTexture(const std::string& file_path) {
     // Set values to the base class.
     this->texture_id = load_mipmaps(stream, header, level_indexes, file_path);
     this->tex_size = {header.pixel_width, header.pixel_height};
-    this->is_v_inverted = false;
 }

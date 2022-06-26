@@ -10,7 +10,6 @@
 GLuint ImageObject::program_id;
 GLuint ImageObject::vertices_id;
 GLuint ImageObject::uvs_id;
-GLuint ImageObject::uvs_inv_v_id;
 GLuint ImageObject::model_matrix_uniform_id;
 GLuint ImageObject::mvp_matrix_uniform_id;
 
@@ -34,11 +33,6 @@ void ImageObject::pre_init() {
     glBindBuffer(GL_ARRAY_BUFFER, uvs_id);
     glBufferData(GL_ARRAY_BUFFER, QUAD_UVS.size() * sizeof(float),
                  QUAD_UVS.data(), GL_STATIC_DRAW);
-                 
-    glGenBuffers(1, &uvs_inv_v_id);
-    glBindBuffer(GL_ARRAY_BUFFER, uvs_inv_v_id);
-    glBufferData(GL_ARRAY_BUFFER, QUAD_UVS_INV_V.size() * sizeof(float),
-                 QUAD_UVS_INV_V.data(), GL_STATIC_DRAW);
 
     // Init shaders.
     program_id = utils::load_shaders("res/shaders/unshaded_textured_vertex.glsl",
@@ -97,10 +91,7 @@ void ImageObject::draw(DrawParameters& params) {
 
     // UVs.
     glEnableVertexAttribArray(1);
-    if (texture->get_is_v_inverted())
-        glBindBuffer(GL_ARRAY_BUFFER, uvs_inv_v_id);
-    else
-        glBindBuffer(GL_ARRAY_BUFFER, uvs_id);
+    glBindBuffer(GL_ARRAY_BUFFER, uvs_id);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind textures.
