@@ -2,11 +2,13 @@
 #include <sstream>
 #include <memory>
 
-#include "utils.hpp"
+#include <GL/glew.h>
+
+#include "shader_loader.hpp"
 
 /// Loads and compiles vertex and fragment shaders from files,
 /// compiles, links them and returns the program ID.
-GLuint utils::load_shaders(std::string vertex_shader_path, std::string fragment_shader_path) {
+GLuint load_shaders(std::string vertex_shader_path, std::string fragment_shader_path) {
     ManagedProgramID program_id = glCreateProgram();
 
     ManagedShaderID vertex_shader_id = load_vertex_shader(vertex_shader_path);
@@ -41,7 +43,7 @@ GLuint utils::load_shaders(std::string vertex_shader_path, std::string fragment_
 
 /// Loads the vertex shader from file, compiles it and
 /// returns the vertex shader ID.
-utils::ManagedShaderID utils::load_vertex_shader(std::string& vertex_shader_path) {
+ManagedShaderID load_vertex_shader(std::string& vertex_shader_path) {
     ManagedShaderID vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 
     std::ifstream file_stream;
@@ -81,7 +83,7 @@ utils::ManagedShaderID utils::load_vertex_shader(std::string& vertex_shader_path
 
 /// Loads the fragment shader from file, compiles it and
 /// returns the fragment shader shader ID.
-utils::ManagedShaderID utils::load_fragment_shader(std::string& fragment_shader_path) {
+ManagedShaderID load_fragment_shader(std::string& fragment_shader_path) {
     ManagedShaderID fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
     std::ifstream file_stream;

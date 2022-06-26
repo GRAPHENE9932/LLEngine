@@ -1,7 +1,6 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "utils/utils.hpp"
 #include "objects/BitmapTextObject.hpp"
 #include "objects/UnshadedDrawableObject.hpp"
 #include "objects/TexturedDrawableObject.hpp"

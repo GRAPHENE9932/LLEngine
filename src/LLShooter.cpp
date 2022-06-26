@@ -1,4 +1,3 @@
-#include "utils/utils.hpp"
 #include "utils/math.hpp"
 #include "objects/Camera.hpp"
 #include "objects/BitmapTextObject.hpp"

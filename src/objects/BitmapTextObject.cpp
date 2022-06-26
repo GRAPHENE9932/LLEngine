@@ -1,7 +1,7 @@
 #include <glm/gtx/transform.hpp>
 
-#include "../utils/utils.hpp"
 #include "../utils/math.hpp"
+#include "../utils/shader_loader.hpp"
 #include "BitmapTextObject.hpp"
 
 GLuint BitmapTextObject::program_id = 0;
@@ -26,7 +26,7 @@ BitmapTextObject::~BitmapTextObject() {
 
 void BitmapTextObject::pre_init() {
     // Init shaders.
-    program_id = utils::load_shaders("res/shaders/colored_text_vertex.glsl",
+    program_id = load_shaders("res/shaders/colored_text_vertex.glsl",
             "res/shaders/colored_text_fragment.glsl");
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     color_uniform_id = glGetUniformLocation(program_id, "COLOR");

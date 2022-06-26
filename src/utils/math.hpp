@@ -12,6 +12,4 @@ namespace utils {
     inline glm::vec2 scr_space_scale_to_gl_space(const glm::vec2 scale, const glm::vec2 window_size) {
         return scale / window_size * 2.0f;
     }
-
-    Rect window_space_to_opengl_space(Rect rect, glm::vec2 window_size);
 }

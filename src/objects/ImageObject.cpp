@@ -2,8 +2,8 @@
 
 #include <glm/gtx/transform.hpp>
 
+#include "../utils/shader_loader.hpp"
 #include "../consts_and_enums.hpp"
-#include "../utils/utils.hpp"
 #include "../utils/math.hpp"
 #include "ImageObject.hpp"
 
@@ -35,7 +35,7 @@ void ImageObject::pre_init() {
                  QUAD_UVS.data(), GL_STATIC_DRAW);
 
     // Init shaders.
-    program_id = utils::load_shaders("res/shaders/unshaded_textured_vertex.glsl",
+    program_id = load_shaders("res/shaders/unshaded_textured_vertex.glsl",
             "res/shaders/unshaded_textured_fragment.glsl");
     model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");

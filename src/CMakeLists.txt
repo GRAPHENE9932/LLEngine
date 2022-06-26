@@ -27,9 +27,6 @@ set(SOURCES
     structs/VertLS.cpp
     structs/RoundedRectangle.cpp
     utils/shader_loader.cpp
-    utils/model_loader.cpp
-    utils/vbo_indexer.cpp
-    utils/math.cpp
 )
 
 add_executable(${CMAKE_PROJECT_NAME}_run main.cpp)

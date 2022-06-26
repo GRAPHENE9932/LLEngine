@@ -1,5 +1,5 @@
-#include "../utils/utils.hpp"
 #include "UnshadedDrawableObject.hpp"
+#include "../utils/shader_loader.hpp"
 
 GLuint UnshadedDrawableObject::program_id;
 GLuint UnshadedDrawableObject::mvp_matrix_uniform_id;
@@ -16,8 +16,8 @@ UnshadedDrawableObject::~UnshadedDrawableObject() {
 
 void UnshadedDrawableObject::pre_init() {
     // Init shaders.
-    program_id = utils::load_shaders("res/shaders/unshaded_vertex.glsl",
-                                     "res/shaders/unshaded_fragment.glsl");
+    program_id = load_shaders("res/shaders/unshaded_vertex.glsl",
+            "res/shaders/unshaded_fragment.glsl");
     // Init uniforms.
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     color_uniform_id = glGetUniformLocation(program_id, "COLOR");

@@ -1,5 +1,5 @@
-#include "../utils/utils.hpp"
 #include "TexturedDrawableObject.hpp"
+#include "../utils/shader_loader.hpp"
 
 GLuint TexturedDrawableObject::program_id;
 GLuint TexturedDrawableObject::mvp_matrix_uniform_id;
@@ -20,8 +20,8 @@ TexturedDrawableObject::~TexturedDrawableObject() {
 
 void TexturedDrawableObject::pre_init() {
     // Init shaders.
-    program_id = utils::load_shaders("res/shaders/textured_vertex.glsl",
-                                     "res/shaders/textured_fragment.glsl");
+    program_id = load_shaders("res/shaders/textured_vertex.glsl",
+            "res/shaders/textured_fragment.glsl");
     // Init uniforms.
     mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
     model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
