@@ -5,18 +5,18 @@
 template<typename T>
 class dynarray {
 public:
-    dynarray(const std::size_t size) : size_impl(size) {
+    inline dynarray(const std::size_t size) : size_impl(size) {
         data_ptr = new T[size];
     }
 
     template<typename... Args>
-    dynarray(const std::size_t size, Args&&... args) : size_impl(size) {
+    inline dynarray(const std::size_t size, Args&&... args) : size_impl(size) {
         data_ptr = new T[size];
         for (std::size_t i = 0; i < size; i++)
             data_ptr[i] = T(args...);
     }
 
-    ~dynarray() {
+    inline ~dynarray() {
         delete[] data_ptr;
     }
 
