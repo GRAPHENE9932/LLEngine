@@ -36,13 +36,13 @@ void LLShooter::init() {
 }
 
 void LLShooter::add_weapon() {
-    auto glock_texture_id = std::make_shared<KTXTexture>("res/textures/glock.ktx");
-    auto glock_mesh = std::make_shared<Mesh>("res/meshes/glock.obj");
-    auto glock_obj = std::make_shared<TexturedDrawableObject>(glock_texture_id, glock_mesh);
-    glock_obj->translation = {1.0f, -0.75f, -1.2f};
-    glock_obj->rotation = glm::quat();
-    glock_obj->scale = {1.0f, 1.0f, 1.0f};
-    rendering_server->add_drawable_object(glock_obj, true);
+    auto gun_texture = std::make_shared<KTXTexture>("res/textures/gun_0.ktx");
+    auto gun_mesh = std::make_shared<Mesh>("res/meshes/gun_0.obj");
+    auto gun_obj = std::make_shared<TexturedDrawableObject>(gun_texture, gun_mesh);
+    gun_obj->translation = {4.0f, -2.0f, -2.5f};
+    gun_obj->rotation = glm::quat();
+    gun_obj->scale = {1.0f, 1.0f, 1.0f};
+    rendering_server->add_drawable_object(gun_obj, true);
 }
 
 void LLShooter::add_crosshair() {
@@ -58,10 +58,10 @@ void LLShooter::add_crosshair() {
 
 void LLShooter::add_lights() {
     rendering_server->draw_params.point_lights[0] = PointLight(
-        {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 1.0f, 0.07f, 0.018f
+        {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 3.0f, 1.0f, 0.07f, 0.018f
     );
     rendering_server->draw_params.point_lights[1] = PointLight(
-        {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 1.0f, 1.0f, 0.07f, 0.018f
+        {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 3.0f, 1.0f, 0.07f, 0.018f
     );
 }
 
