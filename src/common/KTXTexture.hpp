@@ -12,7 +12,7 @@ public:
     /// Not supported:
     ///   - Multiple layers
     ///   - Multiple faces (cubemaps)
-    ///   - Supercompression.
+    ///   - Supercompression other than Zstandard.
     KTXTexture(const std::string& file_path);
 
 private:

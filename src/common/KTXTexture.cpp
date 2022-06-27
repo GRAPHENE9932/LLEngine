@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdexcept>
 
+#include <zstd.h>
 #include <glm/vec2.hpp>
 
 #include "KTXTexture.hpp"
@@ -69,10 +70,46 @@ struct LevelIndex {
     uint64_t uncompressed_byte_length;
 };
 
-inline GLuint load_mipmaps(std::istream& stream, const Header& header,
+enum SupercompressionScheme {
+    SC_NONE = 0, SC_BASISLZ = 1, SC_ZSTANDARD = 2,
+    SC_ZLIB = 3
+};
+
+inline void load_level_data(std::istream& stream, char* const data_ptr,
+        const LevelIndex& level_index, const Header& header,
+        const std::string& file_path) {
+    switch (header.supercompression_scheme) {
+    case SC_NONE: {
+        stream.read(data_ptr, level_index.byte_length);
+        if (!stream)
+            ktx_loading_error("Failed to read the level data.", file_path);
+        break;
+    }
+    case SC_ZSTANDARD: {
+        dynarray<char> compressed_data(level_index.byte_length);
+        stream.read(compressed_data.data(), compressed_data.size());
+        if (!stream)
+            ktx_loading_error("Failed to read the level data.", file_path);
+
+        std::size_t result {ZSTD_decompress(
+            data_ptr, level_index.uncompressed_byte_length,
+            compressed_data.data(), compressed_data.size()
+        )};
+        if (ZSTD_isError(result))
+            ktx_loading_error("zstd decompression error.", file_path);
+        break;
+    }
+    default:
+        ktx_loading_error("Unsupported supercompression scheme."
+                "Only zstd and an no compression at all supported.", file_path);
+        break;
+    }
+}
+
+inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
         const std::vector<LevelIndex>& level_indexes, const std::string& file_path) {
     const VkFormatInfo format_info {VkFormatInfo::from_vk_format(header.vk_format)};
-    const uint32_t mip_padding = header.supercompression_scheme == 0 ?
+    const uint32_t mip_padding = header.supercompression_scheme == SC_NONE ?
             std::lcm(format_info.block_size, 4u) : 1u;
 
     GLuint texture_id {};
@@ -90,24 +127,23 @@ inline GLuint load_mipmaps(std::istream& stream, const Header& header,
     uint32_t mip_level = std::max(header.level_count, 1u);
     do {
         mip_level--;
-        dynarray<char> mip_data(level_indexes[mip_level].byte_length);
+        dynarray<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
         align_stream(stream, mip_padding);
-        stream.read(mip_data.data(), mip_data.size() * sizeof(char));
-        if (!stream)
-            ktx_loading_error("Failed to read the mipmap data.", file_path);
+
+        load_level_data(stream, level_data.data(), level_indexes[mip_level], header, file_path);
 
         if (format_info.is_compressed) {
             glCompressedTexImage2D(
                 GL_TEXTURE_2D, mip_level, format_info.gl_internal_format,
                 sizes[mip_level].x, sizes[mip_level].y, 0,
-                mip_data.size() * sizeof(char), mip_data.data()
+                    level_data.size() * sizeof(char), level_data.data()
             );
         }
         else {
             glTexImage2D(
                 GL_TEXTURE_2D, mip_level, format_info.gl_internal_format,
                 sizes[mip_level].x, sizes[mip_level].y, 0,
-                format_info.gl_format, format_info.gl_type, mip_data.data()
+                format_info.gl_format, format_info.gl_type, level_data.data()
             );
         }
 
@@ -133,8 +169,6 @@ KTXTexture::KTXTexture(const std::string& file_path) {
         ktx_loading_error("Multiple layers are not supported yet.", file_path);
     if (header.face_count > 1)
         ktx_loading_error("Multiple faces are not supported yet.", file_path);
-    if (header.supercompression_scheme != 0)
-        ktx_loading_error("Supercompression is not supported yet.", file_path);
 
     // Check the identifier.
     if (std::memcmp(header.identifier.data(), KTX_IDENTIFIER.data(), 12) != 0 || !stream.good())
@@ -145,7 +179,7 @@ KTXTexture::KTXTexture(const std::string& file_path) {
     stream.read(reinterpret_cast<char*>(&index), sizeof(Index));
     // It's theoretically possible that header.level_count will equal to 4294967295.
     // It will lead to the allocation of 96 GiB. So, limit this value.
-    limit_check(header.level_count, 65536u, "levelCount", file_path);
+    limit_check<uint32_t>(header.level_count, 65536, "levelCount", file_path);
     std::vector<LevelIndex> level_indexes(std::max(1u, header.level_count));
     stream.read(reinterpret_cast<char*>(level_indexes.data()),
             sizeof(LevelIndex) * header.level_count);
@@ -155,7 +189,7 @@ KTXTexture::KTXTexture(const std::string& file_path) {
     // Load the data format descriptor.
     uint32_t dfd_total_size;
     stream.read(reinterpret_cast<char*>(&dfd_total_size), sizeof(uint32_t));
-    limit_check(dfd_total_size, 16777216u, "dfdTotalSize", file_path);
+    limit_check<uint32_t>(dfd_total_size, 16777216, "dfdTotalSize", file_path);
     if (dfd_total_size != 0) {
         dfd_block.resize(dfd_total_size > sizeof(uint32_t) ? dfd_total_size - sizeof(uint32_t) : 0u);
         stream.read(dfd_block.data(), dfd_block.size());
@@ -166,7 +200,7 @@ KTXTexture::KTXTexture(const std::string& file_path) {
     // Load the key/value data.
     uint32_t kvd_already_read {0};
     uint32_t prev_position {static_cast<uint32_t>(stream.tellg())};
-    limit_check(index.kvd_byte_length, 16777216u, "kvdByteLength", file_path);
+    limit_check<uint32_t>(index.kvd_byte_length, 16777216, "kvdByteLength", file_path);
     while (kvd_already_read < index.kvd_byte_length) {
         // Key and value byte length.
         uint32_t key_and_value_byte_length;
@@ -191,13 +225,13 @@ KTXTexture::KTXTexture(const std::string& file_path) {
         align_stream(stream, 8);
 
     // Get supercompression global data.
-    limit_check(index.sgd_byte_length, 16777216ul, "sgdByteLength", file_path);
+    limit_check<uint64_t>(index.sgd_byte_length, 16777216, "sgdByteLength", file_path);
     supercompression_global_data.resize(index.sgd_byte_length);
     stream.read(supercompression_global_data.data(), index.sgd_byte_length);
     if (!stream.good())
         ktx_loading_error("Failed to get supercompression global data.", file_path);
 
     // Set values to the base class.
-    this->texture_id = load_mipmaps(stream, header, level_indexes, file_path);
+    this->texture_id = load_mipmap_levels(stream, header, level_indexes, file_path);
     this->tex_size = {header.pixel_width, header.pixel_height};
 }
