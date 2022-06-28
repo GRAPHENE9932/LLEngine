@@ -1,17 +1,8 @@
 #version 330 core
-in vec3 normal_worldspace;
 in vec3 fragment_pos_worldspace;
 in vec2 uv;
 
 out vec3 color;
-
-struct PointLight {
-    vec3 position;
-    vec3 color;
-    float diffuse_strength;
-
-    float const_coeff, linear_coeff, quadratic_coeff;
-};
 
 struct SpotLight {
     vec3 position;
@@ -21,10 +12,8 @@ struct SpotLight {
 };
 
 const int SPOT_LIGHTS_AMOUNT = 1;
-const int POINT_LIGHTS_AMOUNT = 2;
 
 uniform SpotLight SPOT_LIGHTS[SPOT_LIGHTS_AMOUNT];
-uniform PointLight POINT_LIGHTS[POINT_LIGHTS_AMOUNT];
 uniform sampler2D TEXTURE_SAMPLER;
 
 const float AMBIENT_STRENGTH = 0.25;
@@ -43,26 +32,12 @@ vec3 spot_light(SpotLight light) {
     return light.color_and_strength * intensity;
 }
 
-vec3 point_light(PointLight light) {
-    vec3 light_fragment_vec = fragment_pos_worldspace - light.position;
-    float d = length(light_fragment_vec);
-    vec3 light_direction = (fragment_pos_worldspace - light.position) / d;
-    float diffuse = max(dot(normal_worldspace, -light_direction), 0.0);
-    vec3 diffuse_color = light.diffuse_strength * diffuse * light.color;
-
-    float attenuation = 1.0 / (light.const_coeff + light.linear_coeff * d + light.quadratic_coeff * (d * d));
-
-    return diffuse_color * attenuation;
-}
-
 void main() {
     vec3 obj_color = texture(TEXTURE_SAMPLER, uv).xyz;
 
     vec3 ambient_light = AMBIENT_COLOR * AMBIENT_STRENGTH * obj_color;
 
     vec3 light_coeff = ambient_light;
-    for (int i = 0; i < POINT_LIGHTS_AMOUNT; i++)
-        light_coeff += point_light(POINT_LIGHTS[i]);
     for (int i = 0; i < SPOT_LIGHTS_AMOUNT; i++)
         light_coeff += spot_light(SPOT_LIGHTS[i]);
 

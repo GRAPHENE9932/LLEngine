@@ -19,6 +19,7 @@ set(SOURCES
     objects/CuboidObject.cpp
     objects/ImageObject.cpp
     objects/PointLight.cpp
+    objects/SpotLight.cpp
     objects/BitmapTextObject.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp

@@ -4,10 +4,11 @@
 #include <memory>
 
 #include "../common/Texture.hpp"
-#include "../common/Mesh.hpp"
-#include "PointLight.hpp"
 #include "DrawableObject.hpp"
+#include "../common/Mesh.hpp"
 #include "SpatialObject.hpp"
+#include "PointLight.hpp"
+#include "SpotLight.hpp"
 #include "Camera.hpp"
 
 class TexturedDrawableObject : public DrawableObject, public SpatialObject {
@@ -31,4 +32,5 @@ private:
     static GLuint mvp_matrix_uniform_id, model_matrix_uniform_id,
         normal_matrix_uniform_id, light_position_uniform_id;
     static std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> point_light_uniforms;
+    static std::array<SpotLight::Uniforms, SPOT_LIGHTS_AMOUNT> spot_light_uniforms;
 };

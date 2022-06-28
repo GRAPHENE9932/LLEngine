@@ -7,7 +7,7 @@
 #include "common/KTXTexture.hpp"
 #include "LLShooter.hpp"
 
-const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 1900, WINDOW_HEIGHT = 1000;
 
 LLShooter::~LLShooter() {
 
@@ -57,11 +57,9 @@ void LLShooter::add_crosshair() {
 }
 
 void LLShooter::add_lights() {
-    rendering_server->draw_params.point_lights[0] = PointLight(
-        {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 3.0f, 1.0f, 0.07f, 0.018f
-    );
-    rendering_server->draw_params.point_lights[1] = PointLight(
-        {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, 3.0f, 1.0f, 0.07f, 0.018f
+    rendering_server->draw_params.spot_lights[0] = SpotLight(
+        {0.0f, 2.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f},
+        glm::radians(30.0f), glm::radians(35.0f), 2.0f
     );
 }
 
@@ -111,7 +109,9 @@ void LLShooter::update(float delta) {
     physics_server->update(delta);
 
     // Make light to follow player.
-    rendering_server->draw_params.point_lights[0].position = player->cylinder.position;
+    rendering_server->draw_params.spot_lights[0].position = player->cylinder.position;
+    glm::vec3& l_dir = rendering_server->draw_params.spot_lights[0].direction;
+    l_dir = glm::normalize((camera->direction - l_dir) * 0.2f + l_dir);
 
     fps_meter->frame();
     fps_display->set_text("FPS: " + std::to_string(fps_meter->get_fps()));

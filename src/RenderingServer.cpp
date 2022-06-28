@@ -100,8 +100,9 @@ void RenderingServer::main_loop() {
         const glm::mat4 proj_matrix = camera->get_proj_matrix();
         draw_params.view_proj_matrix = proj_matrix * draw_params.view_matrix;
         for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
-            draw_params.point_lights[i].overlay_position =
-                    draw_params.view_matrix * glm::vec4(draw_params.point_lights[i].position, 1.0f);
+            draw_params.point_lights[i].calc_overlay_position(draw_params.view_matrix);
+        for (GLuint i = 0; i < SPOT_LIGHTS_AMOUNT; i++)
+            draw_params.spot_lights[i].calc_overlay_props(draw_params.view_matrix);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
