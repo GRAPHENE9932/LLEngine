@@ -9,7 +9,7 @@
 
 uint8_t RoundedRectangle::intersection_points(const RoundedRectangle& other,
         std::array<glm::vec2, 4>& points) const {
-    return {get_decomposed().intersection_points(other.get_decomposed(), points)};
+    return get_decomposed().intersection_points(other.get_decomposed(), points);
 }
 
 glm::vec2 RoundedRectangle::closest_point(glm::vec2 point, float* const min_distance_out) const {

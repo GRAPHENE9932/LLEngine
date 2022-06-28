@@ -68,8 +68,7 @@ void LLShooter::add_lights() {
 void LLShooter::add_fps_display() {
     std::shared_ptr<BitmapFont> font {std::make_shared<BitmapFont>("res/fonts/default.llbmf")};
     fps_display = std::make_shared<BitmapTextObject>(
-        font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec2(WINDOW_WIDTH, WINDOW_HEIGHT)
+        font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f)
     );
 
     fps_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});

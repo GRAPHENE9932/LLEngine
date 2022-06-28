@@ -14,10 +14,6 @@ TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<Texture> texture,
     this->mesh = mesh;
 }
 
-TexturedDrawableObject::~TexturedDrawableObject() {
-
-}
-
 void TexturedDrawableObject::pre_init() {
     // Init shaders.
     program_id = load_shaders("res/shaders/textured_vertex.glsl",

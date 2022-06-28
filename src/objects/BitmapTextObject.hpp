@@ -17,7 +17,7 @@ class BitmapTextObject : public SpatialObject, public DrawableObject {
 public:
     BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
             const std::string& text, const glm::vec3& color,
-            const glm::vec2 win_size, const bool is_2d = true);
+            const bool is_2d = true);
     ~BitmapTextObject();
 
     static void pre_init();

@@ -18,7 +18,6 @@ public:
     std::shared_ptr<Texture> texture;
 
     TexturedDrawableObject(std::shared_ptr<Texture> texture, std::shared_ptr<Mesh> mesh);
-    ~TexturedDrawableObject();
 
     static void pre_init();
     static void clean_up();

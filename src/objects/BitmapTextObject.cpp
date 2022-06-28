@@ -9,8 +9,7 @@ GLuint BitmapTextObject::mvp_matrix_uniform_id = 0;
 GLuint BitmapTextObject::color_uniform_id = 0;
 
 BitmapTextObject::BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
-        const std::string& text, const glm::vec3& color,
-        const glm::vec2 win_size, const bool is_2d) :
+        const std::string& text, const glm::vec3& color, const bool is_2d) :
         color(color), is_2d(is_2d) {
     set_font(font);
     set_text(text);

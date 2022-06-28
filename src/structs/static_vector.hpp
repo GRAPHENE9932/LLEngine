@@ -30,7 +30,7 @@ public:
 
     inline T& at(std::size_t index) const {
         if (index >= cur_size)
-            throw std::out_of_range();
+            throw std::out_of_range("Index out of range.");
         
         return array[index];
     }

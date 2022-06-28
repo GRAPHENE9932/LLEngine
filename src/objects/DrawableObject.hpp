@@ -19,4 +19,5 @@ class DrawableObject {
 public:
     virtual void draw(DrawParameters& params) = 0;
     virtual GLuint get_program_id() const = 0;
+    virtual ~DrawableObject() = default;
 };
