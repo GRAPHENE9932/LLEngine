@@ -18,6 +18,7 @@ set(SOURCES
     objects/RectangularWall.cpp
     objects/CuboidObject.cpp
     objects/ImageObject.cpp
+    objects/SkyboxObject.cpp
     objects/PointLight.cpp
     objects/SpotLight.cpp
     objects/BitmapTextObject.cpp

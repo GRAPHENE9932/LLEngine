@@ -20,7 +20,7 @@ GLFWwindow* RenderingServer::get_window() {
     return window;
 }
 
-void RenderingServer::add_drawable_object(std::shared_ptr<DrawableObject> obj, const bool overlay) {
+void RenderingServer::add_drawable_object(const std::shared_ptr<DrawableObject>& obj, const bool overlay) {
     auto& cur_vector {overlay ? drawable_objects_overlay : drawable_objects};
 
     auto iter {std::lower_bound(
@@ -31,6 +31,10 @@ void RenderingServer::add_drawable_object(std::shared_ptr<DrawableObject> obj, c
     )};
 
     cur_vector.insert(iter, obj);
+}
+
+void RenderingServer::set_skybox(const std::shared_ptr<SkyboxObject>& obj) {
+    this->skybox = obj;
 }
 
 void RenderingServer::init_window(int window_width, int window_height) {
@@ -69,7 +73,9 @@ void RenderingServer::init_gl() {
 
     // Enable depth test.
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_FRAMEBUFFER_SRGB);
 
     // Set blend function.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -84,7 +90,7 @@ void RenderingServer::main_loop() {
     ImageObject::pre_init();
     BitmapTextObject::pre_init();
 
-    glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
+    glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
     do {
@@ -97,8 +103,8 @@ void RenderingServer::main_loop() {
 
         // Prepare draw parameters.
         draw_params.view_matrix = camera->compute_view_matrix();
-        const glm::mat4 proj_matrix = camera->get_proj_matrix();
-        draw_params.view_proj_matrix = proj_matrix * draw_params.view_matrix;
+        draw_params.proj_matrix = camera->get_proj_matrix();
+        draw_params.view_proj_matrix = draw_params.proj_matrix * draw_params.view_matrix;
         for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
             draw_params.point_lights[i].calc_overlay_position(draw_params.view_matrix);
         for (GLuint i = 0; i < SPOT_LIGHTS_AMOUNT; i++)
@@ -106,15 +112,23 @@ void RenderingServer::main_loop() {
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+        // Draw objects.
         draw_params.overlay_mode = false;
         for (std::size_t i = 0; i < drawable_objects.size(); i++)
             drawable_objects[i]->draw(draw_params);
 
-        glClear(GL_DEPTH_BUFFER_BIT);
+        // Draw skybox.
+        if (skybox != nullptr) {
+            glDepthMask(GL_FALSE);
+            skybox->draw(draw_params);
+            glDepthMask(GL_TRUE);
+        }
 
+        // Draw overlay objects.
+        glClear(GL_DEPTH_BUFFER_BIT);
         // Overlay objects are already relative to view, so they don't
         // need the view matrix in their model-view-projection matrix.
-        draw_params.view_proj_matrix = proj_matrix;
+        draw_params.view_proj_matrix = draw_params.proj_matrix;
         draw_params.overlay_mode = true;
         for (std::size_t i = 0; i < drawable_objects_overlay.size(); i++)
             drawable_objects_overlay[i]->draw(draw_params);

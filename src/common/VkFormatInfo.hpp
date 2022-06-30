@@ -23,4 +23,8 @@ struct VkFormatInfo {
             block_extents(block_width, block_height) {};
 
     static VkFormatInfo from_vk_format(const uint32_t vk_format);
+
+    /// Compute the size (in bytes) of image with specified
+    /// width and height in the current format.
+    uint64_t compute_image_size(glm::u32vec2 image_extents) const;
 };

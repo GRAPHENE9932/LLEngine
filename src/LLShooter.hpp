@@ -25,6 +25,7 @@ private:
     void add_lights();
     void add_fps_display();
     void add_camera_and_player();
+    void add_skybox();
     void update(float delta);
 
     void load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps);

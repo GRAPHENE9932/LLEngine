@@ -12,7 +12,7 @@
 struct DrawParameters {
     std::array<PointLight, POINT_LIGHTS_AMOUNT> point_lights;
     std::array<SpotLight, SPOT_LIGHTS_AMOUNT> spot_lights;
-    glm::mat4 view_proj_matrix, view_matrix;
+    glm::mat4 view_proj_matrix, view_matrix, proj_matrix;
     GLuint cur_shader;
     bool overlay_mode;
 };

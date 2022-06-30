@@ -28,6 +28,7 @@ void LLShooter::init() {
     add_lights();
     add_weapon();
     add_fps_display();
+    add_skybox();
 
     load_map("res/maps/map_close.llmap", *rendering_server, *physics_server);
 
@@ -53,7 +54,7 @@ void LLShooter::add_crosshair() {
     crosshair->set_screen_space_scale({1.0f, 1.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     crosshair->rotation = glm::quat();
 
-    rendering_server->add_drawable_object(crosshair);
+    rendering_server->add_drawable_object(crosshair, true);
 }
 
 void LLShooter::add_lights() {
@@ -102,6 +103,14 @@ void LLShooter::add_camera_and_player() {
         [this](float delta) {
             update(delta);
         }
+    );
+}
+
+void LLShooter::add_skybox() {
+    rendering_server->set_skybox(
+        std::make_unique<SkyboxObject>(
+            std::make_unique<KTXTexture>("res/textures/night_skybox.ktx")
+        )
     );
 }
 

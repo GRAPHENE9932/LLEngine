@@ -98,8 +98,8 @@ void ImageObject::draw(DrawParameters& params) {
     glBindTexture(GL_TEXTURE_2D, texture->get_id());
 
     // Uniforms.
-    glm::mat4 model_matrix = compute_matrix();
-    glm::mat4 mvp = is_2d ? model_matrix : params.view_proj_matrix * model_matrix;
+    glm::mat4 model_matrix {compute_matrix()};
+    glm::mat4 mvp {is_2d ? model_matrix : params.view_proj_matrix * model_matrix};
 
     glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
 

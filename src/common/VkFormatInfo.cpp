@@ -469,3 +469,12 @@ VkFormatInfo VkFormatInfo::from_vk_format(const uint32_t vk_format) {
     return iter->second;
 }
 
+uint64_t VkFormatInfo::compute_image_size(glm::u32vec2 image_extents) const {
+    // Divide image_extents by block_extents, but round up,
+    // instead of down.
+    image_extents += block_extents - 1u;
+    image_extents /= block_extents;
+
+    // Now we have width and height in blocks instead of texels.
+    return static_cast<uint64_t>(image_extents.x) * image_extents.y * block_size;
+}

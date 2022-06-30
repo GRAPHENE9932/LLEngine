@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 
 #include "objects/DrawableObject.hpp"
+#include "objects/SkyboxObject.hpp"
 #include "objects/PointLight.hpp"
 #include "objects/Camera.hpp"
 
@@ -23,7 +24,8 @@ public:
     void set_update_callback(std::function<void(float)> func);
     GLFWwindow* get_window();
 
-    void add_drawable_object(std::shared_ptr<DrawableObject> const obj, const bool overlay = false);
+    void add_drawable_object(const std::shared_ptr<DrawableObject>& obj, const bool overlay = false);
+    void set_skybox(const std::shared_ptr<SkyboxObject>& obj);
 
     void main_loop();
 
@@ -34,6 +36,7 @@ private:
 
     std::vector<std::shared_ptr<DrawableObject>> drawable_objects;
     std::vector<std::shared_ptr<DrawableObject>> drawable_objects_overlay;
+    std::shared_ptr<SkyboxObject> skybox = nullptr;
 
     void init_window(int window_width, int window_height);
     void init_gl();

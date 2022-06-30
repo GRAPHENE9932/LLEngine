@@ -109,49 +109,75 @@ inline void load_level_data(std::istream& stream, char* const data_ptr,
 inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
         const std::vector<LevelIndex>& level_indexes, const std::string& file_path) {
     const VkFormatInfo format_info {VkFormatInfo::from_vk_format(header.vk_format)};
+
     const uint32_t mip_padding = header.supercompression_scheme == SC_NONE ?
             std::lcm(format_info.block_size, 4u) : 1u;
 
-    GLuint texture_id {};
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    const bool is_cubemap {header.face_count == 6};
+    if (header.face_count != 1 && header.face_count != 6)
+        ktx_loading_error("Invalid count of faces.", file_path);
+
+    const GLenum tex_target {
+        is_cubemap ?
+        static_cast<GLenum>(GL_TEXTURE_CUBE_MAP) :
+        static_cast<GLenum>(GL_TEXTURE_2D)
+    };
 
     // As in the file layout, we will go from the last mipmap level (the smallest image)
-    // to the first one (the biggest). But sizes can be computed in the opposite
-    // order.
+    // to the first one (the biggest). But sizes can be computed only in opposite order.
     dynarray<glm::u32vec2> sizes(std::max(header.level_count, 1u));
     sizes[0] = {header.pixel_width, header.pixel_height};
     for (std::size_t i = 1; i < sizes.size(); i++)
         sizes[i] = sizes[i - 1] / 2u;
 
+    GLuint texture_id {};
+    glGenTextures(1, &texture_id);
+    glBindTexture(tex_target, texture_id);
+
+    const GLenum tex_img_target {
+        is_cubemap ?
+        static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X) :
+        static_cast<GLenum>(GL_TEXTURE_2D)
+    };
+
     uint32_t mip_level = std::max(header.level_count, 1u);
     do {
         mip_level--;
-        dynarray<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
         align_stream(stream, mip_padding);
 
+        dynarray<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
         load_level_data(stream, level_data.data(), level_indexes[mip_level], header, file_path);
 
-        if (format_info.is_compressed) {
-            glCompressedTexImage2D(
-                GL_TEXTURE_2D, mip_level, format_info.gl_internal_format,
-                sizes[mip_level].x, sizes[mip_level].y, 0,
-                    level_data.size() * sizeof(char), level_data.data()
-            );
-        }
-        else {
-            glTexImage2D(
-                GL_TEXTURE_2D, mip_level, format_info.gl_internal_format,
-                sizes[mip_level].x, sizes[mip_level].y, 0,
-                format_info.gl_format, format_info.gl_type, level_data.data()
-            );
-        }
+        const uint64_t face_size {format_info.compute_image_size(sizes[mip_level])};
 
+        for (uint32_t face_i = 0; face_i < header.face_count; face_i++) {
+            const uint64_t mem_offset {face_size * face_i};
+
+            if (format_info.is_compressed) {
+                glCompressedTexImage2D(
+                    tex_img_target + face_i, mip_level, format_info.gl_internal_format,
+                    sizes[mip_level].x, sizes[mip_level].y, 0,
+                    face_size, level_data.data() + mem_offset
+                );
+            }
+            else {
+                glTexImage2D(
+                    tex_img_target + face_i, mip_level, format_info.gl_internal_format,
+                    sizes[mip_level].x, sizes[mip_level].y, 0,
+                    format_info.gl_format, format_info.gl_type, level_data.data() + mem_offset
+                );
+            }
+        }
     } while (mip_level > 0);
 
-    // Set nearest neighbor interpolation.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // Set parameters.
+    glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    if (is_cubemap) {
+        glTexParameteri(tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex_target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
 
     return texture_id;
 }
@@ -167,8 +193,6 @@ KTXTexture::KTXTexture(const std::string& file_path) {
         ktx_loading_error("Failed to read the KTX header.", file_path);
     if (header.layer_count > 1)
         ktx_loading_error("Multiple layers are not supported yet.", file_path);
-    if (header.face_count > 1)
-        ktx_loading_error("Multiple faces are not supported yet.", file_path);
 
     // Check the identifier.
     if (std::memcmp(header.identifier.data(), KTX_IDENTIFIER.data(), 12) != 0 || !stream.good())
