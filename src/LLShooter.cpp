@@ -118,7 +118,7 @@ void LLShooter::update(float delta) {
     physics_server->update(delta);
 
     // Make light to follow player.
-    rendering_server->draw_params.spot_lights[0].position = player->cylinder.position;
+    rendering_server->draw_params.spot_lights[0].position = player->cylinder.highest_point();
     glm::vec3& l_dir = rendering_server->draw_params.spot_lights[0].direction;
     l_dir = glm::normalize((camera->direction - l_dir) * 0.2f + l_dir);
 
