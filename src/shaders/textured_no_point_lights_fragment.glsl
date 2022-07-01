@@ -16,20 +16,23 @@ const int SPOT_LIGHTS_AMOUNT = 1;
 uniform SpotLight SPOT_LIGHTS[SPOT_LIGHTS_AMOUNT];
 uniform sampler2D TEXTURE_SAMPLER;
 
-const float AMBIENT_STRENGTH = 0.25;
+const float AMBIENT_STRENGTH = 0.0;
 const vec3 AMBIENT_COLOR = vec3(1.0, 1.0, 1.0);
 
 vec3 spot_light(SpotLight light) {
-    vec3 dir_from_light = normalize(fragment_pos_worldspace - light.position);
+    float dist = distance(fragment_pos_worldspace, light.position);
+    vec3 dir_from_light = (fragment_pos_worldspace - light.position) / dist;
     float cosine = dot(dir_from_light, light.direction);
 
     float inner_diff = cosine - light.inner_cutoff_angle_cos;
     float outer_diff = cosine - light.outer_cutoff_angle_cos;
 
+    float attenuation = 1.0 / (1.0 + dist * dist);
+
     float intensity = (cosine - light.outer_cutoff_angle_cos) /
             (light.inner_cutoff_angle_cos - light.outer_cutoff_angle_cos);
 
-    return light.color_and_strength * intensity;
+    return intensity * attenuation * light.color_and_strength;
 }
 
 void main() {
