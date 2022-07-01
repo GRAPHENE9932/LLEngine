@@ -70,7 +70,7 @@ void LLShooter::add_info_display() {
         font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f)
     );
 
-    info_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    info_display->set_screen_space_position({2.0f, 25.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     info_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
     info_display->rotation = glm::quat();
 
