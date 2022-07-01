@@ -17,13 +17,13 @@ private:
     std::shared_ptr<ControllableCylinder> player;
     std::unique_ptr<Camera> camera;
     std::unique_ptr<FPSMeter> fps_meter;
-    std::shared_ptr<BitmapTextObject> fps_display;
+    std::shared_ptr<BitmapTextObject> info_display;
 
     void init();
     void add_weapon();
     void add_crosshair();
     void add_lights();
-    void add_fps_display();
+    void add_info_display();
     void add_camera_and_player();
     void add_skybox();
     void update(float delta);

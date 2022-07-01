@@ -136,6 +136,7 @@ void BitmapTextObject::draw(DrawParameters& params) {
     // Draw.
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    params.triangles_drawn += vertices.size() / 3;
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);

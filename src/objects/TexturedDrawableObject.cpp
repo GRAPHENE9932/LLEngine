@@ -99,6 +99,7 @@ void TexturedDrawableObject::draw(DrawParameters& params) {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
     glDrawElements(GL_TRIANGLES, mesh->get_indices().size(), GL_UNSIGNED_SHORT, 0);
+    params.triangles_drawn += mesh->get_indices().size() / 3;
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);

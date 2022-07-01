@@ -15,6 +15,7 @@ struct DrawParameters {
     glm::mat4 view_proj_matrix, view_matrix, proj_matrix;
     GLuint cur_shader;
     bool overlay_mode;
+    unsigned long triangles_drawn;
 };
 
 class DrawableObject {

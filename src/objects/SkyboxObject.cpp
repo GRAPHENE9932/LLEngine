@@ -98,6 +98,7 @@ void SkyboxObject::draw(DrawParameters& params) {
 
     glBindVertexArray(vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, SKYBOX_VERTICES.size());
+    params.triangles_drawn += SKYBOX_VERTICES.size() / 3;
 
     glDisableVertexAttribArray(0);
 }

@@ -27,7 +27,7 @@ void LLShooter::init() {
     add_crosshair();
     add_lights();
     add_weapon();
-    add_fps_display();
+    add_info_display();
     add_skybox();
 
     load_map("res/maps/map_close.llmap", *rendering_server, *physics_server);
@@ -64,17 +64,17 @@ void LLShooter::add_lights() {
     );
 }
 
-void LLShooter::add_fps_display() {
+void LLShooter::add_info_display() {
     std::shared_ptr<BitmapFont> font {std::make_shared<BitmapFont>("res/fonts/default.llbmf")};
-    fps_display = std::make_shared<BitmapTextObject>(
+    info_display = std::make_shared<BitmapTextObject>(
         font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f)
     );
 
-    fps_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-    fps_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-    fps_display->rotation = glm::quat();
+    info_display->set_screen_space_position({2.0f, 22.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    info_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+    info_display->rotation = glm::quat();
 
-    rendering_server->add_drawable_object(fps_display, true);
+    rendering_server->add_drawable_object(info_display, true);
 }
 
 void LLShooter::add_camera_and_player() {
@@ -123,7 +123,11 @@ void LLShooter::update(float delta) {
     l_dir = glm::normalize((camera->direction - l_dir) * 0.2f + l_dir);
 
     fps_meter->frame();
-    fps_display->set_text("FPS: " + std::to_string(fps_meter->get_fps()));
+    info_display->set_text(
+        "FPS: " + std::to_string(fps_meter->get_fps()) + "\n"
+        "Triangles: " + std::to_string(rendering_server->draw_params.triangles_drawn)
+    );
+    rendering_server->draw_params.triangles_drawn = 0;
 }
 
 void LLShooter::load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps) {

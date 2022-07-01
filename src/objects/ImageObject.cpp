@@ -105,6 +105,7 @@ void ImageObject::draw(DrawParameters& params) {
 
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, QUAD_VERTICES.size());
+    params.triangles_drawn += QUAD_VERTICES.size() / 3;
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
