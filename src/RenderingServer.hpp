@@ -25,7 +25,7 @@ public:
     void set_update_callback(std::function<void(float)> func);
     GLFWwindow* get_window();
 
-    void add_drawable_object(const std::shared_ptr<DrawableObject>& obj, const bool overlay = false);
+    void add_drawable_object(const std::shared_ptr<IDrawableObject>& obj, const bool overlay = false);
     void set_skybox(const std::shared_ptr<SkyboxObject>& obj);
 
     void main_loop();
@@ -35,8 +35,8 @@ private:
     std::function<void(float)> update_callback;
     std::chrono::high_resolution_clock::time_point prev_frame_time;
 
-    std::vector<std::shared_ptr<DrawableObject>> drawable_objects;
-    std::vector<std::shared_ptr<DrawableObject>> drawable_objects_overlay;
+    std::vector<std::shared_ptr<IDrawableObject>> drawable_objects;
+    std::vector<std::shared_ptr<IDrawableObject>> drawable_objects_overlay;
     std::shared_ptr<SkyboxObject> skybox = nullptr;
 
     void init_window(int window_width, int window_height);

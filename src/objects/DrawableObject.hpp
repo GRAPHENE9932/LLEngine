@@ -18,9 +18,9 @@ struct DrawParameters {
     unsigned long triangles_drawn;
 };
 
-class DrawableObject {
+class IDrawableObject {
 public:
     virtual void draw(DrawParameters& params) = 0;
     virtual GLuint get_program_id() const = 0;
-    virtual ~DrawableObject() = default;
+    virtual ~IDrawableObject() = default;
 };

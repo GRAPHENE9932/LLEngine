@@ -25,12 +25,12 @@ GLFWwindow* RenderingServer::get_window() {
     return window;
 }
 
-void RenderingServer::add_drawable_object(const std::shared_ptr<DrawableObject>& obj, const bool overlay) {
+void RenderingServer::add_drawable_object(const std::shared_ptr<IDrawableObject>& obj, const bool overlay) {
     auto& cur_vector {overlay ? drawable_objects_overlay : drawable_objects};
 
     auto iter {std::lower_bound(
         cur_vector.begin(), cur_vector.end(), obj,
-        [] (const std::shared_ptr<DrawableObject>& obj_1, const std::shared_ptr<DrawableObject>& obj_2) {
+        [] (const std::shared_ptr<IDrawableObject>& obj_1, const std::shared_ptr<IDrawableObject>& obj_2) {
             return obj_1->get_program_id() < obj_2->get_program_id();
         }
     )};

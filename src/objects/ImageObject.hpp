@@ -11,7 +11,7 @@
 #include "SpatialObject.hpp"
 #include "DrawableObject.hpp"
 
-class ImageObject : public SpatialObject, public DrawableObject {
+class ImageObject : public SpatialObject, public IDrawableObject {
 public:
     static GLuint program_id;
 

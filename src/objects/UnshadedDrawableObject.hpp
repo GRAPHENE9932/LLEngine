@@ -6,7 +6,7 @@
 #include "DrawableObject.hpp"
 #include "SpatialObject.hpp"
 
-class UnshadedDrawableObject : public DrawableObject, public SpatialObject {
+class UnshadedDrawableObject : public IDrawableObject, public SpatialObject {
 public:
     static GLuint program_id;
 

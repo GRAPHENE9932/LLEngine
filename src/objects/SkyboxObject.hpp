@@ -5,7 +5,7 @@
 #include "../common/Texture.hpp"
 #include "DrawableObject.hpp"
 
-class SkyboxObject : public DrawableObject {
+class SkyboxObject : public IDrawableObject {
 public:
     std::shared_ptr<Texture> texture;
 

@@ -13,7 +13,7 @@
 #include "SpatialObject.hpp"
 #include "DrawableObject.hpp"
 
-class BitmapTextObject : public SpatialObject, public DrawableObject {
+class BitmapTextObject : public SpatialObject, public IDrawableObject {
 public:
     BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
             const std::string& text, const glm::vec3& color,

@@ -11,7 +11,7 @@
 #include "SpotLight.hpp"
 #include "Camera.hpp"
 
-class TexturedDrawableObject : public DrawableObject, public SpatialObject {
+class TexturedDrawableObject : public IDrawableObject, public SpatialObject {
 public:
 
     std::shared_ptr<Mesh> mesh;
