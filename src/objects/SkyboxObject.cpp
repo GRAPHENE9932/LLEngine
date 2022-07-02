@@ -71,6 +71,13 @@ void SkyboxObject::pre_init() {
 }
 
 void SkyboxObject::clean_up() {
+    program_id = 0;
+    vertices_id = 0;
+    mvp_uniform_id = 0;
+    cubemap_uniform_id = 0;
+
+    glDeleteBuffers(1, &vertices_id);
+
     glDeleteProgram(program_id);
 }
 

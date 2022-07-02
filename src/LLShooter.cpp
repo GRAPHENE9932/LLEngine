@@ -10,7 +10,11 @@
 const int WINDOW_WIDTH = 1900, WINDOW_HEIGHT = 1000;
 
 LLShooter::~LLShooter() {
-
+    BitmapTextObject::clean_up();
+    ImageObject::clean_up();
+    TexturedDrawableObject::clean_up();
+    UnshadedDrawableObject::clean_up();
+    SkyboxObject::clean_up();
 }
 
 void LLShooter::start() {

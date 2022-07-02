@@ -12,6 +12,11 @@ RenderingServer::RenderingServer(int window_width, int window_height) {
     init_gl();
 }
 
+RenderingServer::~RenderingServer() {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
+
 void RenderingServer::set_update_callback(std::function<void(float)> func) {
     update_callback = func;
 }

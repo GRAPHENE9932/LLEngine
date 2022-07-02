@@ -1,11 +1,11 @@
 #include "TexturedDrawableObject.hpp"
 #include "../utils/shader_loader.hpp"
 
-GLuint TexturedDrawableObject::program_id;
-GLuint TexturedDrawableObject::mvp_matrix_uniform_id;
-GLuint TexturedDrawableObject::model_matrix_uniform_id;
-GLuint TexturedDrawableObject::normal_matrix_uniform_id;
-GLuint TexturedDrawableObject::light_position_uniform_id;
+GLuint TexturedDrawableObject::program_id = 0;
+GLuint TexturedDrawableObject::mvp_matrix_uniform_id = 0;
+GLuint TexturedDrawableObject::model_matrix_uniform_id = 0;
+GLuint TexturedDrawableObject::normal_matrix_uniform_id = 0;
+GLuint TexturedDrawableObject::light_position_uniform_id = 0;
 std::array<SpotLight::Uniforms, SPOT_LIGHTS_AMOUNT> TexturedDrawableObject::spot_light_uniforms;
 std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> TexturedDrawableObject::point_light_uniforms;
 
@@ -46,6 +46,12 @@ void TexturedDrawableObject::pre_init() {
 }
 
 void TexturedDrawableObject::clean_up() {
+    program_id = 0;
+    mvp_matrix_uniform_id = 0;
+    model_matrix_uniform_id = 0;
+    normal_matrix_uniform_id = 0;
+    light_position_uniform_id = 0;
+
     glDeleteProgram(program_id);
 }
 

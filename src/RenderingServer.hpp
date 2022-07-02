@@ -20,6 +20,7 @@ public:
     DrawParameters draw_params;
 
     RenderingServer(int window_width, int window_height);
+    ~RenderingServer();
 
     void set_update_callback(std::function<void(float)> func);
     GLFWwindow* get_window();

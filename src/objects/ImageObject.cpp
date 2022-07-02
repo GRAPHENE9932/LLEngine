@@ -7,11 +7,11 @@
 #include "../utils/math.hpp"
 #include "ImageObject.hpp"
 
-GLuint ImageObject::program_id;
-GLuint ImageObject::vertices_id;
-GLuint ImageObject::uvs_id;
-GLuint ImageObject::model_matrix_uniform_id;
-GLuint ImageObject::mvp_matrix_uniform_id;
+GLuint ImageObject::program_id = 0;
+GLuint ImageObject::vertices_id = 0;
+GLuint ImageObject::uvs_id = 0;
+GLuint ImageObject::model_matrix_uniform_id = 0;
+GLuint ImageObject::mvp_matrix_uniform_id = 0;
 
 ImageObject::ImageObject(std::shared_ptr<Texture> texture, bool is_transparent, bool is_2d) :
     is_transparent(is_transparent), is_2d(is_2d) {
@@ -42,6 +42,12 @@ void ImageObject::pre_init() {
 }
 
 void ImageObject::clean_up() {
+    program_id = 0;
+    vertices_id = 0;
+    uvs_id = 0;
+    model_matrix_uniform_id = 0;
+    mvp_matrix_uniform_id = 0;
+
     glDeleteBuffers(1, &vertices_id);
     glDeleteBuffers(1, &uvs_id);
 

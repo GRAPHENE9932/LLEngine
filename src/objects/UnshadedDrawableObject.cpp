@@ -1,9 +1,9 @@
 #include "UnshadedDrawableObject.hpp"
 #include "../utils/shader_loader.hpp"
 
-GLuint UnshadedDrawableObject::program_id;
-GLuint UnshadedDrawableObject::mvp_matrix_uniform_id;
-GLuint UnshadedDrawableObject::color_uniform_id;
+GLuint UnshadedDrawableObject::program_id = 0;
+GLuint UnshadedDrawableObject::mvp_matrix_uniform_id = 0;
+GLuint UnshadedDrawableObject::color_uniform_id = 0;
 
 UnshadedDrawableObject::UnshadedDrawableObject(std::shared_ptr<Mesh> mesh, glm::vec3 color) :
     color(color) {
@@ -24,6 +24,10 @@ void UnshadedDrawableObject::pre_init() {
 }
 
 void UnshadedDrawableObject::clean_up() {
+    program_id = 0;
+    mvp_matrix_uniform_id = 0;
+    color_uniform_id = 0;
+
     glDeleteProgram(program_id);
 }
 
