@@ -19,9 +19,6 @@ public:
             const std::string& text, const glm::vec3& color,
             const bool is_2d = true);
     ~BitmapTextObject();
-
-    static void pre_init();
-    static void clean_up();
     
     void set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size);
     void set_screen_space_scale(const glm::vec3& scr_space_scale, const glm::vec2 win_size);
@@ -31,13 +28,9 @@ public:
     void set_text(const std::string& text);
 
     void draw(DrawParameters& params) override;
-    GLuint get_program_id() const override {
-        return program_id;
-    }
+    GLuint get_program_id(DrawParameters& params) const override;
 
 private:
-    static GLuint program_id, color_uniform_id, mvp_matrix_uniform_id;
-
     GLuint vertices_id = 0, uvs_id = 0, texture_id = 0;
 
     std::shared_ptr<BitmapFont> font;

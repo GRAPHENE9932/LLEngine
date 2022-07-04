@@ -3,9 +3,6 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-// Also change src/shaders/textured_fragment.glsl:POINT_LIGHTS_AMOUNT
-constexpr GLuint POINT_LIGHTS_AMOUNT = 0;
-
 struct PointLight {
     struct Uniforms {
         GLuint position_id, color_id, diffuse_strength_id, const_coeff_id,

@@ -15,12 +15,8 @@ public:
     static void clean_up();
 
     void draw(DrawParameters& params) override;
-    inline GLuint get_program_id() const override {
-        return program_id;
-    }
+    inline GLuint get_program_id(DrawParameters& params) const override;
 
 private:
-    static GLuint program_id;
     static GLuint vertices_id;
-    static GLuint mvp_uniform_id, cubemap_uniform_id;
 };

@@ -13,25 +13,11 @@
 
 class TexturedDrawableObject : public IDrawableObject, public SpatialObject {
 public:
-
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Texture> texture;
 
     TexturedDrawableObject(std::shared_ptr<Texture> texture, std::shared_ptr<Mesh> mesh);
 
-    static void pre_init();
-    static void clean_up();
-
     void draw(DrawParameters& params) override;
-    inline GLuint get_program_id() const override {
-        return program_id;
-    }
-
-private:
-    static GLuint program_id;
-    static GLuint mvp_matrix_uniform_id, model_matrix_uniform_id,
-        normal_matrix_uniform_id, light_position_uniform_id;
-
-    static std::array<PointLight::Uniforms, POINT_LIGHTS_AMOUNT> point_light_uniforms;
-    static std::array<SpotLight::Uniforms, SPOT_LIGHTS_AMOUNT> spot_light_uniforms;
+    GLuint get_program_id(DrawParameters& params) const override;
 };

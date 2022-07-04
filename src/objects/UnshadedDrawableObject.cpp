@@ -1,62 +1,30 @@
 #include "UnshadedDrawableObject.hpp"
 #include "../utils/shader_loader.hpp"
 
-GLuint UnshadedDrawableObject::program_id = 0;
-GLuint UnshadedDrawableObject::mvp_matrix_uniform_id = 0;
-GLuint UnshadedDrawableObject::color_uniform_id = 0;
-
 UnshadedDrawableObject::UnshadedDrawableObject(std::shared_ptr<Mesh> mesh, glm::vec3 color) :
     color(color) {
     this->mesh = mesh;
 }
 
-UnshadedDrawableObject::~UnshadedDrawableObject() {
-
-}
-
-void UnshadedDrawableObject::pre_init() {
-    // Init shaders.
-    program_id = load_shaders("res/shaders/unshaded_vertex.glsl",
-            "res/shaders/unshaded_fragment.glsl");
-    // Init uniforms.
-    mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
-    color_uniform_id = glGetUniformLocation(program_id, "COLOR");
-}
-
-void UnshadedDrawableObject::clean_up() {
-    program_id = 0;
-    mvp_matrix_uniform_id = 0;
-    color_uniform_id = 0;
-
-    glDeleteProgram(program_id);
-}
-
 void UnshadedDrawableObject::draw(DrawParameters& params) {
-    if (program_id == 0)
-        pre_init();
-    
-    if (params.cur_shader != program_id) {
-        params.cur_shader = program_id;
-        glUseProgram(program_id);
-    }
+    // Uniforms.
+    auto model_matrix = compute_matrix();
+    auto mvp = params.view_proj_matrix * model_matrix;
+    params.sh_mgr.use_unshaded_shader(mvp, color);
 
     // Vertices.
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // Uniforms.
-    auto model_matrix = compute_matrix();
-
-    auto mvp = params.view_proj_matrix * model_matrix;
-    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
-
-    glUniform3fv(color_uniform_id, 1, &color[0]);
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
+
     glDrawElements(GL_TRIANGLES, mesh->get_indices().size(), GL_UNSIGNED_SHORT, 0);
     params.triangles_drawn += mesh->get_indices().size() / 3;
 
     glDisableVertexAttribArray(0);
 }
 
+GLuint UnshadedDrawableObject::get_program_id(DrawParameters& params) const {
+    return params.sh_mgr.get_unshaded_program_id();
+}

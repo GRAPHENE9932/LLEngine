@@ -10,10 +10,7 @@
 const int WINDOW_WIDTH = 1900, WINDOW_HEIGHT = 1000;
 
 LLShooter::~LLShooter() {
-    BitmapTextObject::clean_up();
     ImageObject::clean_up();
-    TexturedDrawableObject::clean_up();
-    UnshadedDrawableObject::clean_up();
     SkyboxObject::clean_up();
 }
 
@@ -62,10 +59,10 @@ void LLShooter::add_crosshair() {
 }
 
 void LLShooter::add_lights() {
-    rendering_server->draw_params.spot_lights[0] = SpotLight(
+    rendering_server->draw_params.spot_lights.push_back(SpotLight(
         {0.0f, 2.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f},
         glm::radians(30.0f), glm::radians(35.0f), 1.0f
-    );
+    ));
 }
 
 void LLShooter::add_info_display() {

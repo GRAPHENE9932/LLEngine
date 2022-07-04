@@ -4,10 +4,6 @@
 #include "../utils/shader_loader.hpp"
 #include "BitmapTextObject.hpp"
 
-GLuint BitmapTextObject::program_id = 0;
-GLuint BitmapTextObject::mvp_matrix_uniform_id = 0;
-GLuint BitmapTextObject::color_uniform_id = 0;
-
 BitmapTextObject::BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
         const std::string& text, const glm::vec3& color, const bool is_2d) :
         color(color), is_2d(is_2d) {
@@ -21,18 +17,6 @@ BitmapTextObject::~BitmapTextObject() {
         glDeleteBuffers(1, &vertices_id);
     if (uvs_id != 0)
         glDeleteBuffers(1, &uvs_id);
-}
-
-void BitmapTextObject::pre_init() {
-    // Init shaders.
-    program_id = load_shaders("res/shaders/colored_text_vertex.glsl",
-            "res/shaders/colored_text_fragment.glsl");
-    mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
-    color_uniform_id = glGetUniformLocation(program_id, "COLOR");
-}
-
-void BitmapTextObject::clean_up() {
-    glDeleteProgram(program_id);
 }
 
 void BitmapTextObject::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
@@ -102,15 +86,12 @@ void BitmapTextObject::set_text(const std::string& text) {
 }
 
 void BitmapTextObject::draw(DrawParameters& params) {
-    if (program_id == 0)
-        pre_init();
-    
-    if (params.cur_shader != program_id) {
-        params.cur_shader = program_id;
-        glUseProgram(program_id);
-    }
-
     glEnable(GL_BLEND);
+
+    // Uniforms.
+    glm::mat4 model_matrix = compute_matrix();
+    glm::mat4 mvp = is_2d ? model_matrix : params.view_proj_matrix * model_matrix;
+    params.sh_mgr.use_colored_text_shader(mvp, color);
 
     // Vertices.
     glEnableVertexAttribArray(0);
@@ -125,14 +106,6 @@ void BitmapTextObject::draw(DrawParameters& params) {
     // Bind the texture.
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    // Uniforms.
-    glm::mat4 model_matrix = compute_matrix();
-    glm::mat4 mvp = is_2d ? model_matrix : params.view_proj_matrix * model_matrix;
-
-    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
-
-    glUniform3fv(color_uniform_id, 1, &color[0]);
-
     // Draw.
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -142,6 +115,10 @@ void BitmapTextObject::draw(DrawParameters& params) {
     glDisableVertexAttribArray(1);
 
     glDisable(GL_BLEND);
+}
+
+GLuint BitmapTextObject::get_program_id(DrawParameters& params) const {
+    return params.sh_mgr.get_colored_text_program_id();
 }
 
 void BitmapTextObject::register_buffers() {

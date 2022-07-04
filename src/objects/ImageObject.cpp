@@ -7,11 +7,8 @@
 #include "../utils/math.hpp"
 #include "ImageObject.hpp"
 
-GLuint ImageObject::program_id = 0;
 GLuint ImageObject::vertices_id = 0;
 GLuint ImageObject::uvs_id = 0;
-GLuint ImageObject::model_matrix_uniform_id = 0;
-GLuint ImageObject::mvp_matrix_uniform_id = 0;
 
 ImageObject::ImageObject(std::shared_ptr<Texture> texture, bool is_transparent, bool is_2d) :
     is_transparent(is_transparent), is_2d(is_2d) {
@@ -33,25 +30,14 @@ void ImageObject::pre_init() {
     glBindBuffer(GL_ARRAY_BUFFER, uvs_id);
     glBufferData(GL_ARRAY_BUFFER, QUAD_UVS.size() * sizeof(float),
                  QUAD_UVS.data(), GL_STATIC_DRAW);
-
-    // Init shaders.
-    program_id = load_shaders("res/shaders/unshaded_textured_vertex.glsl",
-            "res/shaders/unshaded_textured_fragment.glsl");
-    model_matrix_uniform_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
-    mvp_matrix_uniform_id = glGetUniformLocation(program_id, "MVP");
 }
 
 void ImageObject::clean_up() {
-    program_id = 0;
     vertices_id = 0;
     uvs_id = 0;
-    model_matrix_uniform_id = 0;
-    mvp_matrix_uniform_id = 0;
 
     glDeleteBuffers(1, &vertices_id);
     glDeleteBuffers(1, &uvs_id);
-
-    glDeleteProgram(program_id);
 }
 
 void ImageObject::set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size) {
@@ -79,16 +65,13 @@ void ImageObject::set_screen_space_scale(const glm::vec3& scr_space_scale, const
 }
 
 void ImageObject::draw(DrawParameters& params) {
-    if (program_id == 0)
-        pre_init();
-    
-    if (params.cur_shader != program_id) {
-        params.cur_shader = program_id;
-        glUseProgram(program_id);
-    }
-
     if (is_transparent)
         glEnable(GL_BLEND);
+
+    // Uniforms.
+    glm::mat4 model_matrix {compute_matrix()};
+    glm::mat4 mvp {is_2d ? model_matrix : params.view_proj_matrix * model_matrix};
+    params.sh_mgr.use_unshaded_textured_shader(mvp);
 
     // Vertices.
     glEnableVertexAttribArray(0);
@@ -103,12 +86,6 @@ void ImageObject::draw(DrawParameters& params) {
     // Bind textures.
     glBindTexture(GL_TEXTURE_2D, texture->get_id());
 
-    // Uniforms.
-    glm::mat4 model_matrix {compute_matrix()};
-    glm::mat4 mvp {is_2d ? model_matrix : params.view_proj_matrix * model_matrix};
-
-    glUniformMatrix4fv(mvp_matrix_uniform_id, 1, GL_FALSE, &mvp[0][0]);
-
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, QUAD_VERTICES.size());
     params.triangles_drawn += QUAD_VERTICES.size() / 3;
@@ -118,4 +95,8 @@ void ImageObject::draw(DrawParameters& params) {
 
     if (is_transparent)
         glDisable(GL_BLEND);
+}
+
+GLuint ImageObject::get_program_id(DrawParameters& params) const {
+    return params.sh_mgr.get_unshaded_textured_program_id();
 }

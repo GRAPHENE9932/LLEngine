@@ -30,8 +30,8 @@ void RenderingServer::add_drawable_object(const std::shared_ptr<IDrawableObject>
 
     auto iter {std::lower_bound(
         cur_vector.begin(), cur_vector.end(), obj,
-        [] (const std::shared_ptr<IDrawableObject>& obj_1, const std::shared_ptr<IDrawableObject>& obj_2) {
-            return obj_1->get_program_id() < obj_2->get_program_id();
+        [this](const std::shared_ptr<IDrawableObject>& obj_1, const std::shared_ptr<IDrawableObject>& obj_2) {
+            return obj_1->get_program_id(draw_params) < obj_2->get_program_id(draw_params);
         }
     )};
 
@@ -90,10 +90,8 @@ void RenderingServer::init_gl() {
 }
 
 void RenderingServer::main_loop() {
-    TexturedDrawableObject::pre_init();
-    UnshadedDrawableObject::pre_init();
     ImageObject::pre_init();
-    BitmapTextObject::pre_init();
+    SkyboxObject::pre_init();
 
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
@@ -110,10 +108,10 @@ void RenderingServer::main_loop() {
         draw_params.view_matrix = camera->compute_view_matrix();
         draw_params.proj_matrix = camera->get_proj_matrix();
         draw_params.view_proj_matrix = draw_params.proj_matrix * draw_params.view_matrix;
-        for (GLuint i = 0; i < POINT_LIGHTS_AMOUNT; i++)
-            draw_params.point_lights[i].calc_overlay_position(draw_params.view_matrix);
-        for (GLuint i = 0; i < SPOT_LIGHTS_AMOUNT; i++)
-            draw_params.spot_lights[i].calc_overlay_props(draw_params.view_matrix);
+        for (SpotLight& light : draw_params.spot_lights)
+            light.calc_overlay_props(draw_params.view_matrix);
+        for (PointLight& light : draw_params.point_lights)
+            light.calc_overlay_position(draw_params.view_matrix);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 

@@ -8,12 +8,14 @@
 
 /// Loads and compiles vertex and fragment shaders from files,
 /// compiles, links them and returns the program ID.
-GLuint load_shaders(std::string vertex_shader_path, std::string fragment_shader_path) {
+GLuint load_shaders(const std::string& vertex_shader_path,
+                    const std::string& fragment_shader_path,
+                    const std::vector<std::string>& defines) {
     ManagedProgramID program_id = glCreateProgram();
 
-    ManagedShaderID vertex_shader_id = load_vertex_shader(vertex_shader_path);
+    ManagedShaderID vertex_shader_id = load_vertex_shader(vertex_shader_path, defines);
     glAttachShader(program_id, vertex_shader_id);
-    ManagedShaderID fragment_shader_id = load_fragment_shader(fragment_shader_path);
+    ManagedShaderID fragment_shader_id = load_fragment_shader(fragment_shader_path, defines);
     glAttachShader(program_id, fragment_shader_id);
 
     glLinkProgram(program_id);
@@ -43,7 +45,8 @@ GLuint load_shaders(std::string vertex_shader_path, std::string fragment_shader_
 
 /// Loads the vertex shader from file, compiles it and
 /// returns the vertex shader ID.
-ManagedShaderID load_vertex_shader(std::string& vertex_shader_path) {
+ManagedShaderID load_vertex_shader(const std::string& vertex_shader_path,
+                                   const std::vector<std::string>& defines) {
     ManagedShaderID vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 
     std::ifstream file_stream;
@@ -58,6 +61,24 @@ ManagedShaderID load_vertex_shader(std::string& vertex_shader_path) {
     std::stringstream shader_code_ss;
     shader_code_ss << file_stream.rdbuf();
     std::string shader_code = shader_code_ss.str();
+
+    // Insert defines.
+    if (!defines.empty()) {
+        // Find the position of the next line after "#version ...".
+        const std::size_t version_pos {shader_code.find("#version")};
+        if (version_pos == std::string::npos) {
+            throw std::runtime_error(
+                "Shader doesn't contains the \"#version\" directive.\n"
+                "Path to the file: " + vertex_shader_path
+            );
+        }
+        const std::size_t pos {shader_code.find('\n', version_pos) + 1};
+
+        for (const std::string& cur_def : defines) {
+            shader_code.insert(pos, "#define " + cur_def + '\n');
+        }
+    }
+
     const char* shader_code_c = shader_code.c_str();
     glShaderSource(vertex_shader_id, 1, &shader_code_c, nullptr);
     glCompileShader(vertex_shader_id);
@@ -83,7 +104,8 @@ ManagedShaderID load_vertex_shader(std::string& vertex_shader_path) {
 
 /// Loads the fragment shader from file, compiles it and
 /// returns the fragment shader shader ID.
-ManagedShaderID load_fragment_shader(std::string& fragment_shader_path) {
+ManagedShaderID load_fragment_shader(const std::string& fragment_shader_path,
+                                     const std::vector<std::string>& defines) {
     ManagedShaderID fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
     std::ifstream file_stream;
@@ -98,6 +120,24 @@ ManagedShaderID load_fragment_shader(std::string& fragment_shader_path) {
     std::stringstream shader_code_ss;
     shader_code_ss << file_stream.rdbuf();
     std::string shader_code = shader_code_ss.str();
+
+    // Insert defines.
+    if (!defines.empty()) {
+        // Find the position of the next line after "#version ...".
+        const std::size_t version_pos {shader_code.find("#version")};
+        if (version_pos == std::string::npos) {
+            throw std::runtime_error(
+                "Shader doesn't contains the \"#version\" directive.\n"
+                "Path to the file: " + fragment_shader_path
+            );
+        }
+        const std::size_t pos {shader_code.find('\n', version_pos) + 1};
+
+        for (const std::string& cur_def : defines) {
+            shader_code.insert(pos, "#define " + cur_def + '\n');
+        }
+    }
+
     const char* shader_code_c = shader_code.c_str();
     glShaderSource(fragment_shader_id, 1, &shader_code_c, nullptr);
     glCompileShader(fragment_shader_id);

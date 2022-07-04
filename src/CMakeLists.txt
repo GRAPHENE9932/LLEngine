@@ -8,6 +8,12 @@ set(SOURCES
     common/KTXTexture.cpp
     common/BitmapFont.cpp
     common/VkFormatInfo.cpp
+    common/shaders/ShaderManager.cpp
+    common/shaders/ColoredTextShader.cpp
+    common/shaders/SkyboxShader.cpp
+    common/shaders/TexturedShader.cpp
+    common/shaders/UnshadedShader.cpp
+    common/shaders/UnshadedTexturedShader.cpp
     objects/SpatialObject.cpp
     objects/TexturedDrawableObject.cpp
     objects/UnshadedDrawableObject.cpp

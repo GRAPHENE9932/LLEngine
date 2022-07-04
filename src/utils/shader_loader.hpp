@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <GL/glew.h>
 
@@ -56,6 +57,10 @@ private:
     bool released = false;
 };
 
-GLuint load_shaders(std::string vertex_shader_path, std::string fragment_shader_path);
-ManagedShaderID load_vertex_shader(std::string& vertex_shader_path);
-ManagedShaderID load_fragment_shader(std::string& fragment_shader_path);
+GLuint load_shaders(const std::string& vertex_shader_path,
+                    const std::string& fragment_shader_path,
+                    const std::vector<std::string>& defines = {});
+ManagedShaderID load_vertex_shader(const std::string& vertex_shader_path,
+                                   const std::vector<std::string>& defines);
+ManagedShaderID load_fragment_shader(const std::string& fragment_shader_path,
+                                     const std::vector<std::string>& defines);

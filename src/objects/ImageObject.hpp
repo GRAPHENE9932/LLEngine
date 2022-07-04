@@ -13,8 +13,6 @@
 
 class ImageObject : public SpatialObject, public IDrawableObject {
 public:
-    static GLuint program_id;
-
     ImageObject(std::shared_ptr<Texture> texture, bool is_transparent, bool is_2d = true);
 
     static void pre_init();
@@ -26,12 +24,10 @@ public:
     void change_texture(std::shared_ptr<Texture> texture);
 
     void draw(DrawParameters& params) override;
-    GLuint get_program_id() const override {
-        return program_id;
-    }
+    GLuint get_program_id(DrawParameters& params) const override;
 
 private:
-    static GLuint vertices_id, uvs_id, model_matrix_uniform_id, mvp_matrix_uniform_id;
+    static GLuint vertices_id, uvs_id;
 
     std::shared_ptr<Texture> texture;
     bool is_transparent, is_2d;

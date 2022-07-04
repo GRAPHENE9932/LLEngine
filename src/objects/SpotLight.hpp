@@ -6,9 +6,6 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-// Also change src/shaders/textured_fragment.glsl:SPOT_LIGHTS_AMOUNT
-constexpr GLuint SPOT_LIGHTS_AMOUNT = 1;
-
 struct SpotLight {
     struct Uniforms {
         GLuint position_id, direction_id, color_and_strength_id,
