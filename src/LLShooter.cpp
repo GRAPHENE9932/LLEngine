@@ -10,8 +10,8 @@
 const int WINDOW_WIDTH = 1900, WINDOW_HEIGHT = 1000;
 
 LLShooter::~LLShooter() {
-    ImageObject::clean_up();
-    SkyboxObject::clean_up();
+    ImageObject::static_clean_up();
+    SkyboxObject::static_clean_up();
 }
 
 void LLShooter::start() {

@@ -51,7 +51,7 @@ constexpr std::array<float, 108> SKYBOX_VERTICES {{
 
 GLuint SkyboxObject::vertices_id = 0;
 
-void SkyboxObject::pre_init() {
+void SkyboxObject::static_init() {
     // Init buffers.
     glGenBuffers(1, &vertices_id);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
@@ -59,7 +59,7 @@ void SkyboxObject::pre_init() {
             SKYBOX_VERTICES.data(), GL_STATIC_DRAW);
 }
 
-void SkyboxObject::clean_up() {
+void SkyboxObject::static_clean_up() {
     vertices_id = 0;
 
     glDeleteBuffers(1, &vertices_id);

@@ -11,8 +11,8 @@ public:
 
     SkyboxObject(const std::shared_ptr<Texture>& texture) : texture(texture) {};
 
-    static void pre_init();
-    static void clean_up();
+    static void static_init();
+    static void static_clean_up();
 
     void draw(DrawParameters& params) override;
     inline GLuint get_program_id(DrawParameters& params) const override;

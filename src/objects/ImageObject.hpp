@@ -15,8 +15,8 @@ class ImageObject : public SpatialObject, public IDrawableObject {
 public:
     ImageObject(std::shared_ptr<Texture> texture, bool is_transparent, bool is_2d = true);
 
-    static void pre_init();
-    static void clean_up();
+    static void static_init();
+    static void static_clean_up();
 
     void set_screen_space_position(const glm::vec3& scr_space_pos, const glm::vec2 win_size);
     void set_in_center_of_screen(const glm::vec2 win_size, const float z_coord);

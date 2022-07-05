@@ -90,8 +90,8 @@ void RenderingServer::init_gl() {
 }
 
 void RenderingServer::main_loop() {
-    ImageObject::pre_init();
-    SkyboxObject::pre_init();
+    ImageObject::static_init();
+    SkyboxObject::static_init();
 
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 

@@ -19,7 +19,7 @@ void ImageObject::change_texture(std::shared_ptr<Texture> texture) {
     this->texture = texture;
 }
 
-void ImageObject::pre_init() {
+void ImageObject::static_init() {
     // Init buffers.
     glGenBuffers(1, &vertices_id);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
@@ -32,7 +32,7 @@ void ImageObject::pre_init() {
                  QUAD_UVS.data(), GL_STATIC_DRAW);
 }
 
-void ImageObject::clean_up() {
+void ImageObject::static_clean_up() {
     vertices_id = 0;
     uvs_id = 0;
 
