@@ -21,8 +21,10 @@ void TexturedShader::initialize(const std::size_t spot_lights_count,
     );
     // Init uniforms.
     mvp_id = glGetUniformLocation(program_id, "MVP");
-    model_matrix_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
-    normal_matrix_id = glGetUniformLocation(program_id, "NORMAL_MATRIX");
+    if (spot_lights_count != 0 || point_lights_count != 0) {
+        model_matrix_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
+        normal_matrix_id = glGetUniformLocation(program_id, "NORMAL_MATRIX");
+    }
 
     spot_light_ids.resize(spot_lights_count);
     for (GLuint i = 0; i < spot_lights_count; i++)
@@ -48,9 +50,11 @@ void TexturedShader::use_shader(const glm::mat4& mvp, const glm::mat4& model_mat
     glUseProgram(program_id);
 
     glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
-    glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, glm::value_ptr(model_matrix));
-    glm::mat4 normal_matrix = glm::transpose(glm::inverse(model_matrix));
-    glUniformMatrix4fv(normal_matrix_id, 1, GL_FALSE, glm::value_ptr(normal_matrix));
+    if (get_spot_lights_count() != 0 || get_point_lights_count() != 0) {
+        glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, glm::value_ptr(model_matrix));
+        glm::mat4 normal_matrix = glm::transpose(glm::inverse(model_matrix));
+        glUniformMatrix4fv(normal_matrix_id, 1, GL_FALSE, glm::value_ptr(normal_matrix));
+    }
 
     for (GLuint i = 0; i < spot_lights.size(); i++)
         spot_lights[i].set_uniforms(spot_light_ids[i], overlay);
