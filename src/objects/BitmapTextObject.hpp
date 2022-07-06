@@ -9,7 +9,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
-#include "../common/BitmapFont.hpp"
+#include "common/BitmapFont.hpp"
 #include "SpatialObject.hpp"
 #include "DrawableObject.hpp"
 

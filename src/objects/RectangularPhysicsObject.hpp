@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "../structs/RoundedRectangle.hpp"
-#include "../structs/Cylinder.hpp"
-#include "../structs/Rect.hpp"
+#include "structs/RoundedRectangle.hpp"
+#include "structs/Cylinder.hpp"
+#include "structs/Rect.hpp"
 
 class RectangularPhysicsObject {
 public:

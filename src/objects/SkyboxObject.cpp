@@ -2,7 +2,7 @@
 
 #include <glm/gtx/transform.hpp>
 
-#include "../utils/shader_loader.hpp"
+#include "utils/shader_loader.hpp"
 #include "SkyboxObject.hpp"
 
 constexpr std::array<float, 108> SKYBOX_VERTICES {{

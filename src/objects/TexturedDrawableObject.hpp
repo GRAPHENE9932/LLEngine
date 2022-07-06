@@ -3,9 +3,9 @@
 #include <array>
 #include <memory>
 
-#include "../common/Texture.hpp"
+#include "common/Texture.hpp"
 #include "DrawableObject.hpp"
-#include "../common/Mesh.hpp"
+#include "common/Mesh.hpp"
 #include "SpatialObject.hpp"
 #include "PointLight.hpp"
 #include "SpotLight.hpp"

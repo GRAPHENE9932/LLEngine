@@ -1,5 +1,5 @@
 #include "UnshadedDrawableObject.hpp"
-#include "../utils/shader_loader.hpp"
+#include "utils/shader_loader.hpp"
 
 UnshadedDrawableObject::UnshadedDrawableObject(std::shared_ptr<Mesh> mesh, glm::vec3 color) :
     color(color) {

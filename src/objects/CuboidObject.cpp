@@ -1,6 +1,6 @@
 #include <glm/geometric.hpp>
 
-#include "../structs/RoundedRectangle.hpp"
+#include "structs/RoundedRectangle.hpp"
 #include "CuboidObject.hpp"
 
 CuboidObject::CuboidObject(const Rect& rect, float bottom_y, float top_y) :

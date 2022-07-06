@@ -1,6 +1,6 @@
 #include <glm/geometric.hpp>
 
-#include "../utils/math.hpp"
+#include "utils/math.hpp"
 #include "static_vector.hpp"
 #include "QuadrantArc.hpp"
 #include "HorLS.hpp"

@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <limits>
 
-#include "../consts_and_enums.hpp"
+#include "consts_and_enums.hpp"
 #include "KTXTexture.hpp"
 #include "BitmapFont.hpp"
 

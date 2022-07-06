@@ -1,7 +1,7 @@
 #include <glm/gtx/transform.hpp>
 
-#include "../utils/math.hpp"
-#include "../utils/shader_loader.hpp"
+#include "utils/math.hpp"
+#include "utils/shader_loader.hpp"
 #include "BitmapTextObject.hpp"
 
 BitmapTextObject::BitmapTextObject(const std::shared_ptr<BitmapFont>& font,

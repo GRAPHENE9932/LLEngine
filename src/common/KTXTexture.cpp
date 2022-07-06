@@ -12,7 +12,7 @@
 
 #include "KTXTexture.hpp"
 #include "VkFormatInfo.hpp"
-#include "../structs/dynarray.hpp"
+#include "structs/dynarray.hpp"
 
 void ktx_loading_error(const std::string& message, const std::string& file_path) {
     throw std::runtime_error("Failed to load the KTX file. " + message +

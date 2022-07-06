@@ -6,8 +6,8 @@
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
 
-#include "../common/Texture.hpp"
-#include "../structs/Rect.hpp"
+#include "common/Texture.hpp"
+#include "structs/Rect.hpp"
 #include "SpatialObject.hpp"
 #include "DrawableObject.hpp"
 

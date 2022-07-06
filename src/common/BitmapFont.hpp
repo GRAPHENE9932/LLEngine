@@ -5,7 +5,7 @@
 #include <memory>
 #include <span>
 
-#include "../consts_and_enums.hpp"
+#include "consts_and_enums.hpp"
 #include "Texture.hpp"
 
 class BitmapFont {

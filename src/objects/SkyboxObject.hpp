@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../common/Texture.hpp"
+#include "common/Texture.hpp"
 #include "DrawableObject.hpp"
 
 class SkyboxObject : public IDrawableObject {

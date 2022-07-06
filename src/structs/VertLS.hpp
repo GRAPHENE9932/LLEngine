@@ -3,7 +3,7 @@
 #include <glm/vec2.hpp>
 
 #include "HorLS.hpp"
-#include "../consts_and_enums.hpp"
+#include "consts_and_enums.hpp"
 
 /// Vertical line segment.
 struct VertLS {

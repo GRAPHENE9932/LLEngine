@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../objects/TexturedDrawableObject.hpp"
-#include "../objects/UnshadedDrawableObject.hpp"
-#include "../objects/FloorObject.hpp"
-#include "../objects/RectangularWall.hpp"
-#include "../objects/CuboidObject.hpp"
+#include "objects/TexturedDrawableObject.hpp"
+#include "objects/UnshadedDrawableObject.hpp"
+#include "objects/FloorObject.hpp"
+#include "objects/RectangularWall.hpp"
+#include "objects/CuboidObject.hpp"
 
 #include <string>
 #include <memory>

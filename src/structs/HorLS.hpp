@@ -2,7 +2,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "../consts_and_enums.hpp"
+#include "consts_and_enums.hpp"
 
 /// Horizontal line segment.
 struct HorLS {

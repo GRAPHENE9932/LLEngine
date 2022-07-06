@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../structs/Rect.hpp"
+#include "structs/Rect.hpp"
 
 class FloorObject {
 public:

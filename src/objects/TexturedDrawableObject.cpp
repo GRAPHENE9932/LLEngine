@@ -1,5 +1,5 @@
 #include "TexturedDrawableObject.hpp"
-#include "../utils/shader_loader.hpp"
+#include "utils/shader_loader.hpp"
 
 TexturedDrawableObject::TexturedDrawableObject(std::shared_ptr<Texture> texture,
     std::shared_ptr<Mesh> mesh) :

@@ -2,9 +2,9 @@
 
 #include <glm/gtx/transform.hpp>
 
-#include "../utils/shader_loader.hpp"
-#include "../consts_and_enums.hpp"
-#include "../utils/math.hpp"
+#include "utils/shader_loader.hpp"
+#include "consts_and_enums.hpp"
+#include "utils/math.hpp"
 #include "ImageObject.hpp"
 
 GLuint ImageObject::vertices_id = 0;

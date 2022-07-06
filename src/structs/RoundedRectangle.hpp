@@ -3,7 +3,7 @@
 #include <array>
 #include <memory>
 
-#include "../consts_and_enums.hpp"
+#include "consts_and_enums.hpp"
 #include "QuadrantArc.hpp"
 #include "HorLS.hpp"
 #include "VertLS.hpp"

@@ -1,6 +1,6 @@
 #include <glm/geometric.hpp>
 
-#include "../consts_and_enums.hpp"
+#include "consts_and_enums.hpp"
 #include "Circle.hpp"
 
 uint8_t Circle::intersection_points(const Circle& other,

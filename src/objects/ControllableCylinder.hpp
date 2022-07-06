@@ -4,7 +4,7 @@
 #include <glm/trigonometric.hpp>
 
 #include "Camera.hpp"
-#include "../structs/Cylinder.hpp"
+#include "structs/Cylinder.hpp"
 
 class ControllableCylinder {
 public:
