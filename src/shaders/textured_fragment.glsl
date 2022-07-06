@@ -1,10 +1,8 @@
 #version 330 core
 // SPOT_LIGHTS_COUNT and POINT_LIGHTS_COUNT macros
 // must be defined here.
-#if POINT_LIGHTS_COUNT != 0
-in vec3 normal_worldspace;
-#endif
 #if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
+in vec3 normal_worldspace;
 in vec3 fragment_pos_worldspace;
 #endif
 in vec2 uv;
@@ -50,7 +48,9 @@ vec3 spot_light(SpotLight light) {
     float intensity = (cosine - light.outer_cutoff_angle_cos) /
             (light.inner_cutoff_angle_cos - light.outer_cutoff_angle_cos);
 
-    return intensity * attenuation * light.color_and_strength;
+    float normals_contribution = max(dot(normal_worldspace, -dir_from_light), 0.0);
+
+    return intensity * attenuation * normals_contribution * light.color_and_strength;
 }
 #endif
 

@@ -25,11 +25,9 @@ void TexturedDrawableObject::draw(DrawParameters& params) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Normals.
-    if (params.point_lights.size() != 0) {
-        glEnableVertexAttribArray(2);
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->get_normals_id());
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_normals_id());
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind textures.
     glBindTexture(GL_TEXTURE_2D, texture->get_id());
