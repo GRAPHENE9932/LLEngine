@@ -1,7 +1,9 @@
 #pragma once
 
 #include "common/FPSMeter.hpp"
+#include "common/Map.hpp"
 #include "objects/BitmapTextObject.hpp"
+#include "objects/MovingLightBulb.hpp"
 #include "RenderingServer.hpp"
 #include "PhysicsServer.hpp"
 
@@ -12,12 +14,13 @@ public:
     void start();
 
 private:
-    std::unique_ptr<RenderingServer> rendering_server;
-    std::unique_ptr<PhysicsServer> physics_server;
-    std::shared_ptr<ControllableCylinder> player;
-    std::unique_ptr<Camera> camera;
-    std::unique_ptr<FPSMeter> fps_meter;
-    std::shared_ptr<BitmapTextObject> info_display;
+    std::unique_ptr<RenderingServer> rendering_server = nullptr;
+    std::unique_ptr<PhysicsServer> physics_server = nullptr;
+    std::shared_ptr<ControllableCylinder> player = nullptr;
+    std::unique_ptr<Camera> camera = nullptr;
+    std::unique_ptr<FPSMeter> fps_meter = nullptr;
+    std::shared_ptr<BitmapTextObject> info_display = nullptr;
+    std::vector<std::shared_ptr<MovingLightBulb>> moving_light_bulbs;
 
     void init();
     void add_weapon();
@@ -26,6 +29,7 @@ private:
     void add_info_display();
     void add_camera_and_player();
     void add_skybox();
+    void add_moving_light_bulb(Map& map, RenderingServer& rs);
     void update(float delta);
 
     void load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps);

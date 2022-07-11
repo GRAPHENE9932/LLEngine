@@ -5,6 +5,7 @@
 class RectangularWall : public RectangularPhysicsObject {
 public:
     RectangularWall(Rect rect);
+    virtual ~RectangularWall() = default;
 
     bool cylinder_intersects(const Cylinder& cylinder) const override;
 

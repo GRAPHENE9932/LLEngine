@@ -8,6 +8,8 @@
 
 class RectangularPhysicsObject {
 public:
+    virtual ~RectangularPhysicsObject() = default;
+
     virtual bool cylinder_intersects(const Cylinder& cylinder) const = 0;
 
     /// @returns Distance from rect to cylinder. Can be negative if cylinder

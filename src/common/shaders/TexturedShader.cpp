@@ -37,8 +37,8 @@ void TexturedShader::initialize(const std::size_t spot_lights_count,
 
 void TexturedShader::use_shader(const glm::mat4& mvp, const glm::mat4& model_matrix,
                                 const bool overlay,
-                                std::vector<SpotLight>& spot_lights,
-                                std::vector<PointLight>& point_lights) {
+                                std::vector<std::shared_ptr<SpotLight>>& spot_lights,
+                                std::vector<std::shared_ptr<PointLight>>& point_lights) {
     if (!is_initialized())
         initialize(spot_lights.size(), point_lights.size());
 
@@ -57,9 +57,9 @@ void TexturedShader::use_shader(const glm::mat4& mvp, const glm::mat4& model_mat
     }
 
     for (GLuint i = 0; i < spot_lights.size(); i++)
-        spot_lights[i].set_uniforms(spot_light_ids[i], overlay);
+        spot_lights[i]->set_uniforms(spot_light_ids[i], overlay);
     for (GLuint i = 0; i < point_lights.size(); i++)
-        point_lights[i].set_uniforms(point_light_ids[i], overlay);
+        point_lights[i]->set_uniforms(point_light_ids[i], overlay);
 }
 
 GLuint TexturedShader::get_program_id(std::size_t spot_lights_count,

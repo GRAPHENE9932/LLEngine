@@ -108,10 +108,10 @@ void RenderingServer::main_loop() {
         draw_params.view_matrix = camera->compute_view_matrix();
         draw_params.proj_matrix = camera->get_proj_matrix();
         draw_params.view_proj_matrix = draw_params.proj_matrix * draw_params.view_matrix;
-        for (SpotLight& light : draw_params.spot_lights)
-            light.calc_overlay_props(draw_params.view_matrix);
-        for (PointLight& light : draw_params.point_lights)
-            light.calc_overlay_position(draw_params.view_matrix);
+        for (const auto& light : draw_params.spot_lights)
+            light->calc_overlay_props(draw_params.view_matrix);
+        for (const auto& light : draw_params.point_lights)
+            light->calc_overlay_position(draw_params.view_matrix);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 

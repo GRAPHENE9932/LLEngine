@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
@@ -16,8 +17,8 @@ public:
                     const std::size_t point_lights_count);
     void use_shader(const glm::mat4& mvp, const glm::mat4& model_matrix,
                     const bool overlay,
-                    std::vector<SpotLight>& spot_lights,
-                    std::vector<PointLight>& point_lights);
+                    std::vector<std::shared_ptr<SpotLight>>& spot_lights,
+                    std::vector<std::shared_ptr<PointLight>>& point_lights);
     GLuint get_program_id(std::size_t spot_lights_count, std::size_t point_lights_count);
     void delete_shader();
 

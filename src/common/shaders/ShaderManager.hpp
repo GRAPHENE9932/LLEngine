@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "ColoredTextShader.hpp"
 #include "SkyboxShader.hpp"
@@ -14,8 +15,8 @@ public:
     void use_skybox_shader(const glm::mat4& mvp);
     void use_textured_shader(const glm::mat4& mvp, const glm::mat4& model_matrix,
                              const bool overlay,
-                             std::vector<SpotLight>& spot_lights,
-                             std::vector<PointLight>& point_lights);
+                             std::vector<std::shared_ptr<SpotLight>>& spot_lights,
+                             std::vector<std::shared_ptr<PointLight>>& point_lights);
     void use_unshaded_shader(const glm::mat4& mvp, const glm::vec3& color);
     void use_unshaded_textured_shader(const glm::mat4& mvp);
 

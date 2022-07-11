@@ -20,7 +20,6 @@ set(SOURCES
     objects/RectangularPhysicsObject.cpp
     objects/Camera.cpp
     objects/ControllableCylinder.cpp
-    objects/FloorObject.cpp
     objects/RectangularWall.cpp
     objects/CuboidObject.cpp
     objects/ImageObject.cpp
@@ -28,6 +27,7 @@ set(SOURCES
     objects/PointLight.cpp
     objects/SpotLight.cpp
     objects/BitmapTextObject.cpp
+    objects/MovingLightBulb.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp
     structs/Rect.cpp
@@ -40,16 +40,6 @@ set(SOURCES
 add_executable(${CMAKE_PROJECT_NAME}_run main.cpp)
 add_library(${CMAKE_PROJECT_NAME}_lib STATIC ${SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME}_run ${CMAKE_PROJECT_NAME}_lib)
-
-# Try to enable link time optimization.
-include(CheckIPOSupported)
-check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_ERROR)
-if (IPO_SUPPORTED)
-    message(STATUS "IPO/LTO supported and enabled")
-    set_property(TARGET ${CMAKE_PROJECT_NAME}_run PROPERTY INTERPROCERUDAL_OPTIMIZATION TRUE)
-else()
-    message(STATUS "IPO/LTO is not supported and disabled")
-endif()
 
 # Enable warnings.
 if (MSVC)

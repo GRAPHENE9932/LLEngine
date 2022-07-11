@@ -1,0 +1,158 @@
+version = 1
+name = "map_close"
+
+left_bound = -20.0
+right_bound = 20.0
+front_bound = -20.0
+back_bound = 20.0
+
+[[flat_floors]]
+rect = {pos_x = -20.0, pos_z = -20.0, size_x = 40.0, size_z = 40.0}
+height = 0.0
+
+[[meshes]]
+id = 0
+file = "map_close.obj"
+[[meshes]]
+id = 1
+file = "wooden_box.obj"
+[[meshes]]
+id = 2
+file = "lightbulb_rail.obj"
+[[meshes]]
+id = 3
+file = "cube.obj"
+
+[[textures]]
+id = 0
+file = "map_close.ktx"
+[[textures]]
+id = 1
+file = "wooden_box.ktx"
+[[textures]]
+id = 2
+file = "lightbulb_rail.ktx"
+
+[[textured_drawables]]
+id = 0
+mesh_id = 0
+texture_id = 0
+[[textured_drawables]]
+id = 1
+mesh_id = 1
+texture_id = 1
+position = {x = 2.5, y = 1.5, z = -5.0}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 2
+mesh_id = 1
+texture_id = 1
+position = {x = 13.5, y = 1.5, z = -5.0}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 3
+mesh_id = 1
+texture_id = 1
+position = {x = 13.5, y = 1.5, z = -8.48912}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 4
+mesh_id = 1
+texture_id = 1
+position = {x = -18.5284, y = 1.5, z = -15.0}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 5
+mesh_id = 1
+texture_id = 1
+position = {x = -18.5284, y = 1.5, z = -12.0}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 6
+mesh_id = 1
+texture_id = 1
+position = {x = -18.5284, y = 4.5, z = -15.0}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 7
+mesh_id = 1
+texture_id = 1
+position = {x = -8.5, y = 1.5, z = 13.4519}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 8
+mesh_id = 1
+texture_id = 1
+position = {x = -8.5, y = 4.5, z = 13.4519}
+scale = {x = 3.0, y = 3.0, z = 3.0}
+[[textured_drawables]]
+id = 9
+mesh_id = 2
+texture_id = 2
+position = {x = 0.0, y = 4.0, z = 0.0}
+scale = {x = 0.99999, y = 0.99999, z = 1.0}
+
+[[unshaded_drawables]]
+id = 10
+mesh_id = 3
+color = {r = 1.0, g = 1.0, b = 1.0}
+scale = {x = 0.2, y = 0.2, z = 0.2}
+
+[[rectangular_walls]]
+rect = {pos_x = -12.0, pos_z = 4.0, size_x = 8.0, size_z = 8.0}
+[[rectangular_walls]]
+rect = {pos_x = 4.0, pos_z = 4.0, size_x = 8.0, size_z = 8.0}
+[[rectangular_walls]]
+rect = {pos_x = 4.0, pos_z = -12.0, size_x = 8.0, size_z = 8.0}
+[[rectangular_walls]]
+rect = {pos_x = -12.0, pos_z = -12.0, size_x = 8.0, size_z = 8.0}
+
+[[cuboid_objects]]
+rect = {pos_x = 2.5, pos_z = -5.0, size_x = 3.0, size_z = 3.0}
+bottom_y = 0.0
+top_y = 3.0
+[[cuboid_objects]]
+rect = {pos_x = 13.5, pos_z = -5.0, size_x = 3.0, size_z = 3.0}
+bottom_y = 0.0
+top_y = 3.0
+[[cuboid_objects]]
+rect = {pos_x = 13.5, pos_z = -8.48912, size_x = 3.0, size_z = 3.0}
+bottom_y = 0.0
+top_y = 3.0
+[[cuboid_objects]]
+rect = {pos_x = -18.5284, pos_z = -15.0, size_x = 3.0, size_z = 3.0}
+bottom_y = 0.0
+top_y = 3.0
+[[cuboid_objects]]
+rect = {pos_x = -18.5284, pos_z = -12.0, size_x = 3.0, size_z = 3.0}
+bottom_y = 0.0
+top_y = 3.0
+[[cuboid_objects]]
+rect = {pos_x = -18.5284, pos_z = -15.0, size_x = 3.0, size_z = 3.0}
+bottom_y = 3.0
+top_y = 6.0
+[[cuboid_objects]]
+rect = {pos_x = -8.5, pos_z = 13.4519, size_x = 3.0, size_z = 3.0}
+bottom_y = 0.0
+top_y = 3.0
+[[cuboid_objects]]
+rect = {pos_x = -8.5, pos_z = 13.4519, size_x = 3.0, size_z = 3.0}
+bottom_y = 3.0
+top_y = 6.0
+
+[[point_lights]]
+id = 0
+color = {r = 1.0, g = 1.0, b = 1.0}
+diffuse_strength = 1.0
+const_coeff = 1.0
+linear_coeff = 0.3
+quadratic_coeff = 0.2
+
+[[moving_light_bulbs]]
+point_light_id = 0
+drawable_object_id = 10
+speed = 2.5
+path = [{x = -19.9, y = 4.0, z = -19.9},
+        {x = -19.9, y = 4.0, z = 19.9},
+        {x = 19.9, y = 4.0, z = 19.9},
+        {x = 19.9, y = 4.0, z = -19.9}]

@@ -2,7 +2,6 @@
 #include "objects/Camera.hpp"
 #include "objects/BitmapTextObject.hpp"
 #include "objects/ImageObject.hpp"
-#include "common/Map.hpp"
 #include "common/BitmapFont.hpp"
 #include "common/KTXTexture.hpp"
 #include "LLShooter.hpp"
@@ -31,7 +30,7 @@ void LLShooter::init() {
     add_info_display();
     add_skybox();
 
-    load_map("res/maps/map_close.llmap", *rendering_server, *physics_server);
+    load_map("res/maps/map_close.toml", *rendering_server, *physics_server);
 
     // Hide cursor.
     glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -59,9 +58,9 @@ void LLShooter::add_crosshair() {
 }
 
 void LLShooter::add_lights() {
-    rendering_server->draw_params.spot_lights.push_back(SpotLight(
-        {0.0f, 2.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f},
-        glm::radians(30.0f), glm::radians(35.0f), 1.0f
+    rendering_server->draw_params.spot_lights.push_back(std::make_shared<SpotLight>(
+        glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f), glm::radians(30.0f), glm::radians(35.0f), 1.0f
     ));
 }
 
@@ -119,8 +118,8 @@ void LLShooter::update(float delta) {
     physics_server->update(delta);
 
     // Make light to follow player.
-    rendering_server->draw_params.spot_lights[0].position = player->cylinder.highest_point();
-    glm::vec3& l_dir = rendering_server->draw_params.spot_lights[0].direction;
+    rendering_server->draw_params.spot_lights[0]->position = player->cylinder.highest_point();
+    glm::vec3& l_dir = rendering_server->draw_params.spot_lights[0]->direction;
     l_dir = glm::normalize((camera->direction - l_dir) * 0.2f + l_dir);
 
     fps_meter->frame();
@@ -129,36 +128,63 @@ void LLShooter::update(float delta) {
         "Triangles: " + std::to_string(rendering_server->draw_params.triangles_drawn)
     );
     rendering_server->draw_params.triangles_drawn = 0;
+
+    for (const auto& bulb : moving_light_bulbs)
+        bulb->update(delta);
+}
+
+// TODO: clean up after changing the llmap format.
+void LLShooter::add_moving_light_bulb(Map& map, RenderingServer& rs) {
+    /*moving_light_bulb = std::make_unique<MovingLightBulb>(
+        std::vector<glm::vec3>({glm::vec3(-19.9f, 4.0f, -19.9f), glm::vec3(-19.9f, 4.0f, 19.9f),
+        glm::vec3(19.9f, 4.0f, 19.9f), glm::vec3(19.9f, 4.0f, -19.9f)}),
+        5.0f
+    );
+
+    map.unsh_draw_objects.push_back(std::make_shared<UnshadedDrawableObject>(
+        std::make_shared<Mesh>("res/meshes/cube.obj"), glm::vec3(0.0f, 1.0f, 1.0f)
+    ));
+    map.unsh_draw_objects.back()->scale = {1.0f, 1.0f, 1.0f};
+    map.unsh_draw_objects.back()->rotation = glm::quat();
+    moving_light_bulb->drawable_obj = map.unsh_draw_objects.back().get();
+    moving_light_bulb->point_light = &rs.draw_params.point_lights[0];*/
 }
 
 void LLShooter::load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps) {
     Map map(file_path);
+    add_moving_light_bulb(map, rs);
 
     // Spawn textured drawable objects.
-    for (uint16_t i = 0; i < map.tex_draw_objects.size(); i++)
+    for (uint64_t i = 0; i < map.tex_draw_objects.size(); i++)
         rs.add_drawable_object(map.tex_draw_objects[i]);
 
     // Spawn unshaded drawable objects.
-    for (uint16_t i = 0; i < map.unsh_draw_objects.size(); i++)
+    for (uint64_t i = 0; i < map.unsh_draw_objects.size(); i++)
         rs.add_drawable_object(map.unsh_draw_objects[i]);
 
     // Spawn floors.
-    for (uint16_t i = 0; i < map.flat_floors.size(); i++)
+    for (uint64_t i = 0; i < map.flat_floors.size(); i++)
         ps.add_flat_floor(map.flat_floors[i]);
 
     // Spawn rectangular walls.
-    for (uint16_t i = 0; i < map.rect_walls.size(); i++)
+    for (uint64_t i = 0; i < map.rect_walls.size(); i++)
         ps.add_rectangular_wall(map.rect_walls[i]);
 
     // Spawn cuboid objects.
-    for (uint16_t i = 0; i < map.cuboid_objects.size(); i++)
+    for (uint64_t i = 0; i < map.cuboid_objects.size(); i++)
         ps.add_cuboid_object(map.cuboid_objects[i]);
+
+    // Add point lights.
+    rs.draw_params.point_lights = std::move(map.point_lights);
+
+    // Add moving light bulbs.
+    moving_light_bulbs = std::move(map.moving_light_bulbs);
 
     // Set vertical bounds.
     ps.set_bounds(
         map.left_bound,
         map.right_bound,
-        map.top_bound,
-        map.bottom_bound
+        map.back_bound,
+        map.front_bound
     );
 }

@@ -12,8 +12,8 @@ void ShaderManager::use_skybox_shader(const glm::mat4& mvp) {
 
 void ShaderManager::use_textured_shader(const glm::mat4& mvp, const glm::mat4& model_matrix,
                                         const bool overlay,
-                                        std::vector<SpotLight>& spot_lights,
-                                        std::vector<PointLight>& point_lights) {
+                                        std::vector<std::shared_ptr<SpotLight>>& spot_lights,
+                                        std::vector<std::shared_ptr<PointLight>>& point_lights) {
     // Find the textured shader with the same amount of spot and point lights.
     // If not found, then create new.
     auto iter {std::find_if(
