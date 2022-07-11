@@ -15,7 +15,7 @@
 ///  - W coordinates in both vertices list and UVs list are ignored.
 ///  - Objects and groups are ignored.
 ///  - Smooth shading option is ignored.
-void load_wavefront_obj(std::string file_path, std::vector<glm::vec3>& vertices_out,
+void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& vertices_out,
         std::vector<glm::vec2>& uvs_out, std::vector<glm::vec3>& normals_out) {
     std::ifstream stream(file_path, std::ios::in);
     if (!stream)
@@ -186,7 +186,7 @@ void index_vbo(std::vector<glm::vec3>& in_vertices,
     }
 }
 
-Mesh::Mesh(std::string mesh_path) {
+Mesh::Mesh(const std::string& mesh_path) {
     std::vector<glm::vec3> unindexed_vertices;
     std::vector<glm::vec2> unindexed_uvs;
     std::vector<glm::vec3> unindexed_normals;
