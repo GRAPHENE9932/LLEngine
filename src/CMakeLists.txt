@@ -30,7 +30,6 @@ set(SOURCES
     objects/MovingLightBulb.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp
-    structs/Rect.cpp
     structs/HorLS.cpp
     structs/VertLS.cpp
     structs/RoundedRectangle.cpp

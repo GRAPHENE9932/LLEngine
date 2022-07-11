@@ -20,5 +20,7 @@ struct Rect {
         return std::sqrt(diff_x * diff_x + diff_y * diff_y);
     }
 
-    bool operator==(const Rect& other) const;
+    inline bool operator==(const Rect& other) const {
+        return this->position == other.position && this->size == other.size;
+    }
 };
