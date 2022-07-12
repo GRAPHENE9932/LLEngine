@@ -12,7 +12,6 @@
 
 #include "KTXTexture.hpp"
 #include "VkFormatInfo.hpp"
-#include "structs/dynarray.hpp"
 
 void ktx_loading_error(const std::string& message, const std::string& file_path) {
     throw std::runtime_error("Failed to load the KTX file. " + message +
@@ -86,7 +85,7 @@ inline void load_level_data(std::istream& stream, char* const data_ptr,
         break;
     }
     case SC_ZSTANDARD: {
-        dynarray<char> compressed_data(level_index.byte_length);
+        std::vector<char> compressed_data(level_index.byte_length);
         stream.read(compressed_data.data(), compressed_data.size());
         if (!stream)
             ktx_loading_error("Failed to read the level data.", file_path);
@@ -125,7 +124,7 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
 
     // As in the file layout, we will go from the last mipmap level (the smallest image)
     // to the first one (the biggest). But sizes can be computed only in opposite order.
-    dynarray<glm::u32vec2> sizes(std::max(header.level_count, 1u));
+    std::vector<glm::u32vec2> sizes(std::max(header.level_count, 1u));
     sizes[0] = {header.pixel_width, header.pixel_height};
     for (std::size_t i = 1; i < sizes.size(); i++)
         sizes[i] = sizes[i - 1] / 2u;
@@ -145,7 +144,7 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
         mip_level--;
         align_stream(stream, mip_padding);
 
-        dynarray<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
+        std::vector<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
         load_level_data(stream, level_data.data(), level_indexes[mip_level], header, file_path);
 
         const uint64_t face_size {format_info.compute_image_size(sizes[mip_level])};
