@@ -27,7 +27,7 @@ public:
     std::vector<std::shared_ptr<PointLight>> point_lights;
     std::vector<std::shared_ptr<MovingLightBulb>> moving_light_bulbs;
 
-    Map(const std::string& toml_file_path);
+    Map(std::string_view toml_file_path);
 
     /// TOML must contain this data:
     /// version = int (version of map specification. Now 1).
@@ -89,5 +89,5 @@ public:
     ///     {x = float, y = float, z = float},
     ///     ...
     /// ]
-    void from_toml(const std::string& file_path);
+    void from_toml(std::string_view file_path);
 };

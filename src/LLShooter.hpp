@@ -32,5 +32,5 @@ private:
     void add_moving_light_bulb(Map& map, RenderingServer& rs);
     void update(float delta);
 
-    void load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps);
+    void load_map(std::string_view file_path, RenderingServer& rs, PhysicsServer& ps);
 };

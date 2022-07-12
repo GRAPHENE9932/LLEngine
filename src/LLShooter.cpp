@@ -150,7 +150,7 @@ void LLShooter::add_moving_light_bulb(Map& map, RenderingServer& rs) {
     moving_light_bulb->point_light = &rs.draw_params.point_lights[0];*/
 }
 
-void LLShooter::load_map(const std::string& file_path, RenderingServer& rs, PhysicsServer& ps) {
+void LLShooter::load_map(std::string_view file_path, RenderingServer& rs, PhysicsServer& ps) {
     Map map(file_path);
     add_moving_light_bulb(map, rs);
 

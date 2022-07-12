@@ -13,18 +13,22 @@
 #include "KTXTexture.hpp"
 #include "VkFormatInfo.hpp"
 
-void ktx_loading_error(const std::string& message, const std::string& file_path) {
-    throw std::runtime_error("Failed to load the KTX file. " + message +
-            "\nFile path: \"" + file_path + '\"');
+void ktx_loading_error(std::string_view message, std::string_view file_path) {
+    using std::string_literals::operator""s;
+
+    throw std::runtime_error("Failed to load the KTX file. "s + message.data() +
+            "\nFile path: \""s + file_path.data() + '\"');
 }
 
 template<typename T>
 void limit_check(const T value, const T max,
-        const std::string& name, const std::string& file_path) {
+                 std::string_view name, std::string_view file_path) {
+    using std::string_literals::operator""s;
+
     if (value > max) {
         ktx_loading_error(
-            "The " + name + " variable has too large value. "
-            "Have: " + std::to_string(value) + " Max: " + std::to_string(max),
+            "The "s + name.data() + " variable has too large value. "s
+            "Have: "s + std::to_string(value) + " Max: "s + std::to_string(max),
             file_path
         );
     }
@@ -76,7 +80,7 @@ enum SupercompressionScheme {
 
 inline void load_level_data(std::istream& stream, char* const data_ptr,
         const LevelIndex& level_index, const Header& header,
-        const std::string& file_path) {
+        std::string_view file_path) {
     switch (header.supercompression_scheme) {
     case SC_NONE: {
         stream.read(data_ptr, level_index.byte_length);
@@ -106,7 +110,7 @@ inline void load_level_data(std::istream& stream, char* const data_ptr,
 }
 
 inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
-        const std::vector<LevelIndex>& level_indexes, const std::string& file_path) {
+        const std::vector<LevelIndex>& level_indexes, std::string_view file_path) {
     const VkFormatInfo format_info {VkFormatInfo::from_vk_format(header.vk_format)};
 
     const uint32_t mip_padding = header.supercompression_scheme == SC_NONE ?
@@ -181,8 +185,8 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
     return texture_id;
 }
 
-KTXTexture::KTXTexture(const std::string& file_path) {
-    std::ifstream stream(file_path, std::ios::in | std::ios::binary);
+KTXTexture::KTXTexture(std::string_view file_path) {
+    std::ifstream stream(file_path.data(), std::ios::in | std::ios::binary);
     if (!stream)
         ktx_loading_error("File is not accesible or does not exist.", file_path);
 

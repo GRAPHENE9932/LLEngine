@@ -15,11 +15,13 @@
 ///  - W coordinates in both vertices list and UVs list are ignored.
 ///  - Objects and groups are ignored.
 ///  - Smooth shading option is ignored.
-void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& vertices_out,
+void load_wavefront_obj(std::string_view file_path, std::vector<glm::vec3>& vertices_out,
         std::vector<glm::vec2>& uvs_out, std::vector<glm::vec3>& normals_out) {
-    std::ifstream stream(file_path, std::ios::in);
+    using std::string_literals::operator""s;
+
+    std::ifstream stream(file_path.data(), std::ios::in);
     if (!stream)
-        throw std::runtime_error("Failed to read the .obj file. File path: " + file_path);
+        throw std::runtime_error("Failed to read the .obj file. File path: "s + file_path.data());
 
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> uvs;
@@ -54,7 +56,7 @@ void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& ve
                 throw std::runtime_error(
                     "Failed to parse the .obj file:\n"
                     "error on vertex coordinates parsing.\n"
-                    "File path: " + file_path
+                    "File path: "s + file_path.data()
                 );
             vertices.push_back(cur_vertex);
         }
@@ -67,7 +69,7 @@ void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& ve
                 throw std::runtime_error(
                     "Failed to parse the .obj file:\n"
                     "error on texture coordinates parsing.\n"
-                    "File path: " + file_path
+                    "File path: "s + file_path.data()
                 );
             uvs.push_back(cur_uv);
         }
@@ -81,7 +83,7 @@ void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& ve
                 throw std::runtime_error(
                     "Failed to parse the .obj file:\n"
                     "error on vertex normals parsing.\n"
-                    "File path: " + file_path
+                    "File path: "s + file_path.data()
                 );
             normals.push_back(cur_normal);
         }
@@ -94,7 +96,7 @@ void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& ve
                     throw std::runtime_error(
                         "Failed to parse the .obj file:\n"
                         "error on faces parsing.\n"
-                        "File path: " + file_path
+                        "File path: "s + file_path.data()
                     );
 
                 std::array<int, 3> indices;
@@ -105,7 +107,7 @@ void load_wavefront_obj(const std::string& file_path, std::vector<glm::vec3>& ve
                         throw std::runtime_error(
                             "Failed to parse the .obj file:\n"
                             "error on face indices parsing (not enough of them).\n"
-                            "File path: " + file_path
+                            "File path: "s + file_path.data()
                         );
                     indices[i] = std::stoi(index_string);
                 }
@@ -186,7 +188,7 @@ void index_vbo(std::vector<glm::vec3>& in_vertices,
     }
 }
 
-Mesh::Mesh(const std::string& mesh_path) {
+Mesh::Mesh(std::string_view mesh_path) {
     std::vector<glm::vec3> unindexed_vertices;
     std::vector<glm::vec2> unindexed_uvs;
     std::vector<glm::vec3> unindexed_normals;

@@ -35,7 +35,7 @@ public:
         return normals;
     }
 
-    explicit Mesh(const std::string& mesh_path);
+    explicit Mesh(std::string_view mesh_path);
     ~Mesh();
 
 private:

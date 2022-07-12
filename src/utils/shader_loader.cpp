@@ -8,9 +8,11 @@
 
 /// Loads and compiles vertex and fragment shaders from files,
 /// compiles, links them and returns the program ID.
-GLuint load_shaders(const std::string& vertex_shader_path,
-                    const std::string& fragment_shader_path,
+GLuint load_shaders(std::string_view vertex_shader_path,
+                    std::string_view fragment_shader_path,
                     const std::vector<std::string>& defines) {
+    using std::string_literals::operator""s;
+
     ManagedProgramID program_id = glCreateProgram();
 
     ManagedShaderID vertex_shader_id = load_vertex_shader(vertex_shader_path, defines);
@@ -31,9 +33,9 @@ GLuint load_shaders(const std::string& vertex_shader_path,
 
         throw std::runtime_error(
             "Failed to link the program.\n"
-            "Path to the vertex shader file: " + vertex_shader_path + "\n"
-            "Path to the fragment shader file: " + fragment_shader_path + "\n"
-            "Error message: " + error_message.get()
+            "Path to the vertex shader file: "s + vertex_shader_path.data() + "\n"
+            "Path to the fragment shader file: "s + fragment_shader_path.data() + "\n"
+            "Error message: "s + error_message.get()
         );
     }
 
@@ -45,16 +47,18 @@ GLuint load_shaders(const std::string& vertex_shader_path,
 
 /// Loads the vertex shader from file, compiles it and
 /// returns the vertex shader ID.
-ManagedShaderID load_vertex_shader(const std::string& vertex_shader_path,
+ManagedShaderID load_vertex_shader(std::string_view vertex_shader_path,
                                    const std::vector<std::string>& defines) {
+    using std::string_literals::operator""s;
+
     ManagedShaderID vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 
     std::ifstream file_stream;
-    file_stream.open(vertex_shader_path, std::ios::in);
+    file_stream.open(vertex_shader_path.data(), std::ios::in);
     if (!file_stream) {
         throw std::runtime_error(
-            "Failed to read the vertex shader. Path to the file: " +
-            vertex_shader_path
+            "Failed to read the vertex shader. Path to the file: "s +
+            vertex_shader_path.data()
         );
     }
 
@@ -69,13 +73,13 @@ ManagedShaderID load_vertex_shader(const std::string& vertex_shader_path,
         if (version_pos == std::string::npos) {
             throw std::runtime_error(
                 "Shader doesn't contains the \"#version\" directive.\n"
-                "Path to the file: " + vertex_shader_path
+                "Path to the file: "s + vertex_shader_path.data()
             );
         }
         const std::size_t pos {shader_code.find('\n', version_pos) + 1};
 
-        for (const std::string& cur_def : defines) {
-            shader_code.insert(pos, "#define " + cur_def + '\n');
+        for (std::string_view cur_def : defines) {
+            shader_code.insert(pos, "#define "s + cur_def.data() + '\n');
         }
     }
 
@@ -94,8 +98,8 @@ ManagedShaderID load_vertex_shader(const std::string& vertex_shader_path,
 
         throw std::runtime_error(
             "Failed to compile the vertex shader.\n"
-            "Path to the file: " + vertex_shader_path + "\n"
-            "Error message: " + error_message.get()
+            "Path to the file: "s + vertex_shader_path.data() + "\n"
+            "Error message: "s + error_message.get()
         );
     }
 
@@ -104,16 +108,18 @@ ManagedShaderID load_vertex_shader(const std::string& vertex_shader_path,
 
 /// Loads the fragment shader from file, compiles it and
 /// returns the fragment shader shader ID.
-ManagedShaderID load_fragment_shader(const std::string& fragment_shader_path,
+ManagedShaderID load_fragment_shader(std::string_view fragment_shader_path,
                                      const std::vector<std::string>& defines) {
+    using std::string_literals::operator""s;
+
     ManagedShaderID fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
     std::ifstream file_stream;
-    file_stream.open(fragment_shader_path, std::ios::in);
+    file_stream.open(fragment_shader_path.data(), std::ios::in);
     if (!file_stream) {
         throw std::runtime_error(
-            "Failed to read the fragment shader. Path to the file: " +
-            fragment_shader_path
+            "Failed to read the fragment shader. Path to the file: "s +
+            fragment_shader_path.data()
         );
     }
 
@@ -128,13 +134,13 @@ ManagedShaderID load_fragment_shader(const std::string& fragment_shader_path,
         if (version_pos == std::string::npos) {
             throw std::runtime_error(
                 "Shader doesn't contains the \"#version\" directive.\n"
-                "Path to the file: " + fragment_shader_path
+                "Path to the file: "s + fragment_shader_path.data()
             );
         }
         const std::size_t pos {shader_code.find('\n', version_pos) + 1};
 
-        for (const std::string& cur_def : defines) {
-            shader_code.insert(pos, "#define " + cur_def + '\n');
+        for (std::string_view cur_def : defines) {
+            shader_code.insert(pos, "#define "s + cur_def.data() + '\n');
         }
     }
 
@@ -153,8 +159,8 @@ ManagedShaderID load_fragment_shader(const std::string& fragment_shader_path,
 
         throw std::runtime_error(
             "Failed to compile the fragment shader.\n"
-            "Path to the file: " + fragment_shader_path + "\n"
-            "Error message: " + error_message.get()
+            "Path to the file: "s + fragment_shader_path.data() + '\n' +
+            "Error message: "s + error_message.get()
         );
     }
 

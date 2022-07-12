@@ -6,10 +6,12 @@
 #include "KTXTexture.hpp"
 #include "BitmapFont.hpp"
 
-BitmapFont::BitmapFont(const std::string& file_name) {
-    std::ifstream stream(file_name);
+BitmapFont::BitmapFont(std::string_view file_name) {
+    using std::string_literals::operator""s;
+
+    std::ifstream stream(file_name.data());
     if (!stream)
-        throw std::runtime_error("Failed to load the bitmap font. File name: " + file_name);
+        throw std::runtime_error("Failed to load the bitmap font. File name: "s + file_name.data());
     
     //  LLBMF specification:
     //  The first line is header.
@@ -31,13 +33,13 @@ BitmapFont::BitmapFont(const std::string& file_name) {
     if (!stream)
         throw std::runtime_error("Failed to parse the bitmap font:\n"
                 "invalid header data\n"
-                "File name: " + file_name);
+                "File name: "s + file_name.data());
     
     // Skip to the next line.
     if (!stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n'))
         throw std::runtime_error("Failed to parse the bitmap font:\n"
                 "looks like there is no second line in this file.\n"
-                "File name: " + file_name);
+                "File name: "s + file_name.data());
 
     // Read charecter by character up to \n or EOF.
     // Yes, I could use the std::getline function, but

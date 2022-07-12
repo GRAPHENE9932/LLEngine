@@ -10,7 +10,7 @@
 
 class BitmapFont {
 public:
-    BitmapFont(const std::string& file_name);
+    BitmapFont(std::string_view file_name);
 
     GLuint get_texture_id() const;
     glm::vec2 get_char_size() const;

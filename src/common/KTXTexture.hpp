@@ -13,7 +13,7 @@ public:
     ///   - Multiple layers
     ///   - Multiple faces (cubemaps)
     ///   - Supercompression other than Zstandard.
-    KTXTexture(const std::string& file_path);
+    KTXTexture(std::string_view file_path);
 
 private:
     std::vector<char> dfd_block;

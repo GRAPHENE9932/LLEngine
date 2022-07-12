@@ -16,7 +16,7 @@
 class BitmapTextObject : public SpatialObject, public IDrawableObject {
 public:
     BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
-            const std::string& text, const glm::vec3& color,
+            std::string_view text, const glm::vec3& color,
             const bool is_2d = true);
     ~BitmapTextObject();
     
@@ -25,7 +25,7 @@ public:
     /// Appearance of the object will be changed only after
     /// call of the set_text function.
     void set_font(const std::shared_ptr<BitmapFont>& font);
-    void set_text(const std::string& text);
+    void set_text(std::string_view text);
 
     void draw(DrawParameters& params) override;
     GLuint get_program_id(DrawParameters& params) const override;

@@ -5,7 +5,7 @@
 #include "BitmapTextObject.hpp"
 
 BitmapTextObject::BitmapTextObject(const std::shared_ptr<BitmapFont>& font,
-        const std::string& text, const glm::vec3& color, const bool is_2d) :
+        std::string_view text, const glm::vec3& color, const bool is_2d) :
         color(color), is_2d(is_2d) {
     set_font(font);
     set_text(text);
@@ -41,7 +41,7 @@ void BitmapTextObject::set_font(const std::shared_ptr<BitmapFont>& font) {
     this->texture_id = font->get_texture_id();
 }
 
-void BitmapTextObject::set_text(const std::string& text) {
+void BitmapTextObject::set_text(std::string_view text) {
     const glm::vec2 char_size = font->get_char_size();
     const glm::vec2 spacing = font->get_spacing();
 

@@ -6,7 +6,7 @@
 #include "Map.hpp"
 #include "KTXTexture.hpp"
 
-Map::Map(const std::string& toml_file_path) {
+Map::Map(std::string_view toml_file_path) {
     from_toml(toml_file_path);
 }
 
@@ -17,21 +17,23 @@ constexpr glm::vec3 DEFAULT_POS {0.0f, 0.0f, 0.0f};
 constexpr glm::vec3 DEFAULT_SCALE {1.0f, 1.0f, 1.0f};
 constexpr glm::vec3 DEFAULT_ROT {0.0f, 0.0f, 0.0f};
 
-void map_parse_error(const std::string& message, const std::string& file_path) {
+void map_parse_error(std::string_view message, std::string_view file_path) {
+    using std::string_literals::operator""s;
+
     throw std::runtime_error(
-        "Failed to parse the map file: " +
-        message + "\nFile path: " + file_path
+        "Failed to parse the map file: "s +
+        message.data() + "\nFile path: "s + file_path.data()
     );
 }
 
-void invalid_toml_entry_error(const std::string entry_name, const std::string& file_path) {
+void invalid_toml_entry_error(const std::string entry_name, std::string_view file_path) {
     map_parse_error(
         "invalid/non-existent \"" + entry_name + "\" entry",
         file_path
     );
 }
 
-void handle_root_elements(Map& map, const toml::table& root_table, const std::string& file_path) {
+void handle_root_elements(Map& map, const toml::table& root_table, std::string_view file_path) {
     const toml::value<int64_t>* version {root_table.get_as<int64_t>("version")};
     if (!version)
         invalid_toml_entry_error("version", file_path);
@@ -79,7 +81,7 @@ std::optional<Rect> table_to_rect(const toml::table* rect_table) {
     return std::make_optional<Rect>({{pos_x->get(), pos_z->get()}, {size_x->get(), size_z->get()}});
 }
 
-void handle_flat_floors(Map& map, const toml::table& root_table, const std::string& file_path) {
+void handle_flat_floors(Map& map, const toml::table& root_table, std::string_view file_path) {
     map.flat_floors.clear();
 
     const toml::array* flat_floors {root_table.get_as<toml::array>("flat_floors")};
@@ -110,7 +112,7 @@ void handle_flat_floors(Map& map, const toml::table& root_table, const std::stri
 }
 
 std::vector<std::pair<int64_t, std::shared_ptr<Mesh>>>
-handle_meshes(const toml::table& root_table, const std::string& file_path) {
+handle_meshes(const toml::table& root_table, std::string_view file_path) {
     const toml::array* meshes {root_table.get_as<toml::array>("meshes")};
     if (!meshes)
         return {};
@@ -138,7 +140,7 @@ handle_meshes(const toml::table& root_table, const std::string& file_path) {
 }
 
 std::vector<std::pair<int64_t, std::shared_ptr<Texture>>>
-handle_textures(const toml::table& root_table, const std::string& file_path) {
+handle_textures(const toml::table& root_table, std::string_view file_path) {
     const toml::array* textures {root_table.get_as<toml::array>("textures")};
     if (!textures)
         return {};
@@ -195,7 +197,7 @@ std::optional<T> find_in_vector(const std::vector<std::pair<I, T>> vector, I ind
     return std::make_optional((*iter).second);
 }
 
-void handle_textured_drawables(Map& map, const toml::table& root_table, const std::string& file_path,
+void handle_textured_drawables(Map& map, const toml::table& root_table, std::string_view file_path,
                                const std::vector<std::pair<int64_t, std::shared_ptr<Mesh>>>& meshes,
                                const std::vector<std::pair<int64_t, std::shared_ptr<Texture>>>& textures) {
     map.tex_draw_objects.clear();
@@ -255,7 +257,7 @@ void handle_textured_drawables(Map& map, const toml::table& root_table, const st
 }
 
 std::vector<std::pair<int64_t, std::shared_ptr<UnshadedDrawableObject>>>
-handle_unshaded_drawables(Map& map, const toml::table& root_table, const std::string& file_path,
+handle_unshaded_drawables(Map& map, const toml::table& root_table, std::string_view file_path,
                           const std::vector<std::pair<int64_t, std::shared_ptr<Mesh>>>& meshes) {
     map.unsh_draw_objects.clear();
 
@@ -316,7 +318,7 @@ handle_unshaded_drawables(Map& map, const toml::table& root_table, const std::st
     return result;
 }
 
-void handle_rectangular_walls(Map& map, const toml::table& root_table, const std::string& file_path) {
+void handle_rectangular_walls(Map& map, const toml::table& root_table, std::string_view file_path) {
     map.rect_walls.clear();
 
     const toml::array* walls {root_table.get_as<toml::array>("rectangular_walls")};
@@ -340,7 +342,7 @@ void handle_rectangular_walls(Map& map, const toml::table& root_table, const std
     });
 }
 
-void handle_cuboid_objects(Map& map, const toml::table& root_table, const std::string& file_path) {
+void handle_cuboid_objects(Map& map, const toml::table& root_table, std::string_view file_path) {
     map.cuboid_objects.clear();
 
     const toml::array* objects {root_table.get_as<toml::array>("cuboid_objects")};
@@ -375,7 +377,7 @@ void handle_cuboid_objects(Map& map, const toml::table& root_table, const std::s
 }
 
 std::vector<std::pair<int64_t, std::shared_ptr<PointLight>>>
-handle_point_lights(Map& map, const toml::table& root_table, const std::string& file_path) {
+handle_point_lights(Map& map, const toml::table& root_table, std::string_view file_path) {
     map.point_lights.clear();
 
     const toml::array* point_lights {root_table["point_lights"].as_array()};
@@ -433,7 +435,7 @@ handle_point_lights(Map& map, const toml::table& root_table, const std::string& 
     return result;
 }
 
-void handle_moving_light_bulbs(Map& map, const toml::table& root_table, const std::string& file_path,
+void handle_moving_light_bulbs(Map& map, const toml::table& root_table, std::string_view file_path,
         const std::vector<std::pair<int64_t, std::shared_ptr<PointLight>>>& point_lights,
         const std::vector<std::pair<int64_t, std::shared_ptr<UnshadedDrawableObject>>>& unsh_draw_objects) {
     map.moving_light_bulbs.clear();
@@ -497,7 +499,7 @@ void handle_moving_light_bulbs(Map& map, const toml::table& root_table, const st
     });
 }
 
-void Map::from_toml(const std::string& file_path) {
+void Map::from_toml(std::string_view file_path) {
     toml::table root_table;
     try {
         root_table = toml::parse_file(file_path);
