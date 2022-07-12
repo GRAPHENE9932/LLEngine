@@ -13,6 +13,9 @@ RenderingServer::RenderingServer(int window_width, int window_height) {
 }
 
 RenderingServer::~RenderingServer() {
+    ImageObject::static_clean_up();
+    SkyboxObject::static_clean_up();
+
     glfwDestroyWindow(window);
     glfwTerminate();
 }
