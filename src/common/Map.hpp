@@ -27,9 +27,9 @@ public:
     std::vector<std::shared_ptr<PointLight>> point_lights;
     std::vector<std::shared_ptr<MovingLightBulb>> moving_light_bulbs;
 
-    Map(std::string_view toml_file_path);
+    Map(std::string_view json_file_path);
 
-    /// TOML must contain this data:
+    /// JSON must contain the object with these members:
     /// version = int (version of map specification. Now 1).
     /// name = string (name of the map).
     /// right_bound = float (global right (+X) bound).
@@ -37,25 +37,25 @@ public:
     /// back_bound = float (global back (+Z) bound).
     /// front_bound = float (global front (-Z) bound).
     ///
-    /// [[flat_floors]] (array of flat floors. Optional).
+    /// flat_floors[] (array of flat floors. Optional).
     /// rect = {pos_x = float, pos_z = float, size_x = float, size_z = float}
     ///
-    /// [[meshes]] (array of meshes. Optional).
+    /// meshes[] (array of meshes. Optional).
     /// id = int (ID of the mesh to specify in other places of the TOML).
     /// file = string (path to the mesh file).
     ///
-    /// [[textures]] (array of textures. Optional).
+    /// textures[] (array of textures. Optional).
     /// id = int (ID of the texture to specify in other places of the TOML).
     /// file = string (path to the texture file).
     ///
-    /// [[textured_drawables]] (array of textured drawable objects. Optional).
+    /// textured_drawables[] (array of textured drawable objects. Optional).
     /// mesh_id = int
     /// texture_id = int
     /// position = {x = float, y = float, z = float} (default: 0, 0, 0).
     /// scale = {x = float, y = float, z = float} (default: 1, 1, 1).
     /// rotation = {x = float, y = float, z = float} (default: 0, 0, 0).
     ///
-    /// [[unshaded_drawables]] (array of textured drawable objects. Optional).
+    /// unshaded_drawables[] (array of textured drawable objects. Optional).
     /// id = int (ID of the drawable object).
     /// mesh_id = int
     /// color = {r = float, g = float, b = float}
@@ -63,15 +63,15 @@ public:
     /// scale = {x = float, y = float, z = float} (default: 1, 1, 1).
     /// rotation = {x = float, y = float, z = float} (default: 0, 0, 0).
     ///
-    /// [[rectangular_walls]] (array of rectangular walls of infinite height. Optional).
+    /// rectangular_walls[] (array of rectangular walls of infinite height. Optional).
     /// rect = {pos_x = float, pos_z = float, size_x = float, size_z = float}
     ///
-    /// [[cuboid_objects]] (array of physical cuboid objects. Optional).
+    /// cuboid_objects[] (array of physical cuboid objects. Optional).
     /// rect = {pos_x = float, pos_z = float, size_x = float, size_z = float}
     /// bottom_y = float
     /// top_y = float
     ///
-    /// [[point_lights]] (array of point lights. Optional).
+    /// point_lights[] (array of point lights. Optional).
     /// id = int (ID of the point light).
     /// color = {r = float, g = float, b = float}.
     /// position = {x = float, y = float, z = float} (default: 0, 0, 0).
@@ -80,7 +80,7 @@ public:
     /// linear_coeff = float
     /// quadratic_coeff = float
     ///
-    /// [[moving_light_bulb]] (array of moving light bulbs. Optional).
+    /// moving_light_bulb[] (array of moving light bulbs. Optional).
     /// point_light_id = int
     /// drawable_object_id = int
     /// speed = float
@@ -89,5 +89,5 @@ public:
     ///     {x = float, y = float, z = float},
     ///     ...
     /// ]
-    void from_toml(std::string_view file_path);
+    void from_json(std::string_view file_path);
 };

@@ -20,12 +20,6 @@ struct PointLight {
 
     static Uniforms get_uniforms_id(GLuint program_id, std::string var_name, GLuint index);
 
-    PointLight() = default;
-    PointLight(const glm::vec3& position, const glm::vec3& color, float diffuse_strength,
-            float const_coeff, float linear_coeff, float quadratic_coeff) :
-            position(position), color(color), diffuse_strength(diffuse_strength),
-            const_coeff(const_coeff), linear_coeff(linear_coeff), quadratic_coeff(quadratic_coeff) {}
-
     void set_uniforms(const Uniforms& uniforms, const bool overlay = false) const;
     inline void calc_overlay_position(const glm::mat4& view_matrix) {
         overlay_position = view_matrix * glm::vec4(position, 1.0f);

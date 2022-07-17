@@ -30,7 +30,7 @@ void LLShooter::init() {
     add_info_display();
     add_skybox();
 
-    load_map("res/maps/map_close.toml", *rendering_server, *physics_server);
+    load_map("res/maps/map_close.json", *rendering_server, *physics_server);
 
     // Hide cursor.
     glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -133,26 +133,8 @@ void LLShooter::update(float delta) {
         bulb->update(delta);
 }
 
-// TODO: clean up after changing the llmap format.
-void LLShooter::add_moving_light_bulb(Map& map, RenderingServer& rs) {
-    /*moving_light_bulb = std::make_unique<MovingLightBulb>(
-        std::vector<glm::vec3>({glm::vec3(-19.9f, 4.0f, -19.9f), glm::vec3(-19.9f, 4.0f, 19.9f),
-        glm::vec3(19.9f, 4.0f, 19.9f), glm::vec3(19.9f, 4.0f, -19.9f)}),
-        5.0f
-    );
-
-    map.unsh_draw_objects.push_back(std::make_shared<UnshadedDrawableObject>(
-        std::make_shared<Mesh>("res/meshes/cube.obj"), glm::vec3(0.0f, 1.0f, 1.0f)
-    ));
-    map.unsh_draw_objects.back()->scale = {1.0f, 1.0f, 1.0f};
-    map.unsh_draw_objects.back()->rotation = glm::quat();
-    moving_light_bulb->drawable_obj = map.unsh_draw_objects.back().get();
-    moving_light_bulb->point_light = &rs.draw_params.point_lights[0];*/
-}
-
 void LLShooter::load_map(std::string_view file_path, RenderingServer& rs, PhysicsServer& ps) {
     Map map(file_path);
-    add_moving_light_bulb(map, rs);
 
     // Spawn textured drawable objects.
     for (uint64_t i = 0; i < map.tex_draw_objects.size(); i++)

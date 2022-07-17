@@ -29,7 +29,6 @@ private:
     void add_info_display();
     void add_camera_and_player();
     void add_skybox();
-    void add_moving_light_bulb(Map& map, RenderingServer& rs);
     void update(float delta);
 
     void load_map(std::string_view file_path, RenderingServer& rs, PhysicsServer& ps);
