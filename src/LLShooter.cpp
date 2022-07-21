@@ -63,7 +63,7 @@ void LLShooter::add_crosshair() {
 void LLShooter::add_lights() {
     rendering_server->draw_params.spot_lights.push_back(std::make_shared<SpotLight>(
         glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f), glm::radians(30.0f), glm::radians(35.0f), 1.0f
+        glm::vec3(1.0f, 1.0f, 1.0f), glm::radians(30.0f), glm::radians(35.0f), 3.0f
     ));
 }
 
