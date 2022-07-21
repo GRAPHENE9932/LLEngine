@@ -2,8 +2,10 @@
 #include "objects/Camera.hpp"
 #include "objects/BitmapTextObject.hpp"
 #include "objects/ImageObject.hpp"
+#include "objects/TexturedDrawableObject.hpp"
 #include "common/BitmapFont.hpp"
 #include "common/KTXTexture.hpp"
+#include "common/Mesh.hpp"
 #include "LLShooter.hpp"
 
 const int WINDOW_WIDTH = 1900, WINDOW_HEIGHT = 1000;
@@ -30,7 +32,8 @@ void LLShooter::init() {
     add_info_display();
     add_skybox();
 
-    load_map("res/maps/map_close.json", *rendering_server, *physics_server);
+    Map map("res/maps/map_close.json");
+    map.set_map(*rendering_server, *physics_server, moving_light_bulbs);
 
     // Hide cursor.
     glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -131,42 +134,4 @@ void LLShooter::update(float delta) {
 
     for (const auto& bulb : moving_light_bulbs)
         bulb->update(delta);
-}
-
-void LLShooter::load_map(std::string_view file_path, RenderingServer& rs, PhysicsServer& ps) {
-    Map map(file_path);
-
-    // Spawn textured drawable objects.
-    for (uint64_t i = 0; i < map.tex_draw_objects.size(); i++)
-        rs.add_drawable_object(map.tex_draw_objects[i]);
-
-    // Spawn unshaded drawable objects.
-    for (uint64_t i = 0; i < map.unsh_draw_objects.size(); i++)
-        rs.add_drawable_object(map.unsh_draw_objects[i]);
-
-    // Spawn floors.
-    for (uint64_t i = 0; i < map.flat_floors.size(); i++)
-        ps.add_flat_floor(map.flat_floors[i]);
-
-    // Spawn rectangular walls.
-    for (uint64_t i = 0; i < map.rect_walls.size(); i++)
-        ps.add_rectangular_wall(map.rect_walls[i]);
-
-    // Spawn cuboid objects.
-    for (uint64_t i = 0; i < map.cuboid_objects.size(); i++)
-        ps.add_cuboid_object(map.cuboid_objects[i]);
-
-    // Add point lights.
-    rs.draw_params.point_lights = std::move(map.point_lights);
-
-    // Add moving light bulbs.
-    moving_light_bulbs = std::move(map.moving_light_bulbs);
-
-    // Set vertical bounds.
-    ps.set_bounds(
-        map.left_bound,
-        map.right_bound,
-        map.back_bound,
-        map.front_bound
-    );
 }

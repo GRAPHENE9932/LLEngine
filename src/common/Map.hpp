@@ -1,31 +1,83 @@
 #pragma once
 
-#include "objects/TexturedDrawableObject.hpp"
-#include "objects/UnshadedDrawableObject.hpp"
-#include "objects/FloorObject.hpp"
-#include "objects/RectangularWall.hpp"
-#include "objects/CuboidObject.hpp"
-#include "objects/MovingLightBulb.hpp"
-
 #include <string>
-#include <memory>
+#include <vector>
+#include <cstdint>
+
+#include <glm/vec3.hpp>
+
+#include "objects/MovingLightBulb.hpp"
+#include "RenderingServer.hpp"
+#include "structs/Rect.hpp"
+#include "PhysicsServer.hpp"
 
 class Map {
 public:
+    struct MeshArgs {
+        uint64_t id;
+        std::string file;
+    };
+    struct TextureArgs {
+        uint64_t id;
+        std::string file;
+    };
+    struct TexDrawObjArgs {
+        uint64_t id;
+        uint64_t mesh_id;
+        uint64_t texture_id;
+        glm::vec3 position;
+        glm::vec3 scale;
+        glm::vec3 rotation;
+    };
+    struct UnshDrawObjArgs {
+        uint64_t id;
+        uint64_t mesh_id;
+        glm::vec3 color;
+        glm::vec3 position;
+        glm::vec3 scale;
+        glm::vec3 rotation;
+    };
+    struct FloorObjArgs {
+        Rect rect;
+        float height;
+    };
+    struct RectWallArgs {
+        Rect rect;
+    };
+    struct CuboidObjArgs {
+        Rect rect;
+        float bottom_y, top_y;
+    };
+    struct PointLightArgs {
+        uint64_t id;
+        glm::vec3 position;
+        glm::vec3 color;
+        float diffuse_strength;
+        float const_coeff;
+        float linear_coeff;
+        float quadratic_coeff;
+    };
+    struct MovingLightBulbArgs {
+        uint64_t point_light_id;
+        uint64_t drawable_object_id;
+        std::vector<glm::vec3> path;
+        float speed;
+    };
+
     std::string name;
 
-    std::vector<std::shared_ptr<Mesh>> meshes;
-    std::vector<std::shared_ptr<Texture>> textures;
-    std::vector<std::shared_ptr<TexturedDrawableObject>> tex_draw_objects;
-    std::vector<std::shared_ptr<UnshadedDrawableObject>> unsh_draw_objects;
+    std::vector<MeshArgs> meshes_args;
+    std::vector<TextureArgs> textures_args;
+    std::vector<TexDrawObjArgs> tex_draw_objects_args;
+    std::vector<UnshDrawObjArgs> unsh_draw_objects_args;
 
     float left_bound, right_bound, front_bound, back_bound;
-    std::vector<std::shared_ptr<FloorObject>> flat_floors;
-    std::vector<std::shared_ptr<RectangularWall>> rect_walls;
-    std::vector<std::shared_ptr<CuboidObject>> cuboid_objects;
+    std::vector<FloorObjArgs> flat_floors_args;
+    std::vector<RectWallArgs> rect_walls_args;
+    std::vector<CuboidObjArgs> cuboid_objects_args;
 
-    std::vector<std::shared_ptr<PointLight>> point_lights;
-    std::vector<std::shared_ptr<MovingLightBulb>> moving_light_bulbs;
+    std::vector<PointLightArgs> point_lights_args;
+    std::vector<MovingLightBulbArgs> moving_light_bulbs_args;
 
     Map(std::string_view json_file_path);
 
@@ -90,4 +142,10 @@ public:
     ///     ...
     /// ]
     void from_json(std::string_view file_path);
+    void set_map(RenderingServer& rs, PhysicsServer& ps,
+                 std::vector<std::shared_ptr<MovingLightBulb>>& moving_bulbs);
+
+private:
+    void load_from_json(std::string_view file_path);
+    void check_map();
 };

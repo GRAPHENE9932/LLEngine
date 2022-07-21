@@ -1,10 +1,17 @@
+#include <map>
+#include <memory>
 #include <fstream>
+#include <sstream>
 #include <optional>
+#include <algorithm>
 
 #include <nlohmann/json.hpp>
 
 #include "Map.hpp"
-#include "KTXTexture.hpp"
+#include "common/Mesh.hpp"
+#include "common/KTXTexture.hpp"
+#include "objects/TexturedDrawableObject.hpp"
+#include "objects/UnshadedDrawableObject.hpp"
 
 Map::Map(std::string_view json_file_path) {
     from_json(json_file_path);
@@ -64,79 +71,78 @@ void from_json(const json& local_json, Rect& rect) {
     rect.size.y = local_json.at("size_z").get<double>();
 }
 
-void from_json(const json& local_json, std::shared_ptr<FloorObject>& floor) {
-    floor = std::make_shared<FloorObject>(FloorObject({
-        local_json.at("rect").get<Rect>(),
-        static_cast<float>(local_json.at("height").get<double>())
-    }));
+void from_json(const json& local_json, Map::FloorObjArgs& floor) {
+    local_json.at("rect").get_to(floor.rect);
+    local_json.at("height").get_to(floor.height);
 }
 
-void from_json(const json& local_json, std::shared_ptr<Mesh>& mesh) {
-    const std::string file {local_json.at("file").get<std::string>()};
-
-    mesh = std::make_shared<Mesh>(MESHES_PATH + file);
+void from_json(const json& local_json, Map::MeshArgs& mesh) {
+    local_json.at("id").get_to(mesh.id);
+    local_json.at("file").get_to(mesh.file);
 }
 
-void from_json(const json& local_json, std::shared_ptr<Texture>& texture) {
-    const std::string file {local_json.at("file").get<std::string>()};
-
-    texture = std::make_shared<KTXTexture>(TEXTURES_PATH + file);
+void from_json(const json& local_json, Map::TextureArgs& texture) {
+    local_json.at("id").get_to(texture.id);
+    local_json.at("file").get_to(texture.file);
 }
 
-void from_json(const json& local_json, std::shared_ptr<RectangularWall>& wall) {
-    const Rect rect {local_json.at("rect").get<Rect>()};
-    wall = std::make_shared<RectangularWall>(rect);
+void from_json(const json& local_json, Map::RectWallArgs& wall) {
+    local_json.at("rect").get_to(wall.rect);
 }
 
-void from_json(const json& local_json, std::shared_ptr<CuboidObject>& object) {
-    const Rect rect {local_json.at("rect").get<Rect>()};
-    const float bottom_y = local_json.at("bottom_y").get<double>();
-    const float top_y = local_json.at("top_y").get<double>();
-
-    object = std::make_shared<CuboidObject>(rect, bottom_y, top_y);
+void from_json(const json& local_json, Map::CuboidObjArgs& object) {
+    local_json.at("rect").get_to(object.rect);
+    local_json.at("bottom_y").get_to(object.bottom_y);
+    local_json.at("top_y").get_to(object.top_y);
 }
 
-void from_json(const json& local_json, std::shared_ptr<PointLight>& light) {
-    light = std::make_shared<PointLight>();
-    light->color = vec3_from_json(local_json.at("color"), true);
-    light->position = vec3_from_json(local_json, "position", DEFAULT_POS);
-    local_json.at("diffuse_strength").get_to(light->diffuse_strength);
-    local_json.at("const_coeff").get_to(light->const_coeff);
-    local_json.at("linear_coeff").get_to(light->linear_coeff);
-    local_json.at("quadratic_coeff").get_to(light->quadratic_coeff);
+void from_json(const json& local_json, Map::PointLightArgs& light) {
+    local_json.at("id").get_to(light.id);
+    light.position = vec3_from_json(local_json, "position", DEFAULT_POS);
+    light.color = vec3_from_json(local_json.at("color"), true);
+    local_json.at("diffuse_strength").get_to(light.diffuse_strength);
+    local_json.at("const_coeff").get_to(light.const_coeff);
+    local_json.at("linear_coeff").get_to(light.linear_coeff);
+    local_json.at("quadratic_coeff").get_to(light.quadratic_coeff);
 }
 
-void from_json(const json& local_json, std::shared_ptr<MovingLightBulb>& bulb) {
-    const std::vector<glm::vec3> path = local_json.at("path");
-    const float speed = local_json.at("speed").get<double>();
+void from_json(const json& local_json, Map::MovingLightBulbArgs& bulb) {
+    local_json.at("point_light_id").get_to(bulb.point_light_id);
+    local_json.at("drawable_object_id").get_to(bulb.drawable_object_id);
+    local_json.at("path").get_to(bulb.path);
+    local_json.at("speed").get_to(bulb.speed);
+}
 
-    bulb = std::make_shared<MovingLightBulb>(path, speed);
+void from_json(const json& local_json, Map::TexDrawObjArgs& object) {
+    local_json.at("id").get_to(object.id);
+    local_json.at("mesh_id").get_to(object.mesh_id);
+    local_json.at("texture_id").get_to(object.texture_id);
+    object.position = vec3_from_json(local_json, "position", DEFAULT_POS);
+    object.scale = vec3_from_json(local_json, "scale", DEFAULT_SCALE);
+    object.rotation = vec3_from_json(local_json, "rotation", DEFAULT_ROT);
+}
+
+void from_json(const json& local_json, Map::UnshDrawObjArgs& object) {
+    local_json.at("id").get_to(object.id);
+    local_json.at("mesh_id").get_to(object.mesh_id);
+    object.color = vec3_from_json(local_json.at("color"), true);
+    object.position = vec3_from_json(local_json, "position", DEFAULT_POS);
+    object.scale = vec3_from_json(local_json, "scale", DEFAULT_SCALE);
+    object.rotation = vec3_from_json(local_json, "rotation", DEFAULT_ROT);
 }
 
 void handle_flat_floors(Map& map, const json& root_json) {
-    root_json.at("flat_floors").get_to(map.flat_floors);
+    root_json.at("flat_floors").get_to(map.flat_floors_args);
 }
 
-std::vector<std::pair<uint64_t, std::shared_ptr<Mesh>>>
+std::vector<Map::MeshArgs>
 handle_meshes(const json& root_json) {
-    std::vector<std::pair<uint64_t, std::shared_ptr<Mesh>>> result;
-
-    const json meshes_json = root_json.at("meshes");
-    for (const auto& element : meshes_json)
-        result.push_back({element.at("id").get<uint64_t>(), element});
-
-    return result;
+    return root_json.at("meshes").get<std::vector<Map::MeshArgs>>();
 }
 
-std::vector<std::pair<uint64_t, std::shared_ptr<Texture>>>
+std::vector<Map::TextureArgs>
 handle_textures(const json& root_json) {
-    std::vector<std::pair<uint64_t, std::shared_ptr<Texture>>> result;
-
-    const json textures_json = root_json.at("textures");
-    for (const auto& element : textures_json)
-        result.push_back({element.at("id").get<uint64_t>(), element});
-
-    return result;
+    return root_json.at("textures").get<std::vector<Map::TextureArgs>>();
 }
 
 template<typename I, typename T>
@@ -155,161 +161,239 @@ std::optional<T> find_in_vector(const std::vector<std::pair<I, T>> vector, I ind
     return std::make_optional((*iter).second);
 }
 
-void handle_textured_drawables(Map& map, const json& root_json,
-                               const std::vector<std::pair<uint64_t, std::shared_ptr<Mesh>>>& meshes,
-                               const std::vector<std::pair<uint64_t, std::shared_ptr<Texture>>>& textures) {
-    map.tex_draw_objects.clear();
-
-    const json drawables_json = root_json.at("textured_drawables");
-    for (const auto& element : drawables_json) {
-        const uint64_t mesh_id {element.at("mesh_id").get<uint64_t>()};
-        const uint64_t texture_id {element.at("texture_id").get<uint64_t>()};
-        const glm::vec3 position {vec3_from_json(element, "position", DEFAULT_POS)};
-        const glm::vec3 scale {vec3_from_json(element, "scale", DEFAULT_SCALE)};
-        const glm::vec3 rotation {vec3_from_json(element, "rotation", DEFAULT_ROT)};
-
-        // Get mesh from mesh ID.
-        const auto mesh {find_in_vector(meshes, mesh_id)};
-        if (!mesh.has_value())
-            throw std::runtime_error("Invalid mesh_id.");
-
-        // Get texture from texture ID.
-        const auto texture {find_in_vector(textures, texture_id)};
-        if (!texture.has_value())
-            throw std::runtime_error("Invalid texture_id");
-
-        map.tex_draw_objects.push_back(std::make_shared<TexturedDrawableObject>(
-            texture.value(), mesh.value()
-        ));
-        map.tex_draw_objects.back()->translation = position;
-        map.tex_draw_objects.back()->scale = scale;
-        map.tex_draw_objects.back()->rotation = glm::quat(rotation);
-    }
+void handle_textured_drawables(Map& map, const json& root_json) {
+    root_json.at("textured_drawables").get_to(map.tex_draw_objects_args);
 }
-
-std::vector<std::pair<uint64_t, std::shared_ptr<UnshadedDrawableObject>>>
-handle_unshaded_drawables(Map& map, const json& root_json,
-                          const std::vector<std::pair<uint64_t, std::shared_ptr<Mesh>>>& meshes) {
-    map.unsh_draw_objects.clear();
-
-    std::vector<std::pair<uint64_t, std::shared_ptr<UnshadedDrawableObject>>> result;
-    const json drawables_json = root_json.at("unshaded_drawables");
-    for (const auto& element : drawables_json) {
-        const uint64_t id {element.at("id").get<uint64_t>()};
-        const uint64_t mesh_id {element.at("mesh_id").get<uint64_t>()};
-        const glm::vec3 color {vec3_from_json(element.at("color"), true)};
-        const glm::vec3 position {vec3_from_json(element, "position", DEFAULT_POS)};
-        const glm::vec3 scale {vec3_from_json(element, "scale", DEFAULT_SCALE)};
-        const glm::vec3 rotation {vec3_from_json(element, "rotation", DEFAULT_ROT)};
-
-        // Get mesh from mesh ID.
-        const auto mesh {find_in_vector(meshes, mesh_id)};
-        if (!mesh.has_value())
-            throw std::runtime_error("Invalid mesh_id.");
-
-        map.unsh_draw_objects.push_back(std::make_shared<UnshadedDrawableObject>(
-            mesh.value(), color
-        ));
-        map.unsh_draw_objects.back()->translation = position;
-        map.unsh_draw_objects.back()->scale = scale;
-        map.unsh_draw_objects.back()->rotation = glm::quat(rotation);
-        result.push_back({id, map.unsh_draw_objects.back()});
-    }
-
-    return result;
-}
-
-void handle_rectangular_walls(Map& map, const json& root_json) {
-    root_json.at("rectangular_walls").get_to(map.rect_walls);
-}
-
-void handle_cuboid_objects(Map& map, const json& root_json) {
-    root_json.at("cuboid_objects").get_to(map.cuboid_objects);
-}
-
-std::vector<std::pair<uint64_t, std::shared_ptr<PointLight>>>
-handle_point_lights(Map& map, const json& root_json) {
-    map.point_lights.clear();
-
-    std::vector<std::pair<uint64_t, std::shared_ptr<PointLight>>> result;
-    const json lights_json = root_json.at("point_lights");
-    for (const auto& element : lights_json) {
-        const uint64_t id {element.at("id").get<uint64_t>()};
-        const std::shared_ptr<PointLight> light {element};
-        map.point_lights.push_back(light);
-        result.push_back({id, light});
-    }
-
-    return result;
-}
-
-void handle_moving_light_bulbs(Map& map, const json& root_json,
-        const std::vector<std::pair<uint64_t, std::shared_ptr<PointLight>>>& point_lights,
-        const std::vector<std::pair<uint64_t, std::shared_ptr<UnshadedDrawableObject>>>& unsh_draw_objects) {
-    map.moving_light_bulbs.clear();
-
-    const json bulbs_json = root_json.at("moving_light_bulbs");
-    for (const auto& element : bulbs_json) {
-        const uint64_t point_light_id {element.at("point_light_id").get<uint64_t>()};
-        const uint64_t drawable_object_id {element.at("drawable_object_id").get<uint64_t>()};
-        const std::shared_ptr<MovingLightBulb>& bulb = element;
-
-        // Get point light from its ID.
-        const auto light {find_in_vector(point_lights, point_light_id)};
-        if (!light.has_value())
-            throw std::runtime_error("Invalid point_light_id.");
-
-        // Get drawable object from its ID.
-        const auto draw_obj {find_in_vector(unsh_draw_objects, drawable_object_id)};
-        if (!draw_obj.has_value())
-            throw std::runtime_error("Invalid drawable_object_id.");
-
-        bulb->point_light = light.value();
-        bulb->drawable_obj = draw_obj.value();
-        map.moving_light_bulbs.push_back(bulb);
-    }
-}
-
 void Map::from_json(std::string_view file_path) {
-    using std::literals::operator""s;
+    load_from_json(file_path);
+    check_map();
+}
 
-    json json_obj;
-#ifdef NDEBUG
-    try {
-#endif
-        std::ifstream stream(file_path.data());
-        stream >> json_obj;
+void Map::load_from_json(std::string_view file_path) {
+    const std::string file_path_str {file_path};
+    std::ifstream stream(file_path_str);
 
-        handle_root_elements(*this, json_obj);
-        handle_flat_floors(*this, json_obj);
-        auto meshes = handle_meshes(json_obj);
-        auto textures = handle_textures(json_obj);
-        handle_textured_drawables(*this, json_obj, meshes, textures);
-        auto unsh_draw_objects = handle_unshaded_drawables(*this, json_obj, meshes);
-        handle_rectangular_walls(*this, json_obj);
-        handle_cuboid_objects(*this, json_obj);
-        auto point_lights {handle_point_lights(*this, json_obj)};
-        handle_moving_light_bulbs(*this, json_obj, point_lights, unsh_draw_objects);
-#ifdef NDEBUG
-    }
-    catch (const json::parse_error& err) {
+    json root_json;
+    stream >> root_json;
+
+    root_json.at("meshes").get_to(meshes_args);
+    root_json.at("textures").get_to(textures_args);
+    root_json.at("textured_drawables").get_to(tex_draw_objects_args);
+    root_json.at("unshaded_drawables").get_to(unsh_draw_objects_args);
+    root_json.at("left_bound").get_to(left_bound);
+    root_json.at("right_bound").get_to(right_bound);
+    root_json.at("front_bound").get_to(front_bound);
+    root_json.at("back_bound").get_to(back_bound);
+    root_json.at("flat_floors").get_to(flat_floors_args);
+    root_json.at("rectangular_walls").get_to(rect_walls_args);
+    root_json.at("cuboid_objects").get_to(cuboid_objects_args);
+    root_json.at("point_lights").get_to(point_lights_args);
+    root_json.at("moving_light_bulbs").get_to(moving_light_bulbs_args);
+}
+
+void check_file(std::string_view file_path_str, std::string_view extension) {
+    using std::string_literals::operator""s;
+    namespace fs = std::filesystem;
+
+    fs::path file_path(file_path_str);
+
+    if (file_path.extension() != extension) {
         std::stringstream message;
-        message << "JSON parsing error in file \"" << file_path <<
-                "\" on byte " << err.byte <<
-                ": " << err.what();
+        message << "File \"" << file_path << "\" doesn't have the \"" <<
+                extension << "\" extension.";
         throw std::runtime_error(message.str());
     }
-    catch (const json::type_error& err) {
+
+    if (!fs::exists(file_path)) {
         std::stringstream message;
-        message << "JSON type error in file \"" << file_path <<
-                "\": " << err.what();
+        message << "File " << file_path << " doesn't exist.";
         throw std::runtime_error(message.str());
     }
-    catch (const json::out_of_range& err) {
-        std::stringstream message;
-        message << "JSON doesn't contain required data in file \"" << file_path <<
-                "\": " << err.what();
-        throw std::runtime_error(message.str());
+}
+
+/// Warning: sorts the given vector.
+/// Returns true if the check was successful (no duplicates).
+template<typename T>
+bool check_for_id_duplicates(std::vector<T>& vec) {
+    std::sort(
+        vec.begin(),
+        vec.end(),
+        [](const T& left, const T& right) {
+            return left.id > right.id;
+        }
+    );
+    return std::adjacent_find(
+        vec.begin(),
+        vec.end(),
+        [](const T& left, const T& right) {
+            return left.id == right.id;
+        }
+    ) == vec.end();
+}
+
+/// Warning: sorts the given vector.
+/// Returns true if the check was successful (no duplicates).
+template<typename T>
+bool check_for_duplicates(std::vector<T>& vec) {
+    std::sort(vec.begin(), vec.end());
+    return std::adjacent_find(vec.begin(), vec.end()) == vec.end();
+}
+
+/// Returns true if the check was successful.
+template<typename T, typename U, typename F1, typename F2>
+bool validate_id(const std::vector<T>& checked_objects, const std::vector<U>& ids_source,
+                 const F1&& get_checked_objects_id, const F2&& get_sources_ids) {
+    for (const auto& checked_object : checked_objects) {
+        bool contains_id = std::find_if(
+            ids_source.begin(),
+            ids_source.end(),
+            [&checked_object, &get_checked_objects_id, &get_sources_ids](const auto& element) {
+                return get_checked_objects_id(checked_object) == get_sources_ids(element);
+            }
+        ) != ids_source.end();
+        if (!contains_id)
+            return false;
     }
-#endif
+
+    return true;
+}
+
+void Map::check_map() {
+    // Check for ID duplicates.
+    if (!check_for_id_duplicates(meshes_args))
+        throw std::runtime_error("Meshes have duplicate IDs.");
+    if (!check_for_id_duplicates(textures_args))
+        throw std::runtime_error("Textures have duplicate IDs.");
+    std::vector<uint64_t> drawable_ids;
+    drawable_ids.reserve(tex_draw_objects_args.size() + unsh_draw_objects_args.size());
+    for (const auto& obj : tex_draw_objects_args)
+        drawable_ids.push_back(obj.id);
+    for (const auto& obj : unsh_draw_objects_args)
+        drawable_ids.push_back(obj.id);
+    if (!check_for_duplicates(drawable_ids))
+        throw std::runtime_error("Drawable objects have duplicate IDs.");
+
+    // Check if IDs are valid.
+    if (!validate_id(tex_draw_objects_args, textures_args,
+        [](const Map::TexDrawObjArgs& obj) {return obj.texture_id;},
+        [](const Map::TextureArgs& obj) {return obj.id;}
+    ))
+        throw std::runtime_error("Textured drawable objects have invalid texture ID(s).");
+
+    if (!validate_id(tex_draw_objects_args, meshes_args,
+        [](const Map::TexDrawObjArgs& obj) {return obj.mesh_id;},
+        [](const Map::MeshArgs& obj) {return obj.id;}
+    ))
+        throw std::runtime_error("Textured drawable objects have invalid mesh ID(s).");
+
+    if (!validate_id(unsh_draw_objects_args, meshes_args,
+        [](const Map::UnshDrawObjArgs& obj) {return obj.mesh_id;},
+        [](const Map::MeshArgs& obj) {return obj.id;}
+    ))
+        throw std::runtime_error("Unshaded drawable objects have invalid mesh ID(s).");
+
+    if (!validate_id(moving_light_bulbs_args, point_lights_args,
+        [](const Map::MovingLightBulbArgs& obj) {return obj.point_light_id;},
+        [](const Map::PointLightArgs& obj) {return obj.id;}
+    ))
+        throw std::runtime_error("Moving light bulbs have invalid point light ID(s).");
+
+    if (!validate_id(moving_light_bulbs_args, drawable_ids,
+        [](const Map::MovingLightBulbArgs& obj) {return obj.point_light_id;},
+        [](const uint64_t id) {return id;}
+    ))
+        throw std::runtime_error("Moving light bulbs have invalid point light ID(s).");
+
+    // Check files.
+    for (const auto& cur_mesh : meshes_args)
+        check_file(MESHES_PATH + cur_mesh.file, ".obj");
+    for (const auto& cur_texture : textures_args)
+        check_file(TEXTURES_PATH + cur_texture.file, ".ktx");
+}
+
+void Map::set_map(RenderingServer& rs, PhysicsServer& ps,
+                  std::vector<std::shared_ptr<MovingLightBulb>>& moving_bulbs) {
+    // Construct textures.
+    std::map<uint64_t, std::shared_ptr<KTXTexture>> textures;
+    for (const auto& tex_arg : textures_args)
+        textures[tex_arg.id] = std::make_shared<KTXTexture>(TEXTURES_PATH + tex_arg.file);
+
+    // Construct meshes.
+    std::map<uint64_t, std::shared_ptr<Mesh>> meshes;
+    for (const auto& mesh_arg : meshes_args)
+        meshes[mesh_arg.id] = std::make_shared<Mesh>(MESHES_PATH + mesh_arg.file);
+
+    // Construct and emplace textured drawable objects.
+    std::map<uint64_t, std::shared_ptr<SpatialObject>> spatial_objects;
+    for (const auto& tex_draw_arg : tex_draw_objects_args) {
+        const auto cur_obj {std::make_shared<TexturedDrawableObject>(
+            textures[tex_draw_arg.texture_id],
+            meshes[tex_draw_arg.mesh_id]
+        )};
+        cur_obj->translation = tex_draw_arg.position;
+        cur_obj->scale = tex_draw_arg.scale;
+        cur_obj->rotation = tex_draw_arg.rotation;
+        rs.add_drawable_object(cur_obj);
+        spatial_objects[tex_draw_arg.id] = cur_obj;
+    }
+
+    // Construct and emplace unshaded drawable objects.
+    for (const auto& unsh_draw_arg : unsh_draw_objects_args) {
+        const auto cur_obj {std::make_shared<UnshadedDrawableObject>(
+            meshes[unsh_draw_arg.mesh_id],
+            unsh_draw_arg.color
+        )};
+        cur_obj->translation = unsh_draw_arg.position;
+        cur_obj->scale = unsh_draw_arg.scale;
+        cur_obj->rotation = unsh_draw_arg.rotation;
+        rs.add_drawable_object(cur_obj);
+        spatial_objects[unsh_draw_arg.id] = cur_obj;
+    }
+
+    // Construct and emplace point lights.
+    std::map<uint64_t, std::shared_ptr<PointLight>> point_lights;
+    for (const auto& light_args : point_lights_args) {
+        const auto cur_light {std::make_shared<PointLight>(
+            PointLight({
+                light_args.position, light_args.color, light_args.diffuse_strength,
+                light_args.const_coeff, light_args.linear_coeff, light_args.quadratic_coeff
+            })
+        )};
+        rs.draw_params.point_lights.push_back(cur_light);
+        point_lights[light_args.id] = cur_light;
+    }
+
+    // Construct and emplace moving light bulbs.
+    for (const auto& bulb_args : moving_light_bulbs_args) {
+        const auto bulb = std::make_shared<MovingLightBulb>(
+            bulb_args.path, bulb_args.speed
+        );
+        bulb->point_light = point_lights[bulb_args.point_light_id];
+        bulb->bulb_obj = spatial_objects[bulb_args.drawable_object_id];
+        moving_bulbs.push_back(bulb);
+    }
+
+    // Construct and emplace flat floors.
+    for (const auto& floor : flat_floors_args) {
+        ps.add_flat_floor(std::make_shared<FloorObject>(
+            FloorObject({floor.rect, floor.height})
+        ));
+    }
+
+    // Construct and emplace rectangular walls.
+    for (const auto& wall : rect_walls_args) {
+        ps.add_rectangular_wall(std::make_shared<RectangularWall>(
+            wall.rect
+        ));
+    }
+
+    // Construct and emplace cuboid objects.
+    for (const auto& obj : cuboid_objects_args) {
+        ps.add_cuboid_object(std::make_shared<CuboidObject>(
+            obj.rect, obj.bottom_y, obj.top_y
+        ));
+    }
+
+    // Set vertical bounds.
+    ps.set_bounds(left_bound, right_bound, back_bound, front_bound);
 }

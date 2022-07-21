@@ -6,12 +6,12 @@
 #include <glm/vec3.hpp>
 
 #include "PointLight.hpp"
-#include "UnshadedDrawableObject.hpp"
+#include "SpatialObject.hpp"
 
 class MovingLightBulb {
 public:
     std::weak_ptr<PointLight> point_light;
-    std::weak_ptr<UnshadedDrawableObject> drawable_obj;
+    std::weak_ptr<SpatialObject> bulb_obj;
 
     MovingLightBulb(const std::vector<glm::vec3>& path, const float speed);
 

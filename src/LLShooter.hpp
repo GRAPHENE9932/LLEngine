@@ -1,11 +1,11 @@
 #pragma once
 
 #include "common/FPSMeter.hpp"
-#include "common/Map.hpp"
 #include "objects/BitmapTextObject.hpp"
 #include "objects/MovingLightBulb.hpp"
 #include "RenderingServer.hpp"
 #include "PhysicsServer.hpp"
+#include "common/Map.hpp"
 
 class LLShooter {
 public:
@@ -30,6 +30,4 @@ private:
     void add_camera_and_player();
     void add_skybox();
     void update(float delta);
-
-    void load_map(std::string_view file_path, RenderingServer& rs, PhysicsServer& ps);
 };

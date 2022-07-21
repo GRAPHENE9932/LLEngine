@@ -38,6 +38,6 @@ void MovingLightBulb::update(const float delta) {
     // Set position.
     if (std::shared_ptr<PointLight> ptr = point_light.lock())
         ptr->position = new_pos;
-    if (std::shared_ptr<UnshadedDrawableObject> ptr = drawable_obj.lock())
+    if (std::shared_ptr<SpatialObject> ptr = bulb_obj.lock())
         ptr->translation = new_pos;
 }
