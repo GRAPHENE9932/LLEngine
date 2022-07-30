@@ -13,7 +13,7 @@ void SkyboxShader::initialize() {
         "res/shaders/skybox_fragment.glsl"
     );
 
-    mvp_id = glGetUniformLocation(program_id, "MVP");
+    mvp_id = glGetUniformLocation(program_id, "mvp_unif");
 }
 
 void SkyboxShader::use_shader(const glm::mat4& mvp) {

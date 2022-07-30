@@ -1,10 +1,10 @@
 #version 330 core
-in vec2 uv;
+in vec2 uv_in;
 
-out vec4 color;
+out vec4 color_out;
 
-uniform sampler2D TEXTURE_SAMPLER;
+uniform sampler2D texture_unif;
 
 void main() {
-    color = texture(TEXTURE_SAMPLER, uv);
+    color_out = texture(texture_unif, uv_in);
 }

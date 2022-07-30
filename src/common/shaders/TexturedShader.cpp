@@ -20,19 +20,19 @@ void TexturedShader::initialize(const std::size_t spot_lights_count,
         }
     );
     // Init uniforms.
-    mvp_id = glGetUniformLocation(program_id, "MVP");
+    mvp_id = glGetUniformLocation(program_id, "mvp_unif");
     if (spot_lights_count != 0 || point_lights_count != 0) {
-        model_matrix_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
-        normal_matrix_id = glGetUniformLocation(program_id, "NORMAL_MATRIX");
+        model_matrix_id = glGetUniformLocation(program_id, "model_matrix_unif");
+        normal_matrix_id = glGetUniformLocation(program_id, "normal_matrix_unif");
     }
 
     spot_light_ids.resize(spot_lights_count);
     for (GLuint i = 0; i < spot_lights_count; i++)
-        spot_light_ids[i] = SpotLight::get_uniforms_id(program_id, "SPOT_LIGHTS", i);
+        spot_light_ids[i] = SpotLight::get_uniforms_id(program_id, "spot_lights_unif", i);
 
     point_light_ids.resize(point_lights_count);
     for (GLuint i = 0; i < point_lights_count; i++)
-        point_light_ids[i] = PointLight::get_uniforms_id(program_id, "POINT_LIGHTS", i);
+        point_light_ids[i] = PointLight::get_uniforms_id(program_id, "point_lights_unif", i);
 }
 
 void TexturedShader::use_shader(const glm::mat4& mvp, const glm::mat4& model_matrix,

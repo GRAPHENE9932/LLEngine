@@ -1,10 +1,10 @@
 #version 330 core
-in vec3 tex_coords;
+in vec3 passed_tex_coords;
 
-out vec4 color;
+out vec4 color_out;
 
-uniform samplerCube CUBEMAP_SAMPLER;
+uniform samplerCube cubemap_unif;
 
 void main() {
-    color = texture(CUBEMAP_SAMPLER, tex_coords);
+    color_out = texture(cubemap_unif, passed_tex_coords);
 }

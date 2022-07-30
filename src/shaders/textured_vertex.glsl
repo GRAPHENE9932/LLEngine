@@ -1,34 +1,36 @@
 #version 330 core
+
 // SPOT_LIGHTS_COUNT and POINT_LIGHTS_COUNT macros
 // must be defined here.
-layout(location = 0) in vec3 vertex_pos_modelspace;
-layout(location = 1) in vec2 vertex_uv;
+
+layout(location = 0) in vec3 vertex_pos_modelspace_in;
+layout(location = 1) in vec2 vertex_uv_in;
 #if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-layout(location = 2) in vec3 vertex_normal_modelspace;
+layout(location = 2) in vec3 vertex_normal_modelspace_in;
 #endif
 
 #if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-out vec3 normal_worldspace;
+out vec3 passed_normal_worldspace;
 #endif
 #if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-out vec3 fragment_pos_worldspace;
+out vec3 passed_fragment_pos_worldspace;
 #endif
-out vec2 uv;
+out vec2 passed_uv;
 
-uniform mat4 MVP;
-uniform mat4 MODEL_MATRIX;
+uniform mat4 mvp_unif;
+uniform mat4 model_matrix_unif;
 #if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-uniform mat4 NORMAL_MATRIX;
+uniform mat4 normal_matrix_unif;
 #endif
 
 void main() {
-    gl_Position = MVP * vec4(vertex_pos_modelspace, 1.0);
+    gl_Position = mvp_unif * vec4(vertex_pos_modelspace_in, 1.0);
 
 #if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-    vec3 orig_normal_worldspace = (MODEL_MATRIX * vec4(vertex_normal_modelspace, 0.0)).xyz;
-    normal_worldspace = (NORMAL_MATRIX * vec4(orig_normal_worldspace, 0.0)).xyz;
-    fragment_pos_worldspace = (MODEL_MATRIX * vec4(vertex_pos_modelspace, 1.0)).xyz;
+    vec3 orig_normal_worldspace = (model_matrix_unif * vec4(vertex_normal_modelspace_in, 0.0)).xyz;
+    passed_normal_worldspace = (normal_matrix_unif * vec4(orig_normal_worldspace, 0.0)).xyz;
+    passed_fragment_pos_worldspace = (model_matrix_unif * vec4(vertex_pos_modelspace_in, 1.0)).xyz;
 #endif
 
-    uv = vertex_uv;
+    passed_uv = vertex_uv_in;
 }

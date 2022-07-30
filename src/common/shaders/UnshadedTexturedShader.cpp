@@ -13,7 +13,7 @@ void UnshadedTexturedShader::initialize() {
         "res/shaders/unshaded_textured_fragment.glsl"
     );
 
-    mvp_id = glGetUniformLocation(program_id, "MVP");
+    mvp_id = glGetUniformLocation(program_id, "mvp_unif");
 }
 
 void UnshadedTexturedShader::use_shader(const glm::mat4& mvp) {

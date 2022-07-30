@@ -13,8 +13,8 @@ void UnshadedShader::initialize() {
         "res/shaders/unshaded_fragment.glsl"
     );
 
-    mvp_id = glGetUniformLocation(program_id, "MVP");
-    color_id = glGetUniformLocation(program_id, "COLOR");
+    mvp_id = glGetUniformLocation(program_id, "mvp_unif");
+    color_id = glGetUniformLocation(program_id, "color_unif");
 }
 
 void UnshadedShader::use_shader(const glm::mat4& mvp, const glm::vec3& color) {

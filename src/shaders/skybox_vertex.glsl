@@ -1,14 +1,14 @@
 #version 330
-layout (location = 0) in vec3 vertex_pos_modelspace;
+layout (location = 0) in vec3 vertex_pos_modelspace_in;
 
-out vec3 tex_coords;
+out vec3 passed_tex_coords;
 
-uniform mat4 MVP;
+uniform mat4 mvp_unif;
 
 void main() {
-    tex_coords = vertex_pos_modelspace;
+    passed_tex_coords = vertex_pos_modelspace_in;
 
-    vec4 pos = MVP * vec4(vertex_pos_modelspace, 1.0);
+    vec4 pos = mvp_unif * vec4(vertex_pos_modelspace_in, 1.0);
 
     // Perspective division will divide all components of
     // position by w. So, if we set the depth (z) to w,

@@ -1,8 +1,8 @@
 #version 330 core
-layout(location = 0) in vec3 vertex_pos_modelspace;
+layout(location = 0) in vec3 vertex_pos_modelspace_in;
 
-uniform mat4 MVP;
+uniform mat4 mvp_unif;
 
 void main() {
-    gl_Position = MVP * vec4(vertex_pos_modelspace, 1.0);
+    gl_Position = mvp_unif * vec4(vertex_pos_modelspace_in, 1.0);
 }
