@@ -9,8 +9,8 @@ UnshadedTexturedShader::~UnshadedTexturedShader() {
 
 void UnshadedTexturedShader::initialize() {
     program_id = load_shaders(
-        "res/shaders/unshaded_textured_vertex.glsl",
-        "res/shaders/unshaded_textured_fragment.glsl"
+        "res/shaders/unshaded_textured.vert",
+        "res/shaders/unshaded_textured.frag"
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp_unif");

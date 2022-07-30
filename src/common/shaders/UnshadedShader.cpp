@@ -9,8 +9,8 @@ UnshadedShader::~UnshadedShader() {
 
 void UnshadedShader::initialize() {
     program_id = load_shaders(
-        "res/shaders/unshaded_vertex.glsl",
-        "res/shaders/unshaded_fragment.glsl"
+        "res/shaders/unshaded.vert",
+        "res/shaders/unshaded.frag"
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp_unif");

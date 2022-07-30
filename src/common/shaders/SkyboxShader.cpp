@@ -9,8 +9,8 @@ SkyboxShader::~SkyboxShader() {
 
 void SkyboxShader::initialize() {
     program_id = load_shaders(
-        "res/shaders/skybox_vertex.glsl",
-        "res/shaders/skybox_fragment.glsl"
+        "res/shaders/skybox.vert",
+        "res/shaders/skybox.frag"
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp_unif");

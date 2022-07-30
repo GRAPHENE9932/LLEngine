@@ -9,8 +9,8 @@ ColoredTextShader::~ColoredTextShader() {
 
 void ColoredTextShader::initialize() {
     program_id = load_shaders(
-        "res/shaders/colored_text_vertex.glsl",
-        "res/shaders/colored_text_fragment.glsl"
+        "res/shaders/colored_text.vert",
+        "res/shaders/colored_text.frag"
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp_unif");

@@ -12,8 +12,8 @@ TexturedShader::~TexturedShader() {
 void TexturedShader::initialize(const std::size_t spot_lights_count,
                                 const std::size_t point_lights_count) {
     program_id = load_shaders(
-        "res/shaders/textured_vertex.glsl",
-        "res/shaders/textured_fragment.glsl",
+        "res/shaders/textured.vert",
+        "res/shaders/textured.frag",
         {
             "SPOT_LIGHTS_COUNT " + std::to_string(spot_lights_count),
             "POINT_LIGHTS_COUNT " + std::to_string(point_lights_count)
