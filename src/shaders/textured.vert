@@ -1,36 +1,70 @@
 #version 330 core
 
-// SPOT_LIGHTS_COUNT and POINT_LIGHTS_COUNT macros
-// must be defined here.
+// Possible defines:
+// USING_BASE_COLOR_TEXTURE
+// USING_BASE_COLOR_FACTOR
+// USING_VERTEX_NORMALS
+// USING_NORMAL_TEXTURE
+// USING_NORMAL_MAP_SCALE
+// USING_UV
+// USING_GENERAL_UV_TRANSFORM
+// USING_NORMAL_UV_TRANSFORM
+// USING_BASE_UV_TRANSFORM
+// POINT_LIGHTS_COUNT <int>
+// SPOT_LIGHTS_COUNT <int>
 
-layout(location = 0) in vec3 vertex_pos_modelspace_in;
-layout(location = 1) in vec2 vertex_uv_in;
-#if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-layout(location = 2) in vec3 vertex_normal_modelspace_in;
+layout(location = 0) in vec3 VERTEX_POS;
+#ifdef USING_UV
+    layout(location = 1) in vec2 VERTEX_UV;
+#endif
+#ifdef USING_VERTEX_NORMALS
+    layout(location = 2) in vec3 VERTEX_NORMAL;
 #endif
 
-#if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-out vec3 passed_normal_worldspace;
-#endif
-#if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-out vec3 passed_fragment_pos_worldspace;
-#endif
-out vec2 passed_uv;
+// Not all uniforms are used at the same time.
+// Unused ones will be optimized out.
+uniform mat4 MVP;
+uniform mat4 MODEL_MATRIX;
+uniform mat4 NORMAL_MATRIX;
+uniform vec2 UV_OFFSET;
+uniform vec2 UV_SCALE;
+uniform vec2 BASE_UV_OFFSET;
+uniform vec2 BASE_UV_SCALE;
+uniform vec2 NORMAL_UV_OFFSET;
+uniform vec2 NORMAL_UV_SCALE;
 
-uniform mat4 mvp_unif;
-uniform mat4 model_matrix_unif;
-#if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-uniform mat4 normal_matrix_unif;
-#endif
+// Not all outs are used at the same time.
+// Unused ones must be optimized out (I hope).
+out vec2 FRAG_BASE_UV;
+out vec2 FRAG_NORMAL_UV;
+out vec2 FRAG_UV;
+out vec3 FRAG_NORMAL;
+out mat3 FRAG_TBN;
+out vec3 FRAG_POS;
 
 void main() {
-    gl_Position = mvp_unif * vec4(vertex_pos_modelspace_in, 1.0);
+    gl_Position = MVP * vec4(VERTEX_POS, 1.0);
 
-#if POINT_LIGHTS_COUNT != 0 || SPOT_LIGHTS_COUNT != 0
-    vec3 orig_normal_worldspace = (model_matrix_unif * vec4(vertex_normal_modelspace_in, 0.0)).xyz;
-    passed_normal_worldspace = (normal_matrix_unif * vec4(orig_normal_worldspace, 0.0)).xyz;
-    passed_fragment_pos_worldspace = (model_matrix_unif * vec4(vertex_pos_modelspace_in, 1.0)).xyz;
-#endif
+    #ifdef USING_VERTEX_NORMALS
+        vec3 unfixed_normal = (MODEL_MATRIX * vec4(VERTEX_NORMAL, 0.0)).xyz;
+        FRAG_NORMAL = (NORMAL_MATRIX * vec4(unfixed_normal, 0.0)).xyz;
+    #endif
 
-    passed_uv = vertex_uv_in;
+    FRAG_POS = (MODEL_MATRIX * vec4(VERTEX_POS, 1.0)).xyz;
+
+    #ifdef USING_UV
+        #ifdef USING_GENERAL_UV_TRANSFORM
+            FRAG_UV = VERTEX_UV * UV_SCALE + UV_OFFSET;
+        #else
+            FRAG_UV = VERTEX_UV;
+        #endif
+
+        #ifdef USING_BASE_UV_TRANSFORM
+            FRAG_BASE_UV = VERTEX_UV * BASE_UV_SCALE + BASE_UV_OFFSET;
+        #endif
+
+        #ifdef USING_NORMAL_UV_TRANSFORM
+            FRAG_NORMAL_UV = VERTEX_UV * NORMAL_UV_SCALE + NORMAL_UV_OFFSET;
+        #endif
+    #endif
 }

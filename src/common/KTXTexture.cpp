@@ -79,38 +79,38 @@ enum SupercompressionScheme {
 };
 
 inline void load_level_data(std::istream& stream, char* const data_ptr,
-        const LevelIndex& level_index, const Header& header,
-        std::string_view file_path) {
+        const LevelIndex& level_index, const Header& header) {
     switch (header.supercompression_scheme) {
     case SC_NONE: {
         stream.read(data_ptr, level_index.byte_length);
         if (!stream)
-            ktx_loading_error("Failed to read the level data.", file_path);
+            throw std::runtime_error("Failed to read the level data.");
         break;
     }
     case SC_ZSTANDARD: {
         std::vector<char> compressed_data(level_index.byte_length);
         stream.read(compressed_data.data(), compressed_data.size());
         if (!stream)
-            ktx_loading_error("Failed to read the level data.", file_path);
+            throw std::runtime_error("Failed to read the level data.");
 
         std::size_t result {ZSTD_decompress(
             data_ptr, level_index.uncompressed_byte_length,
             compressed_data.data(), compressed_data.size()
         )};
         if (ZSTD_isError(result))
-            ktx_loading_error("zstd decompression error.", file_path);
+            throw std::runtime_error("zstd decompression error.");
         break;
     }
     default:
-        ktx_loading_error("Unsupported supercompression scheme."
-                "Only zstd and an no compression at all supported.", file_path);
-        break;
+        throw std::runtime_error(
+            "Unsupported supercompression scheme. "
+            "Only zstd and uncompressed supported."
+        );
     }
 }
 
 inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
-        const std::vector<LevelIndex>& level_indexes, std::string_view file_path) {
+        const std::vector<LevelIndex>& level_indexes, const KTXTexture::Parameters& params) {
     const VkFormatInfo format_info {VkFormatInfo::from_vk_format(header.vk_format)};
 
     const uint32_t mip_padding = header.supercompression_scheme == SC_NONE ?
@@ -118,7 +118,7 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
 
     const bool is_cubemap {header.face_count == 6};
     if (header.face_count != 1 && header.face_count != 6)
-        ktx_loading_error("Invalid count of faces.", file_path);
+        throw std::runtime_error("Invalid count of faces.");
 
     const GLenum tex_target {
         is_cubemap ?
@@ -149,7 +149,7 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
         align_stream(stream, mip_padding);
 
         std::vector<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
-        load_level_data(stream, level_data.data(), level_indexes[mip_level], header, file_path);
+        load_level_data(stream, level_data.data(), level_indexes[mip_level], header);
 
         const uint64_t face_size {format_info.compute_image_size(sizes[mip_level])};
 
@@ -174,65 +174,67 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
     } while (mip_level > 0);
 
     // Set parameters.
-    glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    if (is_cubemap) {
-        glTexParameteri(tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
+    glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, params.minification_filter);
+    glTexParameteri(tex_target, GL_TEXTURE_WRAP_S, params.wrap_s);
+    glTexParameteri(tex_target, GL_TEXTURE_WRAP_T, params.wrap_t);
+    if (is_cubemap)
         glTexParameteri(tex_target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    }
 
     return texture_id;
 }
 
-KTXTexture::KTXTexture(std::string_view file_path) {
-    std::ifstream stream(file_path.data(), std::ios::in | std::ios::binary);
+KTXTexture::KTXTexture(const Parameters& params) {
+    // TODO: progressive loading (mipmap level after level in other thread).
+
+    std::ifstream stream(params.file_path, std::ios::in | std::ios::binary);
     if (!stream)
-        ktx_loading_error("File is not accesible or does not exist.", file_path);
+        ktx_loading_error("File is not accesible or does not exist.", params.file_path);
+    stream.seekg(params.offset);
 
     Header header;
     stream.read(reinterpret_cast<char*>(&header), sizeof(Header));
     if (!stream.good())
-        ktx_loading_error("Failed to read the KTX header.", file_path);
+        ktx_loading_error("Failed to read the KTX header.", params.file_path);
     if (header.layer_count > 1)
-        ktx_loading_error("Multiple layers are not supported yet.", file_path);
+        ktx_loading_error("Multiple layers are not supported yet.", params.file_path);
 
     // Check the identifier.
-    if (std::memcmp(header.identifier.data(), KTX_IDENTIFIER.data(), 12) != 0 || !stream.good())
-        ktx_loading_error("The KTX identifier is invalid.", file_path);
+    if (std::memcmp(header.identifier.data(), KTX_IDENTIFIER.data(), 12) != 0)
+        ktx_loading_error("The KTX identifier is invalid.", params.file_path);
 
     // Load indexes.
     Index index;
     stream.read(reinterpret_cast<char*>(&index), sizeof(Index));
-    // It's theoretically possible that header.level_count will equal to 4294967295.
-    // It will lead to the allocation of 96 GiB. So, limit this value.
-    limit_check<uint32_t>(header.level_count, 65536, "levelCount", file_path);
+    // It's theoretically possible that header.level_count will be equal to 4294967295.
+    // It will lead to allocation of 96 GiB. So, limit this value.
+    limit_check<uint32_t>(header.level_count, 65536, "levelCount", params.file_path);
     std::vector<LevelIndex> level_indexes(std::max(1u, header.level_count));
     stream.read(reinterpret_cast<char*>(level_indexes.data()),
             sizeof(LevelIndex) * header.level_count);
     if (!stream.good())
-        ktx_loading_error("Failed to read the KTX indexes.", file_path);
+        ktx_loading_error("Failed to read the KTX indexes.", params.file_path);
 
     // Load the data format descriptor.
     uint32_t dfd_total_size;
     stream.read(reinterpret_cast<char*>(&dfd_total_size), sizeof(uint32_t));
-    limit_check<uint32_t>(dfd_total_size, 16777216, "dfdTotalSize", file_path);
+    limit_check<uint32_t>(dfd_total_size, 16777216, "dfdTotalSize", params.file_path);
     if (dfd_total_size != 0) {
         dfd_block.resize(dfd_total_size > sizeof(uint32_t) ? dfd_total_size - sizeof(uint32_t) : 0u);
         stream.read(dfd_block.data(), dfd_block.size());
         if (!stream.good())
-            ktx_loading_error("Failed to read the data format descriptor.", file_path);
+            ktx_loading_error("Failed to read the data format descriptor.", params.file_path);
     }
 
     // Load the key/value data.
     uint32_t kvd_already_read {0};
     uint32_t prev_position {static_cast<uint32_t>(stream.tellg())};
-    limit_check<uint32_t>(index.kvd_byte_length, 16777216, "kvdByteLength", file_path);
+    limit_check<uint32_t>(index.kvd_byte_length, 16777216, "kvdByteLength", params.file_path);
     while (kvd_already_read < index.kvd_byte_length) {
         // Key and value byte length.
         uint32_t key_and_value_byte_length;
         stream.read(reinterpret_cast<char*>(&key_and_value_byte_length), sizeof(uint32_t));
-        limit_check(key_and_value_byte_length, 16777216u, "keyAndValueByteLength", file_path);
+        limit_check(key_and_value_byte_length, 16777216u, "keyAndValueByteLength", params.file_path);
 
         // Key and value data itself.
         key_value_data.push_back({});
@@ -246,19 +248,19 @@ KTXTexture::KTXTexture(std::string_view file_path) {
         prev_position = stream.tellg();
     }
     if (!stream.good())
-        ktx_loading_error("Failed to read the key/value data.", file_path);
+        ktx_loading_error("Failed to read the key/value data.", params.file_path);
 
     if (index.sgd_byte_length > 0)
         align_stream(stream, 8);
 
     // Get supercompression global data.
-    limit_check<uint64_t>(index.sgd_byte_length, 16777216, "sgdByteLength", file_path);
+    limit_check<uint64_t>(index.sgd_byte_length, 16777216, "sgdByteLength", params.file_path);
     supercompression_global_data.resize(index.sgd_byte_length);
     stream.read(supercompression_global_data.data(), index.sgd_byte_length);
     if (!stream.good())
-        ktx_loading_error("Failed to get supercompression global data.", file_path);
+        ktx_loading_error("Failed to get supercompression global data.", params.file_path);
 
     // Set values to the base class.
-    this->texture_id = load_mipmap_levels(stream, header, level_indexes, file_path);
+    this->texture_id = load_mipmap_levels(stream, header, level_indexes, params);
     this->tex_size = {header.pixel_width, header.pixel_height};
 }

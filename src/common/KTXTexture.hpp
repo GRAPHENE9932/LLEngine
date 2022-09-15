@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <stdint.h>
+#include <string> // std::string
+#include <vector> // std::vector
+#include <string_view> // std::string_view
 
 #include "Texture.hpp"
 
@@ -11,9 +11,8 @@ public:
     /// Loads texture from KTX2 file.
     /// Not supported:
     ///   - Multiple layers
-    ///   - Multiple faces (cubemaps)
     ///   - Supercompression other than Zstandard.
-    KTXTexture(std::string_view file_path);
+    KTXTexture(const Parameters& params);
 
 private:
     std::vector<char> dfd_block;

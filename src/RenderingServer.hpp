@@ -8,37 +8,37 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/ext/vector_int2.hpp> // glm::ivec2
 
-#include "objects/DrawableObject.hpp"
-#include "objects/SkyboxObject.hpp"
-#include "objects/PointLight.hpp"
-#include "objects/Camera.hpp"
+#include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
+#include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
+#include "nodes/core/rendering/CameraNode.hpp" // CameraNode
+#include "common/Skybox.hpp" // Skybox
+
+class SceneTree;
 
 class RenderingServer {
 public:
-    Camera* camera;
-    DrawParameters draw_params;
+    SceneTree& scene_tree;
+    CameraNode* camera;
 
-    RenderingServer(int window_width, int window_height);
+    RenderingServer(SceneTree& tree, glm::ivec2 window_extents);
     ~RenderingServer();
 
     void set_update_callback(std::function<void(float)> func);
-    GLFWwindow* get_window();
+    glm::ivec2 get_window_extents() const;
 
-    void add_drawable_object(const std::shared_ptr<IDrawableObject>& obj, const bool overlay = false);
-    void set_skybox(const std::shared_ptr<SkyboxObject>& obj);
+    void set_skybox(const std::shared_ptr<Texture>& texture);
 
     void main_loop();
 
 private:
-    GLFWwindow* window;
+    glm::ivec2 window_extents;
     std::function<void(float)> update_callback;
     std::chrono::high_resolution_clock::time_point prev_frame_time;
 
-    std::vector<std::shared_ptr<IDrawableObject>> drawable_objects;
-    std::vector<std::shared_ptr<IDrawableObject>> drawable_objects_overlay;
-    std::shared_ptr<SkyboxObject> skybox = nullptr;
+    std::unique_ptr<Skybox> skybox = nullptr;
 
-    void init_window(int window_width, int window_height);
+    void init_window(glm::ivec2 window_extents);
     void init_gl();
 };

@@ -53,7 +53,14 @@ BitmapFont::BitmapFont(std::string_view file_name) {
     }
     
     // Load texture file.
-    texture = std::make_shared<KTXTexture>(tex_file_name);
+    const Texture::Parameters tex_params {
+        GL_NEAREST,
+        GL_NEAREST,
+        GL_CLAMP_TO_EDGE,
+        GL_CLAMP_TO_EDGE,
+        tex_file_name
+    };
+    texture = std::make_shared<KTXTexture>(tex_params);
 }
 
 GLuint BitmapFont::get_texture_id() const {

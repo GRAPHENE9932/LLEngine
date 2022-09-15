@@ -1,18 +1,19 @@
 #include "utils/math.hpp"
-#include "objects/Camera.hpp"
-#include "objects/BitmapTextObject.hpp"
-#include "objects/ImageObject.hpp"
-#include "objects/TexturedDrawableObject.hpp"
+#include "nodes/core/rendering/CameraNode.hpp"
+#include "nodes/core/rendering/BitmapTextNode.hpp" // BitmapTextNode
+#include "nodes/core/rendering/ImageNode.hpp" // ImageNode
+#include "nodes/core/rendering/CommonDrawableNode.hpp" // TexturedDrawableNode
 #include "common/BitmapFont.hpp"
 #include "common/KTXTexture.hpp"
 #include "common/Mesh.hpp"
 #include "LLShooter.hpp"
+#include <GLFW/glfw3.h>
+#include <memory>
 
-const int WINDOW_WIDTH = 1900, WINDOW_HEIGHT = 1000;
+const int WINDOW_WIDTH = 1500, WINDOW_HEIGHT = 800;
 
 LLShooter::~LLShooter() {
-    ImageObject::static_clean_up();
-    SkyboxObject::static_clean_up();
+
 }
 
 void LLShooter::start() {
@@ -22,116 +23,12 @@ void LLShooter::start() {
 
 void LLShooter::init() {
     fps_meter = std::make_unique<FPSMeter>(0.25f);
-    rendering_server = std::make_unique<RenderingServer>(WINDOW_WIDTH, WINDOW_HEIGHT);
-    physics_server = std::make_unique<PhysicsServer>();
-
-    add_camera_and_player();
-    add_crosshair();
-    add_lights();
-    add_weapon();
-    add_info_display();
-    add_skybox();
+    rendering_server = std::make_unique<RenderingServer>(scene_tree, glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+    //physics_server = std::make_unique<PhysicsServer>();
 
     Map map("res/maps/map_close.json");
-    map.set_map(*rendering_server, *physics_server, moving_light_bulbs);
+    scene_tree.set_root(map.to_node(scene_tree).release());
 
     // Hide cursor.
-    glfwSetInputMode(rendering_server->get_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-}
-
-void LLShooter::add_weapon() {
-    auto gun_texture = std::make_shared<KTXTexture>("res/textures/gun_0.ktx");
-    auto gun_mesh = std::make_shared<Mesh>("res/meshes/gun_0.obj");
-    auto gun_obj = std::make_shared<TexturedDrawableObject>(gun_texture, gun_mesh);
-    gun_obj->translation = {4.0f, -2.0f, -2.5f};
-    gun_obj->rotation = glm::quat();
-    gun_obj->scale = {1.0f, 1.0f, 1.0f};
-    rendering_server->add_drawable_object(gun_obj, true);
-}
-
-void LLShooter::add_crosshair() {
-    auto crosshair_texture_id = std::make_shared<KTXTexture>("res/textures/crosshair.ktx");
-    auto crosshair = std::make_shared<ImageObject>(crosshair_texture_id, true);
-
-    crosshair->set_in_center_of_screen({WINDOW_WIDTH, WINDOW_HEIGHT}, 0.0f);
-    crosshair->set_screen_space_scale({1.0f, 1.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-    crosshair->rotation = glm::quat();
-
-    rendering_server->add_drawable_object(crosshair, true);
-}
-
-void LLShooter::add_lights() {
-    rendering_server->draw_params.spot_lights.push_back(std::make_shared<SpotLight>(
-        glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f), glm::radians(30.0f), glm::radians(35.0f), 3.0f
-    ));
-}
-
-void LLShooter::add_info_display() {
-    std::shared_ptr<BitmapFont> font {std::make_shared<BitmapFont>("res/fonts/default.llbmf")};
-    info_display = std::make_shared<BitmapTextObject>(
-        font, "NO DATA", glm::vec3(1.0f, 1.0f, 1.0f)
-    );
-
-    info_display->set_screen_space_position({2.0f, 25.0f, 0.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-    info_display->set_screen_space_scale({2.0f, 2.0f, 1.0f}, {WINDOW_WIDTH, WINDOW_HEIGHT});
-    info_display->rotation = glm::quat();
-
-    rendering_server->add_drawable_object(info_display, true);
-}
-
-void LLShooter::add_camera_and_player() {
-    // Create the camera.
-    camera = std::make_unique<Camera>(
-        glm::vec3(0.0f, 0.0f, 0.0f), glm::radians(90.0f),
-        static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT
-    );
-    // Create the player.
-    player = std::make_unique<ControllableCylinder>(
-        camera.get(), rendering_server->get_window(),
-        glm::vec3(0.0f, 1.0f, 0.0f), 2.0f, 0.4f
-    );
-
-    player->mouse_sensivity = 0.005f;
-    player->forward_speed = 20.0f;
-    player->strafe_speed = 10.0f;
-    player->backward_speed = 10.0f;
-    player->jump_force = 25.0f;
-
-    // Add camera and player to the servers.
-    physics_server->set_player(player);
-
-    rendering_server->camera = camera.get();
-    rendering_server->set_update_callback(
-        [this](float delta) {
-            update(delta);
-        }
-    );
-}
-
-void LLShooter::add_skybox() {
-    rendering_server->set_skybox(
-        std::make_unique<SkyboxObject>(
-            std::make_unique<KTXTexture>("res/textures/night_skybox.ktx")
-        )
-    );
-}
-
-void LLShooter::update(float delta) {
-    physics_server->update(delta);
-
-    // Make light to follow player.
-    rendering_server->draw_params.spot_lights[0]->position = player->cylinder.highest_point();
-    glm::vec3& l_dir = rendering_server->draw_params.spot_lights[0]->direction;
-    l_dir = glm::normalize((camera->direction - l_dir) * 0.2f + l_dir);
-
-    fps_meter->frame();
-    info_display->set_text(
-        "FPS: " + std::to_string(fps_meter->get_fps()) + "\n"
-        "Triangles: " + std::to_string(rendering_server->draw_params.triangles_drawn)
-    );
-    rendering_server->draw_params.triangles_drawn = 0;
-
-    for (const auto& bulb : moving_light_bulbs)
-        bulb->update(delta);
+    glfwSetInputMode(scene_tree.get_context().window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }

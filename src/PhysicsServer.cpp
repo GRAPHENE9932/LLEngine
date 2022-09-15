@@ -1,4 +1,4 @@
-#include <utility>
+/*#include <utility>
 #include <array>
 
 #include <glm/vec2.hpp>
@@ -10,7 +10,7 @@
 #include "PhysicsServer.hpp"
 
 constexpr float ALLOWABLE_ERROR = 0.00005f;
-
+*/
 /**
  * +------+
  * |      |
@@ -22,7 +22,7 @@ constexpr float ALLOWABLE_ERROR = 0.00005f;
  *   +------+
  * The minimum ledge length when player still can stay on it.
  */
-constexpr float MIN_LEDGE_LENGTH = 0.05f;
+/*constexpr float MIN_LEDGE_LENGTH = 0.05f;
 
 /// Looks for the closest point in the given array.
 /// @param points The array to find closest point from.
@@ -215,3 +215,4 @@ void PhysicsServer::set_bounds(float left_bound, float right_bound, float top_bo
     this->top_bound = top_bound;
     this->bottom_bound = bottom_bound;
 }
+*/

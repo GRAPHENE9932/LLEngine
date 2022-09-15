@@ -1,13 +1,13 @@
-#pragma once
+/*#pragma once
 
 #include <vector>
 #include <memory>
 
 #include "structs/static_vector.hpp"
-#include "objects/ControllableCylinder.hpp"
-#include "objects/FloorObject.hpp"
-#include "objects/RectangularWall.hpp"
-#include "objects/CuboidObject.hpp"
+#include "nodes/core/physics/ControllableCylinder.hpp"
+#include "nodes/core/physics/FloorObject.hpp"
+#include "nodes/core/physics/RectangularWall.hpp"
+#include "nodes/core/physics/CuboidObject.hpp"
 
 class PhysicsServer {
 public:
@@ -43,3 +43,4 @@ private:
     void resolve_base_cuboid(const CuboidAndRes& base_cuboid,
             const static_vector<CuboidAndRes, 2>& side_cuboids);
 };
+*/

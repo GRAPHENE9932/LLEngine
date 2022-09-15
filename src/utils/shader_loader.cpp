@@ -54,7 +54,7 @@ ManagedShaderID load_vertex_shader(std::string_view vertex_shader_path,
     ManagedShaderID vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
 
     std::ifstream file_stream;
-    file_stream.open(vertex_shader_path.data(), std::ios::in);
+    file_stream.open(std::string(vertex_shader_path), std::ios::in);
     if (!file_stream) {
         throw std::runtime_error(
             "Failed to read the vertex shader. Path to the file: "s +
@@ -115,7 +115,7 @@ ManagedShaderID load_fragment_shader(std::string_view fragment_shader_path,
     ManagedShaderID fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
     std::ifstream file_stream;
-    file_stream.open(fragment_shader_path.data(), std::ios::in);
+    file_stream.open(std::string(fragment_shader_path), std::ios::in);
     if (!file_stream) {
         throw std::runtime_error(
             "Failed to read the fragment shader. Path to the file: "s +

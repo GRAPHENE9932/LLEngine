@@ -2,32 +2,31 @@ set(SOURCES
     LLShooter.cpp
     RenderingServer.cpp
     PhysicsServer.cpp
+    SceneTree.cpp
     common/FPSMeter.cpp
     common/Mesh.cpp
     common/Map.cpp
+    common/GLTF.cpp
     common/KTXTexture.cpp
     common/BitmapFont.cpp
     common/VkFormatInfo.cpp
     common/shaders/ShaderManager.cpp
     common/shaders/ColoredTextShader.cpp
     common/shaders/SkyboxShader.cpp
-    common/shaders/TexturedShader.cpp
-    common/shaders/UnshadedShader.cpp
-    common/shaders/UnshadedTexturedShader.cpp
-    objects/SpatialObject.cpp
-    objects/TexturedDrawableObject.cpp
-    objects/UnshadedDrawableObject.cpp
-    objects/RectangularPhysicsObject.cpp
-    objects/Camera.cpp
-    objects/ControllableCylinder.cpp
-    objects/RectangularWall.cpp
-    objects/CuboidObject.cpp
-    objects/ImageObject.cpp
-    objects/SkyboxObject.cpp
-    objects/PointLight.cpp
-    objects/SpotLight.cpp
-    objects/BitmapTextObject.cpp
-    objects/MovingLightBulb.cpp
+    common/shaders/CommonShader.cpp
+    nodes/core/physics/RectangularPhysicsObject.cpp
+    nodes/core/physics/ControllableCylinder.cpp
+    nodes/core/physics/RectangularWall.cpp
+    nodes/core/physics/CuboidObject.cpp
+    nodes/core/rendering/CameraNode.cpp
+    nodes/core/rendering/ImageNode.cpp
+    nodes/core/rendering/CommonDrawableNode.cpp
+    nodes/core/rendering/PointLightNode.cpp
+    nodes/core/rendering/SpotLight.cpp
+    nodes/core/rendering/BitmapTextNode.cpp
+    nodes/core/rendering/SpectatorCameraNode.cpp
+    nodes/core/SpatialNode.cpp
+    common/Skybox.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp
     structs/HorLS.cpp

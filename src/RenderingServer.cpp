@@ -1,22 +1,25 @@
 #include <cstring>
+#include <glm/ext/vector_int2.hpp>
 #include <stdexcept>
 
-#include "objects/BitmapTextObject.hpp"
-#include "objects/UnshadedDrawableObject.hpp"
-#include "objects/TexturedDrawableObject.hpp"
-#include "objects/ImageObject.hpp"
+#include "SceneTree.hpp"
 #include "RenderingServer.hpp"
+#include "nodes/core/rendering/ImageNode.hpp"
+#include "nodes/core/rendering/BitmapTextNode.hpp"
+#include "nodes/core/rendering/CommonDrawableNode.hpp"
 
-RenderingServer::RenderingServer(int window_width, int window_height) {
-    init_window(window_width, window_height);
+RenderingServer::RenderingServer(SceneTree& scene_tree,
+                                 glm::ivec2 window_extents) :
+                                 scene_tree(scene_tree) {
+    init_window(window_extents);
     init_gl();
 }
 
 RenderingServer::~RenderingServer() {
-    ImageObject::static_clean_up();
-    SkyboxObject::static_clean_up();
+    Skybox::static_clean_up();
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(scene_tree.context.window);
+    scene_tree.context.window = nullptr;
     glfwTerminate();
 }
 
@@ -24,28 +27,18 @@ void RenderingServer::set_update_callback(std::function<void(float)> func) {
     update_callback = func;
 }
 
-GLFWwindow* RenderingServer::get_window() {
-    return window;
+glm::ivec2 RenderingServer::get_window_extents() const {
+    return window_extents;
 }
 
-void RenderingServer::add_drawable_object(const std::shared_ptr<IDrawableObject>& obj, const bool overlay) {
-    auto& cur_vector {overlay ? drawable_objects_overlay : drawable_objects};
-
-    auto iter {std::lower_bound(
-        cur_vector.begin(), cur_vector.end(), obj,
-        [this](const std::shared_ptr<IDrawableObject>& obj_1, const std::shared_ptr<IDrawableObject>& obj_2) {
-            return obj_1->get_program_id(draw_params) < obj_2->get_program_id(draw_params);
-        }
-    )};
-
-    cur_vector.insert(iter, obj);
+void RenderingServer::set_skybox(const std::shared_ptr<Texture>& texture) {
+    if (skybox == nullptr)
+        skybox = std::make_unique<Skybox>(scene_tree, texture);
+    else
+        skybox->texture = texture;
 }
 
-void RenderingServer::set_skybox(const std::shared_ptr<SkyboxObject>& obj) {
-    this->skybox = obj;
-}
-
-void RenderingServer::init_window(int window_width, int window_height) {
+void RenderingServer::init_window(glm::ivec2 window_extents) {
     int glfw_init_res = glfwInit();
 
     if (!glfw_init_res) {
@@ -58,11 +51,14 @@ void RenderingServer::init_window(int window_width, int window_height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(window_width, window_height, "LLShooter", nullptr, nullptr);
-    if (window == nullptr)
+    scene_tree.context.window = glfwCreateWindow(window_extents.x, window_extents.y, "LLShooter",
+                              nullptr, nullptr);
+    if (scene_tree.context.window == nullptr)
         throw std::runtime_error("Failed to create window.");
+    this->window_extents = window_extents;
+    scene_tree.inform_about_new_window_extents(window_extents);
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(scene_tree.context.window);
     //glfwSwapInterval(0);
 
     int glew_init_res = glewInit();
@@ -93,8 +89,7 @@ void RenderingServer::init_gl() {
 }
 
 void RenderingServer::main_loop() {
-    ImageObject::static_init();
-    SkyboxObject::static_init();
+    Skybox::static_init();
 
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
@@ -104,42 +99,39 @@ void RenderingServer::main_loop() {
         auto now = std::chrono::high_resolution_clock::now();
         auto duration = now - prev_frame_time;
         prev_frame_time = now;
-        float delta = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
-        update_callback(delta);
-
-        // Prepare draw parameters.
-        draw_params.view_matrix = camera->compute_view_matrix();
-        draw_params.proj_matrix = camera->get_proj_matrix();
-        draw_params.view_proj_matrix = draw_params.proj_matrix * draw_params.view_matrix;
-        for (const auto& light : draw_params.spot_lights)
-            light->calc_overlay_props(draw_params.view_matrix);
-        for (const auto& light : draw_params.point_lights)
-            light->calc_overlay_position(draw_params.view_matrix);
+        scene_tree.context.delta_time =
+                std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
+        scene_tree.invoke_update(*this);
+        //update_callback(delta);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         // Draw objects.
-        draw_params.overlay_mode = false;
-        for (std::size_t i = 0; i < drawable_objects.size(); i++)
-            drawable_objects[i]->draw(draw_params);
+        const auto& drawables = scene_tree.get_drawables();
+        for (const auto& cur_drawable : drawables)
+            cur_drawable->draw();
 
         // Draw skybox.
         if (skybox != nullptr) {
             glDepthMask(GL_FALSE);
-            skybox->draw(draw_params);
+            skybox->draw();
             glDepthMask(GL_TRUE);
         }
 
         // Draw overlay objects.
         glClear(GL_DEPTH_BUFFER_BIT);
+
+        //for (const auto& drawable : scene_tree.get_drawables()) {
+        //    drawable->draw();
+        //}
         // Overlay objects are already relative to view, so they don't
         // need the view matrix in their model-view-projection matrix.
-        draw_params.view_proj_matrix = draw_params.proj_matrix;
-        draw_params.overlay_mode = true;
-        for (std::size_t i = 0; i < drawable_objects_overlay.size(); i++)
-            drawable_objects_overlay[i]->draw(draw_params);
+        //draw_params.view_proj_matrix = draw_params.proj_matrix;
+        //draw_params.overlay_mode = true;
+        //for (std::size_t i = 0; i < drawable_objects_overlay.size(); i++)
+        //    drawable_objects_overlay[i]->draw(draw_params);
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(scene_tree.context.window);
         glfwPollEvents();
-    } while (!glfwWindowShouldClose(window));
+    } while (!glfwWindowShouldClose(scene_tree.context.window));
 }

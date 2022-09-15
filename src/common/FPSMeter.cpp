@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "FPSMeter.hpp"
 
 FPSMeter::FPSMeter(float interval) : interval(interval) {
