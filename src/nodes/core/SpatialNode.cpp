@@ -76,11 +76,15 @@ void SpatialNode::set_rotation(const glm::quat& new_rotation) {
     needs_recalculation = true;
 }
 
-const glm::vec3& SpatialNode::get_translation() const {
+const glm::vec3& SpatialNode::get_translation() const noexcept {
     return spatial_params.translation;
 }
 
-const glm::quat& SpatialNode::get_rotation() const {
+const glm::vec3 & SpatialNode::get_scale() const noexcept {
+    return spatial_params.scale;
+}
+
+const glm::quat& SpatialNode::get_rotation() const noexcept {
     return spatial_params.rotation;
 }
 

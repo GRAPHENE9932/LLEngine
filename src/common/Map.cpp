@@ -80,9 +80,11 @@ std::unique_ptr<SpatialNode> Map::to_node(SceneTree& scene_tree, const json& jso
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
     if (type == "gltf") {
-        // TODO: use spatial params.
         const SpatialNode::SpatialParams spat_params = json_node.get<SpatialNode::SpatialParams>();
         result = gltfs.at(json_node.at("gltf_index").get<size_t>()).to_node(scene_tree);
+        result->set_translation(spat_params.translation + result->get_translation());
+        result->set_scale(spat_params.scale * result->get_scale());
+        result->set_rotation(spat_params.rotation * result->get_rotation());
     }
     else if (type == "empty") {
         const SpatialNode::SpatialParams spat_params = json_node.get<SpatialNode::SpatialParams>();

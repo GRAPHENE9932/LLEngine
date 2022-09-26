@@ -36,8 +36,9 @@ public:
     void set_scale(const glm::vec3& new_scale);
     void set_rotation(const glm::quat& new_rotation);
 
-    const glm::vec3& get_translation() const;
-    const glm::quat& get_rotation() const;
+    const glm::vec3& get_translation() const noexcept;
+    const glm::vec3& get_scale() const noexcept;
+    const glm::quat& get_rotation() const noexcept;
     glm::mat4 get_local_matrix();
     glm::mat4 get_global_matrix();
 
