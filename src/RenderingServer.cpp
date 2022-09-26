@@ -79,6 +79,7 @@ void RenderingServer::init_gl() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
+    // Enable gamma correction.
     glEnable(GL_FRAMEBUFFER_SRGB);
 
     // Set blend function.
