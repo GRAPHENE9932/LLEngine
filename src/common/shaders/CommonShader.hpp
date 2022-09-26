@@ -22,10 +22,11 @@ public:
         USING_VERTEX_NORMALS = 0x0004,
         USING_NORMAL_TEXTURE = 0x0008,
         USING_NORMAL_MAP_SCALE = 0x0010,
-        USING_UV = 0x0020,
-        USING_GENERAL_UV_TRANSFORM = 0x0040,
-        USING_BASE_UV_TRANSFORM = 0x0080,
-        USING_NORMAL_UV_TRANSFORM = 0x0100
+        USING_FRAGMENT_POSITION = 0x0020,
+        USING_UV = 0x0040,
+        USING_GENERAL_UV_TRANSFORM = 0x0080,
+        USING_BASE_UV_TRANSFORM = 0x0100,
+        USING_NORMAL_UV_TRANSFORM = 0x0200
     };
 
     friend inline constexpr Flags operator|(Flags left, Flags right) noexcept {
@@ -90,8 +91,14 @@ private:
     GLint normal_uv_offset_id = -1;
     GLint normal_uv_scale_id = -1;
 
-    std::vector<SpotLight::Uniforms> spot_light_ids;
+    GLint base_color_texture_uniform_id = -1;
+    GLint normal_map_texture_uniform_id = -1;
+    GLint met_rough_texture_uniform_id = -1;
+    GLint occlusion_texture_uniform_id = -1;
+    GLint emmisive_texture_uniform_id = -1;
+
     std::vector<PointLightNode::Uniforms> point_light_ids;
+    std::vector<SpotLight::Uniforms> spot_light_ids;
 
     Flags flags = NO_FLAGS;
 };

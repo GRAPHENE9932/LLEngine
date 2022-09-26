@@ -34,9 +34,10 @@ void CommonDrawableNode::draw() {
     glBindBuffer(GL_ARRAY_BUFFER, mesh->get_normals_id());
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // Bind textures.
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, material->base_color.texture.value().texture->get_id());
+    // Tangents.
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_tangents_id());
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
     if (mesh->is_indexed()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
@@ -51,6 +52,7 @@ void CommonDrawableNode::draw() {
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
 }
 
 void CommonDrawableNode::register_myself(SpatialNode *parent) {

@@ -18,11 +18,13 @@ CommonShader::Flags compute_flags(const Material& material, const Context& conte
     if (!(context.point_lights.size() == 0 && context.spot_lights.size() == 0)) {
         flags |= CommonShader::USING_VERTEX_NORMALS;
         if (material.normal_map.has_value()) {
-            //flags |= CommonShader::USING_NORMAL_TEXTURE; // TODO: Normal maps are not supported yet.
-            //if (material.normal_map->scale != 1.0f)
-                //flags |= CommonShader::USING_NORMAL_MAP_SCALE; // TODO: Normal maps are not supported yet.
+            flags |= CommonShader::USING_NORMAL_TEXTURE;
+            if (material.normal_map->scale != 1.0f)
+                flags |= CommonShader::USING_NORMAL_MAP_SCALE;
         }
     }
+    if (context.point_lights.size() > 0)
+        flags |= CommonShader::USING_FRAGMENT_POSITION;
     if ((flags & CommonShader::USING_BASE_COLOR_TEXTURE) ||
         (flags & CommonShader::USING_NORMAL_TEXTURE))
         flags |= CommonShader::USING_UV;
@@ -75,6 +77,8 @@ void CommonShader::initialize(const Parameters& params) {
         defines.push_back("USING_NORMAL_TEXTURE");
     if (flags & USING_NORMAL_MAP_SCALE)
         defines.push_back("USING_NORMAL_MAP_SCALE");
+    if (flags & USING_FRAGMENT_POSITION)
+        defines.push_back("USING_FRAGMENT_POSITION");
     if (flags & USING_UV)
         defines.push_back("USING_UV");
     if (flags & USING_GENERAL_UV_TRANSFORM)
@@ -90,7 +94,7 @@ void CommonShader::initialize(const Parameters& params) {
         defines
     );
 
-    // Initialize uniforms.
+    // Initialize uniform locations.
     mvp_id = glGetUniformLocation(program_id, "MVP");
     model_matrix_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
     normal_matrix_id = glGetUniformLocation(program_id, "NORMAL_MATRIX");
@@ -103,6 +107,12 @@ void CommonShader::initialize(const Parameters& params) {
     base_uv_scale_id = glGetUniformLocation(program_id, "BASE_UV_SCALE");
     normal_uv_offset_id = glGetUniformLocation(program_id, "NORMAL_UV_OFFSET");
     normal_uv_scale_id = glGetUniformLocation(program_id, "NORMAL_UV_SCALE");
+
+    base_color_texture_uniform_id = glGetUniformLocation(program_id, "BASE_COLOR_TEXTURE");
+    normal_map_texture_uniform_id = glGetUniformLocation(program_id, "NORMAL_TEXTURE");
+    met_rough_texture_uniform_id = glGetUniformLocation(program_id, "METALLIC_ROUGHNESS_TEXTURE");
+    occlusion_texture_uniform_id = glGetUniformLocation(program_id, "OCCLUSION_TEXTURE");
+    emmisive_texture_uniform_id = glGetUniformLocation(program_id, "EMMISIVE_TEXTURE");
     
     point_light_ids.reserve(params.point_lights_count);
     for (uint32_t i = 0; i < params.point_lights_count; i++) {
@@ -158,6 +168,38 @@ void CommonShader::use_shader(const Material& material, const Context& context,
     }
     for (uint32_t i = 0; i < context.spot_lights.size(); i++) {
         context.spot_lights[i]->set_uniforms(spot_light_ids[i]);
+    }
+
+    GLenum cur_tex_unit = 0;
+    if (base_color_texture_uniform_id != -1) {
+        glUniform1i(base_color_texture_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, material.base_color.texture.value().texture->get_id());
+        cur_tex_unit++;
+    }
+    if (normal_map_texture_uniform_id != -1) {
+        glUniform1i(normal_map_texture_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, material.normal_map.value().texture.texture->get_id());
+        cur_tex_unit++;
+    }
+    if (met_rough_texture_uniform_id != -1) {
+        glUniform1i(met_rough_texture_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, material.metallic_roughness.texture.value().texture->get_id());
+        cur_tex_unit++;
+    }
+    if (occlusion_texture_uniform_id != -1) {
+        glUniform1i(occlusion_texture_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, material.occlusion.texture.value().texture->get_id());
+        cur_tex_unit++;
+    }
+    if (emmisive_texture_uniform_id != -1) {
+        glUniform1i(emmisive_texture_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, material.emmisive.texture.value().texture->get_id());
+        cur_tex_unit++;
     }
 }
 
