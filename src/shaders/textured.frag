@@ -29,6 +29,7 @@ out vec4 COLOR_OUT;
     in vec3 FRAG_NORMAL;
 #endif
 #ifdef USING_FRAGMENT_POSITION
+    // May be in tangent space if USING_NORMAL_TEXTURE is enabled.
     in vec3 FRAG_POS;
 #endif
 #ifdef USING_NORMAL_TEXTURE

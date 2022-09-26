@@ -69,6 +69,7 @@ uniform vec2 NORMAL_UV_SCALE;
     out vec3 FRAG_NORMAL;
 #endif
 #ifdef USING_FRAGMENT_POSITION
+    // May be in tangent space if USING_NORMAL_TEXTURE is enabled.
     out vec3 FRAG_POS;
 #endif
 #ifdef USING_NORMAL_TEXTURE
