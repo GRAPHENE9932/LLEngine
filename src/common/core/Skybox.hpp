@@ -2,7 +2,7 @@
 
 #include <memory> // std::shared_ptr
 
-#include "common/Texture.hpp" // Texture
+#include "common/core/Texture.hpp" // Texture
 #include "Context.hpp" // Context
 
 class SceneTree;

@@ -4,7 +4,7 @@
 
 #include <glm/ext/vector_int2.hpp> // glm::ivec2
 
-#include "common/shaders/ShaderManager.hpp"
+#include "common/core/shaders/ShaderManager.hpp"
 
 class PointLightNode;
 struct GLFWwindow;

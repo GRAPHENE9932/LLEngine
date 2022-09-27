@@ -9,7 +9,7 @@
 #include <glm/vec3.hpp> // glm::vec3
 
 #include "DrawableNode.hpp" // DrawableNode
-#include "common/BitmapFont.hpp" // BitmapFont
+#include "common/core/BitmapFont.hpp" // BitmapFont
 
 class BitmapTextNode : public DrawableNode {
 public:

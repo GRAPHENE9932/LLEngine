@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "SceneTree.hpp"
-#include "common/GLTF.hpp" // GLTF
+#include "common/core/GLTF.hpp" // GLTF
 #include "nodes/core/SpatialNode.hpp" // SpatialNode
 
 class Map {

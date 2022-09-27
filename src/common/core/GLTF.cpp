@@ -22,11 +22,11 @@
 #include <glm/gtx/quaternion.hpp> // glm::quat
 
 #include "GLTF.hpp" // GLTF
-#include "common/Mesh.hpp" // Mesh
-#include "common/IMesh.hpp" // IMesh
-#include "common/Texture.hpp" // Texture::Parameters
-#include "common/Material.hpp" // Material
-#include "common/KTXTexture.hpp" // KTXTexture
+#include "common/core/Mesh.hpp" // Mesh
+#include "common/core/IMesh.hpp" // IMesh
+#include "common/core/Texture.hpp" // Texture::Parameters
+#include "common/core/Material.hpp" // Material
+#include "common/core/KTXTexture.hpp" // KTXTexture
 #include "utils/json_conversion.hpp"
 #include "nodes/core/SpatialNode.hpp" // SpatialNode
 #include "nodes/core/rendering/CommonDrawableNode.hpp" // CommonDrawableNode

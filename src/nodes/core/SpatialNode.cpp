@@ -4,7 +4,7 @@
 
 #include "SpatialNode.hpp" // SpatialNode
 #include "SceneTree.hpp" // SceneTree
-#include "common/GLTF.hpp" // GLTF
+#include "common/core/GLTF.hpp" // GLTF
 
 SpatialNode::SpatialNode(const SpatialParams& p, SceneTree& scene_tree) :
         spatial_params(p), scene_tree(scene_tree) {

@@ -12,7 +12,7 @@
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
 #include "nodes/core/rendering/CameraNode.hpp" // CameraNode
-#include "common/Skybox.hpp" // Skybox
+#include "common/core/Skybox.hpp" // Skybox
 
 class SceneTree;
 

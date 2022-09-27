@@ -11,8 +11,8 @@
 #include <GL/glew.h> // GLenum
 
 #include "SceneTree.hpp" // SceneTree
-#include "common/Mesh.hpp" // Mesh::Data
-#include "common/Texture.hpp" // Texture::Parameters
+#include "common/core/Mesh.hpp" // Mesh::Data
+#include "common/core/Texture.hpp" // Texture::Parameters
 #include "nodes/core/SpatialNode.hpp" // SpatialNode, SpatialNode::SpatialParams
 
 class GLTF {

@@ -2,12 +2,12 @@
 
 #include <memory> // std::shared_ptr
 
-#include "common/Texture.hpp" // Texture
+#include "common/core/Texture.hpp" // Texture
 #include "DrawableNode.hpp" // DrawableNode
-#include "common/IMesh.hpp" // IMesh
-#include "common/Material.hpp" // Material
+#include "common/core/IMesh.hpp" // IMesh
+#include "common/core/Material.hpp" // Material
 #include "nodes/core/SpatialNode.hpp" // SpatialNode
-#include "common/shaders/CommonShader.hpp" // TexturedShader
+#include "common/core/shaders/CommonShader.hpp" // TexturedShader
 
 class CommonDrawableNode : public DrawableNode {
 public:

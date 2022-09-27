@@ -3,17 +3,18 @@ set(SOURCES
     RenderingServer.cpp
     PhysicsServer.cpp
     SceneTree.cpp
-    common/FPSMeter.cpp
-    common/Mesh.cpp
     common/Map.cpp
-    common/GLTF.cpp
-    common/KTXTexture.cpp
-    common/BitmapFont.cpp
-    common/VkFormatInfo.cpp
-    common/shaders/ShaderManager.cpp
-    common/shaders/ColoredTextShader.cpp
-    common/shaders/SkyboxShader.cpp
-    common/shaders/CommonShader.cpp
+    common/FPSMeter.cpp
+    common/core/Mesh.cpp
+    common/core/GLTF.cpp
+    common/core/Skybox.cpp
+    common/core/KTXTexture.cpp
+    common/core/BitmapFont.cpp
+    common/core/VkFormatInfo.cpp
+    common/core/shaders/ShaderManager.cpp
+    common/core/shaders/ColoredTextShader.cpp
+    common/core/shaders/SkyboxShader.cpp
+    common/core/shaders/CommonShader.cpp
     nodes/core/physics/RectangularPhysicsObject.cpp
     nodes/core/physics/ControllableCylinder.cpp
     nodes/core/physics/RectangularWall.cpp
@@ -26,7 +27,6 @@ set(SOURCES
     nodes/core/rendering/BitmapTextNode.cpp
     nodes/core/rendering/SpectatorCameraNode.cpp
     nodes/core/SpatialNode.cpp
-    common/Skybox.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp
     structs/HorLS.cpp

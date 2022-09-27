@@ -7,7 +7,7 @@
 #include <glm/vec4.hpp> // glm::vec4
 #include <glm/mat4x4.hpp> // glm::mat4
 
-#include "common/Material.hpp" // Material
+#include "common/core/Material.hpp" // Material
 #include "nodes/core/rendering/SpotLight.hpp" // SpotLight
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 

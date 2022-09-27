@@ -1,7 +1,7 @@
 #include <algorithm>
 
 #include "ShaderManager.hpp"
-#include "common/shaders/CommonShader.hpp"
+#include "common/core/shaders/CommonShader.hpp"
 
 void ShaderManager::use_colored_text_shader(const glm::mat4& mvp, const glm::vec3& color) {
     colored_text_shader.use_shader(mvp, color);
