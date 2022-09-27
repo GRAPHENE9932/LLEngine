@@ -29,8 +29,8 @@ Map::Map(const std::string& json_path) {
     // Load all glTF files.
     if (json_map.contains("gltf_files")) {
         gltfs.reserve(json_map["gltf_files"].size());
-        for (const std::string& cur_file_path : json_map["gltf_files"])
-            gltfs.emplace_back(cur_file_path);
+        for (const json& cur_file_path : json_map["gltf_files"])
+            gltfs.emplace_back(cur_file_path.get<std::string>());
     }
 }
 
@@ -99,9 +99,9 @@ std::unique_ptr<SpatialNode> Map::to_node(SceneTree& scene_tree, const json& jso
 
     if (json_node.contains("children")) {
         for (const json& cur_json_child : json_node["children"]) {
-            result->add_child(std::move(
+            result->add_child(
                 to_node(scene_tree, cur_json_child)
-            ));
+            );
         }
     }
 

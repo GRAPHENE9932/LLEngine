@@ -14,7 +14,7 @@ public:
 
     Skybox(SceneTree& scene_tree, 
            const std::shared_ptr<Texture>& texture) :
-           texture(texture), scene_tree(scene_tree) {};
+           scene_tree(scene_tree), texture(texture) {};
 
     static void static_init();
     static void static_clean_up();

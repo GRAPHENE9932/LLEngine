@@ -21,7 +21,7 @@ public:
     SceneTree& scene_tree;
 
     SpatialNode(const SpatialParams& p, SceneTree& scene_tree);
-    ~SpatialNode();
+    virtual ~SpatialNode();
 
     void update_children();
     virtual void add_child(std::unique_ptr<SpatialNode> child);

@@ -6,9 +6,9 @@
 
 #include "common/core/shaders/ShaderManager.hpp"
 
-class PointLightNode;
+struct PointLightNode;
 struct GLFWwindow;
-class SpotLight;
+struct SpotLight;
 
 struct Context {
     std::vector<PointLightNode*> point_lights;
