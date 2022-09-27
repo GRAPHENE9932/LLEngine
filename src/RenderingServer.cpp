@@ -1,6 +1,7 @@
 #include <cstring>
-#include <glm/ext/vector_int2.hpp>
 #include <stdexcept>
+
+#include <glm/ext/vector_int2.hpp>
 
 #include "SceneTree.hpp"
 #include "RenderingServer.hpp"
@@ -21,10 +22,6 @@ RenderingServer::~RenderingServer() {
     glfwDestroyWindow(scene_tree.context.window);
     scene_tree.context.window = nullptr;
     glfwTerminate();
-}
-
-void RenderingServer::set_update_callback(std::function<void(float)> func) {
-    update_callback = func;
 }
 
 glm::ivec2 RenderingServer::get_window_extents() const {
@@ -52,7 +49,7 @@ void RenderingServer::init_window(glm::ivec2 window_extents) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     scene_tree.context.window = glfwCreateWindow(window_extents.x, window_extents.y, "LLShooter",
-                              nullptr, nullptr);
+            nullptr, nullptr);
     if (scene_tree.context.window == nullptr)
         throw std::runtime_error("Failed to create window.");
     this->window_extents = window_extents;
@@ -103,7 +100,6 @@ void RenderingServer::main_loop() {
         scene_tree.context.delta_time =
                 std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
         scene_tree.invoke_update(*this);
-        //update_callback(delta);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -121,16 +117,6 @@ void RenderingServer::main_loop() {
 
         // Draw overlay objects.
         glClear(GL_DEPTH_BUFFER_BIT);
-
-        //for (const auto& drawable : scene_tree.get_drawables()) {
-        //    drawable->draw();
-        //}
-        // Overlay objects are already relative to view, so they don't
-        // need the view matrix in their model-view-projection matrix.
-        //draw_params.view_proj_matrix = draw_params.proj_matrix;
-        //draw_params.overlay_mode = true;
-        //for (std::size_t i = 0; i < drawable_objects_overlay.size(); i++)
-        //    drawable_objects_overlay[i]->draw(draw_params);
 
         glfwSwapBuffers(scene_tree.context.window);
         glfwPollEvents();

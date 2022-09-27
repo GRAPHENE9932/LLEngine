@@ -28,7 +28,4 @@ void LLShooter::init() {
 
     Map map("res/maps/map_close.json");
     scene_tree.set_root(map.to_node(scene_tree).release());
-
-    // Hide cursor.
-    glfwSetInputMode(scene_tree.get_context().window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }

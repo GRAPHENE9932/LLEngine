@@ -9,14 +9,12 @@
 #include <GLFW/glfw3.h> // glfwGetCursorPos, glfwSetCursorPos
 #include <glm/trigonometric.hpp>
 
-constexpr glm::quat ROT_UP(M_SQRT2 / 2.0f, M_SQRT2 / 2.0f, 0.0f, 0.0f);
-constexpr glm::quat ROT_RIGHT(M_SQRT2 / 2.0f, 0.0f, -M_SQRT2 / 2.0f, 0.0f);
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
 SpectatorCameraNode::SpectatorCameraNode(const SpatialNode::SpatialParams& p, SceneTree& scene_tree) :
                                  CameraNode(p, scene_tree) {
-    
+    glfwSetInputMode(scene_tree.get_context().window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void SpectatorCameraNode::update() {
