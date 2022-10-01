@@ -14,13 +14,13 @@ constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
 SpectatorCameraNode::SpectatorCameraNode(const SpatialNode::SpatialParams& p, SceneTree& scene_tree) :
                                  CameraNode(p, scene_tree) {
-    glfwSetInputMode(scene_tree.get_context().window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(scene_tree.get_context().window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void SpectatorCameraNode::update() {
     CameraNode::update();
 
-    if (scene_tree.get_context().window) {
+    if (scene_tree.get_context().window.is_initialized()) {
         update_rotation();
         update_position();
     }
@@ -91,11 +91,13 @@ void clamp_x_angle(float& x_angle) {
 void SpectatorCameraNode::update_rotation() {
     // Get the current cursor position.
     glm::dvec2 cursor_pos;
-    glfwGetCursorPos(scene_tree.get_context().window, &cursor_pos.x, &cursor_pos.y);
+    glfwGetCursorPos(scene_tree.get_context().window.get(), &cursor_pos.x, &cursor_pos.y);
     
     // Set cursor to the center.
-    const glm::dvec2 center = static_cast<glm::dvec2>(scene_tree.get_context().window_extents) / 2.0;
-    glfwSetCursorPos(scene_tree.get_context().window, center.x, center.y);
+    const glm::dvec2 center = static_cast<glm::dvec2>(
+        scene_tree.get_context().window.get_window_size()
+    ) / 2.0;
+    glfwSetCursorPos(scene_tree.get_context().window.get(), center.x, center.y);
 
     // Calculate and set new rotation.
     x_angle += sensivity * static_cast<float>(cursor_pos.y - center.y);
@@ -114,16 +116,16 @@ void SpectatorCameraNode::update_position() {
     const auto& window = scene_tree.get_context().window;
     const auto& delta = scene_tree.get_context().delta_time;
 
-    if (glfwGetKey(window, FORWARD_KEY) == GLFW_PRESS) {
+    if (glfwGetKey(window.get(), FORWARD_KEY) == GLFW_PRESS) {
         translate(forward_dir * delta * speed);
     }
-    if (glfwGetKey(window, BACKWARD_KEY) == GLFW_PRESS) {
+    if (glfwGetKey(window.get(), BACKWARD_KEY) == GLFW_PRESS) {
         translate(forward_dir * delta * -speed);
     }
-    if (glfwGetKey(window, RIGHT_KEY) == GLFW_PRESS) {
+    if (glfwGetKey(window.get(), RIGHT_KEY) == GLFW_PRESS) {
         translate(right_dir * delta * speed);
     }
-    if (glfwGetKey(window, LEFT_KEY) == GLFW_PRESS) {
+    if (glfwGetKey(window.get(), LEFT_KEY) == GLFW_PRESS) {
         translate(right_dir * delta * -speed);
     }
 }

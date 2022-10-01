@@ -9,7 +9,7 @@ void SceneTree::set_root(SpatialNode* node) {
     root_node->register_myself(nullptr);
 }
 
-void SceneTree::invoke_update(RenderingServer& rendering_server) {
+void SceneTree::invoke_update() {
     // Prepare context.
     if (camera) {
         context.view_matrix = camera->compute_view_matrix();
@@ -19,14 +19,9 @@ void SceneTree::invoke_update(RenderingServer& rendering_server) {
     else {
         throw std::runtime_error("Camera doesn't exist.");
     }
-    context.window_extents = rendering_server.get_window_extents();
 
     if (root_node)
         root_node->update();
-}
-
-void SceneTree::inform_about_new_window_extents(glm::ivec2 window_extents) {
-    context.window_extents = window_extents;
 }
 
 void SceneTree::register_node(SpatialNode* node_ptr, SpatialNode* parent_ptr) {
@@ -67,7 +62,7 @@ void SceneTree::handle_node_removal(SpatialNode* node) {
     const auto drawables_search_result = std::find(drawables.begin(), drawables.end(), node);
     if (drawables_search_result != drawables.end())
         drawables.erase(drawables_search_result);
-    
+
     const auto p_lights_search_result = std::find(point_lights.begin(), point_lights.end(), std::ref(node));
     if (p_lights_search_result != point_lights.end())
         point_lights.erase(p_lights_search_result);

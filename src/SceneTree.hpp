@@ -14,8 +14,7 @@
 class SceneTree {
 public:
     void set_root(SpatialNode* node);
-    void invoke_update(RenderingServer& rendering_server);
-    void inform_about_new_window_extents(glm::ivec2 window_extents);
+    void invoke_update();
 
     void register_node(SpatialNode* node_ptr, SpatialNode* parent_ptr);
     void register_node(DrawableNode* node_ptr, SpatialNode* parent_ptr);

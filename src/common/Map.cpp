@@ -62,7 +62,7 @@ std::unique_ptr<PointLightNode> point_light_from_json(const json& root_json, Sce
 }
 
 std::unique_ptr<SpectatorCameraNode> player_to_node(const json& root_json, SceneTree& scene_tree) {
-    const auto& extents = scene_tree.get_context().window_extents;
+    const auto& extents = scene_tree.get_context().window.get_window_size();
     const float aspect_ratio {static_cast<float>(extents.x) / extents.y};
 
     auto result = std::make_unique<SpectatorCameraNode>(
@@ -100,7 +100,7 @@ std::unique_ptr<SpatialNode> Map::to_node(SceneTree& scene_tree, const json& jso
     if (json_node.contains("children")) {
         for (const json& cur_json_child : json_node["children"]) {
             result->add_child(
-                to_node(scene_tree, cur_json_child)
+                std::move(*to_node(scene_tree, cur_json_child).release())
             );
         }
     }

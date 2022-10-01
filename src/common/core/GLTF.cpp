@@ -706,15 +706,15 @@ std::unique_ptr<SpatialNode> to_node(SceneTree& scene_tree,
     result->name = gltf_node.name;
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->add_child(
-            to_node(
+        result->add_child(std::move(
+            *to_node(
                 scene_tree,
                 cur_child,
                 gltf,
                 meshes,
                 materials
-            )
-        );
+            ).release()
+        ));
     }
 
     return result;
@@ -825,15 +825,15 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(SceneTree& scene_tree) const {
             scene_tree
         );
         for (const auto& cur_gltf_node : this->nodes) {
-            result->add_child(
-                ::to_node(
+            result->add_child(std::move(
+                *::to_node(
                     scene_tree,
                     cur_gltf_node,
                     *this,
                     meshes,
                     materials
-                )
-            );
+                ).release()
+            ));
         }
         return result;
     }

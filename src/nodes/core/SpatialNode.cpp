@@ -20,8 +20,8 @@ void SpatialNode::update_children() {
         child->update();
 }
 
-void SpatialNode::add_child(std::unique_ptr<SpatialNode> child) {
-    children.push_back(std::move(child));
+void SpatialNode::add_child(SpatialNode&& child) {
+    children.push_back(std::unique_ptr<SpatialNode>(&child));
     children.back()->register_myself(this);
 }
 

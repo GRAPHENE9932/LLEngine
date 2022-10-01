@@ -24,7 +24,7 @@ public:
     virtual ~SpatialNode();
 
     void update_children();
-    virtual void add_child(std::unique_ptr<SpatialNode> child);
+    virtual void add_child(SpatialNode&& child);
     void remove_child(const size_t index);
     void remove_child(SpatialNode* const ptr);
     virtual void register_myself(SpatialNode* parent);

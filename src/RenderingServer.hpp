@@ -24,18 +24,14 @@ public:
     RenderingServer(SceneTree& tree, glm::ivec2 window_extents);
     ~RenderingServer();
 
-    glm::ivec2 get_window_extents() const;
-
     void set_skybox(const std::shared_ptr<Texture>& texture);
 
     void main_loop();
 
 private:
-    glm::ivec2 window_extents;
     std::chrono::high_resolution_clock::time_point prev_frame_time;
 
     std::unique_ptr<Skybox> skybox = nullptr;
 
     void init_window(glm::ivec2 window_extents);
-    void init_gl();
 };
