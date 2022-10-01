@@ -12,7 +12,7 @@ SpatialNode::SpatialNode(const SpatialParams& p, SceneTree& scene_tree) :
 }
 
 SpatialNode::~SpatialNode() {
-
+    scene_tree.handle_node_removal(this);
 }
 
 void SpatialNode::update_children() {
@@ -28,7 +28,6 @@ void SpatialNode::add_child(SpatialNode&& child) {
 void SpatialNode::remove_child(const size_t index) {
     SpatialNode* const ptr = children.at(index).get();
     children.erase(children.begin() + index);
-    scene_tree.handle_node_removal(ptr);
 }
 
 void SpatialNode::remove_child(SpatialNode* const ptr) {
@@ -42,7 +41,6 @@ void SpatialNode::remove_child(SpatialNode* const ptr) {
         throw std::invalid_argument("Can't remove the non-existent child.");
 
     children.erase(iter);
-    scene_tree.handle_node_removal(ptr);
 }
 
 void SpatialNode::register_myself(SpatialNode* parent) {
