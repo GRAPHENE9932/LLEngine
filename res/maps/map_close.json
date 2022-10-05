@@ -2,6 +2,7 @@
 	"version": 1,
 	"name": "map_columns",
 	"gltf_files": [
+		"res/meshes/map_columns.glb",
 		"res/meshes/ucont_ex1_vo1.glb"
 	],
 	"root_node": {
@@ -9,11 +10,29 @@
 		"gltf_index": 0,
 		"children": [
 			{
+				"type": "gltf",
+				"gltf_index": 1,
+				"position": [6.0, 0.75, 0],
+				"scale": [1.5, 1.5, 1.5]
+			},
+			{
+				"type": "gltf",
+				"gltf_index": 1,
+				"position": [-6.0, 0.75, 0],
+				"scale": [1.5, 1.5, 1.5]
+			},
+			{
+				"type": "gltf",
+				"gltf_index": 1,
+				"position": [0.0, 0.75, -6.0],
+				"scale": [1.5, 1.5, 1.5]
+			},
+			{
 				"type": "point_light",
 				"color": [1.0, 1.0, 1.0],
 				"diffuse_strength": 1.0,
 				"coefficients": [1.0, 0.01, 0.001],
-				"position": [0.0, 0.0, -2.0]
+				"position": [0.0, 3.0, 0.0]
 			},
 			{
 				"type": "player",
