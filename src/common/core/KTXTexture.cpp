@@ -1,4 +1,5 @@
 #include <array>
+#include <ios>
 #include <vector>
 #include <memory>
 #include <numeric>
@@ -9,6 +10,7 @@
 
 #include <zstd.h>
 #include <glm/vec2.hpp>
+#include <glm/common.hpp>
 
 #include "KTXTexture.hpp"
 #include "VkFormatInfo.hpp"
@@ -34,11 +36,15 @@ void limit_check(const T value, const T max,
     }
 }
 
-inline void align_stream(std::istream& stream, const std::streamsize boundary) {
+inline void align_stream(std::istream& stream, std::streamsize boundary,
+        std::streamsize boundary_offset) {
     if (boundary <= 1)
         return;
 
-    stream.seekg((stream.tellg() + boundary - static_cast<std::streamsize>(1)) / boundary * boundary);
+    stream.seekg(
+        (stream.tellg() + boundary - static_cast<std::streamsize>(1) - boundary_offset) /
+        boundary * boundary + boundary_offset
+    );
 }
 
 constexpr std::array<uint8_t, 12> KTX_IDENTIFIER {{
@@ -131,7 +137,7 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
     std::vector<glm::u32vec2> sizes(std::max(header.level_count, 1u));
     sizes[0] = {header.pixel_width, header.pixel_height};
     for (std::size_t i = 1; i < sizes.size(); i++)
-        sizes[i] = sizes[i - 1] / 2u;
+        sizes[i] = glm::max(sizes[i - 1] / 2u, 1u);
 
     GLuint texture_id {};
     glGenTextures(1, &texture_id);
@@ -146,7 +152,7 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
     uint32_t mip_level = std::max(header.level_count, 1u);
     do {
         mip_level--;
-        align_stream(stream, mip_padding);
+        align_stream(stream, mip_padding, params.offset % mip_padding);
 
         std::vector<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
         load_level_data(stream, level_data.data(), level_indexes[mip_level], header);
@@ -231,6 +237,8 @@ KTXTexture::KTXTexture(const Parameters& params) {
     uint32_t prev_position {static_cast<uint32_t>(stream.tellg())};
     limit_check<uint32_t>(index.kvd_byte_length, 16777216, "kvdByteLength", params.file_path);
     while (kvd_already_read < index.kvd_byte_length) {
+        align_stream(stream, 4, params.offset % 4);
+
         // Key and value byte length.
         uint32_t key_and_value_byte_length;
         stream.read(reinterpret_cast<char*>(&key_and_value_byte_length), sizeof(uint32_t));
@@ -242,7 +250,7 @@ KTXTexture::KTXTexture(const Parameters& params) {
         std::getline(stream, key_value_data.back().second, '\0');
 
         // Align on 4 byte boundary.
-        align_stream(stream, 4);
+        align_stream(stream, 4, params.offset % 4);
 
         kvd_already_read += static_cast<uint32_t>(stream.tellg()) - prev_position;
         prev_position = stream.tellg();
@@ -251,7 +259,7 @@ KTXTexture::KTXTexture(const Parameters& params) {
         ktx_loading_error("Failed to read the key/value data.", params.file_path);
 
     if (index.sgd_byte_length > 0)
-        align_stream(stream, 8);
+        align_stream(stream, 8, params.offset % 8);
 
     // Get supercompression global data.
     limit_check<uint64_t>(index.sgd_byte_length, 16777216, "sgdByteLength", params.file_path);
