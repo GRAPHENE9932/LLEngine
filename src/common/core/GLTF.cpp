@@ -32,7 +32,6 @@
 #include "nodes/core/rendering/CommonDrawableNode.hpp" // CommonDrawableNode
 
 using json = nlohmann::json;
-using std::string_view_literals::operator""sv;
 
 constexpr uint32_t GLTF_MAGIC = 0x46546C67;
 constexpr int ASSET_VERSION_MAJOR = 2;
@@ -51,7 +50,7 @@ constexpr glm::quat DEFAULT_ROTATION = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 constexpr std::string_view TEXTURES_LOCATION = "res/textures";
 
 constexpr std::array<std::string_view, 1> SUPPORTED_EXTENSIONS {
-    "KHR_texture_transform"sv
+    "KHR_texture_transform"
 };
 
 struct Header {
@@ -100,14 +99,14 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
             const json& cur_sampler = gltf_json.at("samplers").at(cur_json["sampler"].get<uint32_t>());
             result.magnification_filter = get_optional(cur_sampler, "magFilter", GL_LINEAR);
             result.minification_filter = get_optional(cur_sampler, "minFilter", GL_LINEAR);
-            result.wrap_s = get_optional(cur_sampler, "wrapS", GL_CLAMP_TO_EDGE);
-            result.wrap_t = get_optional(cur_sampler, "wrapT", GL_CLAMP_TO_EDGE);
+            result.wrap_s = get_optional(cur_sampler, "wrapS", GL_REPEAT);
+            result.wrap_t = get_optional(cur_sampler, "wrapT", GL_REPEAT);
         }
         else {
             result.magnification_filter = GL_LINEAR;
             result.minification_filter = GL_LINEAR;
-            result.wrap_s = GL_CLAMP_TO_EDGE;
-            result.wrap_t = GL_CLAMP_TO_EDGE;
+            result.wrap_s = GL_REPEAT;
+            result.wrap_t = GL_REPEAT;
         }
 
         // TODO: Placeholder image.
@@ -126,7 +125,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
             result.offset = 0;
         }
         else if (image_json.contains("bufferView")) {
-            const json& buf_view_json = gltf_json.at("bufferViews").at(image_json["bufferView"]);
+            const json& buf_view_json = gltf_json.at("bufferViews")[image_json["bufferView"].get<uint32_t>()];
 
             if (buf_view_json.contains("byteStride"))
                 throw std::runtime_error("byteStride property must not be defined for images.");
@@ -142,18 +141,6 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
         gltf.textures.push_back(result);
     }
 }
-
-/*BasicMaterial<uint32_t>::TextureInfo
-handle_texture_info(const json& tex_info_json) {
-    if (get_optional<uint32_t>(tex_info_json, "texCoord", 0) != 0)
-        throw std::runtime_error("Multiple texture coordinates are not supported.");
-
-    return {
-        tex_info_json.at("index"),
-        DEFAULT_TEXTURE_OFFSET,
-        DEFAULT_TEXTURE_SCALE
-    };
-}*/
 
 BasicMaterial<uint32_t>::TextureInfo
 handle_texture_info(const json& tex_info_json) {
