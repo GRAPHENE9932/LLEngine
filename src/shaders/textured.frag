@@ -127,6 +127,7 @@ vec3 get_normal() {
     #endif
 }
 
+#if POINT_LIGHTS_COUNT > 0
 vec3 calc_point_light(int light_index) {
     #ifdef USING_NORMAL_TEXTURE
         vec3 light_position = POINT_LIGHT_POSITIONS_TANGENT_SPACE[light_index];
@@ -149,6 +150,7 @@ vec3 calc_point_light(int light_index) {
 
     return attenuation * diffuse_color;
 }
+#endif
 
 void main() {
     vec3 lightning_result = AMBIENT;
