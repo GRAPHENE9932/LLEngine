@@ -99,7 +99,7 @@ def main():
 	This script prepares and optimizes common glTF files
 	exported from Blender to LLShooter.
 	Currently, it does these manipulations with glTF:
-	- Converts texture png/jpeg/webp files to ktx2.
+	- Converts texture png/jpeg files to ktx2.
 
 	Use the TOKTX_BIN environment variable to specify path
 	to toktx executable. Otherwise, it will try to execute
@@ -112,6 +112,8 @@ def main():
 			help="ASTC block dimensions. Implies --astc_blk_d argument of toktx.")
 	arg_parser.add_argument("--astc-quality", "-q", metavar="<0-100>", type=int, required=False,
 			default=100, help="ASTC encoding quality. Implies --astc_quality argument of toktx.")
+	arg_parser.add_argument("--extra-args", "-e", metavar="<args>", type=str, required=False,
+			default="", help="Extra arguments separated with spaces for the toktx program.")
 	arg_parser.add_argument("--input", "-i", metavar="<input file>", type=str, required=True,
 			help="Input glTF file (exported from a program like Blender).")
 	arg_parser.add_argument("--output", "-o", metavar="<output file>", type=str, required=True,
@@ -142,6 +144,7 @@ def main():
 		]
 		if args.astc_block_size != None:
 			toktx_args.extend(["--astc_blk_d", args.astc_block_size])
+		toktx_args.extend(args.extra_args.split(" "))
 
 		if cur_image.uri != None:
 			# Calculate input and output file pathes.
