@@ -1,7 +1,6 @@
 set(SOURCES
     LLShooter.cpp
     RenderingServer.cpp
-    PhysicsServer.cpp
     SceneTree.cpp
     common/Map.cpp
     common/FPSMeter.cpp
@@ -16,10 +15,6 @@ set(SOURCES
     common/core/shaders/ColoredTextShader.cpp
     common/core/shaders/SkyboxShader.cpp
     common/core/shaders/CommonShader.cpp
-    nodes/core/physics/RectangularPhysicsObject.cpp
-    nodes/core/physics/ControllableCylinder.cpp
-    nodes/core/physics/RectangularWall.cpp
-    nodes/core/physics/CuboidObject.cpp
     nodes/core/rendering/CameraNode.cpp
     nodes/core/rendering/ImageNode.cpp
     nodes/core/rendering/CommonDrawableNode.cpp

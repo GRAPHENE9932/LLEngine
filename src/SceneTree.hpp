@@ -4,7 +4,6 @@
 #include <memory> // std::unique_ptr
 
 #include "Context.hpp" // Context
-#include "PhysicsServer.hpp" // PhysicsServer
 #include "RenderingServer.hpp" // RenderingServer
 #include "nodes/core/SpatialNode.hpp" // SpatialNode
 #include "nodes/core/rendering/CameraNode.hpp" // CameraNode
