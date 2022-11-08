@@ -2,19 +2,16 @@
 
 #include <memory> // std::shared_ptr
 
-#include "common/core/Texture.hpp" // Texture
-#include "Context.hpp" // Context
+#include <GL/glew.h> // GLuint
 
-class SceneTree;
+class Texture;
+class RenderingServer;
 
 class Skybox {
 public:
-    SceneTree& scene_tree;
     std::shared_ptr<Texture> texture;
 
-    Skybox(SceneTree& scene_tree, 
-           const std::shared_ptr<Texture>& texture) :
-           scene_tree(scene_tree), texture(texture) {};
+    Skybox(RenderingServer& rs, const std::shared_ptr<Texture>& texture);
 
     static void static_init();
     static void static_clean_up();
@@ -22,5 +19,7 @@ public:
     void draw();
 
 private:
+    RenderingServer& rendering_server;
+
     static GLuint vertices_id;
 };

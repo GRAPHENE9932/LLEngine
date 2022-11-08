@@ -1,26 +1,24 @@
-#include <cmath>
+#include "RenderingServer.hpp" // RenderingServer
+#include "SpectatorCameraNode.hpp" // SpectatorCameraNode
 
 #include <glm/ext/vector_int2.hpp> // glm::ivec2
 #include <glm/ext/vector_double2.hpp> // glm::dvec2
 #include <glm/ext/quaternion_exponential.hpp> // glm::pow
-
-#include "SceneTree.hpp" // SceneTree
-#include "SpectatorCameraNode.hpp" // SpectatorCameraNode
 #include <GLFW/glfw3.h> // glfwGetCursorPos, glfwSetCursorPos
-#include <glm/trigonometric.hpp>
 
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
-SpectatorCameraNode::SpectatorCameraNode(const SpatialNode::SpatialParams& p, SceneTree& scene_tree) :
-                                 CameraNode(p, scene_tree) {
-    glfwSetInputMode(scene_tree.get_context().window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+SpectatorCameraNode::SpectatorCameraNode(RenderingServer& rs,
+    const SpatialNode::SpatialParams& p, float display_ratio, float fov) :
+    CameraNode(rs, p, display_ratio, fov), rendering_server(rs) {
+    rs.get_window().disable_cursor();
 }
 
 void SpectatorCameraNode::update() {
     CameraNode::update();
 
-    if (scene_tree.get_context().window.is_initialized()) {
+    if (rendering_server.get_window().is_initialized()) {
         update_rotation();
         update_position();
     }
@@ -89,15 +87,16 @@ void clamp_x_angle(float& x_angle) {
 }
 
 void SpectatorCameraNode::update_rotation() {
+    auto& window {rendering_server.get_window()};
+
     // Get the current cursor position.
-    glm::dvec2 cursor_pos;
-    glfwGetCursorPos(scene_tree.get_context().window.get(), &cursor_pos.x, &cursor_pos.y);
+    glm::dvec2 cursor_pos = window.get_cursor_position();
     
     // Set cursor to the center.
     const glm::dvec2 center = static_cast<glm::dvec2>(
-        scene_tree.get_context().window.get_window_size()
+        window.get_window_size()
     ) / 2.0;
-    glfwSetCursorPos(scene_tree.get_context().window.get(), center.x, center.y);
+    window.set_cursor_position(center);
 
     // Calculate and set new rotation.
     x_angle += sensivity * static_cast<float>(cursor_pos.y - center.y);
@@ -113,19 +112,19 @@ void SpectatorCameraNode::update_position() {
     const glm::vec3 right_dir = get_rotation() * RIGHT;
 
     // Some aliases.
-    const auto& window = scene_tree.get_context().window;
-    const auto& delta = scene_tree.get_context().delta_time;
+    const auto& window {rendering_server.get_window()};
+    const auto& delta {rendering_server.get_delta_time()};
 
-    if (glfwGetKey(window.get(), FORWARD_KEY) == GLFW_PRESS) {
+    if (window.is_key_pressed(FORWARD_KEY)) {
         translate(forward_dir * delta * speed);
     }
-    if (glfwGetKey(window.get(), BACKWARD_KEY) == GLFW_PRESS) {
+    if (window.is_key_pressed(BACKWARD_KEY)) {
         translate(forward_dir * delta * -speed);
     }
-    if (glfwGetKey(window.get(), RIGHT_KEY) == GLFW_PRESS) {
+    if (window.is_key_pressed(RIGHT_KEY)) {
         translate(right_dir * delta * speed);
     }
-    if (glfwGetKey(window.get(), LEFT_KEY) == GLFW_PRESS) {
+    if (window.is_key_pressed(LEFT_KEY)) {
         translate(right_dir * delta * -speed);
     }
 }

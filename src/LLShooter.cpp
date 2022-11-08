@@ -9,11 +9,11 @@
 #include "LLShooter.hpp"
 #include <GLFW/glfw3.h>
 #include <memory>
-
+#include <iostream>
 const int WINDOW_WIDTH = 1500, WINDOW_HEIGHT = 800;
 
 LLShooter::~LLShooter() {
-
+    
 }
 
 void LLShooter::start() {
@@ -23,9 +23,12 @@ void LLShooter::start() {
 
 void LLShooter::init() {
     fps_meter = std::make_unique<FPSMeter>(0.25f);
-    rendering_server = std::make_unique<RenderingServer>(scene_tree, glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+
+    rendering_server = std::make_unique<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
     //physics_server = std::make_unique<PhysicsServer>();
 
     Map map("res/maps/map_close.json");
-    scene_tree.set_root(map.to_node(scene_tree).release());
+    root_node = map.to_node(*rendering_server);
+
+    rendering_server->set_root_node(root_node.get());
 }

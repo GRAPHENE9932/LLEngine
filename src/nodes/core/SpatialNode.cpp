@@ -3,17 +3,12 @@
 #include <glm/gtx/transform.hpp> // glm::translate, glm::scale
 
 #include "SpatialNode.hpp" // SpatialNode
-#include "SceneTree.hpp" // SceneTree
 #include "common/core/GLTF.hpp" // GLTF
 
-SpatialNode::SpatialNode(const SpatialParams& p, SceneTree& scene_tree) :
-        scene_tree(scene_tree), spatial_params(p) {
+SpatialNode::SpatialNode(const SpatialParams& p) :
+    spatial_params(p) {}
 
-}
-
-SpatialNode::~SpatialNode() {
-    scene_tree.handle_node_removal(this);
-}
+SpatialNode::~SpatialNode() {}
 
 void SpatialNode::update_children() {
     for (const auto& child : children)
@@ -22,7 +17,6 @@ void SpatialNode::update_children() {
 
 void SpatialNode::add_child(SpatialNode&& child) {
     children.push_back(std::unique_ptr<SpatialNode>(&child));
-    children.back()->register_myself(this);
 }
 
 void SpatialNode::remove_child(const size_t index) {
@@ -41,10 +35,6 @@ void SpatialNode::remove_child(SpatialNode* const ptr) {
         throw std::invalid_argument("Can't remove the non-existent child.");
 
     children.erase(iter);
-}
-
-void SpatialNode::register_myself(SpatialNode* parent) {
-    scene_tree.register_node(this, parent);
 }
 
 const std::vector<std::unique_ptr<SpatialNode>>& SpatialNode::get_children() {
@@ -78,7 +68,7 @@ const glm::vec3& SpatialNode::get_translation() const noexcept {
     return spatial_params.translation;
 }
 
-const glm::vec3 & SpatialNode::get_scale() const noexcept {
+const glm::vec3& SpatialNode::get_scale() const noexcept {
     return spatial_params.scale;
 }
 

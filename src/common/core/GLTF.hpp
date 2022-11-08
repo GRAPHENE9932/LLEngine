@@ -13,7 +13,10 @@
 #include "SceneTree.hpp" // SceneTree
 #include "common/core/Mesh.hpp" // Mesh::Data
 #include "common/core/Texture.hpp" // Texture::Parameters
+#include "common/core/Material.hpp" // BasicMaterial
 #include "nodes/core/SpatialNode.hpp" // SpatialNode, SpatialNode::SpatialParams
+
+class RenderingServer;
 
 class GLTF {
 public:
@@ -40,5 +43,5 @@ public:
 
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<::SpatialNode> to_node(SceneTree& scene_tree) const;
+    std::unique_ptr<::SpatialNode> to_node(RenderingServer& rs) const;
 };

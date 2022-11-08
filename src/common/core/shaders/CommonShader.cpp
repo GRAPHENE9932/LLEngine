@@ -5,17 +5,18 @@
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 #include "nodes/core/rendering/SpotLight.hpp" // SpotLight
 #include "utils/shader_loader.hpp" // load_shaders
+#include "RenderingServer.hpp" // RenderingServer
 #include "CommonShader.hpp" // TexturedShared
 #include "Context.hpp" // Context
 
-CommonShader::Flags compute_flags(const Material& material, const Context& context) {
+CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs) {
     CommonShader::Flags flags = CommonShader::NO_FLAGS;
 
     if (material.base_color.texture.has_value())
         flags |= CommonShader::USING_BASE_COLOR_TEXTURE;
     if (material.base_color.factor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
         flags |= CommonShader::USING_BASE_COLOR_FACTOR;
-    if (!(context.point_lights.size() == 0 && context.spot_lights.size() == 0)) {
+    if (!(rs.get_point_lights().size() == 0)) {
         flags |= CommonShader::USING_VERTEX_NORMALS;
         if (material.normal_map.has_value()) {
             flags |= CommonShader::USING_NORMAL_TEXTURE;
@@ -23,7 +24,7 @@ CommonShader::Flags compute_flags(const Material& material, const Context& conte
                 flags |= CommonShader::USING_NORMAL_MAP_SCALE;
         }
     }
-    if (context.point_lights.size() > 0)
+    if (rs.get_point_lights().size() > 0)
         flags |= CommonShader::USING_FRAGMENT_POSITION;
     if ((flags & CommonShader::USING_BASE_COLOR_TEXTURE) ||
         (flags & CommonShader::USING_NORMAL_TEXTURE))
@@ -42,15 +43,15 @@ CommonShader::Flags compute_flags(const Material& material, const Context& conte
 }
 
 CommonShader::Parameters
-CommonShader::to_parameters(const Material& material, const Context& context) noexcept {
+CommonShader::to_parameters(const Material& material, RenderingServer& rs) noexcept {
     return {
-        compute_flags(material, context),
-        static_cast<uint32_t>(context.point_lights.size()),
-        static_cast<uint32_t>(context.spot_lights.size())
+        compute_flags(material, rs),
+        static_cast<uint32_t>(rs.get_point_lights().size())
     };
 }
 
-CommonShader::CommonShader(const Parameters& params) {
+CommonShader::CommonShader(const Parameters& params, RenderingServer& rs) :
+    rendering_server(rs) {
     initialize(params);
 }
 
@@ -63,8 +64,7 @@ void CommonShader::initialize(const Parameters& params) {
 
     // Declare #defines for the shader.
     std::vector<std::string> defines {
-        "POINT_LIGHTS_COUNT " + std::to_string(params.point_lights_count),
-        "SPOT_LIGHTS_COUNT " + std::to_string(params.spot_lights_count),
+        "POINT_LIGHTS_COUNT " + std::to_string(params.point_lights_count)
     };
 
     if (flags & USING_BASE_COLOR_TEXTURE)
@@ -114,23 +114,15 @@ void CommonShader::initialize(const Parameters& params) {
     occlusion_texture_uniform_id = glGetUniformLocation(program_id, "OCCLUSION_TEXTURE");
     emmisive_texture_uniform_id = glGetUniformLocation(program_id, "EMMISIVE_TEXTURE");
     
-    point_light_ids.reserve(params.point_lights_count);
-    for (uint32_t i = 0; i < params.point_lights_count; i++) {
-        point_light_ids.push_back(
+    for (size_t i = 0; i < params.point_lights_count; i++) {
+        point_light_ids.insert(
             PointLightNode::get_uniforms_id(program_id, "POINT_LIGHTS", i)
-        );
-    }
-
-    spot_light_ids.reserve(params.spot_lights_count);
-    for (uint32_t i = 0; i < params.spot_lights_count; i++) {
-        spot_light_ids.push_back(
-            SpotLight::get_uniforms_id(program_id, "SPOT_LIGHTS", i)
         );
     }
 }
 
-void CommonShader::use_shader(const Material& material, const Context& context,
-        const glm::mat4& mvp_matrix, const glm::mat4& model_matrix) const {
+void CommonShader::use_shader(const Material& material, const glm::mat4& mvp_matrix,
+    const glm::mat4& model_matrix) const {
     assert(is_initialized());
 
     glUseProgram(program_id);
@@ -163,11 +155,10 @@ void CommonShader::use_shader(const Material& material, const Context& context,
         glUniform2fv(normal_uv_offset_id, 1, glm::value_ptr(material.normal_map->texture.uv_offset));
         glUniform2fv(normal_uv_scale_id, 1, glm::value_ptr(material.normal_map->texture.uv_scale));
     }
-    for (uint32_t i = 0; i < context.point_lights.size(); i++) {
-        context.point_lights[i]->set_uniforms(point_light_ids[i]);
-    }
-    for (uint32_t i = 0; i < context.spot_lights.size(); i++) {
-        context.spot_lights[i]->set_uniforms(spot_light_ids[i]);
+    auto point_light_ids_iter = point_light_ids.begin();
+    for (auto& cur_point_light : rendering_server.get_point_lights()) {
+        cur_point_light->set_uniforms(*point_light_ids_iter);
+        point_light_ids_iter++;
     }
 
     GLenum cur_tex_unit = 0;
@@ -207,7 +198,6 @@ void CommonShader::delete_shader() {
     if (is_initialized()) {
         glDeleteProgram(program_id);
         program_id = 0;
-        spot_light_ids.clear();
         point_light_ids.clear();
     }
 }
@@ -215,8 +205,7 @@ void CommonShader::delete_shader() {
 CommonShader::Parameters CommonShader::extract_parameters() const noexcept {
     return {
         flags,
-        static_cast<uint32_t>(point_light_ids.size()),
-        static_cast<uint32_t>(spot_light_ids.size())
+        static_cast<uint32_t>(point_light_ids.size())
     };
 }
 

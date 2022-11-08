@@ -1,15 +1,21 @@
-#include <string> // std::string
+#include "PointLightNode.hpp" // PointLightNode
+#include "RenderingServer.hpp" // RenderingServer
 
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
 
-#include "SceneTree.hpp" // SceneTree
-#include "PointLightNode.hpp" // PointLightNode
+#include <string> // std::string
 
-void PointLightNode::register_myself(SpatialNode *parent) {
-    scene_tree.register_node(this, parent);
+PointLightNode::PointLightNode(const SpatialParams& p, RenderingServer& rs) :
+    SpatialNode(p), rendering_server(rs) {
+    rendering_server.register_point_light(this);
 }
 
-PointLightNode::Uniforms PointLightNode::get_uniforms_id(GLuint program_id, std::string var_name, GLuint index) {
+PointLightNode::~PointLightNode() {
+    rendering_server.unregister_point_light(this);
+}
+
+PointLightNode::Uniforms PointLightNode::get_uniforms_id(
+    GLuint program_id, const std::string& var_name, GLuint index) {
     PointLightNode::Uniforms result;
 
     // Position.

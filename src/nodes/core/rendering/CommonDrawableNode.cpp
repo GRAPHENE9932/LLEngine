@@ -1,22 +1,17 @@
-#include "CommonDrawableNode.hpp"
-#include "utils/shader_loader.hpp"
-#include "SceneTree.hpp" // SceneTree
+#include "RenderingServer.hpp"
+#include "CommonDrawableNode.hpp" // CommonDrawableNode
 
-CommonDrawableNode::CommonDrawableNode(const SpatialParams& params,
-                                           SceneTree& scene_tree,
-                                           const std::shared_ptr<Material>& material,
-                                           const std::shared_ptr<IMesh>& mesh) :
-                                           DrawableNode(params, scene_tree),
-                                           mesh(mesh), material(material) {}
+CommonDrawableNode::CommonDrawableNode(const SpatialParams& p, RenderingServer& rs,
+    const std::shared_ptr<Material>& material,
+    const std::shared_ptr<IMesh>& mesh) :
+    DrawableNode(p, rs), mesh(mesh), material(material) {}
 
 void CommonDrawableNode::draw() {
-    const auto& context = scene_tree.get_context();
-
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
-    const glm::mat4 mvp = context.view_proj_matrix * model_matrix;
-    scene_tree.get_shader_manager().use_common_shader(
-        *material, context, mvp, model_matrix
+    const glm::mat4 mvp = rendering_server.get_view_proj_matrix() * model_matrix;
+    rendering_server.get_shader_manager().use_common_shader(
+        *material, mvp, model_matrix
     );
 
     // Vertices.
@@ -47,7 +42,7 @@ void CommonDrawableNode::draw() {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
         glDrawArrays(GL_TRIANGLES, 0, mesh->get_amount_of_vertices());
     }
-    scene_tree.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
+    rendering_server.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -55,12 +50,8 @@ void CommonDrawableNode::draw() {
     glDisableVertexAttribArray(3);
 }
 
-void CommonDrawableNode::register_myself(SpatialNode *parent) {
-    scene_tree.register_node(this, parent);
-}
-
 GLuint CommonDrawableNode::get_program_id() const {
-    return scene_tree.get_shader_manager().get_common_program_id(
-        *material, scene_tree.get_context()
+    return rendering_server.get_shader_manager().get_common_program_id(
+        *material
     );
 }

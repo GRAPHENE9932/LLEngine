@@ -668,26 +668,21 @@ GLTF::GLTF(std::string_view file_path) {
     construct_node_params(*this, json_chunk);
 }
 
-std::unique_ptr<SpatialNode> to_node(SceneTree& scene_tree,
-                                     const GLTF::Node& gltf_node,
-                                     const GLTF& gltf,
-                                     const std::vector<std::shared_ptr<IMesh>>& meshes,
-                                     const std::vector<std::shared_ptr<Material>>& materials) {
+std::unique_ptr<SpatialNode> to_node(RenderingServer& rs, const GLTF::Node& gltf_node,
+    const GLTF& gltf, const std::vector<std::shared_ptr<IMesh>>& meshes,
+    const std::vector<std::shared_ptr<Material>>& materials) {
     std::unique_ptr<SpatialNode> result;
 
     if (gltf_node.mesh_index.has_value()) {
         result = std::make_unique<CommonDrawableNode>(
             gltf_node.spatial_params,
-            scene_tree,
+            rs,
             materials.at(gltf.meshes.at(*gltf_node.mesh_index).material_index),
             meshes.at(*gltf_node.mesh_index)
         );
     }
     else {
-        result = std::make_unique<::SpatialNode>(
-            gltf_node.spatial_params,
-            scene_tree
-        );
+        result = std::make_unique<::SpatialNode>(gltf_node.spatial_params);
     }
 
     result->name = gltf_node.name;
@@ -695,7 +690,7 @@ std::unique_ptr<SpatialNode> to_node(SceneTree& scene_tree,
     for (const GLTF::Node& cur_child : gltf_node.children) {
         result->add_child(std::move(
             *to_node(
-                scene_tree,
+                rs,
                 cur_child,
                 gltf,
                 meshes,
@@ -769,7 +764,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::SpatialNode> GLTF::to_node(SceneTree& scene_tree) const {
+std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
     // Construct meshes.
     std::vector<std::shared_ptr<IMesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -795,7 +790,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(SceneTree& scene_tree) const {
     // Convert glTF to node.
     if (this->nodes.size() == 1) {
         return ::to_node(
-            scene_tree,
+            rs,
             this->nodes[0],
             *this,
             meshes,
@@ -807,14 +802,11 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(SceneTree& scene_tree) const {
         // we must return only one root node.
         // So, create the spatial node with default
         // spatial parameters and make it root.
-        auto result = std::make_unique<SpatialNode>(
-            SpatialNode::SpatialParams(),
-            scene_tree
-        );
+        auto result = std::make_unique<SpatialNode>(SpatialNode::SpatialParams());
         for (const auto& cur_gltf_node : this->nodes) {
             result->add_child(std::move(
                 *::to_node(
-                    scene_tree,
+                    rs,
                     cur_gltf_node,
                     *this,
                     meshes,
@@ -825,9 +817,6 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(SceneTree& scene_tree) const {
         return result;
     }
     else {
-        return std::make_unique<SpatialNode>(
-            SpatialNode::SpatialParams(),
-            scene_tree
-        );
+        return std::make_unique<SpatialNode>(SpatialNode::SpatialParams());
     }
 }

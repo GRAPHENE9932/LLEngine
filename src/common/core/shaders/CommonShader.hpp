@@ -1,17 +1,17 @@
 #pragma once
 
-#include <vector> // std::vector
-#include <cstdint> // uint8_t, uint32_t
-#include <optional> // std::optional
-
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-
 #include "common/core/Material.hpp" // Material
 #include "nodes/core/rendering/SpotLight.hpp" // SpotLight
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 
-struct Context;
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+
+#include <set> // std::set
+#include <cstdint> // uint8_t, uint32_t
+#include <optional> // std::optional
+
+class RenderingServer;
 
 class CommonShader {
 public:
@@ -38,28 +38,26 @@ public:
 
     struct Parameters {
         Flags flags;
-        uint32_t point_lights_count;
-        uint32_t spot_lights_count;
+        size_t point_lights_count;
 
         auto operator<=>(const Parameters& other) const noexcept = default;
     };
 
-    static Parameters to_parameters(const Material& material, const Context& context) noexcept;
+    static Parameters to_parameters(const Material& material, RenderingServer& rs) noexcept;
 
-    explicit CommonShader(const Parameters& params);
-    // Make the object non-copyable but movable.
+    explicit CommonShader(const Parameters& params, RenderingServer& rs);
+    // Make the object non-copyable.
     // It was so frustrating to debug an error caused by
     // an unexpected destructor call...
     CommonShader(const CommonShader&) = delete;
     CommonShader& operator=(const CommonShader&) = delete;
     CommonShader(CommonShader&&) noexcept = default;
-    CommonShader& operator=(CommonShader&&) noexcept = default;
 
     ~CommonShader();
 
     void initialize(const Parameters& params);
-    void use_shader(const Material& material, const Context& context,
-            const glm::mat4& mvp_matrix, const glm::mat4& model_matrix) const;
+    void use_shader(const Material& material, const glm::mat4& mvp_matrix,
+        const glm::mat4& model_matrix) const;
     void delete_shader();
 
     Parameters extract_parameters() const noexcept;
@@ -67,9 +65,6 @@ public:
 
     inline bool is_initialized() const noexcept {
         return program_id != 0;
-    }
-    inline uint32_t get_spot_lights_count() const noexcept {
-        return spot_light_ids.size();
     }
     inline uint32_t get_point_lights_count() const noexcept {
         return point_light_ids.size();
@@ -97,8 +92,9 @@ private:
     GLint occlusion_texture_uniform_id = -1;
     GLint emmisive_texture_uniform_id = -1;
 
-    std::vector<PointLightNode::Uniforms> point_light_ids;
-    std::vector<SpotLight::Uniforms> spot_light_ids;
+    std::set<PointLightNode::Uniforms> point_light_ids;
 
     Flags flags = NO_FLAGS;
+
+    RenderingServer& rendering_server;
 };
