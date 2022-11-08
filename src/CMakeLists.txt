@@ -56,5 +56,5 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib OpenGL)
 
 # Zstd.
-find_package(zstd REQUIRED)
+find_package(ZSTD REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib zstd)

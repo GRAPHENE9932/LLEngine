@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 enable_testing()
 add_subdirectory(src)
 add_subdirectory(tst)
