@@ -10,7 +10,6 @@
 
 #include <GL/glew.h> // GLenum
 
-#include "SceneTree.hpp" // SceneTree
 #include "common/core/Mesh.hpp" // Mesh::Data
 #include "common/core/Texture.hpp" // Texture::Parameters
 #include "common/core/Material.hpp" // BasicMaterial
