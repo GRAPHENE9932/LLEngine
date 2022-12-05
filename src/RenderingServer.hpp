@@ -17,8 +17,8 @@ class Texture;
 class RenderingNode;
 class CameraNode;
 class DrawableNode;
-class PointLightNode;
-class SpotLight;
+struct PointLightNode;
+struct SpotLight;
 
 /**
  * @brief Stores non-owning pointers to all
