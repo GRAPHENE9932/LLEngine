@@ -18,10 +18,8 @@ SpectatorCameraNode::SpectatorCameraNode(RenderingServer& rs,
 void SpectatorCameraNode::update() {
     CameraNode::update();
 
-    if (rendering_server.get_window().is_initialized()) {
-        update_rotation();
-        update_position();
-    }
+    update_rotation();
+    update_position();
 }
 
 /// Angle axis to quaternion conversion, but only around the

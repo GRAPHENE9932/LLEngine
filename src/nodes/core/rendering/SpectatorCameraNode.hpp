@@ -3,13 +3,14 @@
 #include <GLFW/glfw3.h> // Macros.
 
 #include "nodes/core/rendering/CameraNode.hpp" // CameraNode
+#include "common/core/IWindow.hpp" // Key
 
 class SpectatorCameraNode : public CameraNode {
 public:
-    static constexpr int FORWARD_KEY = GLFW_KEY_W;
-    static constexpr int BACKWARD_KEY = GLFW_KEY_S;
-    static constexpr int RIGHT_KEY = GLFW_KEY_D;
-    static constexpr int LEFT_KEY = GLFW_KEY_A;
+    static constexpr Key FORWARD_KEY = Key::W;
+    static constexpr Key BACKWARD_KEY = Key::S;
+    static constexpr Key RIGHT_KEY = Key::D;
+    static constexpr Key LEFT_KEY = Key::A;
 
     float sensivity = 0.001f;
     float speed = 1.0f;

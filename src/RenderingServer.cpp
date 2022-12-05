@@ -1,14 +1,14 @@
 #include "RenderingServer.hpp" // RenderingServer
 #include "common/core/Skybox.hpp" // Skybox
+#include "common/core/GLFWWindow.hpp" // GLFWWindow
 #include "nodes/core/rendering/CameraNode.hpp"
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
 
 #include <GLFW/glfw3.h>
 
 RenderingServer::RenderingServer(glm::ivec2 window_extents) :
-    shader_manager(*this) {
-    init_window(window_extents);
-}
+    window(*new GLFWWindow(window_extents, "LLShooter", 3, 3)),
+    shader_manager(*this) {}
 
 RenderingServer::~RenderingServer() {
     Skybox::static_clean_up();
@@ -23,10 +23,6 @@ void RenderingServer::set_skybox(const std::shared_ptr<Texture>& texture) {
 
 void RenderingServer::set_root_node(SpatialNode *root_node) {
     this->root_node = root_node;
-}
-
-void RenderingServer::init_window(glm::ivec2 window_extents) {
-    window.initialize(window_extents, "LLShooter", 3, 3);
 }
 
 void RenderingServer::main_loop() {
@@ -63,7 +59,7 @@ void RenderingServer::main_loop() {
         // Draw overlay objects.
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        window.glfw_swap_buffers();
+        window.swap_buffers();
         glfwPollEvents();
     } while (!window.window_should_close());
 }
