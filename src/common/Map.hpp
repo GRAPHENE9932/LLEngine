@@ -5,7 +5,7 @@
 
 #include <nlohmann/json.hpp> // nlohmann::json
 
-#include "common/core/GLTF.hpp" // GLTF
+#include "common/core/SceneFile.hpp" // SceneFile
 #include "nodes/core/SpatialNode.hpp" // SpatialNode
 
 class Map {
@@ -15,6 +15,6 @@ public:
     std::unique_ptr<SpatialNode> to_node(RenderingServer& rs, const nlohmann::json& json_node) const;
 
 private:
-    std::vector<GLTF> gltfs;
+    std::vector<std::unique_ptr<SceneFile>> scene_files;
     nlohmann::json json_map;
 };

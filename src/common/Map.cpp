@@ -26,10 +26,10 @@ Map::Map(const std::string& json_path) {
         throw std::runtime_error("Invalid map version");
 
     // Load all glTF files.
-    if (json_map.contains("gltf_files")) {
-        gltfs.reserve(json_map["gltf_files"].size());
-        for (const json& cur_file_path : json_map["gltf_files"])
-            gltfs.emplace_back(cur_file_path.get<std::string>());
+    if (json_map.contains("scene_files")) {
+        scene_files.reserve(json_map["scene_files"].size());
+        for (const json& cur_file_path : json_map["scene_files"])
+            scene_files.push_back(SceneFile::load_from_file(cur_file_path));
     }
 }
 
@@ -74,9 +74,9 @@ std::unique_ptr<SpectatorCameraNode> player_to_node(const json& root_json, Rende
 std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_node) const {
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
-    if (type == "gltf") {
+    if (type == "scene_file") {
         const SpatialNode::SpatialParams spat_params = json_node.get<SpatialNode::SpatialParams>();
-        result = gltfs.at(json_node.at("gltf_index").get<size_t>()).to_node(rs);
+        result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(rs);
         result->set_translation(spat_params.translation + result->get_translation());
         result->set_scale(spat_params.scale * result->get_scale());
         result->set_rotation(spat_params.rotation * result->get_rotation());

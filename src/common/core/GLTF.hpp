@@ -13,11 +13,12 @@
 #include "common/core/Mesh.hpp" // Mesh::Data
 #include "common/core/Texture.hpp" // Texture::Parameters
 #include "common/core/Material.hpp" // BasicMaterial
+#include "common/core/SceneFile.hpp" // SceneFile
 #include "nodes/core/SpatialNode.hpp" // SpatialNode, SpatialNode::SpatialParams
 
 class RenderingServer;
 
-class GLTF {
+class GLTF : public SceneFile {
 public:
     struct Node {
         std::string name;
@@ -42,5 +43,5 @@ public:
 
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<::SpatialNode> to_node(RenderingServer& rs) const;
+    std::unique_ptr<::SpatialNode> to_node(RenderingServer& rs) const override;
 };

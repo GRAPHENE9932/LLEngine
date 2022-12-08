@@ -1,29 +1,29 @@
 {
 	"version": 1,
 	"name": "map_columns",
-	"gltf_files": [
+	"scene_files": [
 		"res/meshes/map_columns.glb",
 		"res/meshes/ucont_ex1_vo1.glb"
 	],
 	"root_node": {
-		"type": "gltf",
-		"gltf_index": 0,
+		"type": "scene_file",
+		"scene_file_index": 0,
 		"children": [
 			{
-				"type": "gltf",
-				"gltf_index": 1,
+				"type": "scene_file",
+				"scene_file_index": 1,
 				"position": [6.0, 0.75, 0],
 				"scale": [1.5, 1.5, 1.5]
 			},
 			{
-				"type": "gltf",
-				"gltf_index": 1,
+				"type": "scene_file",
+				"scene_file_index": 1,
 				"position": [-6.0, 0.75, 0],
 				"scale": [1.5, 1.5, 1.5]
 			},
 			{
-				"type": "gltf",
-				"gltf_index": 1,
+				"type": "scene_file",
+				"scene_file_index": 1,
 				"position": [0.0, 0.75, -6.0],
 				"scale": [1.5, 1.5, 1.5]
 			},

@@ -6,6 +6,7 @@ set(SOURCES
     common/core/Mesh.cpp
     common/core/GLTF.cpp
     common/core/Skybox.cpp
+    common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
     common/core/KTXTexture.cpp
     common/core/BitmapFont.cpp
