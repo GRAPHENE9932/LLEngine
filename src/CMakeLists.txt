@@ -4,7 +4,8 @@ set(SOURCES
     common/Map.cpp
     common/FPSMeter.cpp
     common/core/Mesh.cpp
-    common/core/GLTF.cpp
+    common/core/GLTFLoading.cpp
+    common/core/GLTFToNode.cpp
     common/core/Skybox.cpp
     common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
