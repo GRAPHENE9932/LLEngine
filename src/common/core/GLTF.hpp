@@ -7,8 +7,10 @@
 #include <variant> // std::variant, std::monostate
 #include <optional> // std::optional
 #include <string_view> // std::string_view
+#include <unordered_map> // std::unordered_map
 
 #include <GL/glew.h> // GLenum
+#include <nlohmann/json.hpp> // nlohmann:json
 
 #include "common/core/Mesh.hpp" // Mesh::Data
 #include "common/core/Texture.hpp" // Texture::Parameters
@@ -22,6 +24,7 @@ class GLTF : public SceneFile {
 public:
     struct Node {
         std::string name;
+        std::unordered_map<std::string, nlohmann::json> extras;
         std::vector<GLTF::Node> children;
         CompleteSpatialNode::SpatialParams spatial_params;
         std::optional<uint32_t> mesh_index;
@@ -41,6 +44,15 @@ public:
     std::vector<BasicMaterial<uint32_t>> materials;
     std::vector<GLTF::Node> nodes;
 
+    /**
+    * @brief Loads and parses the glTF file.
+    *
+    * Some limitations:
+    *  - KTX2 textures only.
+    *  - Base64 data is not supported.
+    *  - Remote (network) data is not supported.
+    *  - Only KHR_texture_transform extension is supported.
+    */
     explicit GLTF(std::string_view file_path);
 
     std::unique_ptr<::SpatialNode> to_node(RenderingServer& rs) const override;

@@ -517,6 +517,11 @@ GLTF::Node construct_node_and_children_params(const json& gltf_json,
     // Process the name.
     result.name = get_optional<std::string>(node_json, "name", "Unnamed");
 
+    // Process extras.
+    if (node_json.contains("extras")) {
+        result.extras = node_json["extras"];
+    }
+
     // Process the spatial parameters.
     const bool uses_matrix_only {
         !node_json.contains("translation") &&
