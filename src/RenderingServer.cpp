@@ -21,7 +21,7 @@ void RenderingServer::set_skybox(const std::shared_ptr<Texture>& texture) {
         skybox->texture = texture;
 }
 
-void RenderingServer::set_root_node(SpatialNode *root_node) {
+void RenderingServer::set_root_node(SpatialNode* root_node) {
     this->root_node = root_node;
 }
 
