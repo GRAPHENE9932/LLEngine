@@ -5,7 +5,7 @@
 #include "BitmapTextNode.hpp"
 #include "RenderingServer.hpp" // RenderingServer
 
-BitmapTextNode::BitmapTextNode(const SpatialParams& params, RenderingServer& rs,
+BitmapTextNode::BitmapTextNode(const Transform& params, RenderingServer& rs,
     const std::shared_ptr<BitmapFont>& font, std::string_view text,
     const glm::vec3& color) : DrawableNode(params, rs), color(color) {
     set_font(font);

@@ -10,7 +10,7 @@ constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
 SpectatorCameraNode::SpectatorCameraNode(RenderingServer& rs,
-    const CompleteSpatialNode::SpatialParams& p, float display_ratio, float fov) :
+    const Transform& p, float display_ratio, float fov) :
     CameraNode(rs, p, display_ratio, fov), rendering_server(rs) {
     rs.get_window().disable_cursor();
 }

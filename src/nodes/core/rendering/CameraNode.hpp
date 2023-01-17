@@ -17,7 +17,7 @@ public:
      * @param display_ratio Width / height viewport ratio.
      * @param fov Field of view in radians.
      */
-    CameraNode(RenderingServer& rs, const CompleteSpatialNode::SpatialParams& p,
+    CameraNode(RenderingServer& rs, const Transform& p,
         float display_ratio, float fov = glm::radians(90.0f)) noexcept;
 
     glm::mat4 get_view_matrix() noexcept;

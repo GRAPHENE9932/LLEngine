@@ -1,7 +1,7 @@
 #include "RenderingServer.hpp"
 #include "CommonDrawableNode.hpp" // CommonDrawableNode
 
-CommonDrawableNode::CommonDrawableNode(const SpatialParams& p, RenderingServer& rs,
+CommonDrawableNode::CommonDrawableNode(const Transform& p, RenderingServer& rs,
     const std::shared_ptr<Material>& material,
     const std::shared_ptr<IMesh>& mesh) :
     DrawableNode(p, rs), mesh(mesh), material(material) {}

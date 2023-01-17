@@ -25,7 +25,7 @@ struct PointLightNode : public CompleteSpatialNode {
 
     RenderingServer& rendering_server;
 
-    PointLightNode(const SpatialParams& p, RenderingServer& rs);
+    PointLightNode(const Transform& p, RenderingServer& rs);
     ~PointLightNode();
 
     static Uniforms get_uniforms_id(GLuint program_id, const std::string& var_name, GLuint index);

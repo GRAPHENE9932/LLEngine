@@ -533,7 +533,7 @@ GLTF::Node construct_node_and_children_params(const json& gltf_json,
         // TODO: Support it.
         throw std::runtime_error("Node matrix transform is not supported.");
     }
-    result.spatial_params = {
+    result.transform = {
         get_optional<glm::vec3>(node_json, "translation", DEFAULT_TRANSLATION),
         get_optional<glm::vec3>(node_json, "scale", DEFAULT_SCALE),
         get_optional<glm::quat>(node_json, "rotation", DEFAULT_ROTATION)

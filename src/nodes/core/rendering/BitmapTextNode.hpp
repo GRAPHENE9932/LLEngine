@@ -15,7 +15,7 @@ class RenderingServer;
 
 class BitmapTextNode : public DrawableNode {
 public:
-    BitmapTextNode(const SpatialParams& params, RenderingServer& rs,
+    BitmapTextNode(const Transform& params, RenderingServer& rs,
                    const std::shared_ptr<BitmapFont>& font,
                    std::string_view text, const glm::vec3& color);
     ~BitmapTextNode();

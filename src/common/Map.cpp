@@ -33,7 +33,7 @@ Map::Map(const std::string& json_path) {
     }
 }
 
-void from_json(const json& root_json, CompleteSpatialNode::SpatialParams& spat_params) {
+void from_json(const json& root_json, Transform& spat_params) {
     const glm::quat testo({0.0f, 0.0f, 0.0f});
     spat_params = {
         get_optional<glm::vec3>(root_json, "position")
@@ -47,7 +47,7 @@ void from_json(const json& root_json, CompleteSpatialNode::SpatialParams& spat_p
 
 std::unique_ptr<PointLightNode> point_light_from_json(const json& root_json, RenderingServer& rs) {
     auto result = std::make_unique<PointLightNode>(
-        root_json.get<CompleteSpatialNode::SpatialParams>(),
+        root_json.get<Transform>(),
         rs
     );
     root_json.at("color").get_to(result->color);
@@ -65,7 +65,7 @@ std::unique_ptr<SpectatorCameraNode> player_to_node(const json& root_json, Rende
     const float aspect_ratio {static_cast<float>(extents.x) / extents.y};
 
     auto result = std::make_unique<SpectatorCameraNode>(
-        rs, root_json.get<CompleteSpatialNode::SpatialParams>(), aspect_ratio,
+        rs, root_json.get<Transform>(), aspect_ratio,
         glm::radians(root_json.at("fov").get<float>())
     );
     return result;
@@ -75,14 +75,14 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
     if (type == "scene_file") {
-        const CompleteSpatialNode::SpatialParams spat_params = json_node.get<CompleteSpatialNode::SpatialParams>();
+        const Transform spat_params = json_node.get<Transform>();
         result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(rs);
         result->set_translation(spat_params.translation + result->get_translation());
         result->set_scale(spat_params.scale * result->get_scale());
         result->set_rotation(spat_params.rotation * result->get_rotation());
     }
     else if (type == "empty") {
-        const CompleteSpatialNode::SpatialParams spat_params = json_node.get<CompleteSpatialNode::SpatialParams>();
+        const Transform spat_params = json_node.get<Transform>();
         result = std::make_unique<CompleteSpatialNode>(spat_params);
     }
     else if (type == "point_light") {

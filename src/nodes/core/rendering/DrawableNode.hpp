@@ -10,7 +10,7 @@ class DrawableNode : public CompleteSpatialNode {
 public:
     RenderingServer& rendering_server;
 
-    DrawableNode(const SpatialParams& p, RenderingServer& rs);
+    DrawableNode(const Transform& p, RenderingServer& rs);
     ~DrawableNode();
 
     virtual void draw() = 0;

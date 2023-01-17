@@ -12,11 +12,11 @@
 #include <GL/glew.h> // GLenum
 #include <nlohmann/json.hpp> // nlohmann:json
 
+#include "structs/Transform.hpp"
 #include "common/core/Mesh.hpp" // Mesh::Data
 #include "common/core/Texture.hpp" // Texture::Parameters
 #include "common/core/Material.hpp" // BasicMaterial
 #include "common/core/SceneFile.hpp" // SceneFile
-#include "nodes/core/CompleteSpatialNode.hpp"
 
 class RenderingServer;
 
@@ -26,7 +26,7 @@ public:
         std::string name;
         std::unordered_map<std::string, nlohmann::json> extras;
         std::vector<GLTF::Node> children;
-        CompleteSpatialNode::SpatialParams spatial_params;
+        Transform transform;
         std::optional<uint32_t> mesh_index;
     };
     struct MeshParameters {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SpatialNode.hpp"
+#include "structs/Transform.hpp"
 
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/gtx/quaternion.hpp> // glm::quat
@@ -11,15 +12,9 @@
 
 class CompleteSpatialNode : public SpatialNode {
 public:
-    struct SpatialParams {
-        glm::vec3 translation = {0.0f, 0.0f, 0.0f};
-        glm::vec3 scale = {1.0f, 1.0f, 1.0f};
-        glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-    };
-
     std::string name;
 
-    CompleteSpatialNode(const SpatialParams& spatial_params);
+    CompleteSpatialNode(const Transform& transform);
     virtual ~CompleteSpatialNode();
 
     void set_translation(const glm::vec3& new_trans) override;
@@ -37,7 +32,7 @@ public:
     glm::mat4 get_global_matrix() const noexcept override;
 
 protected:
-    SpatialParams spatial_params;
+    Transform transform;
     mutable glm::mat4 cached_local_matrix;
     mutable bool needs_recalculation = true;
 
