@@ -14,7 +14,7 @@
 #include "common/core/Texture.hpp" // Texture::Parameters
 #include "common/core/Material.hpp" // BasicMaterial
 #include "common/core/SceneFile.hpp" // SceneFile
-#include "nodes/core/SpatialNode.hpp" // SpatialNode, SpatialNode::SpatialParams
+#include "nodes/core/CompleteSpatialNode.hpp"
 
 class RenderingServer;
 
@@ -23,7 +23,7 @@ public:
     struct Node {
         std::string name;
         std::vector<GLTF::Node> children;
-        SpatialNode::SpatialParams spatial_params;
+        CompleteSpatialNode::SpatialParams spatial_params;
         std::optional<uint32_t> mesh_index;
     };
     struct MeshParameters {

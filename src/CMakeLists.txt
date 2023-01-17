@@ -24,6 +24,7 @@ set(SOURCES
     nodes/core/rendering/SpotLight.cpp
     nodes/core/rendering/BitmapTextNode.cpp
     nodes/core/rendering/SpectatorCameraNode.cpp
+    nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp
     structs/Circle.cpp
     structs/QuadrantArc.cpp

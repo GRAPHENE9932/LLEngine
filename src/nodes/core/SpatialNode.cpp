@@ -1,27 +1,36 @@
-#include <algorithm> // std::find_if
+#include "SpatialNode.hpp"
 
-#include <glm/gtx/transform.hpp> // glm::translate, glm::scale
-
-#include "SpatialNode.hpp" // SpatialNode
-#include "common/core/GLTF.hpp" // GLTF
-
-SpatialNode::SpatialNode(const SpatialParams& p) :
-    spatial_params(p) {}
+#include <algorithm>
 
 SpatialNode::~SpatialNode() {}
 
+void SpatialNode::set_name(std::string_view new_name) {
+    name = new_name;
+}
+
+[[nodiscard]] const std::string& SpatialNode::get_name() const {
+    return name;
+}
+
 void SpatialNode::update_children() {
-    for (const auto& child : children)
+    for (const auto& child : children) {
         child->update();
+    }
 }
 
 void SpatialNode::add_child(SpatialNode&& child) {
+    child.parent = this;
     children.push_back(std::unique_ptr<SpatialNode>(&child));
 }
 
 void SpatialNode::remove_child(const size_t index) {
-    SpatialNode* const ptr = children.at(index).get();
-    children.erase(children.begin() + index);
+    if (index > children.size()) {
+        throw std::out_of_range("Can not remove child: invalid child index specified.");
+    }
+
+    auto iter = children.begin() + index;
+    iter->get()->parent = nullptr;
+    children.erase(iter);
 }
 
 void SpatialNode::remove_child(SpatialNode* const ptr) {
@@ -34,66 +43,18 @@ void SpatialNode::remove_child(SpatialNode* const ptr) {
     if (iter == children.end())
         throw std::invalid_argument("Can't remove the non-existent child.");
 
+    iter->get()->parent = nullptr;
     children.erase(iter);
 }
 
-const std::vector<std::unique_ptr<SpatialNode>>& SpatialNode::get_children() {
+SpatialNode* SpatialNode::get_parent() const {
+    return parent;
+}
+
+const std::vector<std::unique_ptr<SpatialNode>>& SpatialNode::get_children() const {
     return children;
 }
 
 void SpatialNode::update() {
     update_children();
-}
-
-void SpatialNode::set_translation(const glm::vec3& new_trans) {
-    spatial_params.translation = new_trans;
-    needs_recalculation = true;
-}
-
-void SpatialNode::translate(const glm::vec3 &translation) {
-    set_translation(get_translation() + translation);
-}
-
-void SpatialNode::set_scale(const glm::vec3& new_scale) {
-    spatial_params.scale = new_scale;
-    needs_recalculation = true;
-}
-
-void SpatialNode::set_rotation(const glm::quat& new_rotation) {
-    spatial_params.rotation = new_rotation;
-    needs_recalculation = true;
-}
-
-const glm::vec3& SpatialNode::get_translation() const noexcept {
-    return spatial_params.translation;
-}
-
-const glm::vec3& SpatialNode::get_scale() const noexcept {
-    return spatial_params.scale;
-}
-
-const glm::quat& SpatialNode::get_rotation() const noexcept {
-    return spatial_params.rotation;
-}
-
-glm::mat4 SpatialNode::get_local_matrix() {
-    if (needs_recalculation)
-        recalculate_matrix();
-
-    return local_matrix;
-}
-
-glm::mat4 SpatialNode::get_global_matrix() {
-    if (parent == nullptr)
-        return get_local_matrix();
-    else
-        return get_local_matrix() * parent->get_global_matrix();
-}
-
-void SpatialNode::recalculate_matrix() {
-    local_matrix = glm::translate(spatial_params.translation) *
-            glm::scale(spatial_params.scale) *
-            glm::toMat4(spatial_params.rotation);
-
-    needs_recalculation = false;
 }

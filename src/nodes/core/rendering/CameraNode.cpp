@@ -4,14 +4,14 @@
 
 #include "CameraNode.hpp" // CameraNode
 #include "RenderingServer.hpp" // RenderingServer
-#include "nodes/core/SpatialNode.hpp" // SpatialNode
+#include "nodes/core/CompleteSpatialNode.hpp"
 
 constexpr glm::vec3 UP(0.0f, 1.0f, 0.0f);
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 
-CameraNode::CameraNode(RenderingServer& rs, const SpatialNode::SpatialParams& p,
+CameraNode::CameraNode(RenderingServer& rs, const CompleteSpatialNode::SpatialParams& p,
     float display_ratio, float fov) noexcept :
-    SpatialNode(p), field_of_view(fov), aspect_ratio(display_ratio) {
+    CompleteSpatialNode(p), field_of_view(fov), aspect_ratio(display_ratio) {
     rs.register_camera_node(this);
 }
 
@@ -32,19 +32,19 @@ glm::mat4 CameraNode::get_proj_matrix() noexcept {
 }
 
 void CameraNode::set_translation(const glm::vec3& new_trans) {
-    SpatialNode::set_translation(new_trans);
+    CompleteSpatialNode::set_translation(new_trans);
 
     is_cached_view_matrix_valid = false;
 }
 
 void CameraNode::translate(const glm::vec3 &translation) {
-    SpatialNode::translate(translation);
+    CompleteSpatialNode::translate(translation);
 
     is_cached_view_matrix_valid = false;
 }
 
 void CameraNode::set_rotation(const glm::quat &new_rotation) {
-    SpatialNode::set_rotation(new_rotation);
+    CompleteSpatialNode::set_rotation(new_rotation);
 
     is_cached_view_matrix_valid = false;
 }

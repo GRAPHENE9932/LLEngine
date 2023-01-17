@@ -1,12 +1,12 @@
 #pragma once
 
-#include "nodes/core/SpatialNode.hpp" // SpatialNode
+#include "nodes/core/CompleteSpatialNode.hpp"
 
 #include <GL/glew.h> // GLuint
 
 class RenderingServer;
 
-class DrawableNode : public SpatialNode {
+class DrawableNode : public CompleteSpatialNode {
 public:
     RenderingServer& rendering_server;
 

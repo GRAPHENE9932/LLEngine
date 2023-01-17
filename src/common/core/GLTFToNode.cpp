@@ -16,10 +16,10 @@ std::unique_ptr<SpatialNode> to_node(RenderingServer& rs, const GLTF::Node& gltf
         );
     }
     else {
-        result = std::make_unique<::SpatialNode>(gltf_node.spatial_params);
+        result = std::make_unique<::CompleteSpatialNode>(gltf_node.spatial_params);
     }
 
-    result->name = gltf_node.name;
+    result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
         result->add_child(std::move(
@@ -136,7 +136,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
         // we must return only one root node.
         // So, create the spatial node with default
         // spatial parameters and make it root.
-        auto result = std::make_unique<SpatialNode>(SpatialNode::SpatialParams());
+        auto result = std::make_unique<CompleteSpatialNode>(CompleteSpatialNode::SpatialParams());
         for (const auto& cur_gltf_node : this->nodes) {
             result->add_child(std::move(
                 *::to_node(
@@ -151,6 +151,6 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
         return result;
     }
     else {
-        return std::make_unique<SpatialNode>(SpatialNode::SpatialParams());
+        return std::make_unique<CompleteSpatialNode>(CompleteSpatialNode::SpatialParams());
     }
 }

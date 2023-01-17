@@ -6,7 +6,7 @@
 #include <string> // std::string
 
 PointLightNode::PointLightNode(const SpatialParams& p, RenderingServer& rs) :
-    SpatialNode(p), rendering_server(rs) {
+    CompleteSpatialNode(p), rendering_server(rs) {
     rendering_server.register_point_light(this);
 }
 

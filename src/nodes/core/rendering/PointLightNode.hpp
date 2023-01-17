@@ -5,11 +5,11 @@
 #include <glm/vec3.hpp> // glm::vec3
 #include <GL/glew.h> // GLint
 
-#include "nodes/core/SpatialNode.hpp" // SpatialNode
+#include "nodes/core/CompleteSpatialNode.hpp"
 
 class RenderingServer;
 
-struct PointLightNode : public SpatialNode {
+struct PointLightNode : public CompleteSpatialNode {
     struct Uniforms {
         GLint position_id, color_id, diffuse_strength_id, const_coeff_id,
               linear_coeff_id, quadratic_coeff_id;

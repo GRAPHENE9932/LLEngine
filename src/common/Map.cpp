@@ -8,7 +8,7 @@
 #include "Map.hpp" // Map
 #include "RenderingServer.hpp" // RenderingServer
 #include "utils/json_conversion.hpp" // get_optional
-#include "nodes/core/SpatialNode.hpp" // SpatialNode
+#include "nodes/core/CompleteSpatialNode.hpp"
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 #include "nodes/core/rendering/SpectatorCameraNode.hpp" // SpectatorCameraNode
 
@@ -33,7 +33,7 @@ Map::Map(const std::string& json_path) {
     }
 }
 
-void from_json(const json& root_json, SpatialNode::SpatialParams& spat_params) {
+void from_json(const json& root_json, CompleteSpatialNode::SpatialParams& spat_params) {
     const glm::quat testo({0.0f, 0.0f, 0.0f});
     spat_params = {
         get_optional<glm::vec3>(root_json, "position")
@@ -47,7 +47,7 @@ void from_json(const json& root_json, SpatialNode::SpatialParams& spat_params) {
 
 std::unique_ptr<PointLightNode> point_light_from_json(const json& root_json, RenderingServer& rs) {
     auto result = std::make_unique<PointLightNode>(
-        root_json.get<SpatialNode::SpatialParams>(),
+        root_json.get<CompleteSpatialNode::SpatialParams>(),
         rs
     );
     root_json.at("color").get_to(result->color);
@@ -65,7 +65,7 @@ std::unique_ptr<SpectatorCameraNode> player_to_node(const json& root_json, Rende
     const float aspect_ratio {static_cast<float>(extents.x) / extents.y};
 
     auto result = std::make_unique<SpectatorCameraNode>(
-        rs, root_json.get<SpatialNode::SpatialParams>(), aspect_ratio,
+        rs, root_json.get<CompleteSpatialNode::SpatialParams>(), aspect_ratio,
         glm::radians(root_json.at("fov").get<float>())
     );
     return result;
@@ -75,15 +75,15 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
     if (type == "scene_file") {
-        const SpatialNode::SpatialParams spat_params = json_node.get<SpatialNode::SpatialParams>();
+        const CompleteSpatialNode::SpatialParams spat_params = json_node.get<CompleteSpatialNode::SpatialParams>();
         result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(rs);
         result->set_translation(spat_params.translation + result->get_translation());
         result->set_scale(spat_params.scale * result->get_scale());
         result->set_rotation(spat_params.rotation * result->get_rotation());
     }
     else if (type == "empty") {
-        const SpatialNode::SpatialParams spat_params = json_node.get<SpatialNode::SpatialParams>();
-        result = std::make_unique<SpatialNode>(spat_params);
+        const CompleteSpatialNode::SpatialParams spat_params = json_node.get<CompleteSpatialNode::SpatialParams>();
+        result = std::make_unique<CompleteSpatialNode>(spat_params);
     }
     else if (type == "point_light") {
         result = point_light_from_json(json_node, rs);

@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "nodes/core/SpatialNode.hpp" // SpatialNode
+#include "nodes/core/CompleteSpatialNode.hpp"
 
 class RenderingServer;
 
@@ -11,13 +11,13 @@ class RenderingServer;
  * @brief Basic static camera. Everything it needs - spatial parameters,
  * field of view and display ratio.
  */
-class CameraNode : public SpatialNode {
+class CameraNode : public CompleteSpatialNode {
 public:
     /**
      * @param display_ratio Width / height viewport ratio.
      * @param fov Field of view in radians.
      */
-    CameraNode(RenderingServer& rs, const SpatialNode::SpatialParams& p,
+    CameraNode(RenderingServer& rs, const CompleteSpatialNode::SpatialParams& p,
         float display_ratio, float fov = glm::radians(90.0f)) noexcept;
 
     glm::mat4 get_view_matrix() noexcept;
