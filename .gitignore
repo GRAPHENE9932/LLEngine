@@ -11,3 +11,4 @@ build/
 *.kdev4
 .vscode/
 *.kateproject
+.idea/
