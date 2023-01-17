@@ -100,7 +100,7 @@ public:
         return point_lights;
     }
 
-    const std::set<DrawableNode*> get_drawable_nodes() const {
+    const std::set<DrawableNode*>& get_drawable_nodes() const {
         return drawable_nodes;
     }
 
