@@ -21,15 +21,18 @@ public:
     void translate(const glm::vec3& translation) override;
     void set_scale(const glm::vec3& new_scale) override;
     void set_rotation(const glm::quat& new_rotation) override;
+    void set_transform(const Transform& new_transform) override;
 
-    glm::vec3 get_translation() const noexcept override;
-    glm::vec3 get_global_position() const noexcept override;
-    glm::vec3 get_scale() const noexcept override;
-    glm::vec3 get_global_scale() const noexcept override;
-    glm::quat get_rotation() const noexcept override;
-    glm::quat get_global_rotation() const noexcept override;
-    glm::mat4 get_local_matrix() const noexcept override;
-    glm::mat4 get_global_matrix() const noexcept override;
+    glm::vec3 get_translation() const noexcept override final;
+    glm::vec3 get_global_position() const noexcept override final;
+    glm::vec3 get_scale() const noexcept override final;
+    glm::vec3 get_global_scale() const noexcept override final;
+    glm::quat get_rotation() const noexcept override final;
+    glm::quat get_global_rotation() const noexcept override final;
+    Transform get_transform() const noexcept override final;
+    Transform get_global_transform() const noexcept override final;
+    glm::mat4 get_local_matrix() const noexcept override final;
+    glm::mat4 get_global_matrix() const noexcept override final;
 
 protected:
     Transform transform;

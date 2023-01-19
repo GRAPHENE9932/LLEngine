@@ -15,4 +15,33 @@ struct Transform {
             glm::scale(scale) *
             glm::toMat4(rotation);
     }
+
+    /**
+     * @brief Combines multiple transforms similarly to
+     * matrix multiplication. Keep in mind that transformation
+     * order is opposite to operand order, just like in
+     * matrix multiplication.
+     */
+    Transform operator*=(const Transform& other) noexcept {
+        translation += other.translation;
+        scale *= other.scale;
+        rotation *= other.rotation;
+        return *this;
+    }
+
+    Transform operator*(const Transform& other) const noexcept {
+        Transform result(*this);
+        result *= other;
+        return result;
+    }
+
+    bool operator==(const Transform& other) const noexcept {
+        return translation == other.translation &&
+            scale == other.scale &&
+            rotation == other.rotation;
+    }
+
+    bool operator!=(const Transform& other) const noexcept {
+        return !(*this == other);
+    }
 };

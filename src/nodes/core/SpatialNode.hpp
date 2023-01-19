@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/Event.hpp"
+#include "structs/Transform.hpp"
 
 #include <glm/vec3.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -30,6 +31,7 @@ public:
     virtual void translate(const glm::vec3& translation) = 0;
     virtual void set_scale(const glm::vec3& new_scale) = 0;
     virtual void set_rotation(const glm::quat& new_rotation) = 0;
+    virtual void set_transform(const Transform& new_transform) = 0;
 
     [[nodiscard]] virtual glm::vec3 get_translation() const noexcept = 0;
     [[nodiscard]] virtual glm::vec3 get_global_position() const noexcept = 0;
@@ -37,6 +39,8 @@ public:
     [[nodiscard]] virtual glm::vec3 get_global_scale() const noexcept = 0;
     [[nodiscard]] virtual glm::quat get_rotation() const noexcept = 0;
     [[nodiscard]] virtual glm::quat get_global_rotation() const noexcept = 0;
+    [[nodiscard]] virtual Transform get_transform() const noexcept = 0;
+    [[nodiscard]] virtual Transform get_global_transform() const noexcept = 0;
     [[nodiscard]] virtual glm::mat4 get_local_matrix() const noexcept = 0;
     [[nodiscard]] virtual glm::mat4 get_global_matrix() const noexcept = 0;
 

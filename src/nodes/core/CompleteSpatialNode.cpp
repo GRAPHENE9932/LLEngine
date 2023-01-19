@@ -29,6 +29,10 @@ void CompleteSpatialNode::set_rotation(const glm::quat& new_rotation) {
     needs_recalculation = true;
 }
 
+void CompleteSpatialNode::set_transform(const Transform& new_transform) {
+    transform = new_transform;
+}
+
 glm::vec3 CompleteSpatialNode::get_translation() const noexcept {
     return transform.translation;
 }
@@ -71,6 +75,21 @@ glm::quat CompleteSpatialNode::get_global_rotation() const noexcept {
     }
     else {
         return get_rotation();
+    }
+}
+
+Transform CompleteSpatialNode::get_transform() const noexcept {
+    return transform;
+}
+
+Transform CompleteSpatialNode::get_global_transform() const noexcept {
+    const auto parent = get_parent();
+
+    if (parent) {
+        return get_transform() * parent->get_global_transform();
+    }
+    else {
+        return get_transform();
     }
 }
 
