@@ -1,4 +1,5 @@
 #include "RenderingServer.hpp" // RenderingServer
+#include "BulletPhysicsServer.hpp"
 #include "common/core/Skybox.hpp" // Skybox
 #include "common/core/GLFWWindow.hpp" // GLFWWindow
 #include "nodes/core/rendering/CameraNode.hpp"
@@ -37,6 +38,9 @@ void RenderingServer::main_loop() {
         auto duration = now - prev_frame_time;
         prev_frame_time = now;
         delta_time = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
+
+        // Do a physics step.
+        BulletPhysicsServer::do_step_if_needed(delta_time);
 
         // Invoke update.
         if (root_node) {

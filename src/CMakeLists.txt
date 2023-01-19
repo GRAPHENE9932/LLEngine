@@ -1,6 +1,7 @@
 set(SOURCES
     LLShooter.cpp
     RenderingServer.cpp
+    BulletPhysicsServer.cpp
     common/Map.cpp
     common/FPSMeter.cpp
     common/core/Mesh.cpp
@@ -24,13 +25,13 @@ set(SOURCES
     nodes/core/rendering/SpotLight.cpp
     nodes/core/rendering/BitmapTextNode.cpp
     nodes/core/rendering/SpectatorCameraNode.cpp
+    nodes/core/physics/bullet/BulletRigidBodyNode.cpp
     nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp
-    structs/Circle.cpp
-    structs/QuadrantArc.cpp
-    structs/HorLS.cpp
-    structs/VertLS.cpp
-    structs/RoundedRectangle.cpp
+    structs/shapes/Shape.cpp
+    structs/shapes/SphereShape.cpp
+    structs/shapes/BoxShape.cpp
+    structs/shapes/CylinderShape.cpp
     utils/shader_loader.cpp
 )
 
@@ -61,3 +62,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib OpenGL)
 # Zstd.
 find_package(ZSTD REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib zstd)
+
+# Bullet.
+find_package(Bullet REQUIRED)
+include_directories(${BULLET_INCLUDE_DIR})
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib ${BULLET_LIBRARIES})
