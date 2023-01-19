@@ -9,14 +9,14 @@ std::unique_ptr<SpatialNode> to_node(RenderingServer& rs, const GLTF::Node& gltf
 
     if (gltf_node.mesh_index.has_value()) {
         result = std::make_unique<CommonDrawableNode>(
-            gltf_node.spatial_params,
+            gltf_node.transform,
             rs,
             materials.at(gltf.meshes.at(*gltf_node.mesh_index).material_index),
             meshes.at(*gltf_node.mesh_index)
         );
     }
     else {
-        result = std::make_unique<::CompleteSpatialNode>(gltf_node.spatial_params);
+        result = std::make_unique<::CompleteSpatialNode>(gltf_node.transform);
     }
 
     result->set_name(gltf_node.name);
