@@ -58,18 +58,20 @@ BulletRigidBodyNode::~BulletRigidBodyNode() noexcept {
 }
 
 void BulletRigidBodyNode::before_simulation_step() {
-    const auto current_parent_transform {get_parent()->get_global_transform()};
-
-    if (current_parent_transform != previous_parent_transform) {
-        // Now we know that parent's global transform has changed.
-        // We don't store the local transform here, but only the global one.
-        // So, calculate the local transform relatively to the previous
-        // parent's transform and apply it relatively to the new
-        // parent's transform.
-        const auto local_transform {
-            get_relative_transform(*this, previous_parent_transform)
-        };
-        set_global_transform(local_transform * current_parent_transform);
+    if (get_parent()) {
+        const auto current_parent_transform {get_parent()->get_global_transform()};
+        
+        if (current_parent_transform != previous_parent_transform) {
+            // Now we know that parent's global transform has changed.
+            // We don't store the local transform here, but only the global one.
+            // So, calculate the local transform relatively to the previous
+            // parent's transform and apply it relatively to the new
+            // parent's transform.
+            const auto local_transform {
+                get_relative_transform(*this, previous_parent_transform)
+            };
+            set_global_transform(local_transform * current_parent_transform);
+        }
     }
 }
 
