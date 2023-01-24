@@ -14,16 +14,6 @@ std::optional<T> get_optional(const nlohmann::json& upper_json, const std::strin
     else
         return std::nullopt;
 }
-/*
-template<typename T>
-std::optional<T> get_optional(const nlohmann::json& upper_json,
-                              const std::string& intermediate_name,
-                              const std::string& name) {
-    if (upper_json.contains(intermediate_name))
-        return get_optional<T>(upper_json.at(intermediate_name), name);
-    else
-        return std::nullopt;
-}*/
 
 template<typename T>
 T get_optional(const nlohmann::json& upper_json, std::string_view name, const T& default_value) {
