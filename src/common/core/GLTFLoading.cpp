@@ -508,18 +508,19 @@ void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view g
     }    
 }
 
-GLTF::Node construct_node_and_children_params(const json& gltf_json,
-        const uint32_t node_index) {
-    const json& node_json = gltf_json.at("nodes").at(node_index);
-
-    GLTF::Node result;
-
+GLTF::Node::Node(
+    const GLTF& master, const nlohmann::json& gltf_json,
+    const nlohmann::json& node_json
+) : master(master) {
     // Process the name.
-    result.name = get_optional<std::string>(node_json, "name", "Unnamed");
+    name = get_optional<std::string>(node_json, "name", "Unnamed");
 
     // Process extras.
     if (node_json.contains("extras")) {
-        result.extras = node_json["extras"];
+        extras = node_json["extras"];
+    }
+    else {
+        extras = std::nullopt;
     }
 
     // Process the spatial parameters.
@@ -533,26 +534,23 @@ GLTF::Node construct_node_and_children_params(const json& gltf_json,
         // TODO: Support it.
         throw std::runtime_error("Node matrix transform is not supported.");
     }
-    result.transform = {
+    transform = {
         get_optional<glm::vec3>(node_json, "translation", DEFAULT_TRANSLATION),
         get_optional<glm::vec3>(node_json, "scale", DEFAULT_SCALE),
         get_optional<glm::quat>(node_json, "rotation", DEFAULT_ROTATION)
     };
 
     // Process the mesh index.
-    result.mesh_index = get_optional<uint32_t>(node_json, "mesh");
+    mesh_index = get_optional<uint32_t>(node_json, "mesh");
 
     // Process children.
     if (node_json.contains("children")) {
-        result.children.reserve(node_json["children"].size());
+        children.reserve(node_json["children"].size());
         for (const uint32_t cur_child_index : node_json["children"]) {
-            result.children.push_back(
-                construct_node_and_children_params(gltf_json, cur_child_index)
-            );
+            const json& cur_child_json = gltf_json.at("nodes").at(cur_child_index);
+            children.emplace_back(master, gltf_json, cur_child_json);
         }
     }
-
-    return result;
 }
 
 void construct_node_params(GLTF& gltf, const json& gltf_json) {
@@ -581,9 +579,7 @@ void construct_node_params(GLTF& gltf, const json& gltf_json) {
         if (non_root_nodes.contains(i))
             continue;
         
-        gltf.nodes.push_back(construct_node_and_children_params(
-            gltf_json, i
-        ));
+        gltf.nodes.emplace_back(gltf, gltf_json, gltf_json.at("nodes").at(i));
     }
 }
 

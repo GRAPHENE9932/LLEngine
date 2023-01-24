@@ -10,10 +10,9 @@
 #include <unordered_map> // std::unordered_map
 
 #include <GL/glew.h> // GLenum
-#include <nlohmann/json.hpp> // nlohmann:json
+#include <nlohmann/json.hpp> // nlohmann::json
 
 #include "structs/Transform.hpp"
-#include "common/core/Mesh.hpp" // Mesh::Data
 #include "common/core/Texture.hpp" // Texture::Parameters
 #include "common/core/Material.hpp" // BasicMaterial
 #include "common/core/SceneFile.hpp" // SceneFile
@@ -23,11 +22,19 @@ class RenderingServer;
 class GLTF : public SceneFile {
 public:
     struct Node {
+        Node(const GLTF& master, const nlohmann::json& gltf_json, const nlohmann::json& node_json);
+
+        const GLTF& master;
+
         std::string name;
-        std::unordered_map<std::string, nlohmann::json> extras;
+        std::optional<nlohmann::json> extras;
         std::vector<GLTF::Node> children;
         Transform transform;
         std::optional<uint32_t> mesh_index;
+
+        bool is_drawable() const;
+        bool is_rigid_body() const;
+        std::unique_ptr<SpatialNode> to_node() const;
     };
     struct MeshParameters {
         std::variant<std::vector<uint16_t>, std::vector<uint32_t>, std::monostate> indices;
@@ -52,6 +59,25 @@ public:
     *  - Base64 data is not supported.
     *  - Remote (network) data is not supported.
     *  - Only KHR_texture_transform extension is supported.
+    *
+    * Rigid bodies:
+    *    You can make node a rigid body using custom properties (extras).
+    *    If this node also have a mesh, then a new node with mesh will be
+    *    created with rigid body parent. This game engine doesn't support
+    *    nodes that are drawable and physical at the same time.
+    *    Firstly, it must contain the "collider_type" string property
+    *    that contains one of these string values:
+    *      - "BOX": then it also must contain "extents" property of
+    *        type float array. It must contain 3 values that
+    *        represents width (x), height (y), length (z).
+    *      - "SPHERE": then it also must contain "radius" property
+    *        of type float.
+    *      - "CYLINDER": the it also must contain "radius" and
+    *        "height" properties.
+    *
+    *    Secondly, it may contain the "mass" property of type float.
+    *    If mass is absent or equals to 0.0, then this rigid body
+    *    will be considered as static.
     */
     explicit GLTF(std::string_view file_path);
 
