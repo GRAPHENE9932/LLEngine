@@ -30,7 +30,9 @@ public:
     BulletRigidBodyNode(const BulletRigidBodyNode& node) = delete;
     ~BulletRigidBodyNode() noexcept;
 
-    void update() override {}
+    void update() override {
+        SpatialNode::update();
+    }
 
     /**
      * @brief This method must be called by the physics
