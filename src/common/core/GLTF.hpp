@@ -39,9 +39,9 @@ public:
     struct MeshParameters {
         std::variant<std::vector<uint16_t>, std::vector<uint32_t>, std::monostate> indices;
         std::vector<glm::vec3> vertices;
-        std::vector<glm::vec2> uvs;
-        std::vector<glm::vec3> normals;
-        std::vector<glm::vec4> tangents;
+        std::optional<std::vector<glm::vec2>> uvs;
+        std::optional<std::vector<glm::vec3>> normals;
+        std::optional<std::vector<glm::vec4>> tangents;
 
         uint32_t material_index;
     };

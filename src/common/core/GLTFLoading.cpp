@@ -407,10 +407,10 @@ std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& acce
 }
 
 template<typename T>
-std::vector<T> load_primitive_attribute(const CommonBufferArgs& args, const json& attributes_json,
+std::optional<std::vector<T>> load_primitive_attribute(const CommonBufferArgs& args, const json& attributes_json,
         const std::string_view attribute_name) {
     if (!attributes_json.contains(attribute_name))
-        return {};
+        return std::nullopt;
     
     const uint32_t accessor_index = attributes_json[attribute_name].get<uint32_t>();
     const json& accessor_json = args.gltf_json.at("accessors").at(accessor_index);
@@ -463,15 +463,17 @@ void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view g
         // Check attributes.
         if (!prim_json.contains("attributes"))
             throw std::runtime_error("The primitive does not contain attributes.");
-        if (!prim_json["attributes"].contains("POSITION"))
-            throw std::runtime_error("The POSITION attribute is not specified.");
         
         const json& attributes_json = prim_json["attributes"];
         
         // Load positions.
-        result.vertices = load_primitive_attribute<glm::vec3>(
+        auto vertices_optional = load_primitive_attribute<glm::vec3>(
             args, attributes_json, "POSITION"
         );
+        if (!vertices_optional.has_value()) {
+            throw std::runtime_error("The mesh doesn't contain vertices positions.");
+        }
+        result.vertices = *vertices_optional;
         // Load UV (texture) coordinates.
         result.uvs = load_primitive_attribute<glm::vec2>(
             args, attributes_json, "TEXCOORD_0"

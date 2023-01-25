@@ -174,13 +174,25 @@ template<typename T>
 std::shared_ptr<Mesh<T>> construct_mesh(const GLTF::MeshParameters& mesh_params) {
     std::shared_ptr<Mesh<T>> result = std::make_shared<Mesh<T>>();
 
-    if (std::holds_alternative<std::monostate>(mesh_params.indices))
+    if (std::holds_alternative<std::monostate>(mesh_params.indices)) {
         result->set_indices({});
+    }
+
     result->set_indices(std::move(std::get<std::vector<T>>(mesh_params.indices)));
+
     result->set_vertices(std::move(mesh_params.vertices));
-    result->set_uvs(std::move(mesh_params.uvs));
-    result->set_normals(std::move(mesh_params.normals));
-    result->set_tangents(std::move(mesh_params.tangents));
+    
+    if (mesh_params.uvs.has_value()) {
+        result->set_uvs(std::move(*mesh_params.uvs));
+    }
+
+    if (mesh_params.normals.has_value()) {
+        result->set_normals(std::move(*mesh_params.normals));
+    }
+
+    if (mesh_params.tangents.has_value()) {
+        result->set_tangents(std::move(*mesh_params.tangents));
+    }
 
     return result;
 }
