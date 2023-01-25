@@ -7,6 +7,15 @@ CommonDrawableNode::CommonDrawableNode(const Transform& p, RenderingServer& rs,
     DrawableNode(p, rs), mesh(mesh), material(material) {}
 
 void CommonDrawableNode::draw() {
+    // Do some checks.
+    if (material->normal_map.has_value() &&
+        (mesh->get_normals_id() == 0 || mesh->get_tangents_id() == 0)) {
+        throw std::runtime_error(
+            "Drawable node's material has a normal map, but "
+            "its mesh doesn't have normals and/or tangents."
+        );
+    }
+
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rendering_server.get_view_proj_matrix() * model_matrix;
