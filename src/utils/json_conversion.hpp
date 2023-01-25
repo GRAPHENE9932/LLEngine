@@ -50,10 +50,10 @@ namespace glm {
 
     inline void from_json(const nlohmann::json& root_json, glm::quat& vec) {
         vec = {
+            root_json.at(3).get<float>(),
             root_json.at(0).get<float>(),
             root_json.at(1).get<float>(),
-            root_json.at(2).get<float>(),
-            root_json.at(3).get<float>()
+            root_json.at(2).get<float>()
         };
     }
 
