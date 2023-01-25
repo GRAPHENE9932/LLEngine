@@ -9,7 +9,7 @@
 # gltf-pipeline?
 # Because they can't make KTX textures with ASTC compression,
 # only UASTC, ETC1S + BasisLZ. Both are slower to load and
-# harder to implement.
+# will require one more dependency.
 
 import os
 import sys
@@ -101,6 +101,15 @@ def main():
 	Currently, it does these manipulations with glTF:
 	- Converts texture png/jpeg files to ktx2.
 
+	WARNING: it's likely that your normal maps are in
+	sRGB color space. Make sure that PNG normal maps
+	before export have linear RGB (not sRGB) color space
+	with this command: "magick identify normal_map.png". If you
+	see that this image is in sRGB color space, you can
+	assign RGB color space to it without modifying the
+	stored information with this command:
+	"magick convert normal_map.png -set colorspace RGB -depth 8 normal_map_fixed.png"
+
 	Use the TOKTX_BIN environment variable to specify path
 	to toktx executable. Otherwise, it will try to execute
 	"toktx" instead.
@@ -178,6 +187,9 @@ def main():
 			output_file_name,
 			input_file_name
 		])
+
+		# Filter the toktx arguments from empty strings.
+		toktx_args = list(filter(lambda arg : arg, toktx_args))
 
 		# Execute command.
 		print("EXECUTING COMMAND:", *toktx_args, sep=" ")
