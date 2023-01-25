@@ -86,11 +86,11 @@ void main() {
     gl_Position = MVP * vec4(VERTEX_POS, 1.0);
 
     #ifdef USING_VERTEX_NORMALS
-        vec3 normal = (NORMAL_MATRIX * MODEL_MATRIX * vec4(VERTEX_NORMAL, 0.0)).xyz;
+        vec3 normal = (NORMAL_MATRIX * vec4(VERTEX_NORMAL, 0.0)).xyz;
         FRAG_NORMAL = normal;
 
         #ifdef USING_NORMAL_TEXTURE
-            vec3 tangent = (NORMAL_MATRIX * MODEL_MATRIX * vec4(VERTEX_TANGENT.xyz, 0.0)).xyz;
+            vec3 tangent = (NORMAL_MATRIX * vec4(VERTEX_TANGENT.xyz, 0.0)).xyz;
             vec3 bitangent = cross(normal, tangent) * VERTEX_TANGENT.w;
             mat3 tbn = mat3(tangent, bitangent, normal);
             // TBN matrix is orthogonal, so we can use the transpose() function

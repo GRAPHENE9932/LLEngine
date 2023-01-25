@@ -132,7 +132,7 @@ void CommonShader::use_shader(const Material& material, const glm::mat4& mvp_mat
     glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, glm::value_ptr(model_matrix));
     if (normal_matrix_id != -1) {
         glm::mat4 normal_matrix = glm::transpose(glm::inverse(
-            model_matrix
+            glm::mat3(model_matrix)
         ));
         glUniformMatrix4fv(normal_matrix_id, 1, GL_FALSE, glm::value_ptr(normal_matrix));
     }
