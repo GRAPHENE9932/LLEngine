@@ -12,8 +12,6 @@
 
 class CompleteSpatialNode : public SpatialNode {
 public:
-    std::string name;
-
     CompleteSpatialNode(const Transform& transform);
     virtual ~CompleteSpatialNode();
 
