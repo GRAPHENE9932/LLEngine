@@ -1,11 +1,3 @@
-#include "utils/math.hpp"
-#include "nodes/core/rendering/CameraNode.hpp"
-#include "nodes/core/rendering/BitmapTextNode.hpp" // BitmapTextNode
-#include "nodes/core/rendering/ImageNode.hpp" // ImageNode
-#include "nodes/core/rendering/CommonDrawableNode.hpp" // TexturedDrawableNode
-#include "common/core/BitmapFont.hpp"
-#include "common/core/KTXTexture.hpp"
-#include "common/core/Mesh.hpp"
 #include "LLShooter.hpp"
 #include <GLFW/glfw3.h>
 
