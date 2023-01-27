@@ -3,11 +3,9 @@
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
 
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
-#include "nodes/core/rendering/SpotLight.hpp" // SpotLight
 #include "utils/shader_loader.hpp" // load_shaders
 #include "RenderingServer.hpp" // RenderingServer
 #include "CommonShader.hpp" // TexturedShared
-#include "Context.hpp" // Context
 
 CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs) {
     CommonShader::Flags flags = CommonShader::NO_FLAGS;
@@ -16,7 +14,7 @@ CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs)
         flags |= CommonShader::USING_BASE_COLOR_TEXTURE;
     if (material.base_color.factor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
         flags |= CommonShader::USING_BASE_COLOR_FACTOR;
-    if (!(rs.get_point_lights().size() == 0)) {
+    if (!rs.get_point_lights().empty()) {
         flags |= CommonShader::USING_VERTEX_NORMALS;
         if (material.normal_map.has_value()) {
             flags |= CommonShader::USING_NORMAL_TEXTURE;

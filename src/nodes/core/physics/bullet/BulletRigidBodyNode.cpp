@@ -29,7 +29,7 @@ BulletRigidBodyNode::BulletRigidBodyNode(const Transform& spat_params,
         glm_quat_to_bullet(spat_params.rotation),
         glm_vec3_to_bullet(spat_params.translation)
     );
-    set_scale(spat_params.scale);
+    BulletRigidBodyNode::set_scale(spat_params.scale);
 
     std::unique_ptr<btDefaultMotionState> motion_state =
         std::make_unique<btDefaultMotionState>(bt_transform);

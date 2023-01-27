@@ -11,7 +11,7 @@ public:
     Shape();
     Shape(const Shape& shape) = delete;
     Shape(Shape&& shape);
-    ~Shape();
+    virtual ~Shape();
 
     virtual bool operator==(const Shape& other) const noexcept = 0;
 

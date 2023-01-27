@@ -11,7 +11,7 @@ class RenderingServer;
 
 class ShaderManager {
 public:
-    ShaderManager(RenderingServer& rs);
+    explicit ShaderManager(RenderingServer& rs);
 
     void use_colored_text_shader(const glm::mat4& mvp, const glm::vec3& color);
     void use_skybox_shader(const glm::mat4& mvp);

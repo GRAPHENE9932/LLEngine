@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common/core/Material.hpp" // Material
-#include "nodes/core/rendering/SpotLight.hpp" // SpotLight
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 
 #include <glm/vec4.hpp> // glm::vec4

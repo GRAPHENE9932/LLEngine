@@ -91,6 +91,9 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     else if (type == "player") {
         result = player_to_node(json_node, rs);
     }
+    else {
+        throw std::runtime_error("Unknown node type.");
+    }
 
     if (json_node.contains("children")) {
         for (const json& cur_json_child : json_node["children"]) {
