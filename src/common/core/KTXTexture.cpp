@@ -5,7 +5,7 @@
 #include <numeric>
 #include <fstream>
 #include <cstring>
-#include <stdint.h>
+#include <cstdint>
 #include <stdexcept>
 
 #include <zstd.h>
@@ -84,11 +84,19 @@ enum SupercompressionScheme {
     SC_ZLIB = 3
 };
 
-inline void load_level_data(std::istream& stream, char* const data_ptr,
-        const LevelIndex& level_index, const Header& header) {
+inline std::vector<char> load_level_data(
+    std::istream& stream,
+    const LevelIndex& level_index,
+    const Header& header
+) {
+    std::vector<char> result(level_index.uncompressed_byte_length);
+
     switch (header.supercompression_scheme) {
     case SC_NONE: {
-        stream.read(data_ptr, level_index.byte_length);
+        if (level_index.byte_length != result.size()) {
+            throw std::runtime_error("Invalid data lengths in the KTX level index.");
+        }
+        stream.read(result.data(), level_index.byte_length);
         if (!stream)
             throw std::runtime_error("Failed to read the level data.");
         break;
@@ -99,11 +107,11 @@ inline void load_level_data(std::istream& stream, char* const data_ptr,
         if (!stream)
             throw std::runtime_error("Failed to read the level data.");
 
-        std::size_t result {ZSTD_decompress(
-            data_ptr, level_index.uncompressed_byte_length,
+        std::size_t zstd_result {ZSTD_decompress(
+            result.data(), result.size(),
             compressed_data.data(), compressed_data.size()
         )};
-        if (ZSTD_isError(result))
+        if (ZSTD_isError(zstd_result))
             throw std::runtime_error("zstd decompression error.");
         break;
     }
@@ -113,6 +121,8 @@ inline void load_level_data(std::istream& stream, char* const data_ptr,
             "Only zstd and uncompressed supported."
         );
     }
+
+    return result;
 }
 
 inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
@@ -149,13 +159,14 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
         static_cast<GLenum>(GL_TEXTURE_2D)
     };
 
-    uint32_t mip_level = std::max(header.level_count, 1u);
+    GLint mip_level = std::max(static_cast<GLint>(header.level_count), 1);
     do {
         mip_level--;
         align_stream(stream, mip_padding, params.offset % mip_padding);
 
-        std::vector<char> level_data(level_indexes[mip_level].uncompressed_byte_length);
-        load_level_data(stream, level_data.data(), level_indexes[mip_level], header);
+        std::vector<char> level_data {
+            load_level_data(stream, level_indexes[mip_level], header)
+        };
 
         const uint64_t face_size {format_info.compute_image_size(sizes[mip_level])};
 
@@ -245,7 +256,7 @@ KTXTexture::KTXTexture(const Parameters& params) {
         limit_check(key_and_value_byte_length, 16777216u, "keyAndValueByteLength", params.file_path);
 
         // Key and value data itself.
-        key_value_data.push_back({});
+        key_value_data.emplace_back();
         std::getline(stream, key_value_data.back().first, '\0');
         std::getline(stream, key_value_data.back().second, '\0');
 

@@ -18,7 +18,7 @@ struct SpotLight {
     float inner_cutoff_angle, outer_cutoff_angle;
     float strength;
 
-    static Uniforms get_uniforms_id(GLuint program_id, std::string arr_name, GLuint index);
+    static Uniforms get_uniforms_id(GLuint program_id, const std::string& arr_name, GLuint index);
 
     SpotLight() = default;
     SpotLight(const glm::vec3& position, const glm::vec3& direction,

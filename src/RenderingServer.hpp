@@ -26,7 +26,7 @@ struct SpotLight;
  */
 class RenderingServer {
 public:
-    RenderingServer(glm::ivec2 window_extents);
+    explicit RenderingServer(glm::ivec2 window_extents);
     ~RenderingServer();
 
     void set_skybox(const std::shared_ptr<Texture>& texture);
@@ -79,14 +79,14 @@ public:
      *
      * If camera is missing, returns identity matrix.
      */
-    glm::mat4 get_view_matrix() const noexcept;
+    [[nodiscard]] glm::mat4 get_view_matrix() const noexcept;
 
     /**
      * @brief Returns projection matrix from the current camera.
      *
      * If camera is missing, returns identity matrix.
      */
-    glm::mat4 get_proj_matrix() const noexcept;
+    [[nodiscard]] glm::mat4 get_proj_matrix() const noexcept;
     
     /**
      * @brief Get the projection matrix multiplied by view matrix.
@@ -94,25 +94,25 @@ public:
      * Both these matrices can be retrieved from
      * get_view_matrix() and get_proj_matrix().
      */
-    glm::mat4 get_view_proj_matrix() const noexcept;
+    [[nodiscard]] glm::mat4 get_view_proj_matrix() const noexcept;
 
-    const std::set<PointLightNode*>& get_point_lights() const noexcept {
+    [[nodiscard]] const std::set<PointLightNode*>& get_point_lights() const noexcept {
         return point_lights;
     }
 
-    const std::set<DrawableNode*>& get_drawable_nodes() const {
+    [[nodiscard]] const std::set<DrawableNode*>& get_drawable_nodes() const {
         return drawable_nodes;
     }
 
-    float get_delta_time() const {
+    [[nodiscard]] float get_delta_time() const {
         return delta_time;
     }
 
-    IWindow& get_window() {
+    [[nodiscard]] IWindow& get_window() {
         return window;
     }
 
-    ShaderManager& get_shader_manager() {
+    [[nodiscard]] ShaderManager& get_shader_manager() {
         return shader_manager;
     }
 

@@ -2,17 +2,17 @@
 
 #include <thread>
 #include <condition_variable>
-#include <stdint.h>
+#include <cstdint>
 
 class FPSMeter {
 public:
     /// @param interval means interval between the fps updates.
-    FPSMeter(float interval);
+    explicit FPSMeter(float interval);
     ~FPSMeter();
 
     /// Call this function once on every frame.
     void frame() noexcept;
-    inline float get_fps() noexcept {
+    inline float get_fps() const noexcept {
         return cur_fps;
     }
 

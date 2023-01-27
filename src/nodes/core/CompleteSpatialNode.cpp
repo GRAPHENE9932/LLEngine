@@ -3,7 +3,6 @@
 #include <glm/gtx/transform.hpp> // glm::translate, glm::scale
 
 #include "CompleteSpatialNode.hpp"
-#include "common/core/GLTF.hpp" // GLTF
 
 CompleteSpatialNode::CompleteSpatialNode(const Transform& p) :
     transform(p) {}

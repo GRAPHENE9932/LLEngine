@@ -23,7 +23,7 @@ static void initialize_glfw() {
 }
 
 static void initialize_glew() {
-    int glew_init_res = glewInit();
+    GLenum glew_init_res = glewInit();
     if (glew_init_res != GLEW_OK) {
         throw std::runtime_error(
             std::string("Failed to initialize GLEW. Error code: " + std::to_string(glew_init_res))

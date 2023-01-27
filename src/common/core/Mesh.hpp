@@ -26,11 +26,11 @@ public:
     size_t get_amount_of_vertices() override;
     GLenum get_indices_type() override;
 
-    void set_indices(std::vector<INDEX_T> new_indices);
-    void set_vertices(std::vector<glm::vec3> new_vertices);
-    void set_uvs(std::vector<glm::vec2> new_uvs);
-    void set_normals(std::vector<glm::vec3> new_normals);
-    void set_tangents(std::vector<glm::vec4> new_tangents);
+    void set_indices(const std::vector<INDEX_T>& new_indices);
+    void set_vertices(const std::vector<glm::vec3>& new_vertices);
+    void set_uvs(const std::vector<glm::vec2>& new_uvs);
+    void set_normals(const std::vector<glm::vec3>& new_normals);
+    void set_tangents(const std::vector<glm::vec4>& new_tangents);
 
     bool is_indexed() override;
 

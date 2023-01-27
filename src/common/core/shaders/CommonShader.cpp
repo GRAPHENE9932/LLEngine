@@ -22,7 +22,7 @@ CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs)
                 flags |= CommonShader::USING_NORMAL_MAP_SCALE;
         }
     }
-    if (rs.get_point_lights().size() > 0)
+    if (!rs.get_point_lights().empty())
         flags |= CommonShader::USING_FRAGMENT_POSITION;
     if ((flags & CommonShader::USING_BASE_COLOR_TEXTURE) ||
         (flags & CommonShader::USING_NORMAL_TEXTURE))
@@ -66,25 +66,25 @@ void CommonShader::initialize(const Parameters& params) {
     };
 
     if (flags & USING_BASE_COLOR_TEXTURE)
-        defines.push_back("USING_BASE_COLOR_TEXTURE");
+        defines.emplace_back("USING_BASE_COLOR_TEXTURE");
     if (flags & USING_BASE_COLOR_FACTOR)
-        defines.push_back("USING_BASE_COLOR_FACTOR");
+        defines.emplace_back("USING_BASE_COLOR_FACTOR");
     if (flags & USING_VERTEX_NORMALS)
-        defines.push_back("USING_VERTEX_NORMALS");
+        defines.emplace_back("USING_VERTEX_NORMALS");
     if (flags & USING_NORMAL_TEXTURE)
-        defines.push_back("USING_NORMAL_TEXTURE");
+        defines.emplace_back("USING_NORMAL_TEXTURE");
     if (flags & USING_NORMAL_MAP_SCALE)
-        defines.push_back("USING_NORMAL_MAP_SCALE");
+        defines.emplace_back("USING_NORMAL_MAP_SCALE");
     if (flags & USING_FRAGMENT_POSITION)
-        defines.push_back("USING_FRAGMENT_POSITION");
+        defines.emplace_back("USING_FRAGMENT_POSITION");
     if (flags & USING_UV)
-        defines.push_back("USING_UV");
+        defines.emplace_back("USING_UV");
     if (flags & USING_GENERAL_UV_TRANSFORM)
-        defines.push_back("USING_GENERAL_UV_TRANSFORM");
+        defines.emplace_back("USING_GENERAL_UV_TRANSFORM");
     if (flags & USING_BASE_UV_TRANSFORM)
-        defines.push_back("USING_BASE_UV_TRANSFORM");
+        defines.emplace_back("USING_BASE_UV_TRANSFORM");
     if (flags & USING_NORMAL_UV_TRANSFORM)
-        defines.push_back("USING_NORMAL_UV_TRANSFORM");
+        defines.emplace_back("USING_NORMAL_UV_TRANSFORM");
 
     program_id = load_shaders(
         "res/shaders/textured.vert",
@@ -159,7 +159,7 @@ void CommonShader::use_shader(const Material& material, const glm::mat4& mvp_mat
         point_light_ids_iter++;
     }
 
-    GLenum cur_tex_unit = 0;
+    GLint cur_tex_unit = 0;
     if (base_color_texture_uniform_id != -1) {
         glUniform1i(base_color_texture_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);

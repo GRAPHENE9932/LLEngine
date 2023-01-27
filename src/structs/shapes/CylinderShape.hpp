@@ -7,7 +7,7 @@
 class CylinderShape : public Shape {
 public:
     CylinderShape(const CylinderShape& cylinder_shape);
-    CylinderShape(CylinderShape&& cylinder_shape);
+    CylinderShape(CylinderShape&& cylinder_shape) noexcept;
     explicit CylinderShape(float radius_x, float radius_z, float height) noexcept;
     explicit CylinderShape(const glm::vec3& semi_axis) noexcept;
 

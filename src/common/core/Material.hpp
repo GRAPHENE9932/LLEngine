@@ -42,7 +42,7 @@ struct BasicMaterial {
         glm::vec3 factor = {0.0f, 0.0f, 0.0f};
     } emmisive;
 
-    bool have_offsets_and_scales() const noexcept {
+    [[nodiscard]] bool have_offsets_and_scales() const noexcept {
         return {
             have_offsets_and_scales(base_color) ||
             have_offsets_and_scales(metallic_roughness) ||
@@ -52,7 +52,7 @@ struct BasicMaterial {
         };
     }
 
-    bool have_identical_offsets_and_scales() const noexcept {
+    [[nodiscard]] bool have_identical_offsets_and_scales() const noexcept {
         std::array<std::optional<std::pair<glm::vec2, glm::vec2>>, 5> array {
             base_color.texture.has_value() ?
             std::make_optional(std::make_pair(base_color.texture->uv_offset, base_color.texture->uv_scale)) :
@@ -94,7 +94,7 @@ struct BasicMaterial {
     /// The material must have identical UV offsets and scales, otherwise
     /// result is undefined.
     /// @returns Pair of two vectors: offset and scale.
-    std::pair<glm::vec2, glm::vec2> get_general_uv_offset_and_scale() const noexcept {
+    [[nodiscard]] std::pair<glm::vec2, glm::vec2> get_general_uv_offset_and_scale() const noexcept {
         assert(have_identical_offsets_and_scales());
         // In this function we assume that all uv_offsets and uv_scales are identical
         // between base color texture, metallic-roughness texture, normal map, etc.

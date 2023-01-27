@@ -15,12 +15,12 @@ public:
     ~GLFWWindow();
 
     void swap_buffers() override;
-    bool window_should_close() const override;
+    [[nodiscard]] bool window_should_close() const override;
     void disable_cursor() override;
-    glm::dvec2 get_cursor_position() const override;
-    glm::ivec2 get_window_size() const override;
+    [[nodiscard]] glm::dvec2 get_cursor_position() const override;
+    [[nodiscard]] glm::ivec2 get_window_size() const override;
     void set_cursor_position(const glm::dvec2 & new_position) override;
-    bool is_key_pressed(Key key) const override;
+    [[nodiscard]] bool is_key_pressed(Key key) const override;
 
 private:
     // This static count is needed to terminate GLFW when

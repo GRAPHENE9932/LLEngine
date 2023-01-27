@@ -3,7 +3,7 @@
 
 #include <stdexcept> // std::runtime_error
 
-std::unique_ptr<SceneFile> SceneFile::load_from_file(std::filesystem::path file_path) {
+std::unique_ptr<SceneFile> SceneFile::load_from_file(const std::filesystem::path& file_path) {
     const auto extension = file_path.extension().string();
 
     if (extension == ".glb" || extension == ".gltf") {

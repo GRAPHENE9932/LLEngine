@@ -306,7 +306,7 @@ std::vector<T> read_from_fine_buffer_view(const CommonBufferArgs& args,
         stream.open(std::string(uri), std::ios::in | std::ios::binary);
     }
     stream.seekg(
-        get_optional<uint64_t>(buf_view_json, "byteOffset", 0) +
+        get_optional<std::streamoff>(buf_view_json, "byteOffset", 0) +
         args.bin_chunk_offset +
         offset
     );
@@ -513,10 +513,8 @@ void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view g
 GLTF::Node::Node(
     const GLTF& master, const nlohmann::json& gltf_json,
     const nlohmann::json& node_json
-) : master(master) {
-    // Process the name.
-    name = get_optional<std::string>(node_json, "name", "Unnamed");
-
+) : master(master),
+    name(get_optional<std::string>(node_json, "name", "Unnamed")) {
     // Process extras.
     if (node_json.contains("extras")) {
         extras = node_json["extras"];
@@ -568,8 +566,7 @@ void construct_node_params(GLTF& gltf, const json& gltf_json) {
     // the non_root_nodes set.
     std::unordered_set<uint32_t> non_root_nodes;
     for (const json& cur_node_json : gltf_json["nodes"]) {
-        if (cur_node_json.contains("children") &&
-                cur_node_json["children"].size() > 0) {
+        if (cur_node_json.contains("children") && !cur_node_json["children"].empty()) {
             non_root_nodes.insert(
                 cur_node_json["children"].begin(),
                 cur_node_json["children"].end()

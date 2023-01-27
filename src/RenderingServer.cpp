@@ -101,7 +101,7 @@ glm::mat4 RenderingServer::get_view_matrix() const noexcept {
         return camera->get_view_matrix();
     }
     else {
-        return glm::mat4();
+        return {};
     }
 }
 
@@ -110,7 +110,7 @@ glm::mat4 RenderingServer::get_proj_matrix() const noexcept {
         return camera->get_proj_matrix();
     }
     else {
-        return glm::mat4();
+        return {};
     }
 }
 

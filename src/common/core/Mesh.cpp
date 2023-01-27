@@ -40,32 +40,32 @@ void handle_buffer(std::vector<T>& buffer, GLuint& buffer_id) {
 }
 
 template<typename INDEX_T>
-void Mesh<INDEX_T>::set_indices(std::vector<INDEX_T> new_indices) {
-    indices = std::move(new_indices);
+void Mesh<INDEX_T>::set_indices(const std::vector<INDEX_T>& new_indices) {
+    indices = new_indices;
     handle_buffer<INDEX_T, GL_ELEMENT_ARRAY_BUFFER>(indices, indices_id);
 }
 
 template<typename INDEX_T>
-void Mesh<INDEX_T>::set_vertices(std::vector<glm::vec3> new_vertices) {
-    vertices = std::move(new_vertices);
+void Mesh<INDEX_T>::set_vertices(const std::vector<glm::vec3>& new_vertices) {
+    vertices = new_vertices;
     handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(vertices, vertices_id);
 }
 
 template<typename INDEX_T>
-void Mesh<INDEX_T>::set_uvs(std::vector<glm::vec2> new_uvs) {
-    uvs = std::move(new_uvs);
+void Mesh<INDEX_T>::set_uvs(const std::vector<glm::vec2>& new_uvs) {
+    uvs = new_uvs;
     handle_buffer<glm::vec2, GL_ARRAY_BUFFER>(uvs, uvs_id);
 }
 
 template<typename INDEX_T>
-void Mesh<INDEX_T>::set_normals(std::vector<glm::vec3> new_normals) {
-    normals = std::move(new_normals);
+void Mesh<INDEX_T>::set_normals(const std::vector<glm::vec3>& new_normals) {
+    normals = new_normals;
     handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(normals, normals_id);
 }
 
 template<typename INDEX_T>
-void Mesh<INDEX_T>::set_tangents(std::vector<glm::vec4> new_tangents) {
-    tangents = std::move(new_tangents);
+void Mesh<INDEX_T>::set_tangents(const std::vector<glm::vec4>& new_tangents) {
+    tangents = new_tangents;
     handle_buffer<glm::vec4, GL_ARRAY_BUFFER>(tangents, tangents_id);
 }
 
@@ -121,7 +121,7 @@ void Mesh<INDEX_T>::index_data() {
 
     std::unordered_map<CompleteVertex, INDEX_T, CompleteVertexHasher> vertex_to_index;
 
-    for (INDEX_T i = 0; i < in_vertices.size(); i++) {
+    for (std::size_t i = 0; i < in_vertices.size(); i++) {
         CompleteVertex complete {in_vertices[i], in_uvs[i], in_normals[i]};
 
         auto find_result = vertex_to_index.find(complete);

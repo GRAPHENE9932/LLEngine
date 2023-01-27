@@ -7,8 +7,8 @@
 class BoxShape : public Shape {
 public:
     BoxShape(const BoxShape& box_shape) : BoxShape(box_shape.get_extents()) {}
-    BoxShape(BoxShape&& box_shape) : extents(box_shape.extents), Shape(std::move(box_shape)) {}
-    BoxShape(const glm::vec3& extents) noexcept : extents(extents) {}
+    BoxShape(BoxShape&& box_shape) noexcept : extents(box_shape.extents), Shape(std::move(box_shape)) {}
+    explicit BoxShape(const glm::vec3& extents) noexcept : extents(extents) {}
 
     [[nodiscard]] bool operator==(const Shape& other) const noexcept override;
     [[nodiscard]] std::shared_ptr<Shape> deep_copy() const override;

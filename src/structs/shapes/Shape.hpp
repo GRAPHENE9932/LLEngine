@@ -10,7 +10,7 @@ class Shape {
 public:
     Shape();
     Shape(const Shape& shape) = delete;
-    Shape(Shape&& shape);
+    Shape(Shape&& shape) noexcept;
     virtual ~Shape();
 
     virtual bool operator==(const Shape& other) const noexcept = 0;

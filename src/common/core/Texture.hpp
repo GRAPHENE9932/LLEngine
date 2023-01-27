@@ -18,7 +18,7 @@ public:
     };
 
     Texture() = default;
-    inline Texture(GLuint texture_id) noexcept :
+    explicit inline Texture(GLuint texture_id) noexcept :
             texture_id(texture_id) {}
     inline ~Texture() {
         glDeleteTextures(1, &texture_id);
@@ -35,14 +35,14 @@ public:
         texture_id = new_id;
     }
 
-    inline GLuint get_id() const {
+    [[nodiscard]] inline GLuint get_id() const {
         return texture_id;
     }
-    glm::u32vec2 get_size() const {
+    [[nodiscard]] glm::u32vec2 get_size() const {
         return tex_size;
     }
 
 protected:
     GLuint texture_id;
-    glm::u32vec2 tex_size;
+    glm::u32vec2 tex_size {0, 0};
 };

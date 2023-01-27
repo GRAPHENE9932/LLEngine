@@ -7,7 +7,7 @@
 CylinderShape::CylinderShape(const CylinderShape& cylinder_shape) :
     CylinderShape(cylinder_shape.get_semi_axis()) {}
 
-CylinderShape::CylinderShape(CylinderShape&& cylinder_shape) :
+CylinderShape::CylinderShape(CylinderShape&& cylinder_shape) noexcept :
     semi_axis(cylinder_shape.semi_axis), Shape(std::move(cylinder_shape)) {}
 
 CylinderShape::CylinderShape(float radius_x, float radius_z, float height) noexcept :

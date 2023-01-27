@@ -12,7 +12,7 @@
 
 class CompleteSpatialNode : public SpatialNode {
 public:
-    CompleteSpatialNode(const Transform& transform);
+    explicit CompleteSpatialNode(const Transform& transform);
     virtual ~CompleteSpatialNode();
 
     void set_translation(const glm::vec3& new_trans) override;

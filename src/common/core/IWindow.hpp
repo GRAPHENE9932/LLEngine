@@ -81,14 +81,14 @@ public:
      *
      * @throws uninitialized_error if window is uninitialized.
      */
-    virtual bool window_should_close() const = 0;
+    [[nodiscard]] virtual bool window_should_close() const = 0;
     virtual void disable_cursor() = 0;
-    virtual glm::dvec2 get_cursor_position() const = 0;
-    virtual glm::ivec2 get_window_size() const = 0;
+    [[nodiscard]] virtual glm::dvec2 get_cursor_position() const = 0;
+    [[nodiscard]] virtual glm::ivec2 get_window_size() const = 0;
     virtual void set_cursor_position(const glm::dvec2& new_position) = 0;
     /**
      * @returns if specified keyboard key is pressed. If
      * the specified key is invalid, always returns false.
      */
-    virtual bool is_key_pressed(Key key) const = 0;
+    [[nodiscard]] virtual bool is_key_pressed(Key key) const = 0;
 };

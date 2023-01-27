@@ -2,7 +2,7 @@
 
 #include "SpotLight.hpp"
 
-SpotLight::Uniforms SpotLight::get_uniforms_id(GLuint program_id, std::string arr_name, GLuint index) {
+SpotLight::Uniforms SpotLight::get_uniforms_id(GLuint program_id, const std::string& arr_name, GLuint index) {
     Uniforms result;
 
     // Position.

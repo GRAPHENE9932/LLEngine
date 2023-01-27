@@ -12,7 +12,7 @@ public:
     /// Not supported:
     ///   - Multiple layers
     ///   - Supercompression other than Zstandard.
-    KTXTexture(const Parameters& params);
+    explicit KTXTexture(const Parameters& params);
 
 private:
     std::vector<char> dfd_block;

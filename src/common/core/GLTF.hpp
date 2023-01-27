@@ -32,9 +32,9 @@ public:
         Transform transform;
         std::optional<uint32_t> mesh_index;
 
-        bool is_drawable() const;
-        bool is_rigid_body() const;
-        std::unique_ptr<SpatialNode> to_node() const;
+        [[nodiscard]] bool is_drawable() const;
+        [[nodiscard]] bool is_rigid_body() const;
+        [[nodiscard]] std::unique_ptr<SpatialNode> to_node() const;
     };
     struct MeshParameters {
         std::variant<std::vector<uint16_t>, std::vector<uint32_t>, std::monostate> indices;

@@ -28,7 +28,7 @@ public:
                         const std::shared_ptr<Shape>& shape,
                         float mass);
     BulletRigidBodyNode(const BulletRigidBodyNode& node) = delete;
-    ~BulletRigidBodyNode() noexcept;
+    ~BulletRigidBodyNode() noexcept override;
 
     void update() override {
         SpatialNode::update();
@@ -49,16 +49,16 @@ public:
     void set_global_scale(const glm::vec3& new_scale);
     void set_global_transform(const Transform& new_transform);
 
-    [[nodiscard]] glm::vec3 get_translation() const noexcept override final;
-    [[nodiscard]] glm::vec3 get_global_position() const noexcept override final;
-    [[nodiscard]] glm::vec3 get_scale() const noexcept override final;
-    [[nodiscard]] glm::vec3 get_global_scale() const noexcept override final;
-    [[nodiscard]] glm::quat get_rotation() const noexcept override final;
-    [[nodiscard]] glm::quat get_global_rotation() const noexcept override final;
-    [[nodiscard]] Transform get_transform() const noexcept override final;
-    [[nodiscard]] Transform get_global_transform() const noexcept override final;
-    [[nodiscard]] glm::mat4 get_local_matrix() const noexcept override final;
-    [[nodiscard]] glm::mat4 get_global_matrix() const noexcept override final;
+    [[nodiscard]] glm::vec3 get_translation() const noexcept final;
+    [[nodiscard]] glm::vec3 get_global_position() const noexcept final;
+    [[nodiscard]] glm::vec3 get_scale() const noexcept final;
+    [[nodiscard]] glm::vec3 get_global_scale() const noexcept final;
+    [[nodiscard]] glm::quat get_rotation() const noexcept final;
+    [[nodiscard]] glm::quat get_global_rotation() const noexcept final;
+    [[nodiscard]] Transform get_transform() const noexcept final;
+    [[nodiscard]] Transform get_global_transform() const noexcept final;
+    [[nodiscard]] glm::mat4 get_local_matrix() const noexcept final;
+    [[nodiscard]] glm::mat4 get_global_matrix() const noexcept final;
 
     /**
      * @brief returns non-owning pointer to the btRigidBody object.

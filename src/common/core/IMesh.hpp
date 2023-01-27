@@ -15,5 +15,5 @@ public:
 
     virtual bool is_indexed() = 0;
 
-    virtual ~IMesh() {};
+    virtual ~IMesh() = default;
 };

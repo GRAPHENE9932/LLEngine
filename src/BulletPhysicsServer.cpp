@@ -15,7 +15,7 @@ BulletPhysicsServer::BulletPhysicsServer() {
     );
 }
 
-BulletPhysicsServer::~BulletPhysicsServer() {}
+BulletPhysicsServer::~BulletPhysicsServer() = default;
 
 void BulletPhysicsServer::do_step_if_needed(float delta_time) {
     if (singleton_initialized) {
