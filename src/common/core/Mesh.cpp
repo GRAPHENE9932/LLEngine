@@ -6,27 +6,24 @@
 
 #include "Mesh.hpp"
 
-template<typename INDEX_T>
-size_t Mesh<INDEX_T>::get_amount_of_vertices() {
-    if (is_indexed())
-        return indices.size();
-    else
+size_t Mesh::get_amount_of_vertices() const {
+    if (is_indexed()) {
+        return std::visit([] (const auto& vector) -> std::size_t {
+            return vector.size();
+        }, indices);
+    }
+    else {
         return vertices.size();
+    }
 }
 
-template<typename INDEX_T>
-GLuint Mesh<INDEX_T>::get_indices_type() {
-    return 0;
-}
-
-template<>
-GLenum Mesh<uint16_t>::get_indices_type() {
-    return GL_UNSIGNED_SHORT;
-}
-
-template<>
-GLenum Mesh<uint32_t>::get_indices_type() {
-    return GL_UNSIGNED_INT;
+GLenum Mesh::get_indices_type() const {
+    if (std::holds_alternative<std::vector<uint16_t>>(indices)) {
+        return GL_UNSIGNED_SHORT;
+    }
+    else {
+        return GL_UNSIGNED_INT;
+    }
 }
 
 template<typename T, GLenum TARGET>
@@ -39,39 +36,33 @@ void handle_buffer(std::vector<T>& buffer, GLuint& buffer_id) {
                  buffer.data(), GL_STATIC_DRAW);
 }
 
-template<typename INDEX_T>
-void Mesh<INDEX_T>::set_indices(const std::vector<INDEX_T>& new_indices) {
+template<typename T>
+void Mesh::set_indices(const std::vector<T>& new_indices) {
     indices = new_indices;
-    handle_buffer<INDEX_T, GL_ELEMENT_ARRAY_BUFFER>(indices, indices_id);
+    handle_buffer<T, GL_ELEMENT_ARRAY_BUFFER>(
+        std::get<std::vector<T>>(indices),
+        indices_id
+    );
 }
 
-template<typename INDEX_T>
-void Mesh<INDEX_T>::set_vertices(const std::vector<glm::vec3>& new_vertices) {
+void Mesh::set_vertices(const std::vector<glm::vec3>& new_vertices) {
     vertices = new_vertices;
     handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(vertices, vertices_id);
 }
 
-template<typename INDEX_T>
-void Mesh<INDEX_T>::set_uvs(const std::vector<glm::vec2>& new_uvs) {
+void Mesh::set_uvs(const std::vector<glm::vec2>& new_uvs) {
     uvs = new_uvs;
     handle_buffer<glm::vec2, GL_ARRAY_BUFFER>(uvs, uvs_id);
 }
 
-template<typename INDEX_T>
-void Mesh<INDEX_T>::set_normals(const std::vector<glm::vec3>& new_normals) {
+void Mesh::set_normals(const std::vector<glm::vec3>& new_normals) {
     normals = new_normals;
     handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(normals, normals_id);
 }
 
-template<typename INDEX_T>
-void Mesh<INDEX_T>::set_tangents(const std::vector<glm::vec4>& new_tangents) {
+void Mesh::set_tangents(const std::vector<glm::vec4>& new_tangents) {
     tangents = new_tangents;
     handle_buffer<glm::vec4, GL_ARRAY_BUFFER>(tangents, tangents_id);
-}
-
-template<typename INDEX_T>
-bool Mesh<INDEX_T>::is_indexed() {
-    return static_cast<bool>(get_indices_id());
 }
 
 struct CompleteVertex {
@@ -102,12 +93,14 @@ struct CompleteVertexHasher {
     }
 };
 
-template<typename INDEX_T>
-void Mesh<INDEX_T>::index_data() {
+template<typename T>
+void Mesh::index_data() {
     if (vertices.size() != uvs.size() ||
         vertices.size() != normals.size()) {
         throw std::runtime_error("Can't index mesh data: unequal amounts of components.");
     }
+
+    auto& indices = std::get<std::vector<T>>(this->indices);
     
     // Copy input data.
     auto in_vertices = vertices;
@@ -119,7 +112,7 @@ void Mesh<INDEX_T>::index_data() {
     uvs.clear();
     normals.clear();
 
-    std::unordered_map<CompleteVertex, INDEX_T, CompleteVertexHasher> vertex_to_index;
+    std::unordered_map<CompleteVertex, T, CompleteVertexHasher> vertex_to_index;
 
     for (std::size_t i = 0; i < in_vertices.size(); i++) {
         CompleteVertex complete {in_vertices[i], in_uvs[i], in_normals[i]};
@@ -145,8 +138,16 @@ void Mesh<INDEX_T>::index_data() {
     }
 }
 
-template<typename INDEX_T>
-Mesh<INDEX_T>::~Mesh() {
+void Mesh::index_data() {
+    if (std::holds_alternative<std::vector<uint16_t>>(indices)) {
+        index_data<uint16_t>();
+    }
+    else {
+        index_data<uint32_t>();
+    }
+}
+
+Mesh::~Mesh() {
     if (indices_id)
         glDeleteBuffers(1, &indices_id);
     if (vertices_id)
@@ -159,5 +160,5 @@ Mesh<INDEX_T>::~Mesh() {
         glDeleteBuffers(1, &tangents_id);
 }
 
-template class Mesh<uint16_t>;
-template class Mesh<uint32_t>;
+template void Mesh::set_indices(const std::vector<uint16_t> &new_indices);
+template void Mesh::set_indices(const std::vector<uint32_t> &new_indices);

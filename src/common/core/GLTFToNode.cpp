@@ -16,7 +16,7 @@
 struct ConstructionEnvironment {
     const GLTF& gltf;
     RenderingServer& rendering_server;
-    const std::vector<std::shared_ptr<IMesh>>& meshes;
+    const std::vector<std::shared_ptr<Mesh>>& meshes;
     const std::vector<std::shared_ptr<Material>>& materials;
     std::vector<std::shared_ptr<Shape>> shapes_pool;
 };
@@ -170,15 +170,15 @@ std::unique_ptr<SpatialNode> to_node(
     }
 }
 
-template<typename T>
-std::shared_ptr<Mesh<T>> construct_mesh(const GLTF::MeshParameters& mesh_params) {
-    std::shared_ptr<Mesh<T>> result = std::make_shared<Mesh<T>>();
+std::shared_ptr<Mesh> construct_mesh(const GLTF::MeshParameters& mesh_params) {
+    std::shared_ptr<Mesh> result = std::make_shared<Mesh>();
 
-    if (std::holds_alternative<std::monostate>(mesh_params.indices)) {
-        result->set_indices({});
+    if (std::holds_alternative<std::vector<uint16_t>>(mesh_params.indices)) {
+        result->set_indices(std::get<std::vector<uint16_t>>(mesh_params.indices));
     }
-
-    result->set_indices(std::get<std::vector<T>>(mesh_params.indices));
+    else if (std::holds_alternative<std::vector<uint32_t>>(mesh_params.indices)) {
+        result->set_indices(std::get<std::vector<uint32_t>>(mesh_params.indices));
+    }
 
     result->set_vertices(mesh_params.vertices);
     
@@ -246,13 +246,10 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
 
 std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
     // Construct meshes.
-    std::vector<std::shared_ptr<IMesh>> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
     for (auto& cur_mesh_params : this->meshes) {
-        if (std::holds_alternative<std::vector<uint32_t>>(cur_mesh_params.indices))
-            meshes.push_back(construct_mesh<uint32_t>(cur_mesh_params));
-        else
-            meshes.push_back(construct_mesh<uint16_t>(cur_mesh_params));
+        meshes.push_back(construct_mesh(cur_mesh_params));
     }
 
     // Construct textures.
