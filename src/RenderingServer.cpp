@@ -70,7 +70,7 @@ void RenderingServer::main_loop() {
 
 void RenderingServer::register_drawable_node(DrawableNode* drawable_node) noexcept {
     if (drawable_node) {
-        drawable_nodes.insert(drawable_node);
+        drawable_nodes.push_back(drawable_node);
     }
 }
 
@@ -80,16 +80,26 @@ void RenderingServer::register_camera_node(CameraNode* camera_node) noexcept {
 
 void RenderingServer::register_point_light(PointLightNode* point_light) noexcept {
     if (point_light) {
-        point_lights.insert(point_light);
+        point_lights.push_back(point_light);
     }
 }
 
 void RenderingServer::unregister_drawable_node(DrawableNode* drawable_node) noexcept {
-    drawable_nodes.erase(drawable_node);
+    const auto iter {
+        std::find(drawable_nodes.begin(), drawable_nodes.end(), drawable_node)
+    };
+    if (iter != drawable_nodes.end()) {
+        drawable_nodes.erase(iter);
+    }
 }
 
 void RenderingServer::unregister_point_light(PointLightNode* point_light) noexcept {
-    point_lights.erase(point_light);
+    const auto iter {
+        std::find(point_lights.begin(), point_lights.end(), point_light)
+    };
+    if (iter != point_lights.end()) {
+        point_lights.erase(iter);
+    }
 }
 
 void RenderingServer::report_about_drawn_triangles(uint64_t triangles_amount) noexcept {

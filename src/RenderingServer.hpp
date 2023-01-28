@@ -96,11 +96,11 @@ public:
      */
     [[nodiscard]] glm::mat4 get_view_proj_matrix() const noexcept;
 
-    [[nodiscard]] const std::set<PointLightNode*>& get_point_lights() const noexcept {
+    [[nodiscard]] const std::vector<PointLightNode*>& get_point_lights() const noexcept {
         return point_lights;
     }
 
-    [[nodiscard]] const std::set<DrawableNode*>& get_drawable_nodes() const {
+    [[nodiscard]] const std::vector<DrawableNode*>& get_drawable_nodes() const noexcept {
         return drawable_nodes;
     }
 
@@ -127,8 +127,8 @@ private:
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
     std::unique_ptr<Skybox> skybox = nullptr;
-    std::set<DrawableNode*> drawable_nodes;
-    std::set<PointLightNode*> point_lights;
+    std::vector<DrawableNode*> drawable_nodes;
+    std::vector<PointLightNode*> point_lights;
 
     // Non-owning pointer to the root node. Used to invoke update().
     SpatialNode* root_node = nullptr;
