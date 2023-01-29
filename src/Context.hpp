@@ -5,7 +5,7 @@
 #include <glm/ext/vector_int2.hpp> // glm::ivec2
 
 #include "common/core/shaders/ShaderManager.hpp"
-#include "common/core/IWindow.hpp" // IWindow
+#include "common/core/Window.hpp" // Window
 
 struct PointLightNode;
 struct SpotLight;
@@ -16,7 +16,7 @@ struct Context {
     glm::mat4 view_proj_matrix, view_matrix, proj_matrix;
     ShaderManager sh_mgr;
 
-    IWindow* window;
+    Window* window;
 
     float delta_time;
     unsigned long triangles_drawn = 0;

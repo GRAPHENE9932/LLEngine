@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h> // Macros.
 
 #include "nodes/core/rendering/CameraNode.hpp" // CameraNode
-#include "common/core/IWindow.hpp" // Key
+#include "common/core/Window.hpp" // Key
 
 class SpectatorCameraNode : public CameraNode {
 public:

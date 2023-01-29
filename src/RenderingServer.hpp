@@ -9,7 +9,7 @@
 #include <glm/vec2.hpp> // glm::ivec2
 #include <glm/mat4x4.hpp> // glm::mat4
 
-#include "common/core/IWindow.hpp" // IWindow
+#include "common/core/Window.hpp" // Window
 #include "common/core/Skybox.hpp" // Skybox
 #include "common/core/shaders/ShaderManager.hpp" // ShaderManager
 
@@ -108,7 +108,7 @@ public:
         return delta_time;
     }
 
-    [[nodiscard]] IWindow& get_window() {
+    [[nodiscard]] Window& get_window() {
         return window;
     }
 
@@ -117,7 +117,7 @@ public:
     }
 
 private:
-    IWindow& window;
+    Window& window;
     ShaderManager shader_manager;
 
     // Time point of the last frame.
