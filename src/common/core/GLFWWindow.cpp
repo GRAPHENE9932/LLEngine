@@ -97,7 +97,7 @@ bool GLFWWindow::window_should_close() const {
 }
 
 void GLFWWindow::disable_cursor() {
-    glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 glm::dvec2 GLFWWindow::get_cursor_position() const {
