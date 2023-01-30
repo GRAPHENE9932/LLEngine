@@ -93,28 +93,28 @@ void CommonShader::initialize(const Parameters& params) {
     );
 
     // Initialize uniform locations.
-    mvp_id = glGetUniformLocation(program_id, "MVP");
-    model_matrix_id = glGetUniformLocation(program_id, "MODEL_MATRIX");
-    normal_matrix_id = glGetUniformLocation(program_id, "NORMAL_MATRIX");
-    ambient_id = glGetUniformLocation(program_id, "AMBIENT");
-    base_color_factor_id = glGetUniformLocation(program_id, "BASE_COLOR_FACTOR");
-    normal_scale_id = glGetUniformLocation(program_id, "NORMAL_MAP_SCALE");
-    uv_offset_id = glGetUniformLocation(program_id, "UV_OFFSET");
-    uv_scale_id = glGetUniformLocation(program_id, "UV_SCALE");
-    base_uv_offset_id = glGetUniformLocation(program_id, "BASE_UV_OFFSET");
-    base_uv_scale_id = glGetUniformLocation(program_id, "BASE_UV_SCALE");
-    normal_uv_offset_id = glGetUniformLocation(program_id, "NORMAL_UV_OFFSET");
-    normal_uv_scale_id = glGetUniformLocation(program_id, "NORMAL_UV_SCALE");
+    mvp_id = glGetUniformLocation(program_id, "mvp");
+    model_matrix_id = glGetUniformLocation(program_id, "model_matrix");
+    normal_matrix_id = glGetUniformLocation(program_id, "normal_matrix");
+    ambient_id = glGetUniformLocation(program_id, "ambient");
+    base_color_factor_id = glGetUniformLocation(program_id, "base_color_factor");
+    normal_scale_id = glGetUniformLocation(program_id, "normal_map_scale");
+    uv_offset_id = glGetUniformLocation(program_id, "uv_offset");
+    uv_scale_id = glGetUniformLocation(program_id, "uv_scale");
+    base_uv_offset_id = glGetUniformLocation(program_id, "base_uv_offset");
+    base_uv_scale_id = glGetUniformLocation(program_id, "base_uv_scale");
+    normal_uv_offset_id = glGetUniformLocation(program_id, "normal_uv_offset");
+    normal_uv_scale_id = glGetUniformLocation(program_id, "normal_uv_scale");
 
-    base_color_texture_uniform_id = glGetUniformLocation(program_id, "BASE_COLOR_TEXTURE");
-    normal_map_texture_uniform_id = glGetUniformLocation(program_id, "NORMAL_TEXTURE");
-    met_rough_texture_uniform_id = glGetUniformLocation(program_id, "METALLIC_ROUGHNESS_TEXTURE");
-    occlusion_texture_uniform_id = glGetUniformLocation(program_id, "OCCLUSION_TEXTURE");
-    emmisive_texture_uniform_id = glGetUniformLocation(program_id, "EMMISIVE_TEXTURE");
+    base_color_texture_uniform_id = glGetUniformLocation(program_id, "base_color_texture");
+    normal_map_texture_uniform_id = glGetUniformLocation(program_id, "normal_texture");
+    met_rough_texture_uniform_id = glGetUniformLocation(program_id, "metallic_roughness_texture");
+    occlusion_texture_uniform_id = glGetUniformLocation(program_id, "occlusion_texture");
+    emmisive_texture_uniform_id = glGetUniformLocation(program_id, "emmisive_texture");
     
     for (size_t i = 0; i < params.point_lights_count; i++) {
         point_light_ids.insert(
-            PointLightNode::get_uniforms_id(program_id, "POINT_LIGHTS", i)
+            PointLightNode::get_uniforms_id(program_id, "point_lights", i)
         );
     }
 }

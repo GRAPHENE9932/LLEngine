@@ -14,31 +14,31 @@
 // POINT_LIGHTS_COUNT <int>
 // SPOT_LIGHTS_COUNT <int>
 
-out vec4 COLOR_OUT;
+out vec4 color_out;
 
 #ifdef USING_BASE_UV_TRANSFORM
-    in vec2 FRAG_BASE_UV;
+    in vec2 frag_base_uv;
 #endif
 #ifdef USING_NORMAL_UV_TRANSFORM
-    in vec2 FRAG_NORMAL_UV;
+    in vec2 frag_normal_uv;
 #endif
 #ifdef USING_UV
-    in vec2 FRAG_UV;
+    in vec2 frag_uv;
 #endif
 #ifdef USING_VERTEX_NORMALS
-    in vec3 FRAG_NORMAL;
+    in vec3 frag_normal;
 #endif
 #ifdef USING_FRAGMENT_POSITION
     // May be in tangent space if USING_NORMAL_TEXTURE is enabled.
-    in vec3 FRAG_POS;
+    in vec3 frag_pos;
 #endif
 #ifdef USING_NORMAL_TEXTURE
     #if POINT_LIGHTS_COUNT > 0
-        in vec3 POINT_LIGHT_POSITIONS_TANGENT_SPACE[POINT_LIGHTS_COUNT];
+        in vec3 point_light_positions_tangent_space[POINT_LIGHTS_COUNT];
     #endif
     #if SPOT_LIGHTS_COUNT > 0
-        in vec3 SPOT_LIGHT_POSITIONS_TANGENT_SPACE[SPOT_LIGHTS_COUNT];
-        in vec3 SPOT_LIGHT_DIRECTIONS_TANGENT_SPACE[SPOT_LIGHTS_COUNT];
+        in vec3 spot_light_positions_tangent_space[SPOT_LIGHTS_COUNT];
+        in vec3 spot_light_directions_tangent_space[SPOT_LIGHTS_COUNT];
     #endif
 #endif
 
@@ -57,24 +57,24 @@ struct SpotLight {
 
 // Not all uniforms are used at the same time.
 // Unused ones will be optimized out.
-uniform sampler2D BASE_COLOR_TEXTURE;
-uniform sampler2D NORMAL_TEXTURE;
-uniform vec4 BASE_COLOR_FACTOR;
-uniform float NORMAL_MAP_SCALE;
-uniform vec3 AMBIENT;
+uniform sampler2D base_color_texture;
+uniform sampler2D normal_texture;
+uniform vec4 base_color_factor;
+uniform float normal_map_scale;
+uniform vec3 ambient;
 #if POINT_LIGHTS_COUNT > 0
-    uniform PointLight POINT_LIGHTS[POINT_LIGHTS_COUNT];
+    uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
 #if SPOT_LIGHTS_COUNT > 0
-    uniform SpotLight SPOT_LIGHTS[SPOT_LIGHTS_COUNT];
+    uniform SpotLight spot_lights[SPOT_LIGHTS_COUNT];
 #endif
 
 vec2 get_base_uv() {
     #ifdef USING_UV
         #ifdef USING_BASE_UV_TRANSFORM
-            return FRAG_BASE_UV;
+            return frag_base_uv;
         #else
-            return FRAG_UV;
+            return frag_uv;
         #endif
     #else
         return vec2(0.0, 0.0);
@@ -84,9 +84,9 @@ vec2 get_base_uv() {
 vec2 get_normal_uv() {
     #ifdef USING_UV
         #ifdef USING_NORMAL_UV_TRANSFORM
-            return FRAG_NORMAL_UV;
+            return frag_normal_uv;
         #else
-            return FRAG_UV;
+            return frag_uv;
         #endif
     #else
         return vec2(0.0, 0.0);
@@ -96,13 +96,13 @@ vec2 get_normal_uv() {
 vec4 get_base_color() {
     #ifdef USING_BASE_COLOR_TEXTURE
         #ifdef USING_BASE_COLOR_FACTOR
-            return texture(BASE_COLOR_TEXTURE, get_base_uv()) * BASE_COLOR_FACTOR;
+            return texture(base_color_texture, get_base_uv()) * base_color_factor;
         #else
-            return texture(BASE_COLOR_TEXTURE, get_base_uv());
+            return texture(base_color_texture, get_base_uv());
         #endif
     #else
         #ifdef USING_BASE_COLOR_FACTOR
-            return BASE_COLOR_FACTOR;
+            return base_color_factor;
         #else
             return vec4(0.0, 0.0, 0.0, 1.0);
         #endif
@@ -112,15 +112,15 @@ vec4 get_base_color() {
 vec3 get_normal() {
     #ifdef USING_VERTEX_NORMALS
         #ifdef USING_NORMAL_TEXTURE
-            vec3 result = texture(NORMAL_TEXTURE, get_normal_uv()).rgb;
+            vec3 result = texture(normal_texture, get_normal_uv()).rgb;
             result = result * 2.0 - 1.0;
             #ifdef USING_NORMAL_MAP_SCALE
-                return NORMAL_MAP_SCALE * result;
+                return normal_map_scale * result;
             #else
                 return result;
             #endif
         #else
-            return FRAG_NORMAL;
+            return frag_normal;
         #endif
     #else
         return vec3(0.0, 0.0, 0.0);
@@ -130,22 +130,22 @@ vec3 get_normal() {
 #if POINT_LIGHTS_COUNT > 0
 vec3 calc_point_light(int light_index) {
     #ifdef USING_NORMAL_TEXTURE
-        vec3 light_position = POINT_LIGHT_POSITIONS_TANGENT_SPACE[light_index];
+        vec3 light_position = point_light_positions_tangent_space[light_index];
     #else
-        vec3 light_position = POINT_LIGHTS[light_index].position;
+        vec3 light_position = point_lights[light_index].position;
     #endif
 
-    float distance = length(FRAG_POS - light_position);
-    vec3 direction = (FRAG_POS - light_position) / distance;
+    float distance = length(frag_pos - light_position);
+    vec3 direction = (frag_pos - light_position) / distance;
 
     float diffuse_factor = max(dot(get_normal(), -direction), 0.0) *
-            POINT_LIGHTS[light_index].diffuse_strength;
-    vec3 diffuse_color = diffuse_factor * POINT_LIGHTS[light_index].color;
+            point_lights[light_index].diffuse_strength;
+    vec3 diffuse_color = diffuse_factor * point_lights[light_index].color;
 
     float attenuation = 1.0 / (
-        POINT_LIGHTS[light_index].const_coeff +
-        POINT_LIGHTS[light_index].linear_coeff * distance +
-        POINT_LIGHTS[light_index].quadratic_coeff * (distance * distance)
+        point_lights[light_index].const_coeff +
+        point_lights[light_index].linear_coeff * distance +
+        point_lights[light_index].quadratic_coeff * (distance * distance)
     );
 
     return attenuation * diffuse_color;
@@ -153,7 +153,7 @@ vec3 calc_point_light(int light_index) {
 #endif
 
 void main() {
-    vec3 lightning_result = AMBIENT;
+    vec3 lightning_result = ambient;
     
     #if POINT_LIGHTS_COUNT > 0
         for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
@@ -161,5 +161,5 @@ void main() {
         }
     #endif
 
-    COLOR_OUT = vec4(lightning_result, 1.0) * get_base_color();
+    color_out = vec4(lightning_result, 1.0) * get_base_color();
 }
