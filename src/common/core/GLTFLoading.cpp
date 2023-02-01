@@ -182,29 +182,37 @@ void construct_material_params(GLTF& gltf, const json& gltf_json) {
         if (cur_json.contains("pbrMetallicRoughness")) {
             const json& pbrmr = cur_json["pbrMetallicRoughness"];
 
-            result.base_color.factor = get_optional<glm::vec4>(
+            result.base_color_factor = get_optional<glm::vec4>(
                 pbrmr, "baseColorFactor", {1.0f, 1.0f, 1.0f, 1.0f}
             );
-            result.metallic_roughness.metallic_factor = get_optional<float>(
+            result.metallic_factor = get_optional<float>(
                 pbrmr, "metallicFactor", DEFAULT_METALLIC
             );
-            result.metallic_roughness.roughness_factor = get_optional<float>(
+            result.roughness_factor = get_optional<float>(
                 pbrmr, "roughnessFactor", DEFAULT_ROUGHNESS
             );
 
-            if (pbrmr.contains("metallicRoughnessTexture"))
-                result.metallic_roughness.texture = handle_texture_info(
+
+            if (pbrmr.contains("metallicRoughnessTexture")) {
+                auto tex_info = handle_texture_info(
                     pbrmr["metallicRoughnessTexture"]
                 );
-            else
-                result.metallic_roughness.texture = std::nullopt;
+                result.metallic_texture = {tex_info, Channel::BLUE};
+                result.roughness_texture = {tex_info, Channel::GREEN};
+            }
+            else {
+                result.metallic_texture = std::nullopt;
+                result.roughness_texture = std::nullopt;
+            }
 
-            if (pbrmr.contains("baseColorTexture"))
-                result.base_color.texture = handle_texture_info(
+            if (pbrmr.contains("baseColorTexture")) {
+                result.base_color_texture = handle_texture_info(
                     pbrmr["baseColorTexture"]
                 );
-            else
-                result.base_color.texture = std::nullopt;
+            }
+            else {
+                result.base_color_texture = std::nullopt;
+            }
         }
 
         // Handle normal map info.

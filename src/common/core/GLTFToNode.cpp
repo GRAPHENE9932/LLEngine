@@ -210,19 +210,39 @@ construct_texture_info(const std::optional<BasicMaterial<uint32_t>::TextureInfo>
     });
 }
 
+std::optional<Material::SingleChannelTextureInfo>
+construct_texture_info(const std::optional<BasicMaterial<uint32_t>::SingleChannelTextureInfo>& tex_info_params,
+        const std::vector<std::shared_ptr<Texture>>& textures) {
+    if (!tex_info_params.has_value())
+        return std::nullopt;
+
+    return Material::SingleChannelTextureInfo({
+        textures.at(tex_info_params->texture),
+        tex_info_params->uv_offset,
+        tex_info_params->uv_scale,
+        tex_info_params->channel
+    });
+}
+
 std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_params,
         const std::vector<std::shared_ptr<Texture>>& textures) {
     std::shared_ptr<Material> result = std::make_shared<Material>();
 
-    result->base_color = {
-        construct_texture_info(mat_params.base_color.texture, textures),
-        mat_params.base_color.factor
-    };
-    result->metallic_roughness = {
-        construct_texture_info(mat_params.metallic_roughness.texture, textures),
-        mat_params.metallic_roughness.metallic_factor,
-        mat_params.metallic_roughness.roughness_factor
-    };
+    result->base_color_texture = construct_texture_info(mat_params.base_color_texture, textures);
+    result->base_color_factor = mat_params.base_color_factor;
+
+    result->emissive_texture = construct_texture_info(mat_params.emissive_texture, textures);
+    result->emissive_factor = mat_params.emissive_factor;
+
+    result->ambient_occlusion_texture = construct_texture_info(mat_params.ambient_occlusion_texture, textures);
+    result->ambient_occlusion_factor = mat_params.ambient_occlusion_factor;
+
+    result->metallic_texture = construct_texture_info(mat_params.metallic_texture, textures);
+    result->metallic_factor = mat_params.metallic_factor;
+    
+    result->roughness_texture = construct_texture_info(mat_params.roughness_texture, textures);
+    result->roughness_factor = mat_params.roughness_factor;
+
     if (mat_params.normal_map.has_value()) {
         result->normal_map = {
             *construct_texture_info(mat_params.normal_map->texture, textures),
@@ -232,14 +252,6 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     else {
         result->normal_map = std::nullopt;
     }
-    result->occlusion = {
-        construct_texture_info(mat_params.occlusion.texture, textures),
-        mat_params.occlusion.strength
-    };
-    result->emmisive = {
-        construct_texture_info(mat_params.emmisive.texture, textures),
-        mat_params.emmisive.factor
-    };
 
     return result;
 }
