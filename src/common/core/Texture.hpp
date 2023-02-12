@@ -20,17 +20,22 @@ public:
     Texture() = default;
     explicit inline Texture(GLuint texture_id) noexcept :
             texture_id(texture_id) {}
+    Texture(const Texture& other) = delete;
+    Texture(Texture&& other) = delete;
     inline ~Texture() {
+        // This function ignores texture ID of 0.
         glDeleteTextures(1, &texture_id);
     }
+
+    Texture operator=(const Texture& other) = delete;
 
     inline operator GLuint() const noexcept {
         return texture_id;
     }
 
     inline void set_id(GLuint new_id) {
-        if (texture_id != 0)
-            glDeleteTextures(1, &texture_id);
+        // This function ignores texture ID of 0.
+        glDeleteTextures(1, &texture_id);
 
         texture_id = new_id;
     }
@@ -43,6 +48,6 @@ public:
     }
 
 protected:
-    GLuint texture_id;
+    GLuint texture_id = 0; // ID of value 0 implies that there are no texture.
     glm::u32vec2 tex_size {0, 0};
 };

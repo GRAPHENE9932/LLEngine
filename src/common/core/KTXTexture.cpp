@@ -283,3 +283,38 @@ KTXTexture::KTXTexture(const Parameters& params) {
     this->texture_id = load_mipmap_levels(stream, header, level_indexes, params);
     this->tex_size = {header.pixel_width, header.pixel_height};
 }
+
+KTXTexture::KTXTexture(std::string_view file_path) :
+        KTXTexture(Parameters{
+            GL_LINEAR,
+            GL_LINEAR,
+            GL_CLAMP_TO_EDGE,
+            GL_CLAMP_TO_EDGE,
+            std::string(file_path),
+            0
+        }) {}
+
+KTXTexture::KTXTexture(KTXTexture&& other) noexcept {
+    texture_id = other.texture_id;
+    tex_size = other.tex_size;
+    dfd_block = std::move(other.dfd_block);
+    key_value_data = std::move(other.key_value_data);
+    supercompression_global_data = std::move(other.supercompression_global_data);
+
+    other.texture_id = 0;
+}
+
+KTXTexture& KTXTexture::operator=(KTXTexture&& other) noexcept {
+    // This function ignores texture ID of 0.
+    glDeleteTextures(1, &texture_id);
+
+    texture_id = other.texture_id;
+    tex_size = other.tex_size;
+    dfd_block = std::move(other.dfd_block);
+    key_value_data = std::move(other.key_value_data);
+    supercompression_global_data = std::move(other.supercompression_global_data);
+
+    other.texture_id = 0;
+
+    return *this;
+}

@@ -13,6 +13,14 @@ public:
     ///   - Multiple layers
     ///   - Supercompression other than Zstandard.
     explicit KTXTexture(const Parameters& params);
+    /// Loads texture from KTX2 file.
+    /// Not supported:
+    ///   - Multiple layers
+    ///   - Supercompression other than Zstandard.
+    explicit KTXTexture(std::string_view file_path);
+    KTXTexture(const KTXTexture& other) = delete;
+    KTXTexture(KTXTexture&& other) noexcept;
+    KTXTexture& operator=(KTXTexture&& other) noexcept;
 
 private:
     std::vector<char> dfd_block;
