@@ -11,6 +11,7 @@ set(SOURCES
     common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
     common/core/KTXTexture.cpp
+    common/core/RGBETexture.cpp
     common/core/BitmapFont.cpp
     common/core/VkFormatInfo.cpp
     common/core/shaders/ShaderManager.cpp
