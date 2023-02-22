@@ -49,15 +49,30 @@ constexpr std::array<float, 108> SKYBOX_VERTICES {{
 
 GLuint Cubemap::vertices_id = 0;
 
+Cubemap::Cubemap(Cubemap&& other) noexcept :
+        Cubemap(other.rendering_server, other.cubemap_texture) {
+    other.cubemap_texture = nullptr;
+}
+
 Cubemap::Cubemap(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture) :
-    cubemap_texture(cubemap_texture), rendering_server(rs) {};
+    cubemap_texture(cubemap_texture), rendering_server(rs) {
+    static_init_if_needed();
+    amount_of_sky_boxes++;
+};
+
+Cubemap::~Cubemap() {
+    amount_of_sky_boxes--;
+    if (amount_of_sky_boxes == 0) {
+        static_clean_up();
+    }
+}
 
 Cubemap Cubemap::from_cubemap(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture) {
     return Cubemap(rs, cubemap_texture);
 }
 
 Cubemap Cubemap::from_panorama(RenderingServer& rs, const std::shared_ptr<Texture>& panorama_texture) {
-    static_init();
+    static_init_if_needed();
 
     const glm::mat4 proj_matrix {glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f)};
     const std::array<glm::mat4, 6> mvp_matrices {
@@ -126,9 +141,10 @@ Cubemap Cubemap::from_panorama(RenderingServer& rs, const std::shared_ptr<Textur
     return Cubemap::from_cubemap(rs, std::make_shared<Texture>(cubemap_id));
 }
 
-void Cubemap::static_init() {
-    if (vertices_id)
+void Cubemap::static_init_if_needed() {
+    if (vertices_id != 0) {
         return;
+    }
 
     // Init buffers.
     glGenBuffers(1, &vertices_id);

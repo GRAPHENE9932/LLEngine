@@ -11,9 +11,7 @@ RenderingServer::RenderingServer(glm::ivec2 window_extents) :
     window(*new GLFWWindow(window_extents, "LLShooter", 3, 3)),
     shader_manager(*this) {}
 
-RenderingServer::~RenderingServer() {
-    Cubemap::static_clean_up();
-}
+RenderingServer::~RenderingServer() {}
 
 void RenderingServer::set_cubemap(Cubemap&& cubemap) {
     this->cubemap = std::make_unique<Cubemap>(std::move(cubemap));
@@ -24,8 +22,6 @@ void RenderingServer::set_root_node(SpatialNode* root_node) {
 }
 
 void RenderingServer::main_loop() {
-    Cubemap::static_init();
-
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
     prev_frame_time = std::chrono::high_resolution_clock::now();
