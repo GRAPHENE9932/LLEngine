@@ -45,11 +45,8 @@ void from_json(const json& root_json, Transform& spat_params) {
     };
 }
 
-std::unique_ptr<PointLightNode> point_light_from_json(const json& root_json, RenderingServer& rs) {
-    auto result = std::make_unique<PointLightNode>(
-        root_json.get<Transform>(),
-        rs
-    );
+std::unique_ptr<PointLightNode> point_light_from_json(const json& root_json) {
+    auto result = std::make_unique<PointLightNode>(root_json.get<Transform>());
     root_json.at("color").get_to(result->color);
     root_json.at("diffuse_strength").get_to(result->diffuse_strength);
     const auto& coef_json = root_json.at("coefficients");
@@ -60,23 +57,23 @@ std::unique_ptr<PointLightNode> point_light_from_json(const json& root_json, Ren
     return result;
 }
 
-std::unique_ptr<SpectatorCameraNode> player_to_node(const json& root_json, RenderingServer& rs) {
-    const auto& extents = rs.get_window().get_window_size();
+std::unique_ptr<SpectatorCameraNode> player_to_node(const json& root_json) {
+    const auto& extents = RenderingServer::get_instance().get_window().get_window_size();
     const float aspect_ratio {static_cast<float>(extents.x) / extents.y};
 
     auto result = std::make_unique<SpectatorCameraNode>(
-        rs, root_json.get<Transform>(), aspect_ratio,
+        root_json.get<Transform>(), aspect_ratio,
         glm::radians(root_json.at("fov").get<float>())
     );
     return result;
 }
 
-std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_node) const {
+std::unique_ptr<SpatialNode> Map::to_node(const json& json_node) const {
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
     if (type == "scene_file") {
         const Transform spat_params = json_node.get<Transform>();
-        result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(rs);
+        result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node();
         result->set_translation(spat_params.translation + result->get_translation());
         result->set_scale(spat_params.scale * result->get_scale());
         result->set_rotation(spat_params.rotation * result->get_rotation());
@@ -86,10 +83,10 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
         result = std::make_unique<CompleteSpatialNode>(spat_params);
     }
     else if (type == "point_light") {
-        result = point_light_from_json(json_node, rs);
+        result = point_light_from_json(json_node);
     }
     else if (type == "player") {
-        result = player_to_node(json_node, rs);
+        result = player_to_node(json_node);
     }
     else {
         throw std::runtime_error("Unknown node type.");
@@ -98,7 +95,7 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     if (json_node.contains("children")) {
         for (const json& cur_json_child : json_node["children"]) {
             result->add_child(
-                std::move(*to_node(rs, cur_json_child).release())
+                std::move(*to_node(cur_json_child).release())
             );
         }
     }
@@ -106,6 +103,6 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     return result;
 }
 
-std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs) const {
-    return to_node(rs, json_map.at("root_node"));
+std::unique_ptr<SpatialNode> Map::to_node() const {
+    return to_node(json_map.at("root_node"));
 }

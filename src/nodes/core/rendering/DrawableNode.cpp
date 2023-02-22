@@ -1,11 +1,11 @@
-#include "RenderingServer.hpp" // RenderingServer
 #include "DrawableNode.hpp" // DrawableNode
+#include "RenderingServer.hpp"
 
-DrawableNode::DrawableNode(const Transform& p, RenderingServer& rs) :
-    CompleteSpatialNode(p), rendering_server(rs) {
-    rendering_server.register_drawable_node(this);
+DrawableNode::DrawableNode(const Transform& p) :
+    CompleteSpatialNode(p) {
+    RenderingServer::get_instance().register_drawable_node(this);
 }
 
 DrawableNode::~DrawableNode() {
-    rendering_server.unregister_drawable_node(this);
+    RenderingServer::get_instance().unregister_drawable_node(this);
 }

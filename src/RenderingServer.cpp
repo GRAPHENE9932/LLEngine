@@ -7,9 +7,8 @@
 
 #include <GLFW/glfw3.h>
 
-RenderingServer::RenderingServer(glm::ivec2 window_extents) :
-    window(*new GLFWWindow(window_extents, "LLShooter", 3, 3)),
-    shader_manager(*this) {}
+RenderingServer::RenderingServer() :
+    window(*new GLFWWindow(starting_resolution, "LLShooter", 3, 3)) {}
 
 RenderingServer::~RenderingServer() {}
 

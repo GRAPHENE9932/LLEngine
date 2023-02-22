@@ -26,8 +26,20 @@ struct SpotLight;
  */
 class RenderingServer {
 public:
-    explicit RenderingServer(glm::ivec2 window_extents);
     ~RenderingServer();
+
+    static RenderingServer& get_instance() {
+        static RenderingServer instance;
+        return instance;
+    }
+
+    static void force_initialize() {
+        get_instance();
+    }
+
+    static void set_starting_resolution(glm::ivec2 window_extents) {
+        starting_resolution = window_extents;
+    }
 
     void set_cubemap(Cubemap&& skybox);
     void set_root_node(SpatialNode* root_node);
@@ -127,6 +139,8 @@ public:
     get_environment_cubemap(const glm::vec3& obj_position);
 
 private:
+    static inline glm::ivec2 starting_resolution = glm::vec2(1500, 800);
+
     Window& window;
     ShaderManager shader_manager;
 
@@ -142,4 +156,6 @@ private:
 
     // Non-owning pointer to the root node. Used to invoke update().
     SpatialNode* root_node = nullptr;
+
+    RenderingServer();
 };

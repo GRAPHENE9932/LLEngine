@@ -11,8 +11,6 @@
 #include <cstdint> // uint8_t, uint32_t
 #include <optional> // std::optional
 
-class RenderingServer;
-
 class CommonShader {
 public:
     enum Flags : uint32_t {
@@ -51,11 +49,10 @@ public:
     };
 
     static Parameters to_parameters(
-        const Material& material, bool using_environment_cubemap,
-        RenderingServer& rs
+        const Material& material, bool using_environment_cubemap
     ) noexcept;
 
-    explicit CommonShader(const Parameters& params, RenderingServer& rs);
+    explicit CommonShader(const Parameters& params);
     // Make the object non-copyable.
     // It was so frustrating to debug an error caused by
     // an unexpected destructor call...
@@ -111,8 +108,6 @@ private:
     GLint environment_cubemap_uniform_id = -1;
 
     std::set<PointLightNode::Uniforms> point_light_ids;
-
-    RenderingServer& rendering_server;
 
     void initialize_uniforms(const Parameters& params);
 };

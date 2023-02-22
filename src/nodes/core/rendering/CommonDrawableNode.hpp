@@ -6,14 +6,12 @@
 #include "common/core/Mesh.hpp"
 #include "common/core/Material.hpp" // Material
 
-class RenderingServer;
-
 class CommonDrawableNode : public DrawableNode {
 public:
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Material> material;
 
-    CommonDrawableNode(const Transform& p, RenderingServer& rs,
+    CommonDrawableNode(const Transform& p,
         const std::shared_ptr<Material>& material,
         const std::shared_ptr<Mesh>& mesh);
 

@@ -14,7 +14,6 @@ public:
     void start();
 
 private:
-    std::unique_ptr<RenderingServer> rendering_server = nullptr;
     std::unique_ptr<FPSMeter> fps_meter = nullptr;
     std::shared_ptr<BitmapTextNode> info_display = nullptr;
     std::unique_ptr<SpatialNode> root_node = nullptr;

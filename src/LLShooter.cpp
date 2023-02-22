@@ -1,4 +1,8 @@
 #include "LLShooter.hpp"
+#include "common/core/KTXTexture.hpp"
+#include "common/core/RGBETexture.hpp"
+#include "nodes/core/rendering/CommonDrawableNode.hpp"
+
 #include <GLFW/glfw3.h>
 
 #include <memory>
@@ -12,16 +16,17 @@ LLShooter::~LLShooter() {
 
 void LLShooter::start() {
     init();
-    rendering_server->main_loop();
+    RenderingServer::get_instance().main_loop();
 }
 
 void LLShooter::init() {
-    fps_meter = std::make_unique<FPSMeter>(0.25f);
-
-    rendering_server = std::make_unique<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+    RenderingServer::set_starting_resolution(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+    RenderingServer::force_initialize();
 
     Map map("res/maps/map_close.json");
-    root_node = map.to_node(*rendering_server);
+    root_node = map.to_node();
+    RenderingServer::get_instance().set_root_node(root_node.get());
 
-    rendering_server->set_root_node(root_node.get());
+    auto sky_panorama = std::make_shared<RGBETexture>("res/textures/sky.hdr");
+    RenderingServer::get_instance().set_cubemap(Cubemap::from_panorama(sky_panorama));
 }

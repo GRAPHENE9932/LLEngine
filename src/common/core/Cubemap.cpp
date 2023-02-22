@@ -50,12 +50,12 @@ constexpr std::array<float, 108> SKYBOX_VERTICES {{
 GLuint Cubemap::vertices_id = 0;
 
 Cubemap::Cubemap(Cubemap&& other) noexcept :
-        Cubemap(other.rendering_server, other.cubemap_texture) {
+        Cubemap(other.cubemap_texture) {
     other.cubemap_texture = nullptr;
 }
 
-Cubemap::Cubemap(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture) :
-    cubemap_texture(cubemap_texture), rendering_server(rs) {
+Cubemap::Cubemap(const std::shared_ptr<Texture>& cubemap_texture) :
+    cubemap_texture(cubemap_texture) {
     static_init_if_needed();
     amount_of_sky_boxes++;
 };
@@ -67,11 +67,11 @@ Cubemap::~Cubemap() {
     }
 }
 
-Cubemap Cubemap::from_cubemap(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture) {
-    return Cubemap(rs, cubemap_texture);
+Cubemap Cubemap::from_cubemap(const std::shared_ptr<Texture>& cubemap_texture) {
+    return Cubemap(cubemap_texture);
 }
 
-Cubemap Cubemap::from_panorama(RenderingServer& rs, const std::shared_ptr<Texture>& panorama_texture) {
+Cubemap Cubemap::from_panorama(const std::shared_ptr<Texture>& panorama_texture) {
     static_init_if_needed();
 
     const glm::mat4 proj_matrix {glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f)};
@@ -123,7 +123,8 @@ Cubemap Cubemap::from_panorama(RenderingServer& rs, const std::shared_ptr<Textur
             cubemap_id, 0
         );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        rs.get_shader_manager().use_equirectangular_mapper_shader(mvp_matrices[i], panorama_texture->get_id());
+        RenderingServer::get_instance().get_shader_manager()
+                .use_equirectangular_mapper_shader(mvp_matrices[i], panorama_texture->get_id());
         
         // Draw.
         // Vertices.
@@ -133,12 +134,12 @@ Cubemap Cubemap::from_panorama(RenderingServer& rs, const std::shared_ptr<Textur
         // Bind the cubemap.
         glBindVertexArray(vertices_id);
         glDrawArrays(GL_TRIANGLES, 0, SKYBOX_VERTICES.size());
-        rs.report_about_drawn_triangles(SKYBOX_VERTICES.size() / 3);
+        RenderingServer::get_instance().report_about_drawn_triangles(SKYBOX_VERTICES.size() / 3);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, 1500, 800);
 
-    return Cubemap::from_cubemap(rs, std::make_shared<Texture>(cubemap_id));
+    return Cubemap::from_cubemap(std::make_shared<Texture>(cubemap_id));
 }
 
 void Cubemap::static_init_if_needed() {
@@ -160,11 +161,13 @@ void Cubemap::static_clean_up() {
 }
 
 void Cubemap::draw() {
+    auto& rs = RenderingServer::get_instance();
+
     // Uniforms.
-    const glm::mat4 view_without_translation = glm::mat3(rendering_server.get_view_matrix());
-    const glm::mat4 mvp = rendering_server.get_proj_matrix() * view_without_translation;
+    const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());
+    const glm::mat4 mvp = rs.get_proj_matrix() * view_without_translation;
     
-    rendering_server.get_shader_manager().use_skybox_shader(mvp);
+    rs.get_shader_manager().use_skybox_shader(mvp);
 
     // Vertices.
     glEnableVertexAttribArray(0);
@@ -172,11 +175,12 @@ void Cubemap::draw() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind the cubemap.
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture->get_id());
 
     glBindVertexArray(vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, SKYBOX_VERTICES.size());
-    rendering_server.report_about_drawn_triangles(SKYBOX_VERTICES.size() / 3);
+    rs.report_about_drawn_triangles(SKYBOX_VERTICES.size() / 3);
 
     glDisableVertexAttribArray(0);
 }

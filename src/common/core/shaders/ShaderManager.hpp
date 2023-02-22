@@ -8,12 +8,8 @@
 #include "SkyboxShader.hpp"
 #include "CommonShader.hpp"
 
-class RenderingServer;
-
 class ShaderManager {
 public:
-    explicit ShaderManager(RenderingServer& rs);
-
     void use_equirectangular_mapper_shader(
         const glm::mat4& mvp,
         GLuint panorama_texture_id
@@ -35,7 +31,6 @@ private:
 
     EquirectangularMapperShader equirectangular_mapper_shader;
     ColoredTextShader colored_text_shader;
-    RenderingServer& rendering_server;
     SkyboxShader skybox_shader;
 
     struct ComShaderComparator {

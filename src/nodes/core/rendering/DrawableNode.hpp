@@ -4,13 +4,9 @@
 
 #include <GL/glew.h> // GLuint
 
-class RenderingServer;
-
 class DrawableNode : public CompleteSpatialNode {
 public:
-    RenderingServer& rendering_server;
-
-    DrawableNode(const Transform& p, RenderingServer& rs);
+    DrawableNode(const Transform& p);
     ~DrawableNode();
 
     virtual void draw() = 0;

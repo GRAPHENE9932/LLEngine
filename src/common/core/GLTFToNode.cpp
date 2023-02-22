@@ -15,7 +15,6 @@
 // Packed parameters used across functions.
 struct ConstructionEnvironment {
     const GLTF& gltf;
-    RenderingServer& rendering_server;
     const std::vector<std::shared_ptr<Mesh>>& meshes;
     const std::vector<std::shared_ptr<Material>>& materials;
     std::vector<std::shared_ptr<Shape>> shapes_pool;
@@ -41,7 +40,6 @@ std::unique_ptr<CommonDrawableNode> construct_common_drawable(
 
     auto result = std::make_unique<CommonDrawableNode>(
         gltf_node.transform,
-        constr_env.rendering_server,
         constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
         constr_env.meshes.at(*gltf_node.mesh_index)
     );
@@ -256,7 +254,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
+std::unique_ptr<::SpatialNode> GLTF::to_node() const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -279,7 +277,6 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
     // Pack this into a ConstructionEnvironment.
     ConstructionEnvironment constr_env {
         *this,
-        rs,
         meshes,
         materials,
         {}

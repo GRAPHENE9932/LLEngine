@@ -5,9 +5,9 @@
 #include "BitmapTextNode.hpp"
 #include "RenderingServer.hpp" // RenderingServer
 
-BitmapTextNode::BitmapTextNode(const Transform& params, RenderingServer& rs,
+BitmapTextNode::BitmapTextNode(const Transform& params,
     const std::shared_ptr<BitmapFont>& font, std::string_view text,
-    const glm::vec3& color) : DrawableNode(params, rs), color(color) {
+    const glm::vec3& color) : DrawableNode(params), color(color) {
     set_font(font);
     set_text(text);
 }
@@ -89,14 +89,16 @@ void BitmapTextNode::set_screen_space_scale(const glm::vec3& scr_space_scale,
 }
 
 void BitmapTextNode::update() {
+    auto& rs = RenderingServer::get_instance();
+
     update_children();
 
     glEnable(GL_BLEND);
 
     // Uniforms.
     glm::mat4 model_matrix = get_global_matrix();
-    glm::mat4 mvp = rendering_server.get_view_proj_matrix() * model_matrix;
-    rendering_server.get_shader_manager().use_colored_text_shader(mvp, color);
+    glm::mat4 mvp = RenderingServer::get_instance().get_view_proj_matrix() * model_matrix;
+    rs.get_shader_manager().use_colored_text_shader(mvp, color);
 
     // Vertices.
     glEnableVertexAttribArray(0);
@@ -114,7 +116,7 @@ void BitmapTextNode::update() {
     // Draw.
     glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-    rendering_server.report_about_drawn_triangles(vertices.size() / 3);
+    rs.report_about_drawn_triangles(vertices.size() / 3);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -123,7 +125,7 @@ void BitmapTextNode::update() {
 }
 
 GLuint BitmapTextNode::get_program_id() const {
-    return rendering_server.get_shader_manager().get_colored_text_program_id();
+    return RenderingServer::get_instance().get_shader_manager().get_colored_text_program_id();
 }
 
 void BitmapTextNode::register_buffers() {

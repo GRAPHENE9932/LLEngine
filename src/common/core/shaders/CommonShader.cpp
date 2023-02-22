@@ -9,8 +9,7 @@
 #include "CommonShader.hpp" // TexturedShared
 
 CommonShader::Flags compute_flags(
-    const Material& material, bool using_environment_cubemap,
-    RenderingServer& rs
+    const Material& material, bool using_environment_cubemap
 ) {
     CommonShader::Flags flags = CommonShader::NO_FLAGS;
 
@@ -20,7 +19,7 @@ CommonShader::Flags compute_flags(
     if (material.base_color_factor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)) {
         flags |= CommonShader::USING_BASE_COLOR_FACTOR;
     }
-    if (!rs.get_point_lights().empty()) {
+    if (!RenderingServer::get_instance().get_point_lights().empty()) {
         flags |= CommonShader::USING_VERTEX_NORMALS;
         if (material.normal_map.has_value()) {
             flags |= CommonShader::USING_NORMAL_TEXTURE;
@@ -50,7 +49,7 @@ CommonShader::Flags compute_flags(
     if (using_environment_cubemap) {
         flags |= CommonShader::USING_ENVIRONMENT_CUBEMAP;
     }
-    if (!rs.get_point_lights().empty() || flags & CommonShader::USING_ENVIRONMENT_CUBEMAP) {
+    if (!RenderingServer::get_instance().get_point_lights().empty() || flags & CommonShader::USING_ENVIRONMENT_CUBEMAP) {
         flags |= CommonShader::USING_FRAGMENT_POSITION;
     }
     if ((flags & CommonShader::USING_BASE_COLOR_TEXTURE) ||
@@ -75,17 +74,15 @@ CommonShader::Flags compute_flags(
 
 CommonShader::Parameters
 CommonShader::to_parameters(
-    const Material& material, bool using_environment_cubemap,
-    RenderingServer& rs
+    const Material& material, bool using_environment_cubemap
 ) noexcept {
     return {
-        compute_flags(material, using_environment_cubemap, rs),
-        static_cast<uint32_t>(rs.get_point_lights().size())
+        compute_flags(material, using_environment_cubemap),
+        static_cast<uint32_t>(RenderingServer::get_instance().get_point_lights().size())
     };
 }
 
-CommonShader::CommonShader(const Parameters& params, RenderingServer& rs) :
-    rendering_server(rs) {
+CommonShader::CommonShader(const Parameters& params) {
     initialize(params);
 }
 
@@ -213,7 +210,7 @@ void CommonShader::use_shader(
         glUniform2fv(normal_uv_scale_id, 1, glm::value_ptr(material.normal_map->texture.uv_scale));
     }
     auto point_light_ids_iter = point_light_ids.begin();
-    for (auto& cur_point_light : rendering_server.get_point_lights()) {
+    for (auto& cur_point_light : RenderingServer::get_instance().get_point_lights()) {
         cur_point_light->set_uniforms(*point_light_ids_iter);
         point_light_ids_iter++;
     }

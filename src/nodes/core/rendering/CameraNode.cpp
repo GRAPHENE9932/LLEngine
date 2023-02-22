@@ -9,10 +9,10 @@
 constexpr glm::vec3 UP(0.0f, 1.0f, 0.0f);
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 
-CameraNode::CameraNode(RenderingServer& rs, const Transform& p,
+CameraNode::CameraNode(const Transform& p,
     float display_ratio, float fov) noexcept :
     CompleteSpatialNode(p), field_of_view(fov), aspect_ratio(display_ratio) {
-    rs.register_camera_node(this);
+    RenderingServer::get_instance().register_camera_node(this);
 }
 
 glm::mat4 CameraNode::get_view_matrix() noexcept {

@@ -1,12 +1,14 @@
 #include "RenderingServer.hpp"
 #include "CommonDrawableNode.hpp" // CommonDrawableNode
 
-CommonDrawableNode::CommonDrawableNode(const Transform& p, RenderingServer& rs,
+CommonDrawableNode::CommonDrawableNode(const Transform& p,
     const std::shared_ptr<Material>& material,
     const std::shared_ptr<Mesh>& mesh) :
-    DrawableNode(p, rs), mesh(mesh), material(material) {}
+    DrawableNode(p), mesh(mesh), material(material) {}
 
 void CommonDrawableNode::draw() {
+    auto& rs = RenderingServer::get_instance();
+
     // Do some checks.
     if (material->normal_map.has_value() &&
         (mesh->get_normals_id() == 0 || mesh->get_tangents_id() == 0)) {
@@ -18,10 +20,10 @@ void CommonDrawableNode::draw() {
 
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
-    const glm::mat4 mvp = rendering_server.get_view_proj_matrix() * model_matrix;
-    rendering_server.get_shader_manager().use_common_shader(
-        *material, mvp, model_matrix, rendering_server.get_camera_position(),
-        rendering_server.get_environment_cubemap(get_global_position())
+    const glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
+    rs.get_shader_manager().use_common_shader(
+        *material, mvp, model_matrix, rs.get_camera_position(),
+        rs.get_environment_cubemap(get_global_position())
     );
 
     // Vertices.
@@ -52,7 +54,7 @@ void CommonDrawableNode::draw() {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
         glDrawArrays(GL_TRIANGLES, 0, mesh->get_amount_of_vertices());
     }
-    rendering_server.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
+    rs.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -61,7 +63,7 @@ void CommonDrawableNode::draw() {
 }
 
 GLuint CommonDrawableNode::get_program_id() const {
-    return rendering_server.get_shader_manager().get_common_program_id(
-        *material, rendering_server.get_environment_cubemap(get_global_position()).has_value()
+    return RenderingServer::get_instance().get_shader_manager().get_common_program_id(
+        *material, RenderingServer::get_instance().get_environment_cubemap(get_global_position()).has_value()
     );
 }

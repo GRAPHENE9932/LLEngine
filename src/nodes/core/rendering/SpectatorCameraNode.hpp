@@ -18,14 +18,11 @@ public:
     float x_angle = 0.0f;
     float y_angle = 0.0f;
 
-    SpectatorCameraNode(RenderingServer& rs, const Transform& p,
-        float display_ratio, float fov = glm::radians(90.0f));
+    SpectatorCameraNode(const Transform& p, float display_ratio, float fov = glm::radians(90.0f));
 
     void update() override;
 
 private:
-    RenderingServer& rendering_server;
-
     void update_rotation();
     void update_position();
 };

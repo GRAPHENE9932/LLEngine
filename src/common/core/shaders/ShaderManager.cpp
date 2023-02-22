@@ -1,11 +1,9 @@
 #include <algorithm>
 
+#include "RenderingServer.hpp"
 #include "ShaderManager.hpp"
 #include "common/core/Cubemap.hpp"
 #include "common/core/shaders/CommonShader.hpp"
-
-ShaderManager::ShaderManager(RenderingServer& rs) :
-    rendering_server(rs) {}
 
 void ShaderManager::use_equirectangular_mapper_shader(
     const glm::mat4& mvp,
@@ -44,13 +42,12 @@ GLuint ShaderManager::get_common_program_id(const Material& material, bool using
 }
 
 const CommonShader& ShaderManager::get_common_shader(const Material& material, bool using_environment_cubemap) {
-    const auto params = CommonShader::to_parameters(material, using_environment_cubemap, rendering_server);
+    const auto params = CommonShader::to_parameters(material, using_environment_cubemap);
     auto iter {common_shaders.find(params)};
 
     if (iter == common_shaders.end()) {
         iter = common_shaders.emplace(
-            CommonShader::to_parameters(material, using_environment_cubemap, rendering_server),
-            rendering_server
+            CommonShader::to_parameters(material, using_environment_cubemap)
         ).first;
     }
     
