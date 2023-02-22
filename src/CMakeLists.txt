@@ -21,7 +21,6 @@ set(SOURCES
     common/core/shaders/EquirectangularMapperShader.cpp
     nodes/core/rendering/DrawableNode.cpp
     nodes/core/rendering/CameraNode.cpp
-    nodes/core/rendering/ImageNode.cpp
     nodes/core/rendering/CommonDrawableNode.cpp
     nodes/core/rendering/PointLightNode.cpp
     nodes/core/rendering/SpotLight.cpp
