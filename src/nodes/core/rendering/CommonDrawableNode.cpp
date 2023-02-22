@@ -20,7 +20,8 @@ void CommonDrawableNode::draw() {
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rendering_server.get_view_proj_matrix() * model_matrix;
     rendering_server.get_shader_manager().use_common_shader(
-        *material, mvp, model_matrix
+        *material, mvp, model_matrix, rendering_server.get_camera_position(),
+        rendering_server.get_environment_cubemap(get_global_position())
     );
 
     // Vertices.
@@ -61,6 +62,6 @@ void CommonDrawableNode::draw() {
 
 GLuint CommonDrawableNode::get_program_id() const {
     return rendering_server.get_shader_manager().get_common_program_id(
-        *material
+        *material, rendering_server.get_environment_cubemap(get_global_position()).has_value()
     );
 }

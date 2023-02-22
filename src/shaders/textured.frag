@@ -1,19 +1,5 @@
 #version 330 core
 
-// Possible defines:
-// USING_BASE_COLOR_TEXTURE
-// USING_BASE_COLOR_FACTOR
-// USING_VERTEX_NORMALS
-// USING_NORMAL_TEXTURE
-// USING_NORMAL_MAP_SCALE
-// USING_FRAGMENT_POSITION
-// USING_UV
-// USING_GENERAL_UV_TRANSFORM
-// USING_NORMAL_UV_TRANSFORM
-// USING_BASE_UV_TRANSFORM
-// POINT_LIGHTS_COUNT <int>
-// SPOT_LIGHTS_COUNT <int>
-
 out vec4 color_out;
 
 #ifdef USING_BASE_UV_TRANSFORM
@@ -29,17 +15,13 @@ out vec4 color_out;
     in vec3 frag_normal;
 #endif
 #ifdef USING_FRAGMENT_POSITION
-    // May be in tangent space if USING_NORMAL_TEXTURE is enabled.
     in vec3 frag_pos;
 #endif
+#ifdef USING_ENVIRONMENT_CUBEMAP
+    in vec3 frag_camera_position;
+#endif
 #ifdef USING_NORMAL_TEXTURE
-    #if POINT_LIGHTS_COUNT > 0
-        in vec3 point_light_positions_tangent_space[POINT_LIGHTS_COUNT];
-    #endif
-    #if SPOT_LIGHTS_COUNT > 0
-        in vec3 spot_light_positions_tangent_space[SPOT_LIGHTS_COUNT];
-        in vec3 spot_light_directions_tangent_space[SPOT_LIGHTS_COUNT];
-    #endif
+    in mat3 tbn;
 #endif
 
 struct PointLight {
@@ -59,6 +41,7 @@ struct SpotLight {
 // Unused ones will be optimized out.
 uniform sampler2D base_color_texture;
 uniform sampler2D normal_texture;
+uniform samplerCube environment_cubemap;
 uniform vec4 base_color_factor;
 uniform float normal_map_scale;
 uniform vec3 ambient;
@@ -109,11 +92,13 @@ vec4 get_base_color() {
     #endif
 }
 
+// Will be in tangent space if USING_NORMAL_TEXTURE is defined.
 vec3 get_normal() {
     #ifdef USING_VERTEX_NORMALS
         #ifdef USING_NORMAL_TEXTURE
             vec3 result = texture(normal_texture, get_normal_uv()).rgb;
             result = result * 2.0 - 1.0;
+            result = tbn * result;
             #ifdef USING_NORMAL_MAP_SCALE
                 return normal_map_scale * result;
             #else
@@ -129,14 +114,8 @@ vec3 get_normal() {
 
 #if POINT_LIGHTS_COUNT > 0
 vec3 calc_point_light(int light_index) {
-    #ifdef USING_NORMAL_TEXTURE
-        vec3 light_position = point_light_positions_tangent_space[light_index];
-    #else
-        vec3 light_position = point_lights[light_index].position;
-    #endif
-
-    float distance = length(frag_pos - light_position);
-    vec3 direction = (frag_pos - light_position) / distance;
+    float distance = length(frag_pos - point_lights[light_index].position);
+    vec3 direction = (frag_pos - point_lights[light_index].position) / distance;
 
     float diffuse_factor = max(dot(get_normal(), -direction), 0.0) *
             point_lights[light_index].diffuse_strength;
@@ -152,6 +131,14 @@ vec3 calc_point_light(int light_index) {
 }
 #endif
 
+#ifdef USING_ENVIRONMENT_CUBEMAP
+vec3 calc_reflection() {
+    vec3 from_camera = normalize(frag_pos - frag_camera_position);
+    vec3 reflected = reflect(from_camera, get_normal());
+    return texture(environment_cubemap, reflected).rgb;
+}
+#endif
+
 void main() {
     vec3 lightning_result = ambient;
     
@@ -161,5 +148,9 @@ void main() {
         }
     #endif
 
-    color_out = vec4(lightning_result, 1.0) * get_base_color();
+    #ifdef USING_ENVIRONMENT_CUBEMAP
+        color_out = vec4(lightning_result, 1.0) * get_base_color() * vec4(calc_reflection(), 1.0);
+    #else
+        color_out = vec4(lightning_result, 1.0) * get_base_color();
+    #endif
 }

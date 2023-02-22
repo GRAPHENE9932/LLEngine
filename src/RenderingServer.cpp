@@ -1,6 +1,6 @@
 #include "RenderingServer.hpp" // RenderingServer
 #include "BulletPhysicsServer.hpp"
-#include "common/core/Skybox.hpp" // Skybox
+#include "common/core/Cubemap.hpp"
 #include "common/core/GLFWWindow.hpp" // GLFWWindow
 #include "nodes/core/rendering/CameraNode.hpp"
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
@@ -12,14 +12,11 @@ RenderingServer::RenderingServer(glm::ivec2 window_extents) :
     shader_manager(*this) {}
 
 RenderingServer::~RenderingServer() {
-    Skybox::static_clean_up();
+    Cubemap::static_clean_up();
 }
 
-void RenderingServer::set_skybox(const std::shared_ptr<Texture>& texture) {
-    if (skybox == nullptr)
-        skybox = std::make_unique<Skybox>(*this, texture);
-    else
-        skybox->texture = texture;
+void RenderingServer::set_cubemap(Cubemap&& cubemap) {
+    this->cubemap = std::make_unique<Cubemap>(std::move(cubemap));
 }
 
 void RenderingServer::set_root_node(SpatialNode* root_node) {
@@ -27,7 +24,7 @@ void RenderingServer::set_root_node(SpatialNode* root_node) {
 }
 
 void RenderingServer::main_loop() {
-    Skybox::static_init();
+    Cubemap::static_init();
 
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
@@ -54,9 +51,9 @@ void RenderingServer::main_loop() {
             cur_drawable->draw();
 
         // Draw skybox.
-        if (skybox != nullptr) {
+        if (cubemap != nullptr) {
             glDepthMask(GL_FALSE);
-            skybox->draw();
+            cubemap->draw();
             glDepthMask(GL_TRUE);
         }
 
@@ -115,6 +112,15 @@ glm::mat4 RenderingServer::get_view_matrix() const noexcept {
     }
 }
 
+glm::vec3 RenderingServer::get_camera_position() const noexcept {
+    if (camera) {
+        return camera->get_global_position();
+    }
+    else {
+        return {0.0f, 0.0f, 0.0f};
+    }
+}
+
 glm::mat4 RenderingServer::get_proj_matrix() const noexcept {
     if (camera) {
         return camera->get_proj_matrix();
@@ -126,4 +132,14 @@ glm::mat4 RenderingServer::get_proj_matrix() const noexcept {
 
 glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return get_proj_matrix() * get_view_matrix();
+}
+
+std::optional<std::reference_wrapper<Cubemap>>
+RenderingServer::get_environment_cubemap(const glm::vec3& obj_position) {
+    if (cubemap) {
+        return *cubemap;
+    }
+    else {
+        return std::nullopt;
+    }
 }

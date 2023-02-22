@@ -8,7 +8,10 @@
 #include "RenderingServer.hpp" // RenderingServer
 #include "CommonShader.hpp" // TexturedShared
 
-CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs) {
+CommonShader::Flags compute_flags(
+    const Material& material, bool using_environment_cubemap,
+    RenderingServer& rs
+) {
     CommonShader::Flags flags = CommonShader::NO_FLAGS;
 
     if (material.base_color_texture.has_value()) {
@@ -44,7 +47,10 @@ CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs)
     if (material.roughness_factor != 1.0f) {
         flags |= CommonShader::USING_ROUGHNESS_FACTOR;
     }
-    if (!rs.get_point_lights().empty()) {
+    if (using_environment_cubemap) {
+        flags |= CommonShader::USING_ENVIRONMENT_CUBEMAP;
+    }
+    if (!rs.get_point_lights().empty() || flags & CommonShader::USING_ENVIRONMENT_CUBEMAP) {
         flags |= CommonShader::USING_FRAGMENT_POSITION;
     }
     if ((flags & CommonShader::USING_BASE_COLOR_TEXTURE) ||
@@ -68,9 +74,12 @@ CommonShader::Flags compute_flags(const Material& material, RenderingServer& rs)
 }
 
 CommonShader::Parameters
-CommonShader::to_parameters(const Material& material, RenderingServer& rs) noexcept {
+CommonShader::to_parameters(
+    const Material& material, bool using_environment_cubemap,
+    RenderingServer& rs
+) noexcept {
     return {
-        compute_flags(material, rs),
+        compute_flags(material, using_environment_cubemap, rs),
         static_cast<uint32_t>(rs.get_point_lights().size())
     };
 }
@@ -89,6 +98,7 @@ void CommonShader::initialize_uniforms(const Parameters& params) {
     model_matrix_id = glGetUniformLocation(program_id, "model_matrix");
     normal_matrix_id = glGetUniformLocation(program_id, "normal_matrix");
     ambient_id = glGetUniformLocation(program_id, "ambient");
+    camera_position_id = glGetUniformLocation(program_id, "camera_position");
     base_color_factor_id = glGetUniformLocation(program_id, "base_color_factor");
     normal_scale_id = glGetUniformLocation(program_id, "normal_map_scale");
     uv_offset_id = glGetUniformLocation(program_id, "uv_offset");
@@ -104,6 +114,7 @@ void CommonShader::initialize_uniforms(const Parameters& params) {
     metallic_texture_uniform_id = glGetUniformLocation(program_id, "metallic_texture");
     roughness_texture_uniform_id = glGetUniformLocation(program_id, "roughness_texture");
     emissive_texture_uniform_id = glGetUniformLocation(program_id, "emmisive_texture");
+    environment_cubemap_uniform_id = glGetUniformLocation(program_id, "environment_cubemap");
 
     for (size_t i = 0; i < params.point_lights_count; i++) {
         point_light_ids.insert(
@@ -140,6 +151,20 @@ void CommonShader::initialize(const Parameters& params) {
         defines.emplace_back("USING_BASE_UV_TRANSFORM");
     if (flags & USING_NORMAL_UV_TRANSFORM)
         defines.emplace_back("USING_NORMAL_UV_TRANSFORM");
+    if (flags & USING_METALLIC_TEXTURE)
+        defines.emplace_back("USING_METALLIC_TEXTURE");
+    if (flags & USING_METALLIC_FACTOR)
+        defines.emplace_back("USING_METALLIC_FACTOR");
+    if (flags & USING_ROUGHNESS_TEXTURE)
+        defines.emplace_back("USING_ROUGHNESS_TEXTURE");
+    if (flags & USING_ROUGHNESS_FACTOR)
+        defines.emplace_back("USING_ROUGHNESS_FACTOR");
+    if (flags & USING_AMBIENT_OCCLUSION_TEXTURE)
+        defines.emplace_back("USING_AMBIENT_OCCLUSION_TEXTURE");
+    if (flags & USING_AMBIENT_OCCLUSION_FACTOR)
+        defines.emplace_back("USING_AMBIENT_OCCLUSION_FACTOR");
+    if (flags & USING_ENVIRONMENT_CUBEMAP)
+        defines.emplace_back("USING_ENVIRONMENT_CUBEMAP");
 
     program_id = load_shaders(
         "res/shaders/textured.vert",
@@ -150,50 +175,48 @@ void CommonShader::initialize(const Parameters& params) {
     initialize_uniforms(params);
 }
 
-void CommonShader::set_uniforms(const Material& material, const glm::mat4& mvp_matrix,
-        const glm::mat4& model_matrix) const {
+void CommonShader::use_shader(
+    const Material& material, const glm::mat4& mvp_matrix,
+    const glm::mat4& model_matrix, const glm::vec3& camera_position,
+    std::optional<std::reference_wrapper<Cubemap>> environment_cubemap
+) const {
+    assert(is_initialized());
+
+    glUseProgram(program_id);
+
     glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp_matrix));
-
     glUniformMatrix4fv(model_matrix_id, 1, GL_FALSE, glm::value_ptr(model_matrix));
-
     if (normal_matrix_id != -1) {
         glm::mat4 normal_matrix = glm::transpose(glm::inverse(
             glm::mat3(model_matrix)
         ));
         glUniformMatrix4fv(normal_matrix_id, 1, GL_FALSE, glm::value_ptr(normal_matrix));
     }
-
     glUniform3fv(ambient_id, 1, glm::value_ptr(glm::vec3(0.2f, 0.2f, 0.2f)));
-
+    glUniform3fv(camera_position_id, 1, glm::value_ptr(camera_position));
     glUniform4fv(base_color_factor_id, 1, glm::value_ptr(material.base_color_factor));
-
     if (material.normal_map.has_value()) {
         glUniform1fv(normal_scale_id, 1, &material.normal_map->scale);
     }
-
     if (uv_offset_id != -1 || uv_scale_id != -1) {
         const std::pair<glm::vec2, glm::vec2> general_offset_scale =
                 material.get_general_uv_offset_and_scale();
         glUniform2fv(uv_offset_id, 1, glm::value_ptr(general_offset_scale.first));
         glUniform2fv(uv_scale_id, 1, glm::value_ptr(general_offset_scale.second));
     }
-
     if ((base_uv_offset_id != -1 || base_uv_scale_id != -1) && material.base_color_texture.has_value()) {
         glUniform2fv(base_uv_offset_id, 1, glm::value_ptr(material.base_color_texture->uv_offset));
         glUniform2fv(base_uv_scale_id, 1, glm::value_ptr(material.base_color_texture->uv_scale));
     }
-
     if ((normal_uv_offset_id != -1 || normal_uv_scale_id != -1) && material.normal_map.has_value()) {
         glUniform2fv(normal_uv_offset_id, 1, glm::value_ptr(material.normal_map->texture.uv_offset));
         glUniform2fv(normal_uv_scale_id, 1, glm::value_ptr(material.normal_map->texture.uv_scale));
     }
-
     auto point_light_ids_iter = point_light_ids.begin();
     for (auto& cur_point_light : rendering_server.get_point_lights()) {
         cur_point_light->set_uniforms(*point_light_ids_iter);
         point_light_ids_iter++;
     }
-
     GLint cur_tex_unit = 0;
     if (base_color_texture_uniform_id != -1) {
         glUniform1i(base_color_texture_uniform_id, cur_tex_unit);
@@ -231,15 +254,12 @@ void CommonShader::set_uniforms(const Material& material, const glm::mat4& mvp_m
         glBindTexture(GL_TEXTURE_2D, material.emissive_texture.value().texture->get_id());
         cur_tex_unit++;
     }
-}
-
-void CommonShader::use_shader(const Material& material, const glm::mat4& mvp_matrix,
-    const glm::mat4& model_matrix) const {
-    assert(is_initialized());
-
-    glUseProgram(program_id);
-
-    set_uniforms(material, mvp_matrix, model_matrix);
+    if (environment_cubemap_uniform_id != -1) {
+        glUniform1i(environment_cubemap_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, environment_cubemap.value().get().get_texture().get_id());
+        cur_tex_unit++;
+    }
 }
 
 void CommonShader::delete_shader() {

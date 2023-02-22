@@ -1,19 +1,5 @@
 #version 330 core
 
-// Possible defines:
-// USING_BASE_COLOR_TEXTURE
-// USING_BASE_COLOR_FACTOR
-// USING_VERTEX_NORMALS
-// USING_NORMAL_TEXTURE
-// USING_NORMAL_MAP_SCALE
-// USING_FRAGMENT_POSITION
-// USING_UV
-// USING_GENERAL_UV_TRANSFORM
-// USING_NORMAL_UV_TRANSFORM
-// USING_BASE_UV_TRANSFORM
-// POINT_LIGHTS_COUNT <int>
-// SPOT_LIGHTS_COUNT <int>
-
 layout(location = 0) in vec3 vertex_pos;
 #ifdef USING_UV
     layout(location = 1) in vec2 vertex_uv;
@@ -49,6 +35,7 @@ uniform vec2 base_uv_offset;
 uniform vec2 base_uv_scale;
 uniform vec2 normal_uv_offset;
 uniform vec2 normal_uv_scale;
+uniform vec3 camera_position;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -69,17 +56,13 @@ uniform vec2 normal_uv_scale;
     out vec3 frag_normal;
 #endif
 #ifdef USING_FRAGMENT_POSITION
-    // May be in tangent space if USING_NORMAL_TEXTURE is enabled.
     out vec3 frag_pos;
 #endif
+#ifdef USING_ENVIRONMENT_CUBEMAP
+    out vec3 frag_camera_position;
+#endif
 #ifdef USING_NORMAL_TEXTURE
-    #if POINT_LIGHTS_COUNT > 0
-        out vec3 point_light_positions_tangent_space[POINT_LIGHTS_COUNT];
-    #endif
-    #if SPOT_LIGHTS_COUNT > 0
-        out vec3 spot_light_positions_tangent_space[SPOT_LIGHTS_COUNT];
-        out vec3 spot_light_directions_tangent_space[SPOT_LIGHTS_COUNT];
-    #endif
+    out mat3 tbn;
 #endif
 
 void main() {
@@ -92,31 +75,16 @@ void main() {
         #ifdef USING_NORMAL_TEXTURE
             vec3 tangent = (normal_matrix * vec4(vertex_tangent.xyz, 0.0)).xyz;
             vec3 bitangent = cross(normal, tangent) * vertex_tangent.w;
-            mat3 tbn = mat3(tangent, bitangent, normal);
-            // TBN matrix is orthogonal, so we can use the transpose() function
-            // instead of inverse().
-            mat3 tbn_inverse = transpose(tbn);
-
-            #if POINT_LIGHTS_COUNT > 0
-                for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
-                    point_light_positions_tangent_space[i] = tbn_inverse * point_lights[i].position;
-                }
-            #endif
-            #if SPOT_LIGHTS_COUNT > 0
-                for (int i = 0; i < SPOT_LIGHTS_COUNT; i++) {
-                    spot_light_positions_tangent_space[i] = tbn_inverse * spot_lights[i].position;
-                    spot_light_directions_tangent_space[i] = tbn_inverse * spot_lights[i].direction;
-                }
-            #endif
+            tbn = mat3(tangent, bitangent, normal);
         #endif
     #endif
 
     #ifdef USING_FRAGMENT_POSITION
-        #ifdef USING_NORMAL_TEXTURE
-            frag_pos = tbn_inverse * (model_matrix * vec4(vertex_pos, 1.0)).xyz;
-        #else
-            frag_pos = (model_matrix * vec4(vertex_pos, 1.0)).xyz;
-        #endif
+        frag_pos = (model_matrix * vec4(vertex_pos, 1.0)).xyz;
+    #endif
+
+    #ifdef USING_ENVIRONMENT_CUBEMAP
+        frag_camera_position = camera_position;
     #endif
 
     #ifdef USING_UV

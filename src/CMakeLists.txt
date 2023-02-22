@@ -7,7 +7,7 @@ set(SOURCES
     common/core/Mesh.cpp
     common/core/GLTFLoading.cpp
     common/core/GLTFToNode.cpp
-    common/core/Skybox.cpp
+    common/core/Cubemap.cpp
     common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
     common/core/KTXTexture.cpp
@@ -18,6 +18,7 @@ set(SOURCES
     common/core/shaders/ColoredTextShader.cpp
     common/core/shaders/SkyboxShader.cpp
     common/core/shaders/CommonShader.cpp
+    common/core/shaders/EquirectangularMapperShader.cpp
     nodes/core/rendering/DrawableNode.cpp
     nodes/core/rendering/CameraNode.cpp
     nodes/core/rendering/ImageNode.cpp

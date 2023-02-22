@@ -10,7 +10,7 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 
 #include "common/core/Window.hpp" // Window
-#include "common/core/Skybox.hpp" // Skybox
+#include "common/core/Cubemap.hpp" // Skybox
 #include "common/core/shaders/ShaderManager.hpp" // ShaderManager
 
 class Texture;
@@ -29,7 +29,7 @@ public:
     explicit RenderingServer(glm::ivec2 window_extents);
     ~RenderingServer();
 
-    void set_skybox(const std::shared_ptr<Texture>& texture);
+    void set_cubemap(Cubemap&& skybox);
     void set_root_node(SpatialNode* root_node);
 
     void main_loop();
@@ -82,6 +82,13 @@ public:
     [[nodiscard]] glm::mat4 get_view_matrix() const noexcept;
 
     /**
+     * @brief Returns position of the current camera.
+     *
+     * If camera is missing, returns (0.0, 0.0, 0.0).
+     */
+    [[nodiscard]] glm::vec3 get_camera_position() const noexcept;
+
+    /**
      * @brief Returns projection matrix from the current camera.
      *
      * If camera is missing, returns identity matrix.
@@ -116,6 +123,9 @@ public:
         return shader_manager;
     }
 
+    [[nodiscard]] std::optional<std::reference_wrapper<Cubemap>>
+    get_environment_cubemap(const glm::vec3& obj_position);
+
 private:
     Window& window;
     ShaderManager shader_manager;
@@ -126,7 +136,7 @@ private:
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
-    std::unique_ptr<Skybox> skybox = nullptr;
+    std::unique_ptr<Cubemap> cubemap = nullptr;
     std::vector<DrawableNode*> drawable_nodes;
     std::vector<PointLightNode*> point_lights;
 
