@@ -16,10 +16,8 @@
 #include "VkFormatInfo.hpp"
 
 void ktx_loading_error(std::string_view message, std::string_view file_path) {
-    using std::string_literals::operator""s;
-
-    throw std::runtime_error("Failed to load the KTX file. "s + message.data() +
-            "\nFile path: \""s + file_path.data() + '\"');
+    throw std::runtime_error("Failed to load the KTX file. " + std::string(message) +
+            "\nFile path: \"" + std::string(file_path) + '\"');
 }
 
 template<typename T>
