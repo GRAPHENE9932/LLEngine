@@ -139,7 +139,7 @@ Cubemap Cubemap::from_panorama(const std::shared_ptr<Texture>& panorama_texture)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, 1500, 800);
 
-    return Cubemap::from_cubemap(std::make_shared<Texture>(cubemap_id));
+    return Cubemap::from_cubemap(std::make_shared<Texture>(cubemap_id, cube_map_size, true));
 }
 
 void Cubemap::static_init_if_needed() {
