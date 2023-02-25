@@ -2,52 +2,7 @@
 
 #include "Cubemap.hpp" // Skybox
 #include "RenderingServer.hpp" // RenderingServer
-
-constexpr std::array<float, 108> SKYBOX_VERTICES {{
-    -1.0f, 1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, 1.0f, -1.0f,
-    -1.0f, 1.0f, -1.0f,
-
-    -1.0f, -1.0f, 1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, 1.0f, -1.0f,
-    -1.0f, 1.0f, -1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,
-
-    1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-
-    -1.0f, -1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, -1.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,
-
-    -1.0f, 1.0f, -1.0f,
-    1.0f, 1.0f, -1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, -1.0f,
-
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, 1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, 1.0f,
-    1.0f, -1.0f, 1.0f
-}};
-
-GLuint Cubemap::vertices_id = 0;
+#include "utils/primitive_meshes.hpp"
 
 Cubemap::Cubemap(Cubemap&& other) noexcept :
         Cubemap(other.cubemap_texture) {
@@ -55,25 +10,13 @@ Cubemap::Cubemap(Cubemap&& other) noexcept :
 }
 
 Cubemap::Cubemap(const std::shared_ptr<Texture>& cubemap_texture) :
-    cubemap_texture(cubemap_texture) {
-    static_init_if_needed();
-    amount_of_sky_boxes++;
-};
-
-Cubemap::~Cubemap() {
-    amount_of_sky_boxes--;
-    if (amount_of_sky_boxes == 0) {
-        static_clean_up();
-    }
-}
+    cubemap_texture(cubemap_texture) {};
 
 Cubemap Cubemap::from_cubemap(const std::shared_ptr<Texture>& cubemap_texture) {
     return Cubemap(cubemap_texture);
 }
 
 Cubemap Cubemap::from_panorama(const std::shared_ptr<Texture>& panorama_texture) {
-    static_init_if_needed();
-
     const glm::mat4 proj_matrix {glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f)};
     const std::array<glm::mat4, 6> mvp_matrices {
         proj_matrix * glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
@@ -117,6 +60,7 @@ Cubemap Cubemap::from_panorama(const std::shared_ptr<Texture>& panorama_texture)
 
     // Render.
     glViewport(0, 0, cube_map_size.x, cube_map_size.y);
+    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
     for (std::size_t i = 0; i < 6; i++) {
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -129,12 +73,12 @@ Cubemap Cubemap::from_panorama(const std::shared_ptr<Texture>& panorama_texture)
         // Draw.
         // Vertices.
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
+        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
         // Bind the cubemap.
-        glBindVertexArray(vertices_id);
-        glDrawArrays(GL_TRIANGLES, 0, SKYBOX_VERTICES.size());
-        RenderingServer::get_instance().report_about_drawn_triangles(SKYBOX_VERTICES.size() / 3);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
+        glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
+        RenderingServer::get_instance().report_about_drawn_triangles(cube_mesh->get_amount_of_vertices() / 3);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, 1500, 800);
@@ -142,26 +86,9 @@ Cubemap Cubemap::from_panorama(const std::shared_ptr<Texture>& panorama_texture)
     return Cubemap::from_cubemap(std::make_shared<Texture>(cubemap_id, cube_map_size, true));
 }
 
-void Cubemap::static_init_if_needed() {
-    if (vertices_id != 0) {
-        return;
-    }
-
-    // Init buffers.
-    glGenBuffers(1, &vertices_id);
-    glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
-    glBufferData(GL_ARRAY_BUFFER, SKYBOX_VERTICES.size() * sizeof(float),
-            SKYBOX_VERTICES.data(), GL_STATIC_DRAW);
-}
-
-void Cubemap::static_clean_up() {
-    vertices_id = 0;
-
-    glDeleteBuffers(1, &vertices_id);
-}
-
 void Cubemap::draw() {
-    auto& rs = RenderingServer::get_instance();
+    auto& rs = RenderingServer::get_instance(); // Alias the rendering server;
+    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
 
     // Uniforms.
     const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());
@@ -171,16 +98,16 @@ void Cubemap::draw() {
 
     // Vertices.
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertices_id);
+    glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     // Bind the cubemap.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture->get_id());
 
-    glBindVertexArray(vertices_id);
-    glDrawArrays(GL_TRIANGLES, 0, SKYBOX_VERTICES.size());
-    rs.report_about_drawn_triangles(SKYBOX_VERTICES.size() / 3);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
+    glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
+    rs.report_about_drawn_triangles(cube_mesh->get_amount_of_vertices() / 3);
 
     glDisableVertexAttribArray(0);
 }

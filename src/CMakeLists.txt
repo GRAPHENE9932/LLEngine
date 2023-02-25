@@ -34,6 +34,7 @@ set(SOURCES
     structs/shapes/BoxShape.cpp
     structs/shapes/CylinderShape.cpp
     utils/shader_loader.cpp
+    utils/primitive_meshes.cpp
 )
 
 add_executable(${CMAKE_PROJECT_NAME}_run main.cpp)
