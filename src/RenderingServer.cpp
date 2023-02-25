@@ -13,6 +13,10 @@ RenderingServer::RenderingServer() :
 RenderingServer::~RenderingServer() {}
 
 void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
+    if (!cubemap->is_cubemap()) {
+        throw std::invalid_argument("Specified cubemap texture for skybox is not actually a cubemap.");
+    }
+
     this->skybox = std::make_unique<Skybox>(cubemap);
 }
 
