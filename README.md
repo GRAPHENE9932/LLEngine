@@ -3,10 +3,10 @@ Really under development, it is unplayable.
 
 ## Currently implemented technical features:
 - Rendering with OpenGL.
-- Character control with mouse and keyboard.
-- Collision of character with floors, walls and cuboids.
-- Point lights and spotlights.
+- Camera control with mouse and keyboard.
+- Integration of the Bullet3 physics engine.
+- Point lights.
 - Skybox.
-- Wavefront obj model loading.
-- KTX texture loading.
-- Bitmap text.
+- glTF model loading.
+- KTX2 texture loading (including cubemaps).
+- Radiance RGBE (.hdr) texture loading.
