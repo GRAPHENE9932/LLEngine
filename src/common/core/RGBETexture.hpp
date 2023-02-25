@@ -8,5 +8,6 @@ public:
     explicit RGBETexture(std::string_view file_path);
     RGBETexture(const RGBETexture& other) = delete;
     RGBETexture(RGBETexture&& other) noexcept;
+    RGBETexture& operator=(const RGBETexture& other) = delete;
     RGBETexture& operator=(RGBETexture&& other) noexcept;
 };
