@@ -8,12 +8,12 @@
 
 class CommonDrawableNode : public DrawableNode {
 public:
-    std::shared_ptr<Mesh> mesh;
+    std::shared_ptr<const Mesh> mesh;
     std::shared_ptr<Material> material;
 
     CommonDrawableNode(const Transform& p,
         const std::shared_ptr<Material>& material,
-        const std::shared_ptr<Mesh>& mesh);
+        const std::shared_ptr<const Mesh>& mesh);
 
     void draw() override;
     GLuint get_program_id() const override;

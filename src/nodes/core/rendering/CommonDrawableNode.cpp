@@ -3,7 +3,7 @@
 
 CommonDrawableNode::CommonDrawableNode(const Transform& p,
     const std::shared_ptr<Material>& material,
-    const std::shared_ptr<Mesh>& mesh) :
+    const std::shared_ptr<const Mesh>& mesh) :
     DrawableNode(p), mesh(mesh), material(material) {}
 
 void CommonDrawableNode::draw() {
