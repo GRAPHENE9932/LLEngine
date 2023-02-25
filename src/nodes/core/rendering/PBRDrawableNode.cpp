@@ -1,12 +1,12 @@
 #include "RenderingServer.hpp"
-#include "CommonDrawableNode.hpp" // CommonDrawableNode
+#include "PBRDrawableNode.hpp" // PBRDrawableNode
 
-CommonDrawableNode::CommonDrawableNode(const Transform& p,
+PBRDrawableNode::PBRDrawableNode(const Transform& p,
     const std::shared_ptr<Material>& material,
     const std::shared_ptr<const Mesh>& mesh) :
     DrawableNode(p), mesh(mesh), material(material) {}
 
-void CommonDrawableNode::draw() {
+void PBRDrawableNode::draw() {
     auto& rs = RenderingServer::get_instance();
 
     // Do some checks.
@@ -62,7 +62,7 @@ void CommonDrawableNode::draw() {
     glDisableVertexAttribArray(3);
 }
 
-GLuint CommonDrawableNode::get_program_id() const {
+GLuint PBRDrawableNode::get_program_id() const {
     return PBRShaderManager::get_instance().get_common_program_id(
         *material, RenderingServer::get_instance().get_environment_cubemap(get_global_position()).has_value()
     );

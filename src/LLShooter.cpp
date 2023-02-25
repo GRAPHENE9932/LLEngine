@@ -1,7 +1,7 @@
 #include "LLShooter.hpp"
 #include "common/core/KTXTexture.hpp"
 #include "common/core/RGBETexture.hpp"
-#include "nodes/core/rendering/CommonDrawableNode.hpp"
+#include "nodes/core/rendering/PBRDrawableNode.hpp"
 #include "utils/primitive_meshes.hpp"
 #include "utils/texture_tools.hpp"
 

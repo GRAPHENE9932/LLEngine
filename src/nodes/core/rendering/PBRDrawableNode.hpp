@@ -6,12 +6,12 @@
 #include "common/core/Mesh.hpp"
 #include "common/core/Material.hpp" // Material
 
-class CommonDrawableNode : public DrawableNode {
+class PBRDrawableNode : public DrawableNode {
 public:
     std::shared_ptr<const Mesh> mesh;
     std::shared_ptr<Material> material;
 
-    CommonDrawableNode(const Transform& p,
+    PBRDrawableNode(const Transform& p,
         const std::shared_ptr<Material>& material,
         const std::shared_ptr<const Mesh>& mesh);
 

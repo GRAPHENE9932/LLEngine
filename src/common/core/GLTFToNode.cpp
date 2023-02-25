@@ -5,7 +5,7 @@
 #include "structs/shapes/BoxShape.hpp"
 #include "structs/shapes/SphereShape.hpp"
 #include "structs/shapes/CylinderShape.hpp"
-#include "nodes/core/rendering/CommonDrawableNode.hpp" // CommonDrawableNode
+#include "nodes/core/rendering/PBRDrawableNode.hpp" // PBRDrawableNode
 #include "nodes/core/physics/bullet/BulletRigidBodyNode.hpp"
 #include "utils/json_conversion.hpp"
 
@@ -33,12 +33,12 @@ std::unique_ptr<SpatialNode> to_node(
 );
 
 template<bool with_children = true>
-std::unique_ptr<CommonDrawableNode> construct_common_drawable(
+std::unique_ptr<PBRDrawableNode> construct_common_drawable(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
 ) {
     assert(gltf_node.is_drawable());
 
-    auto result = std::make_unique<CommonDrawableNode>(
+    auto result = std::make_unique<PBRDrawableNode>(
         gltf_node.transform,
         constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
         constr_env.meshes.at(*gltf_node.mesh_index)
