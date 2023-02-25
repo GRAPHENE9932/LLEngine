@@ -48,9 +48,7 @@ std::unique_ptr<CommonDrawableNode> construct_common_drawable(
 
     if constexpr (with_children) {
         for (const GLTF::Node& cur_child : gltf_node.children) {
-            result->add_child(std::move(
-                *to_node(constr_env, cur_child).release()
-            ));
+            result->add_child(to_node(constr_env, cur_child));
         }
     }
 
@@ -65,9 +63,7 @@ std::unique_ptr<CompleteSpatialNode> construct_complete_spatial(
     result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->add_child(std::move(
-            *to_node(constr_env, cur_child).release()
-        ));
+        result->add_child(to_node(constr_env, cur_child));
     }
 
     return result;
@@ -140,15 +136,13 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
         drawable->set_transform(Transform());
         drawable->set_name(drawable->get_name() + "_drawable");
 
-        result->add_child(std::move(*drawable.release()));
+        result->add_child(std::move(drawable));
     }
 
     result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->add_child(std::move(
-            *to_node(constr_env, cur_child).release()
-        ));
+        result->add_child(to_node(constr_env, cur_child));
     }
 
     return result;
@@ -293,9 +287,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node() const {
         // transform and make it root.
         auto result = std::make_unique<CompleteSpatialNode>(Transform());
         for (const auto& cur_gltf_node : this->nodes) {
-            result->add_child(std::move(
-                *::to_node(constr_env, cur_gltf_node).release()
-            ));
+            result->add_child(::to_node(constr_env, cur_gltf_node));
         }
         return result;
     }

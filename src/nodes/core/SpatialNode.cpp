@@ -18,9 +18,9 @@ void SpatialNode::update_children() {
     }
 }
 
-void SpatialNode::add_child(SpatialNode&& child) {
-    child.parent = this;
-    children.push_back(std::unique_ptr<SpatialNode>(&child));
+void SpatialNode::add_child(std::unique_ptr<SpatialNode>&& child) {
+    child->parent = this;
+    children.push_back(std::move(child));
 }
 
 void SpatialNode::remove_child(const size_t index) {

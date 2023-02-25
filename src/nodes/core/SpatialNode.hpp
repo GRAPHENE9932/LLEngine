@@ -20,7 +20,7 @@ public:
     [[nodiscard]] const std::string& get_name() const;
 
     void update_children();
-    void add_child(SpatialNode&& child);
+    void add_child(std::unique_ptr<SpatialNode>&& child);
     void remove_child(const size_t index);
     void remove_child(SpatialNode* const ptr);
     [[nodiscard]] SpatialNode* get_parent() const;

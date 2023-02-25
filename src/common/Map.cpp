@@ -95,7 +95,7 @@ std::unique_ptr<SpatialNode> Map::to_node(const json& json_node) const {
     if (json_node.contains("children")) {
         for (const json& cur_json_child : json_node["children"]) {
             result->add_child(
-                std::move(*to_node(cur_json_child).release())
+                to_node(cur_json_child)
             );
         }
     }
