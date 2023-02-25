@@ -10,7 +10,7 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 
 #include "common/core/Window.hpp" // Window
-#include "common/core/Cubemap.hpp" // Skybox
+#include "common/core/Skybox.hpp" // Skybox
 #include "common/core/shaders/ShaderManager.hpp" // ShaderManager
 
 class Texture;
@@ -41,7 +41,7 @@ public:
         starting_resolution = window_extents;
     }
 
-    void set_cubemap(Cubemap&& skybox);
+    void set_cubemap(const std::shared_ptr<Texture>& cubemap);
     void set_root_node(SpatialNode* root_node);
 
     void main_loop();
@@ -135,7 +135,7 @@ public:
         return shader_manager;
     }
 
-    [[nodiscard]] std::optional<std::reference_wrapper<Cubemap>>
+    [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
 
 private:
@@ -150,7 +150,7 @@ private:
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
-    std::unique_ptr<Cubemap> cubemap = nullptr;
+    std::unique_ptr<Skybox> skybox = nullptr;
     std::vector<DrawableNode*> drawable_nodes;
     std::vector<PointLightNode*> point_lights;
 

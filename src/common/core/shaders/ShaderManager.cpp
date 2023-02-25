@@ -2,7 +2,7 @@
 
 #include "RenderingServer.hpp"
 #include "ShaderManager.hpp"
-#include "common/core/Cubemap.hpp"
+#include "common/core/Skybox.hpp"
 #include "common/core/shaders/CommonShader.hpp"
 
 void ShaderManager::use_equirectangular_mapper_shader(
@@ -23,7 +23,7 @@ void ShaderManager::use_skybox_shader(const glm::mat4& mvp) {
 void ShaderManager::use_common_shader(
     const Material& material, const glm::mat4& mvp_matrix,
     const glm::mat4& model_matrix, const glm::vec3& camera_position,
-    std::optional<std::reference_wrapper<Cubemap>> environment_cubemap
+    std::optional<std::reference_wrapper<const Texture>> environment_cubemap
 ) {
     get_common_shader(material, environment_cubemap.has_value())
         .use_shader(material, mvp_matrix, model_matrix, camera_position, environment_cubemap);

@@ -280,7 +280,7 @@ KTXTexture::KTXTexture(const Parameters& params) {
     // Set values to the base class.
     this->texture_id = load_mipmap_levels(stream, header, level_indexes, params);
     this->tex_size = {header.pixel_width, header.pixel_height};
-    this->cube_map = header.face_count == 6;
+    this->cubemap = header.face_count == 6;
 }
 
 KTXTexture::KTXTexture(std::string_view file_path) :
@@ -296,7 +296,7 @@ KTXTexture::KTXTexture(std::string_view file_path) :
 KTXTexture::KTXTexture(KTXTexture&& other) noexcept {
     texture_id = other.texture_id;
     tex_size = other.tex_size;
-    cube_map = other.cube_map;
+    cubemap = other.cubemap;
     dfd_block = std::move(other.dfd_block);
     key_value_data = std::move(other.key_value_data);
     supercompression_global_data = std::move(other.supercompression_global_data);
@@ -310,7 +310,7 @@ KTXTexture& KTXTexture::operator=(KTXTexture&& other) noexcept {
 
     texture_id = other.texture_id;
     tex_size = other.tex_size;
-    cube_map = other.cube_map;
+    cubemap = other.cubemap;
     dfd_block = std::move(other.dfd_block);
     key_value_data = std::move(other.key_value_data);
     supercompression_global_data = std::move(other.supercompression_global_data);

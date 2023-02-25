@@ -2,6 +2,8 @@
 #include "common/core/KTXTexture.hpp"
 #include "common/core/RGBETexture.hpp"
 #include "nodes/core/rendering/CommonDrawableNode.hpp"
+#include "utils/primitive_meshes.hpp"
+#include "utils/texture_tools.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -27,6 +29,9 @@ void LLShooter::init() {
     root_node = map.to_node();
     RenderingServer::get_instance().set_root_node(root_node.get());
 
-    auto sky_panorama = std::make_shared<RGBETexture>("res/textures/sky.hdr");
-    RenderingServer::get_instance().set_cubemap(Cubemap::from_panorama(sky_panorama));
+    auto sky_panorama = RGBETexture("res/textures/sky.hdr");
+    auto sky_cubemap = panorama_to_cubemap(sky_panorama);
+    RenderingServer::get_instance().set_cubemap(
+        sky_cubemap
+    );
 }

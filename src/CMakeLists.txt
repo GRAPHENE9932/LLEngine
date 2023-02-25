@@ -7,7 +7,7 @@ set(SOURCES
     common/core/Mesh.cpp
     common/core/GLTFLoading.cpp
     common/core/GLTFToNode.cpp
-    common/core/Cubemap.cpp
+    common/core/Skybox.cpp
     common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
     common/core/KTXTexture.cpp
@@ -35,6 +35,7 @@ set(SOURCES
     structs/shapes/CylinderShape.cpp
     utils/shader_loader.cpp
     utils/primitive_meshes.cpp
+    utils/texture_tools.cpp
 )
 
 add_executable(${CMAKE_PROJECT_NAME}_run main.cpp)

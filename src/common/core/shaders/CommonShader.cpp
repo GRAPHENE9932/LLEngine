@@ -175,7 +175,7 @@ void CommonShader::initialize(const Parameters& params) {
 void CommonShader::use_shader(
     const Material& material, const glm::mat4& mvp_matrix,
     const glm::mat4& model_matrix, const glm::vec3& camera_position,
-    std::optional<std::reference_wrapper<Cubemap>> environment_cubemap
+    std::optional<std::reference_wrapper<const Texture>> environment_cubemap
 ) const {
     assert(is_initialized());
 
@@ -254,7 +254,7 @@ void CommonShader::use_shader(
     if (environment_cubemap_uniform_id != -1) {
         glUniform1i(environment_cubemap_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, environment_cubemap.value().get().get_texture().get_id());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, environment_cubemap.value().get().get_id());
         cur_tex_unit++;
     }
 }

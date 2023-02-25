@@ -19,7 +19,7 @@ public:
 
     Texture() = default;
     inline Texture(GLuint texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
-            texture_id(texture_id), tex_size(tex_size), cube_map(is_cubemap) {}
+            texture_id(texture_id), tex_size(tex_size), cubemap(is_cubemap) {}
     Texture(const Texture& other) = delete;
     Texture(Texture&& other) = delete;
     inline ~Texture() {
@@ -46,12 +46,12 @@ public:
     [[nodiscard]] glm::u32vec2 get_size() const {
         return tex_size;
     }
-    [[nodiscard]] bool is_cube_map() const {
-        return cube_map;
+    [[nodiscard]] bool is_cubemap() const {
+        return cubemap;
     }
 
 protected:
     GLuint texture_id = 0; // ID of value 0 implies that there are no texture.
     glm::u32vec2 tex_size {0, 0};
-    bool cube_map = false;
+    bool cubemap = false;
 };

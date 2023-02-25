@@ -2,7 +2,7 @@
 
 #include "nodes/core/rendering/PointLightNode.hpp" // PointLightNode
 #include "common/core/Material.hpp"
-#include "common/core/Cubemap.hpp"
+#include "common/core/Skybox.hpp"
 
 #include <glm/vec4.hpp> // glm::vec4
 #include <glm/mat4x4.hpp> // glm::mat4
@@ -66,7 +66,7 @@ public:
     void use_shader(
         const Material& material, const glm::mat4& mvp_matrix,
         const glm::mat4& model_matrix, const glm::vec3& camera_position,
-        std::optional<std::reference_wrapper<Cubemap>> environment_cubemap
+        std::optional<std::reference_wrapper<const Texture>> environment_cubemap
     ) const;
     void delete_shader();
 

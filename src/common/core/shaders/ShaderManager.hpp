@@ -19,7 +19,7 @@ public:
     void use_common_shader(
         const Material& material, const glm::mat4& mvp_matrix,
         const glm::mat4& model_matrix, const glm::vec3& camera_position,
-        std::optional<std::reference_wrapper<Cubemap>> environment_cubemap
+        std::optional<std::reference_wrapper<const Texture>> environment_cubemap
     );
 
     GLuint get_colored_text_program_id();

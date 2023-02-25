@@ -1,6 +1,6 @@
 #include "RenderingServer.hpp" // RenderingServer
 #include "BulletPhysicsServer.hpp"
-#include "common/core/Cubemap.hpp"
+#include "common/core/Skybox.hpp"
 #include "common/core/GLFWWindow.hpp" // GLFWWindow
 #include "nodes/core/rendering/CameraNode.hpp"
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
@@ -12,8 +12,8 @@ RenderingServer::RenderingServer() :
 
 RenderingServer::~RenderingServer() {}
 
-void RenderingServer::set_cubemap(Cubemap&& cubemap) {
-    this->cubemap = std::make_unique<Cubemap>(std::move(cubemap));
+void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
+    this->skybox = std::make_unique<Skybox>(cubemap);
 }
 
 void RenderingServer::set_root_node(SpatialNode* root_node) {
@@ -46,9 +46,9 @@ void RenderingServer::main_loop() {
             cur_drawable->draw();
 
         // Draw skybox.
-        if (cubemap != nullptr) {
+        if (skybox != nullptr) {
             glDepthMask(GL_FALSE);
-            cubemap->draw();
+            skybox->draw();
             glDepthMask(GL_TRUE);
         }
 
@@ -129,10 +129,10 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return get_proj_matrix() * get_view_matrix();
 }
 
-std::optional<std::reference_wrapper<Cubemap>>
+std::optional<std::reference_wrapper<const Texture>>
 RenderingServer::get_environment_cubemap(const glm::vec3& obj_position) {
-    if (cubemap) {
-        return *cubemap;
+    if (skybox) {
+        return skybox->get_texture();
     }
     else {
         return std::nullopt;

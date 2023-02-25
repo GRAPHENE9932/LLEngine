@@ -281,7 +281,7 @@ RGBETexture::RGBETexture(const Parameters& params) {
         std::vector<float> rgb_data {get_rgb_data(x_resolution, y_resolution, stream)};
         this->texture_id = initialize_opengl_texture(x_resolution, y_resolution, params, rgb_data);
         this->tex_size = {x_resolution, y_resolution};
-        this->cube_map = false;
+        this->cubemap = false;
     }
     catch (const RGBEDataLoadingError& e) {
         throw RGBELoadingError(std::string("Failed to read RGBE data: \"") + e.what() + '\"', params.file_path);
