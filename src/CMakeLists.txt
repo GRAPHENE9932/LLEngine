@@ -14,10 +14,10 @@ set(SOURCES
     common/core/RGBETexture.cpp
     common/core/BitmapFont.cpp
     common/core/VkFormatInfo.cpp
-    common/core/shaders/ShaderManager.cpp
+    common/core/shaders/PBRShaderManager.cpp
     common/core/shaders/ColoredTextShader.cpp
     common/core/shaders/SkyboxShader.cpp
-    common/core/shaders/CommonShader.cpp
+    common/core/shaders/PBRShader.cpp
     common/core/shaders/EquirectangularMapperShader.cpp
     nodes/core/rendering/DrawableNode.cpp
     nodes/core/rendering/CameraNode.cpp

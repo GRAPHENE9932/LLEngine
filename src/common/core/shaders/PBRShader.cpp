@@ -6,74 +6,74 @@
 #include "common/core/Material.hpp"
 #include "utils/shader_loader.hpp" // load_shaders
 #include "RenderingServer.hpp" // RenderingServer
-#include "CommonShader.hpp" // TexturedShared
+#include "PBRShader.hpp" // TexturedShared
 
-CommonShader::Flags compute_flags(
+PBRShader::Flags compute_flags(
     const Material& material, bool using_environment_cubemap
 ) {
-    CommonShader::Flags flags = CommonShader::NO_FLAGS;
+    PBRShader::Flags flags = PBRShader::NO_FLAGS;
 
     if (material.base_color_texture.has_value()) {
-        flags |= CommonShader::USING_BASE_COLOR_TEXTURE;
+        flags |= PBRShader::USING_BASE_COLOR_TEXTURE;
     }
     if (material.base_color_factor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)) {
-        flags |= CommonShader::USING_BASE_COLOR_FACTOR;
+        flags |= PBRShader::USING_BASE_COLOR_FACTOR;
     }
     if (!RenderingServer::get_instance().get_point_lights().empty()) {
-        flags |= CommonShader::USING_VERTEX_NORMALS;
+        flags |= PBRShader::USING_VERTEX_NORMALS;
         if (material.normal_map.has_value()) {
-            flags |= CommonShader::USING_NORMAL_TEXTURE;
+            flags |= PBRShader::USING_NORMAL_TEXTURE;
             if (material.normal_map->scale != 1.0f) {
-                flags |= CommonShader::USING_NORMAL_MAP_SCALE;
+                flags |= PBRShader::USING_NORMAL_MAP_SCALE;
             }
         }
     }
     if (material.ambient_occlusion_texture.has_value()) {
-        flags |= CommonShader::USING_AMBIENT_OCCLUSION_TEXTURE;
+        flags |= PBRShader::USING_AMBIENT_OCCLUSION_TEXTURE;
     }
     if (material.ambient_occlusion_factor != 1.0f) {
-        flags |= CommonShader::USING_AMBIENT_OCCLUSION_FACTOR;
+        flags |= PBRShader::USING_AMBIENT_OCCLUSION_FACTOR;
     }
     if (material.metallic_texture.has_value()) {
-        flags |= CommonShader::USING_METALLIC_TEXTURE;
+        flags |= PBRShader::USING_METALLIC_TEXTURE;
     }
     if (material.metallic_factor != 1.0f) {
-        flags |= CommonShader::USING_METALLIC_FACTOR;
+        flags |= PBRShader::USING_METALLIC_FACTOR;
     }
     if (material.roughness_texture.has_value()) {
-        flags |= CommonShader::USING_ROUGHNESS_TEXTURE;
+        flags |= PBRShader::USING_ROUGHNESS_TEXTURE;
     }
     if (material.roughness_factor != 1.0f) {
-        flags |= CommonShader::USING_ROUGHNESS_FACTOR;
+        flags |= PBRShader::USING_ROUGHNESS_FACTOR;
     }
     if (using_environment_cubemap) {
-        flags |= CommonShader::USING_ENVIRONMENT_CUBEMAP;
+        flags |= PBRShader::USING_ENVIRONMENT_CUBEMAP;
     }
-    if (!RenderingServer::get_instance().get_point_lights().empty() || flags & CommonShader::USING_ENVIRONMENT_CUBEMAP) {
-        flags |= CommonShader::USING_FRAGMENT_POSITION;
+    if (!RenderingServer::get_instance().get_point_lights().empty() || flags & PBRShader::USING_ENVIRONMENT_CUBEMAP) {
+        flags |= PBRShader::USING_FRAGMENT_POSITION;
     }
-    if ((flags & CommonShader::USING_BASE_COLOR_TEXTURE) ||
-        (flags & CommonShader::USING_NORMAL_TEXTURE) ||
-        (flags & CommonShader::USING_AMBIENT_OCCLUSION_TEXTURE) ||
-        (flags & CommonShader::USING_METALLIC_TEXTURE) ||
-        (flags & CommonShader::USING_ROUGHNESS_TEXTURE)) {
-        flags |= CommonShader::USING_UV;
+    if ((flags & PBRShader::USING_BASE_COLOR_TEXTURE) ||
+        (flags & PBRShader::USING_NORMAL_TEXTURE) ||
+        (flags & PBRShader::USING_AMBIENT_OCCLUSION_TEXTURE) ||
+        (flags & PBRShader::USING_METALLIC_TEXTURE) ||
+        (flags & PBRShader::USING_ROUGHNESS_TEXTURE)) {
+        flags |= PBRShader::USING_UV;
     }
     if (material.has_offsets_and_scales()) {
         if (material.has_identical_offsets_and_scales()) {
-            flags |= CommonShader::USING_GENERAL_UV_TRANSFORM;
+            flags |= PBRShader::USING_GENERAL_UV_TRANSFORM;
         }
         else {
-            flags |= CommonShader::USING_BASE_UV_TRANSFORM;
-            flags |= CommonShader::USING_NORMAL_UV_TRANSFORM;
+            flags |= PBRShader::USING_BASE_UV_TRANSFORM;
+            flags |= PBRShader::USING_NORMAL_UV_TRANSFORM;
         }
     }
 
     return flags;
 }
 
-CommonShader::Parameters
-CommonShader::to_parameters(
+PBRShader::Parameters
+PBRShader::to_parameters(
     const Material& material, bool using_environment_cubemap
 ) noexcept {
     return {
@@ -82,15 +82,15 @@ CommonShader::to_parameters(
     };
 }
 
-CommonShader::CommonShader(const Parameters& params) {
+PBRShader::PBRShader(const Parameters& params) {
     initialize(params);
 }
 
-CommonShader::~CommonShader() {
+PBRShader::~PBRShader() {
     delete_shader();
 }
 
-void CommonShader::initialize_uniforms(const Parameters& params) {
+void PBRShader::initialize_uniforms(const Parameters& params) {
     mvp_id = glGetUniformLocation(program_id, "mvp");
     model_matrix_id = glGetUniformLocation(program_id, "model_matrix");
     normal_matrix_id = glGetUniformLocation(program_id, "normal_matrix");
@@ -120,7 +120,7 @@ void CommonShader::initialize_uniforms(const Parameters& params) {
     }
 }
 
-void CommonShader::initialize(const Parameters& params) {
+void PBRShader::initialize(const Parameters& params) {
     flags = params.flags;
 
     // Declare #defines for the shader.
@@ -172,7 +172,7 @@ void CommonShader::initialize(const Parameters& params) {
     initialize_uniforms(params);
 }
 
-void CommonShader::use_shader(
+void PBRShader::use_shader(
     const Material& material, const glm::mat4& mvp_matrix,
     const glm::mat4& model_matrix, const glm::vec3& camera_position,
     std::optional<std::reference_wrapper<const Texture>> environment_cubemap
@@ -259,7 +259,7 @@ void CommonShader::use_shader(
     }
 }
 
-void CommonShader::delete_shader() {
+void PBRShader::delete_shader() {
     if (is_initialized()) {
         glDeleteProgram(program_id);
         program_id = 0;
@@ -267,13 +267,13 @@ void CommonShader::delete_shader() {
     }
 }
 
-CommonShader::Parameters CommonShader::extract_parameters() const noexcept {
+PBRShader::Parameters PBRShader::extract_parameters() const noexcept {
     return {
         flags,
         static_cast<uint32_t>(point_light_ids.size())
     };
 }
 
-GLuint CommonShader::get_program_id() const noexcept {
+GLuint PBRShader::get_program_id() const noexcept {
     return program_id;
 }

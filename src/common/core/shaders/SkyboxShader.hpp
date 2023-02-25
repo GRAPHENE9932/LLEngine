@@ -7,17 +7,19 @@ class SkyboxShader {
 public:
     ~SkyboxShader();
 
-    void initialize();
-    void use_shader(const glm::mat4& mvp);
-    GLuint get_program_id();
-    void delete_shader();
+    static SkyboxShader& get_instance() {
+        static SkyboxShader instance;
+        return instance;
+    }
 
-    [[nodiscard]] inline bool is_initialized() const noexcept {
-        return program_id != 0;
+    void use_shader(const glm::mat4& mvp);
+    [[nodiscard]] inline GLuint get_program_id() const noexcept {
+        return program_id;
     }
 
 private:
+    SkyboxShader();
+
     GLuint program_id = 0;
     GLuint mvp_id = 0;
 };
-

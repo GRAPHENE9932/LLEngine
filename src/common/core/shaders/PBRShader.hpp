@@ -11,7 +11,7 @@
 #include <cstdint> // uint8_t, uint32_t
 #include <optional> // std::optional
 
-class CommonShader {
+class PBRShader {
 public:
     enum Flags : uint32_t {
         NO_FLAGS = 0x0,
@@ -52,15 +52,15 @@ public:
         const Material& material, bool using_environment_cubemap
     ) noexcept;
 
-    explicit CommonShader(const Parameters& params);
+    explicit PBRShader(const Parameters& params);
     // Make the object non-copyable.
     // It was so frustrating to debug an error caused by
     // an unexpected destructor call...
-    CommonShader(const CommonShader&) = delete;
-    CommonShader& operator=(const CommonShader&) = delete;
-    CommonShader(CommonShader&&) noexcept = default;
+    PBRShader(const PBRShader&) = delete;
+    PBRShader& operator=(const PBRShader&) = delete;
+    PBRShader(PBRShader&&) noexcept = default;
 
-    ~CommonShader();
+    ~PBRShader();
 
     void initialize(const Parameters& params);
     void use_shader(

@@ -11,7 +11,7 @@
 
 #include "common/core/Window.hpp" // Window
 #include "common/core/Skybox.hpp" // Skybox
-#include "common/core/shaders/ShaderManager.hpp" // ShaderManager
+#include "common/core/shaders/PBRShaderManager.hpp" // PBRShaderManager
 
 class Texture;
 class RenderingNode;
@@ -131,10 +131,6 @@ public:
         return window;
     }
 
-    [[nodiscard]] ShaderManager& get_shader_manager() {
-        return shader_manager;
-    }
-
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
 
@@ -142,7 +138,6 @@ private:
     static inline glm::ivec2 starting_resolution = glm::vec2(1500, 800);
 
     Window& window;
-    ShaderManager shader_manager;
 
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;

@@ -21,7 +21,7 @@ void CommonDrawableNode::draw() {
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
-    rs.get_shader_manager().use_common_shader(
+    PBRShaderManager::get_instance().use_common_shader(
         *material, mvp, model_matrix, rs.get_camera_position(),
         rs.get_environment_cubemap(get_global_position())
     );
@@ -63,7 +63,7 @@ void CommonDrawableNode::draw() {
 }
 
 GLuint CommonDrawableNode::get_program_id() const {
-    return RenderingServer::get_instance().get_shader_manager().get_common_program_id(
+    return PBRShaderManager::get_instance().get_common_program_id(
         *material, RenderingServer::get_instance().get_environment_cubemap(get_global_position()).has_value()
     );
 }
