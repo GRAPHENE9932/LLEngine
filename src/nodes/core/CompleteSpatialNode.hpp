@@ -12,7 +12,7 @@
 
 class CompleteSpatialNode : public SpatialNode {
 public:
-    explicit CompleteSpatialNode(const Transform& transform);
+    explicit CompleteSpatialNode(const Transform& transform = Transform());
     virtual ~CompleteSpatialNode();
 
     void set_translation(const glm::vec3& new_trans) override;
@@ -33,8 +33,8 @@ public:
     glm::mat4 get_global_matrix() const noexcept override final;
 
 protected:
-    Transform transform;
-    mutable glm::mat4 cached_local_matrix;
+    Transform transform = Transform();
+    mutable glm::mat4 cached_local_matrix = glm::mat4();
     mutable bool needs_recalculation = true;
 
     void recalculate_matrix() const noexcept;
