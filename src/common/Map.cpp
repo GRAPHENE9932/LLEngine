@@ -69,12 +69,12 @@ std::unique_ptr<SpectatorCameraNode> player_to_node(RenderingServer& rs, const j
     return result;
 }
 
-std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_node) const {
+std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, BulletPhysicsServer& bps, const json& json_node) const {
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
     if (type == "scene_file") {
         const Transform spat_params = json_node.get<Transform>();
-        result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(rs);
+        result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(rs, bps);
         result->set_translation(spat_params.translation + result->get_translation());
         result->set_scale(spat_params.scale * result->get_scale());
         result->set_rotation(spat_params.rotation * result->get_rotation());
@@ -96,7 +96,7 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     if (json_node.contains("children")) {
         for (const json& cur_json_child : json_node["children"]) {
             result->add_child(
-                to_node(rs, cur_json_child)
+                to_node(rs, bps, cur_json_child)
             );
         }
     }
@@ -104,6 +104,6 @@ std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, const json& json_
     return result;
 }
 
-std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs) const {
-    return to_node(rs, json_map.at("root_node"));
+std::unique_ptr<SpatialNode> Map::to_node(RenderingServer& rs, BulletPhysicsServer& bps) const {
+    return to_node(rs, bps, json_map.at("root_node"));
 }

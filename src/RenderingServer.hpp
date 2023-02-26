@@ -30,7 +30,9 @@ public:
     ~RenderingServer();
 
     void set_cubemap(const std::shared_ptr<Texture>& cubemap);
-    void set_root_node(SpatialNode* root_node);
+    void set_update_callback(const std::function<void(float)> callback) {
+        this->update_callback = callback;
+    }
 
     void main_loop();
 
@@ -126,6 +128,7 @@ public:
 
 private:
     Window& window;
+    std::function<void(float)> update_callback;
 
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;
@@ -136,7 +139,4 @@ private:
     std::unique_ptr<Skybox> skybox = nullptr;
     std::vector<DrawableNode*> drawable_nodes;
     std::vector<PointLightNode*> point_lights;
-
-    // Non-owning pointer to the root node. Used to invoke update().
-    SpatialNode* root_node = nullptr;
 };

@@ -24,9 +24,11 @@ public:
      *
      * @throws std::invalid_argument if mass value is invalid.
      */
-    BulletRigidBodyNode(const Transform& spat_params,
-                        const std::shared_ptr<Shape>& shape,
-                        float mass);
+    BulletRigidBodyNode(
+        BulletPhysicsServer& bps,
+        const std::shared_ptr<Shape>& shape,
+        float mass, const Transform& transform = Transform()
+    );
     BulletRigidBodyNode(const BulletRigidBodyNode& node) = delete;
     ~BulletRigidBodyNode() noexcept override;
 
@@ -80,6 +82,8 @@ public:
     [[nodiscard]] float get_mass() const noexcept;
 
 private:
+    BulletPhysicsServer& bps;
+
     glm::vec3 scale = {1.0f, 1.0f, 1.0f};
 
     Transform previous_parent_transform;

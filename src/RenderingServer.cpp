@@ -19,11 +19,6 @@ void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
 
     this->skybox = std::make_unique<Skybox>(*this, cubemap);
 }
-
-void RenderingServer::set_root_node(SpatialNode* root_node) {
-    this->root_node = root_node;
-}
-
 void RenderingServer::main_loop() {
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
@@ -35,13 +30,8 @@ void RenderingServer::main_loop() {
         prev_frame_time = now;
         delta_time = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
 
-        // Do a physics step.
-        BulletPhysicsServer::do_step_if_needed(delta_time);
-
-        // Invoke update.
-        if (root_node) {
-            root_node->update();
-        }
+        // Invoke callback.
+        update_callback(delta_time);
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 

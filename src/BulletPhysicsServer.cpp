@@ -17,12 +17,6 @@ BulletPhysicsServer::BulletPhysicsServer() {
 
 BulletPhysicsServer::~BulletPhysicsServer() = default;
 
-void BulletPhysicsServer::do_step_if_needed(float delta_time) {
-    if (singleton_initialized) {
-        get_instance().do_step(delta_time);
-    }
-}
-
 void BulletPhysicsServer::do_step(float delta_time) {
     for (BulletRigidBodyNode* cur_rigid_body : rigid_bodies) {
         cur_rigid_body->before_simulation_step();

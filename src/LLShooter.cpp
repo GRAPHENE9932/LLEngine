@@ -22,15 +22,20 @@ void LLShooter::start() {
 }
 
 void LLShooter::init() {
-    rendering_server = std::make_shared<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+    rendering_server = std::make_unique<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
+    bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
     Map map("res/maps/map_close.json");
-    root_node = map.to_node(*rendering_server);
-    rendering_server->set_root_node(root_node.get());
+    root_node = map.to_node(*rendering_server, *bullet_physics_server);
 
     auto sky_panorama = RGBETexture("res/textures/sky.hdr");
     auto sky_cubemap = panorama_to_cubemap(sky_panorama);
     rendering_server->set_cubemap(
         sky_cubemap
     );
+
+    rendering_server->set_update_callback([&](float delta_time){
+        bullet_physics_server->do_step(delta_time);
+        root_node->update();
+    });
 }

@@ -16,6 +16,7 @@
 struct ConstructionEnvironment {
     const GLTF& gltf;
     RenderingServer& rs;
+    BulletPhysicsServer& bps;
     const std::vector<std::shared_ptr<Mesh>>& meshes;
     const std::vector<std::shared_ptr<Material>>& materials;
     std::vector<std::shared_ptr<Shape>> shapes_pool;
@@ -126,9 +127,10 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     assert(gltf_node.is_rigid_body());
 
     auto result = std::make_unique<BulletRigidBodyNode>(
-        gltf_node.transform,
+        constr_env.bps,
         extract_shape(constr_env, gltf_node),
-        get_optional<float>(gltf_node.extras.value(), "mass").value_or(0.0f)
+        get_optional<float>(gltf_node.extras.value(), "mass").value_or(0.0f),
+        gltf_node.transform
     );
 
     if (gltf_node.is_drawable()) {
@@ -250,7 +252,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
+std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs, BulletPhysicsServer& bps) const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -274,6 +276,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
     ConstructionEnvironment constr_env {
         *this,
         rs,
+        bps,
         meshes,
         materials,
         {}
