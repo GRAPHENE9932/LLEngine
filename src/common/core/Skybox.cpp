@@ -5,15 +5,14 @@
 #include "utils/primitive_meshes.hpp"
 
 Skybox::Skybox(Skybox&& other) noexcept :
-        Skybox(other.cubemap_texture) {
+        Skybox(other.rs, other.cubemap_texture) {
     other.cubemap_texture = nullptr;
 }
 
-Skybox::Skybox(const std::shared_ptr<Texture>& cubemap_texture) :
-    cubemap_texture(cubemap_texture) {};
+Skybox::Skybox(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture) :
+    cubemap_texture(cubemap_texture), rs(rs) {};
 
 void Skybox::draw() {
-    auto& rs = RenderingServer::get_instance(); // Alias the rendering server;
     const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
 
     // Uniforms.

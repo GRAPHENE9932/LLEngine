@@ -48,9 +48,7 @@ public:
         auto operator<=>(const Parameters& other) const noexcept = default;
     };
 
-    static Parameters to_parameters(
-        const Material& material, bool using_environment_cubemap
-    ) noexcept;
+    static Parameters to_parameters(RenderingServer& rs, const Material& material) noexcept;
 
     explicit PBRShader(const Parameters& params);
     // Make the object non-copyable.
@@ -64,9 +62,9 @@ public:
 
     void initialize(const Parameters& params);
     void use_shader(
+        RenderingServer& rs,
         const Material& material, const glm::mat4& mvp_matrix,
-        const glm::mat4& model_matrix, const glm::vec3& camera_position,
-        std::optional<std::reference_wrapper<const Texture>> environment_cubemap
+        const glm::mat4& model_matrix, const glm::vec3& camera_position
     ) const;
     void delete_shader();
 

@@ -1,14 +1,14 @@
 #include "RenderingServer.hpp"
 #include "PBRDrawableNode.hpp" // PBRDrawableNode
 
-PBRDrawableNode::PBRDrawableNode(const Transform& p,
+PBRDrawableNode::PBRDrawableNode(
+    RenderingServer& rs,
     const std::shared_ptr<Material>& material,
-    const std::shared_ptr<const Mesh>& mesh) :
-    DrawableNode(p), mesh(mesh), material(material) {}
+    const std::shared_ptr<const Mesh>& mesh,
+    const Transform& transform
+) : DrawableNode(rs, transform), mesh(mesh), material(material) {}
 
 void PBRDrawableNode::draw() {
-    auto& rs = RenderingServer::get_instance();
-
     // Do some checks.
     if (material->normal_map.has_value() &&
         (mesh->get_normals_id() == 0 || mesh->get_tangents_id() == 0)) {
@@ -22,8 +22,7 @@ void PBRDrawableNode::draw() {
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
     PBRShaderManager::get_instance().use_common_shader(
-        *material, mvp, model_matrix, rs.get_camera_position(),
-        rs.get_environment_cubemap(get_global_position())
+        rs, *material, mvp, model_matrix, rs.get_camera_position()
     );
 
     // Vertices.
@@ -63,7 +62,5 @@ void PBRDrawableNode::draw() {
 }
 
 GLuint PBRDrawableNode::get_program_id() const {
-    return PBRShaderManager::get_instance().get_common_program_id(
-        *material, RenderingServer::get_instance().get_environment_cubemap(get_global_position()).has_value()
-    );
+    return PBRShaderManager::get_instance().get_common_program_id(rs, *material);
 }

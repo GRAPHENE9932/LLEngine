@@ -18,20 +18,19 @@ LLShooter::~LLShooter() {
 
 void LLShooter::start() {
     init();
-    RenderingServer::get_instance().main_loop();
+    rendering_server.get()->main_loop();
 }
 
 void LLShooter::init() {
-    RenderingServer::set_starting_resolution(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
-    RenderingServer::force_initialize();
+    rendering_server = std::make_shared<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
 
     Map map("res/maps/map_close.json");
-    root_node = map.to_node();
-    RenderingServer::get_instance().set_root_node(root_node.get());
+    root_node = map.to_node(*rendering_server);
+    rendering_server->set_root_node(root_node.get());
 
     auto sky_panorama = RGBETexture("res/textures/sky.hdr");
     auto sky_cubemap = panorama_to_cubemap(sky_panorama);
-    RenderingServer::get_instance().set_cubemap(
+    rendering_server->set_cubemap(
         sky_cubemap
     );
 }

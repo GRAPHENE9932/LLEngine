@@ -7,6 +7,8 @@
 
 #include "nodes/core/CompleteSpatialNode.hpp"
 
+class RenderingServer;
+
 struct PointLightNode : public CompleteSpatialNode {
     struct Uniforms {
         GLint position_id, color_id, diffuse_strength_id, const_coeff_id,
@@ -15,13 +17,15 @@ struct PointLightNode : public CompleteSpatialNode {
         auto operator<=>(const Uniforms& other) const noexcept = default;
     };
 
+    RenderingServer& rs;
+
     glm::vec3 color;
     float diffuse_strength = 0.0f;
     float const_coeff = 0.0f;
     float linear_coeff = 0.0f;
     float quadratic_coeff = 0.0f;
 
-    PointLightNode(const Transform& p);
+    PointLightNode(RenderingServer& rs, const Transform& transform = Transform());
     ~PointLightNode();
 
     static Uniforms get_uniforms_id(GLuint program_id, const std::string& var_name, GLuint index);

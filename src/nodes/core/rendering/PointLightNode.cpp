@@ -5,13 +5,13 @@
 
 #include <string> // std::string
 
-PointLightNode::PointLightNode(const Transform& p) :
-    CompleteSpatialNode(p) {
-    RenderingServer::get_instance().register_point_light(this);
+PointLightNode::PointLightNode(RenderingServer& rs, const Transform& transform) :
+    CompleteSpatialNode(transform), rs(rs) {
+    rs.register_point_light(this);
 }
 
 PointLightNode::~PointLightNode() {
-    RenderingServer::get_instance().unregister_point_light(this);
+    rs.unregister_point_light(this);
 }
 
 PointLightNode::Uniforms PointLightNode::get_uniforms_id(

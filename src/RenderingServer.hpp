@@ -26,20 +26,8 @@ struct SpotLight;
  */
 class RenderingServer {
 public:
+    RenderingServer(glm::ivec2 window_size);
     ~RenderingServer();
-
-    static RenderingServer& get_instance() {
-        static RenderingServer instance;
-        return instance;
-    }
-
-    static void force_initialize() {
-        get_instance();
-    }
-
-    static void set_starting_resolution(glm::ivec2 window_extents) {
-        starting_resolution = window_extents;
-    }
 
     void set_cubemap(const std::shared_ptr<Texture>& cubemap);
     void set_root_node(SpatialNode* root_node);
@@ -134,9 +122,9 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
 
-private:
-    static inline glm::ivec2 starting_resolution = glm::vec2(1500, 800);
+    [[nodiscard]] bool have_environment_cubemap();
 
+private:
     Window& window;
 
     // Time point of the last frame.
@@ -151,6 +139,4 @@ private:
 
     // Non-owning pointer to the root node. Used to invoke update().
     SpatialNode* root_node = nullptr;
-
-    RenderingServer();
 };

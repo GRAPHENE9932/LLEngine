@@ -5,6 +5,8 @@
 
 #include "nodes/core/CompleteSpatialNode.hpp"
 
+class RenderingServer;
+
 /**
  * @brief Basic static camera. Everything it needs - spatial parameters,
  * field of view and display ratio.
@@ -15,7 +17,10 @@ public:
      * @param display_ratio Width / height viewport ratio.
      * @param fov Field of view in radians.
      */
-    CameraNode(const Transform& p, float display_ratio, float fov = glm::radians(90.0f)) noexcept;
+    CameraNode(
+        RenderingServer& rs, float display_ratio,
+        float fov = glm::radians(90.0f), const Transform& transform = Transform()
+    ) noexcept;
 
     glm::mat4 get_view_matrix() noexcept;
     glm::mat4 get_proj_matrix() noexcept;
@@ -26,6 +31,9 @@ public:
 
     void set_field_of_view(float new_field_of_view);
     void set_aspect_ratio(float new_aspect_ratio);
+
+protected:
+    RenderingServer& rs;
 
 private:
     float field_of_view;

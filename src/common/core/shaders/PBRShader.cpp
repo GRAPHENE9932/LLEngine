@@ -8,9 +8,7 @@
 #include "RenderingServer.hpp" // RenderingServer
 #include "PBRShader.hpp" // TexturedShared
 
-PBRShader::Flags compute_flags(
-    const Material& material, bool using_environment_cubemap
-) {
+PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     PBRShader::Flags flags = PBRShader::NO_FLAGS;
 
     if (material.base_color_texture.has_value()) {
@@ -19,7 +17,7 @@ PBRShader::Flags compute_flags(
     if (material.base_color_factor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)) {
         flags |= PBRShader::USING_BASE_COLOR_FACTOR;
     }
-    if (!RenderingServer::get_instance().get_point_lights().empty()) {
+    if (!rs.get_point_lights().empty()) {
         flags |= PBRShader::USING_VERTEX_NORMALS;
         if (material.normal_map.has_value()) {
             flags |= PBRShader::USING_NORMAL_TEXTURE;
@@ -46,10 +44,10 @@ PBRShader::Flags compute_flags(
     if (material.roughness_factor != 1.0f) {
         flags |= PBRShader::USING_ROUGHNESS_FACTOR;
     }
-    if (using_environment_cubemap) {
+    if (rs.have_environment_cubemap()) {
         flags |= PBRShader::USING_ENVIRONMENT_CUBEMAP;
     }
-    if (!RenderingServer::get_instance().get_point_lights().empty() || flags & PBRShader::USING_ENVIRONMENT_CUBEMAP) {
+    if (!rs.get_point_lights().empty() || flags & PBRShader::USING_ENVIRONMENT_CUBEMAP) {
         flags |= PBRShader::USING_FRAGMENT_POSITION;
     }
     if ((flags & PBRShader::USING_BASE_COLOR_TEXTURE) ||
@@ -74,11 +72,12 @@ PBRShader::Flags compute_flags(
 
 PBRShader::Parameters
 PBRShader::to_parameters(
-    const Material& material, bool using_environment_cubemap
+    RenderingServer& rs,
+    const Material& material
 ) noexcept {
     return {
-        compute_flags(material, using_environment_cubemap),
-        static_cast<uint32_t>(RenderingServer::get_instance().get_point_lights().size())
+        compute_flags(rs, material),
+        static_cast<uint32_t>(rs.get_point_lights().size())
     };
 }
 
@@ -173,9 +172,9 @@ void PBRShader::initialize(const Parameters& params) {
 }
 
 void PBRShader::use_shader(
+    RenderingServer& rs,
     const Material& material, const glm::mat4& mvp_matrix,
-    const glm::mat4& model_matrix, const glm::vec3& camera_position,
-    std::optional<std::reference_wrapper<const Texture>> environment_cubemap
+    const glm::mat4& model_matrix, const glm::vec3& camera_position
 ) const {
     assert(is_initialized());
 
@@ -210,7 +209,7 @@ void PBRShader::use_shader(
         glUniform2fv(normal_uv_scale_id, 1, glm::value_ptr(material.normal_map->texture.uv_scale));
     }
     auto point_light_ids_iter = point_light_ids.begin();
-    for (auto& cur_point_light : RenderingServer::get_instance().get_point_lights()) {
+    for (auto& cur_point_light : rs.get_point_lights()) {
         cur_point_light->set_uniforms(*point_light_ids_iter);
         point_light_ids_iter++;
     }
@@ -254,7 +253,7 @@ void PBRShader::use_shader(
     if (environment_cubemap_uniform_id != -1) {
         glUniform1i(environment_cubemap_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, environment_cubemap.value().get().get_id());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_environment_cubemap(camera_position).value().get().get_id());
         cur_tex_unit++;
     }
 }

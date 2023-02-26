@@ -16,17 +16,17 @@ public:
     }
 
     void use_common_shader(
+        RenderingServer& rs,
         const Material& material, const glm::mat4& mvp_matrix,
-        const glm::mat4& model_matrix, const glm::vec3& camera_position,
-        std::optional<std::reference_wrapper<const Texture>> environment_cubemap
+        const glm::mat4& model_matrix, const glm::vec3& camera_position
     );
 
-    GLuint get_common_program_id(const Material& material, bool using_environment_cubemap);
+    GLuint get_common_program_id(RenderingServer& rs, const Material& material);
 
 private:
     PBRShaderManager() = default;
 
-    const PBRShader& get_common_shader(const Material& material, bool using_environment_cubemap);
+    const PBRShader& get_common_shader(RenderingServer& rs, const Material& material);
 
     struct PBRShaderComparator {
         using is_transparent = std::true_type;

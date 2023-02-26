@@ -7,8 +7,8 @@
 
 #include <GLFW/glfw3.h>
 
-RenderingServer::RenderingServer() :
-    window(*new GLFWWindow(starting_resolution, "LLShooter", 3, 3)) {}
+RenderingServer::RenderingServer(glm::ivec2 window_size) :
+    window(*new GLFWWindow(window_size, "LLShooter", 3, 3)) {}
 
 RenderingServer::~RenderingServer() {}
 
@@ -17,7 +17,7 @@ void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
         throw std::invalid_argument("Specified cubemap texture for skybox is not actually a cubemap.");
     }
 
-    this->skybox = std::make_unique<Skybox>(cubemap);
+    this->skybox = std::make_unique<Skybox>(*this, cubemap);
 }
 
 void RenderingServer::set_root_node(SpatialNode* root_node) {
@@ -134,11 +134,15 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
 }
 
 std::optional<std::reference_wrapper<const Texture>>
-RenderingServer::get_environment_cubemap(const glm::vec3& obj_position) {
+RenderingServer::get_environment_cubemap(const glm::vec3& camera_position) {
     if (skybox) {
         return skybox->get_texture();
     }
     else {
         return std::nullopt;
     }
+}
+
+bool RenderingServer::have_environment_cubemap() {
+    return skybox != nullptr;
 }

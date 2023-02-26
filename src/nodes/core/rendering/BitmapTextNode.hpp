@@ -13,9 +13,12 @@
 
 class BitmapTextNode : public DrawableNode {
 public:
-    BitmapTextNode(const Transform& params,
-                   const std::shared_ptr<BitmapFont>& font,
-                   std::string_view text, const glm::vec3& color);
+    BitmapTextNode(
+        RenderingServer& rs,
+        const std::shared_ptr<BitmapFont>& font,
+        std::string_view text, const glm::vec3& color,
+        const Transform& transform = Transform()
+    );
     ~BitmapTextNode();
     
     /// Appearance of the object will be changed only after

@@ -9,9 +9,12 @@
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
-SpectatorCameraNode::SpectatorCameraNode(const Transform& p, float display_ratio, float fov) :
-    CameraNode(p, display_ratio, fov) {
-    RenderingServer::get_instance().get_window().disable_cursor();
+SpectatorCameraNode::SpectatorCameraNode(
+    RenderingServer& rs, float display_ratio,
+    float fov, const Transform& transform
+) :
+    CameraNode(rs, display_ratio, fov, transform) {
+    rs.get_window().disable_cursor();
 }
 
 void SpectatorCameraNode::update() {
@@ -84,7 +87,7 @@ void clamp_x_angle(float& x_angle) {
 }
 
 void SpectatorCameraNode::update_rotation() {
-    auto& window {RenderingServer::get_instance().get_window()};
+    auto& window {rs.get_window()};
 
     // Get the current cursor position.
     glm::dvec2 cursor_pos = window.get_cursor_position();
@@ -109,8 +112,8 @@ void SpectatorCameraNode::update_position() {
     const glm::vec3 right_dir = get_rotation() * RIGHT;
 
     // Some aliases.
-    const auto& window {RenderingServer::get_instance().get_window()};
-    const auto& delta {RenderingServer::get_instance().get_delta_time()};
+    const auto& window {rs.get_window()};
+    const auto& delta {rs.get_delta_time()};
 
     if (window.is_key_pressed(FORWARD_KEY)) {
         translate(forward_dir * delta * speed);

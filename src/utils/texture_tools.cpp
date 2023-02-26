@@ -76,7 +76,6 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama) {
         // Bind the cubemap.
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
-        RenderingServer::get_instance().report_about_drawn_triangles(cube_mesh->get_amount_of_vertices() / 3);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

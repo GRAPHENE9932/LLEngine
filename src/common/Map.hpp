@@ -11,10 +11,11 @@
 class Map {
 public:
     explicit Map(const std::string& json_path);
-    std::unique_ptr<SpatialNode> to_node() const;
-    std::unique_ptr<SpatialNode> to_node(const nlohmann::json& json_node) const;
+    std::unique_ptr<SpatialNode> to_node(RenderingServer& rs) const;
 
 private:
     std::vector<std::unique_ptr<SceneFile>> scene_files;
     nlohmann::json json_map;
+
+    std::unique_ptr<SpatialNode> to_node(RenderingServer& rs, const nlohmann::json& json_node) const;
 };

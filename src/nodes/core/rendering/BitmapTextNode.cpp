@@ -5,9 +5,12 @@
 #include "BitmapTextNode.hpp"
 #include "RenderingServer.hpp" // RenderingServer
 
-BitmapTextNode::BitmapTextNode(const Transform& params,
-    const std::shared_ptr<BitmapFont>& font, std::string_view text,
-    const glm::vec3& color) : DrawableNode(params), color(color) {
+BitmapTextNode::BitmapTextNode(
+    RenderingServer& rs,
+    const std::shared_ptr<BitmapFont>& font,
+    std::string_view text, const glm::vec3& color,
+    const Transform& transform
+) : DrawableNode(rs, transform), color(color) {
     set_font(font);
     set_text(text);
 }
@@ -89,15 +92,13 @@ void BitmapTextNode::set_screen_space_scale(const glm::vec3& scr_space_scale,
 }
 
 void BitmapTextNode::update() {
-    auto& rs = RenderingServer::get_instance();
-
     update_children();
 
     glEnable(GL_BLEND);
 
     // Uniforms.
     glm::mat4 model_matrix = get_global_matrix();
-    glm::mat4 mvp = RenderingServer::get_instance().get_view_proj_matrix() * model_matrix;
+    glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
     ColoredTextShader::get_instance().use_shader(mvp, color);
 
     // Vertices.

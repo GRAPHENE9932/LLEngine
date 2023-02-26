@@ -15,6 +15,7 @@
 // Packed parameters used across functions.
 struct ConstructionEnvironment {
     const GLTF& gltf;
+    RenderingServer& rs;
     const std::vector<std::shared_ptr<Mesh>>& meshes;
     const std::vector<std::shared_ptr<Material>>& materials;
     std::vector<std::shared_ptr<Shape>> shapes_pool;
@@ -39,9 +40,10 @@ std::unique_ptr<PBRDrawableNode> construct_common_drawable(
     assert(gltf_node.is_drawable());
 
     auto result = std::make_unique<PBRDrawableNode>(
-        gltf_node.transform,
+        constr_env.rs,
         constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
-        constr_env.meshes.at(*gltf_node.mesh_index)
+        constr_env.meshes.at(*gltf_node.mesh_index),
+        gltf_node.transform
     );
 
     result->set_name(gltf_node.name);
@@ -248,7 +250,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::SpatialNode> GLTF::to_node() const {
+std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs) const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -271,6 +273,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node() const {
     // Pack this into a ConstructionEnvironment.
     ConstructionEnvironment constr_env {
         *this,
+        rs,
         meshes,
         materials,
         {}

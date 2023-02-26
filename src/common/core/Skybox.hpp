@@ -5,10 +5,11 @@
 #include <GL/glew.h> // GLuint
 
 class Texture;
+class RenderingServer;
 
 class Skybox {
 public:
-    explicit Skybox(const std::shared_ptr<Texture>& cubemap_texture);
+    Skybox(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture);
     Skybox(const Skybox& other) = delete;
     Skybox(Skybox&& other) noexcept;
     Skybox& operator=(const Skybox& other) = delete;
@@ -20,5 +21,6 @@ public:
     void draw();
 
 private:
+    RenderingServer& rs;
     std::shared_ptr<Texture> cubemap_texture;
 };
