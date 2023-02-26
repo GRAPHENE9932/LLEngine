@@ -15,8 +15,7 @@
 // Packed parameters used across functions.
 struct ConstructionEnvironment {
     const GLTF& gltf;
-    RenderingServer& rs;
-    BulletPhysicsServer& bps;
+    EngineServers& servers;
     const std::vector<std::shared_ptr<Mesh>>& meshes;
     const std::vector<std::shared_ptr<Material>>& materials;
     std::vector<std::shared_ptr<Shape>> shapes_pool;
@@ -41,7 +40,7 @@ std::unique_ptr<PBRDrawableNode> construct_common_drawable(
     assert(gltf_node.is_drawable());
 
     auto result = std::make_unique<PBRDrawableNode>(
-        constr_env.rs,
+        constr_env.servers.rs,
         constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
         constr_env.meshes.at(*gltf_node.mesh_index),
         gltf_node.transform
@@ -127,7 +126,7 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     assert(gltf_node.is_rigid_body());
 
     auto result = std::make_unique<BulletRigidBodyNode>(
-        constr_env.bps,
+        constr_env.servers.bps,
         extract_shape(constr_env, gltf_node),
         get_optional<float>(gltf_node.extras.value(), "mass").value_or(0.0f),
         gltf_node.transform
@@ -252,7 +251,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs, BulletPhysicsServer& bps) const {
+std::unique_ptr<::SpatialNode> GLTF::to_node(EngineServers& servers) const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -275,8 +274,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(RenderingServer& rs, BulletPhysicsS
     // Pack this into a ConstructionEnvironment.
     ConstructionEnvironment constr_env {
         *this,
-        rs,
-        bps,
+        servers,
         meshes,
         materials,
         {}

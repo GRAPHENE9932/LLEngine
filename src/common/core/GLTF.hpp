@@ -79,7 +79,5 @@ public:
     */
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<::SpatialNode> to_node(
-        RenderingServer& rs, BulletPhysicsServer& bps
-    ) const override;
+    std::unique_ptr<::SpatialNode> to_node(EngineServers& servers) const override;
 };

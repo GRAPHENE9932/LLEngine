@@ -26,7 +26,8 @@ void LLShooter::init() {
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
     Map map("res/maps/map_close.json");
-    root_node = map.to_node(*rendering_server, *bullet_physics_server);
+    EngineServers engine_servers {*rendering_server, *bullet_physics_server};
+    root_node = map.to_node(engine_servers);
 
     auto sky_panorama = RGBETexture("res/textures/sky.hdr");
     auto sky_cubemap = panorama_to_cubemap(sky_panorama);
