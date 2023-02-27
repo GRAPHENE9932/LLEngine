@@ -21,7 +21,7 @@ void PBRDrawableNode::draw() {
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
-    PBRShaderManager::get_instance().use_shader(
+    rs.get_shader_holder().get_pbr_shader_manager().use_shader(
         rs, *material, mvp, model_matrix, rs.get_camera_position()
     );
 
@@ -62,5 +62,5 @@ void PBRDrawableNode::draw() {
 }
 
 GLuint PBRDrawableNode::get_program_id() const {
-    return PBRShaderManager::get_instance().get_program_id(rs, *material);
+    return rs.get_shader_holder().get_pbr_shader_manager().get_program_id(rs, *material);
 }

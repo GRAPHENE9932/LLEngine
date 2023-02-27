@@ -11,7 +11,7 @@
 
 #include "common/core/Window.hpp" // Window
 #include "common/core/Skybox.hpp" // Skybox
-#include "common/core/shaders/PBRShaderManager.hpp" // PBRShaderManager
+#include "common/core/shaders/ShaderHolder.hpp"
 
 class Texture;
 class RenderingNode;
@@ -121,6 +121,10 @@ public:
         return window;
     }
 
+    [[nodiscard]] ShaderHolder& get_shader_holder() {
+        return shader_holder;
+    }
+
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
 
@@ -139,4 +143,6 @@ private:
     std::unique_ptr<Skybox> skybox = nullptr;
     std::vector<DrawableNode*> drawable_nodes;
     std::vector<PointLightNode*> point_lights;
+
+    ShaderHolder shader_holder;
 };

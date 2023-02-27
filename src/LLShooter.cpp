@@ -30,7 +30,10 @@ void LLShooter::init() {
     root_node = map.to_node(engine_servers);
 
     auto sky_panorama = RGBETexture("res/textures/sky.hdr");
-    auto sky_cubemap = panorama_to_cubemap(sky_panorama);
+    auto sky_cubemap = panorama_to_cubemap(
+        sky_panorama,
+        rendering_server->get_shader_holder().get_equirectangular_mapper_shader()
+    );
     rendering_server->set_cubemap(
         sky_cubemap
     );

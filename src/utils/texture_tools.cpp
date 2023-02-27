@@ -8,7 +8,7 @@
 
 #include <array>
 
-std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama) {
+std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, EquirectangularMapperShader& shader) {
     if (panorama.is_cubemap()) {
         throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
     }
@@ -66,7 +66,7 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama) {
             cubemap_id, 0
         );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        EquirectangularMapperShader::get_instance().use_shader(mvp_matrices[i], panorama.get_id());
+        shader.use_shader(mvp_matrices[i], panorama.get_id());
         
         // Draw.
         // Vertices.

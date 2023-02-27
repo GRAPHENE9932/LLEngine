@@ -19,7 +19,7 @@ void Skybox::draw() {
     const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());
     const glm::mat4 mvp = rs.get_proj_matrix() * view_without_translation;
     
-    SkyboxShader::get_instance().use_shader(mvp);
+    rs.get_shader_holder().get_skybox_shader().use_shader(mvp);
 
     // Vertices.
     glEnableVertexAttribArray(0);

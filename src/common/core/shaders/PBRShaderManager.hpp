@@ -10,10 +10,7 @@
 
 class PBRShaderManager {
 public:
-    static PBRShaderManager& get_instance() {
-        static PBRShaderManager instance;
-        return instance;
-    }
+    PBRShaderManager() = default;
 
     void use_shader(
         RenderingServer& rs,
@@ -24,8 +21,6 @@ public:
     GLuint get_program_id(RenderingServer& rs, const Material& material);
 
 private:
-    PBRShaderManager() = default;
-
     const PBRShader& get_shader(RenderingServer& rs, const Material& material);
 
     struct PBRShaderComparator {

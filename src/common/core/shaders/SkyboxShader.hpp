@@ -5,12 +5,8 @@
 
 class SkyboxShader {
 public:
+    SkyboxShader();
     ~SkyboxShader();
-
-    static SkyboxShader& get_instance() {
-        static SkyboxShader instance;
-        return instance;
-    }
 
     void use_shader(const glm::mat4& mvp);
     [[nodiscard]] inline GLuint get_program_id() const noexcept {
@@ -18,8 +14,6 @@ public:
     }
 
 private:
-    SkyboxShader();
-
     GLuint program_id = 0;
     GLuint mvp_id = 0;
 };

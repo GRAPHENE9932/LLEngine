@@ -99,7 +99,7 @@ void BitmapTextNode::update() {
     // Uniforms.
     glm::mat4 model_matrix = get_global_matrix();
     glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
-    ColoredTextShader::get_instance().use_shader(mvp, color);
+    rs.get_shader_holder().get_colored_text_shader().use_shader(mvp, color);
 
     // Vertices.
     glEnableVertexAttribArray(0);
@@ -126,7 +126,7 @@ void BitmapTextNode::update() {
 }
 
 GLuint BitmapTextNode::get_program_id() const {
-    return ColoredTextShader::get_instance().get_program_id();
+    return rs.get_shader_holder().get_colored_text_shader().get_program_id();
 }
 
 void BitmapTextNode::register_buffers() {
