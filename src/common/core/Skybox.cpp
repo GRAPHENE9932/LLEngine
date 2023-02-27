@@ -19,16 +19,12 @@ void Skybox::draw() {
     const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());
     const glm::mat4 mvp = rs.get_proj_matrix() * view_without_translation;
     
-    rs.get_shader_holder().get_skybox_shader().use_shader(mvp);
+    rs.get_shader_holder().get_skybox_shader().use_shader(mvp, *cubemap_texture);
 
     // Vertices.
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // Bind the cubemap.
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture->get_id());
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
     glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
