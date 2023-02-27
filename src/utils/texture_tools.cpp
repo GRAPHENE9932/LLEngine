@@ -66,7 +66,7 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
             cubemap_id, 0
         );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.use_shader(mvp_matrices[i], panorama.get_id());
+        shader.use_shader(mvp_matrices[i], panorama);
         
         // Draw.
         // Vertices.

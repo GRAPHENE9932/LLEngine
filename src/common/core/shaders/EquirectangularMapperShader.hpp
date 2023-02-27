@@ -10,7 +10,7 @@ class EquirectangularMapperShader {
 public:
     EquirectangularMapperShader();
 
-    void use_shader(const glm::mat4& mvp, GLuint panorama_texture_id);
+    void use_shader(const glm::mat4& mvp, const Texture& panorama_texture);
 
 private:
     GLuint program_id = 0;
