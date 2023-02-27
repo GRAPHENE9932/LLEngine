@@ -15,18 +15,18 @@ public:
         return instance;
     }
 
-    void use_common_shader(
+    void use_shader(
         RenderingServer& rs,
         const Material& material, const glm::mat4& mvp_matrix,
         const glm::mat4& model_matrix, const glm::vec3& camera_position
     );
 
-    GLuint get_common_program_id(RenderingServer& rs, const Material& material);
+    GLuint get_program_id(RenderingServer& rs, const Material& material);
 
 private:
     PBRShaderManager() = default;
 
-    const PBRShader& get_common_shader(RenderingServer& rs, const Material& material);
+    const PBRShader& get_shader(RenderingServer& rs, const Material& material);
 
     struct PBRShaderComparator {
         using is_transparent = std::true_type;
@@ -41,5 +41,5 @@ private:
             return left < right.extract_parameters();
         }
     };
-    std::set<PBRShader, PBRShaderComparator> common_shaders;
+    std::set<PBRShader, PBRShaderComparator> pbr_shaders;
 };

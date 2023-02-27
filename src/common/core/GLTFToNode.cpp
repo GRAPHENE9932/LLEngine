@@ -34,7 +34,7 @@ std::unique_ptr<SpatialNode> to_node(
 );
 
 template<bool with_children = true>
-std::unique_ptr<PBRDrawableNode> construct_common_drawable(
+std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
 ) {
     assert(gltf_node.is_drawable());
@@ -135,7 +135,7 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     if (gltf_node.is_drawable()) {
         // If our GLTF::Node is rigid body and drawable at the same time,
         // then add the drawable component as a child.
-        auto drawable {construct_common_drawable<false>(constr_env, gltf_node)};
+        auto drawable {construct_pbr_drawable<false>(constr_env, gltf_node)};
         drawable->set_transform(Transform());
         drawable->set_name(drawable->get_name() + "_drawable");
 
@@ -158,7 +158,7 @@ std::unique_ptr<SpatialNode> to_node(
         return construct_bullet_rigid_body(constr_env, gltf_node);
     }
     else if (gltf_node.is_drawable()) {
-        return construct_common_drawable(constr_env, gltf_node);
+        return construct_pbr_drawable(constr_env, gltf_node);
     }
     else {
         return construct_complete_spatial(constr_env, gltf_node);
