@@ -163,8 +163,8 @@ void PBRShader::initialize(const Parameters& params) {
         defines.emplace_back("USING_ENVIRONMENT_CUBEMAP");
 
     program_id = load_shaders(
-        "res/shaders/textured.vert",
-        "res/shaders/textured.frag",
+        "res/shaders/pbr_shader.vert",
+        "res/shaders/pbr_shader.frag",
         defines
     );
 
