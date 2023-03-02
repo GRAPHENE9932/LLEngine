@@ -32,47 +32,22 @@ public:
             std::runtime_error(message) {} 
 };
 
-struct RGBETexel {
-    std::array<std::uint8_t, 4> components {228, 0, 0, 228};
-
-    RGBETexel() = default;
-    RGBETexel(const std::array<std::uint8_t, 4>& components) {
-        this->components = components;
-    }
-
-    inline std::uint8_t& operator[](std::size_t index) noexcept {
-        assert(index < 4);
-        return components[index];
-    }
-
-    inline std::uint8_t& r() noexcept { return components[0]; }
-    inline std::uint8_t r() const noexcept { return components[0]; }
-    inline std::uint8_t& g() noexcept { return components[1]; }
-    inline std::uint8_t g() const noexcept { return components[1]; }
-    inline std::uint8_t& b() noexcept { return components[2]; }
-    inline std::uint8_t b() const noexcept { return components[2]; }
-    inline std::uint8_t& e() noexcept { return components[3]; }
-    inline std::uint8_t e() const noexcept { return components[3]; }
-};
-
 template<typename InputIter, typename OutputIter>
 void rgbe_to_rgb(
     InputIter rgbe_data_begin, InputIter rgbe_data_end,
     OutputIter rgb_data_begin
 ) {
-    static_assert(std::is_same<typename std::remove_reference<decltype(*rgbe_data_begin)>::type, RGBETexel>());
-    static_assert(std::is_same<typename std::remove_reference<decltype(*rgbe_data_end)>::type, RGBETexel>());
+    static_assert(std::is_same<typename std::remove_reference<decltype(*rgbe_data_begin)>::type, uint8_t>());
+    static_assert(std::is_same<typename std::remove_reference<decltype(*rgbe_data_end)>::type, uint8_t>());
     static_assert(std::is_same<typename std::remove_reference<decltype(*rgb_data_begin)>::type, float>());
+    assert((rgbe_data_end - rgbe_data_begin) % 4 == 0);
 
-    while (rgbe_data_begin != rgbe_data_end) {
-        const RGBETexel texel = *rgbe_data_begin;
-
-        float exponent = std::ldexp(1.0f, texel.e() - 128);
-        *rgb_data_begin++ = texel.r() / 255.0f * exponent;
-        *rgb_data_begin++ = texel.g() / 255.0f * exponent;
-        *rgb_data_begin++ = texel.b() / 255.0f * exponent;
-
-        rgbe_data_begin++;
+    const auto size {(rgbe_data_end - rgbe_data_begin) / 4};
+    for (std::size_t i = 0; i < size; i++) {
+        float exponent = std::ldexp(1.0f, *(rgbe_data_begin + size * 3 + i) - 128);
+        *rgb_data_begin++ = *(rgbe_data_begin + size * 0 + i) / 255.0f * exponent;
+        *rgb_data_begin++ = *(rgbe_data_begin + size * 1 + i) / 255.0f * exponent;
+        *rgb_data_begin++ = *(rgbe_data_begin + size * 2 + i) / 255.0f * exponent;
     }
 }
 
@@ -91,43 +66,42 @@ std::vector<float> read_run_length_encoded_data(
             throw RGBEDataLoadingError("Ambiguous texture width.");
         }
 
-        std::vector<RGBETexel> scanline_buffer(width);
+        std::vector<std::uint8_t> scanline_buffer(width * 4);
 
-        for (std::uint8_t component_i = 0; component_i < 4; component_i++) {
-            for (std::uint32_t cur_column = 0; cur_column < width;) {
-                std::uint8_t run_length;
-                stream.read(reinterpret_cast<char*>(&run_length), 1);
+        for (std::uint32_t cur_column = 0; cur_column < width * 4;) {
+            std::uint8_t run_length;
+            stream.read(reinterpret_cast<char*>(&run_length), 1);
 
-                if (run_length > 128) {
-                    // A run of the same value.
-                    run_length -= 128;
+            if (run_length > 128) {
+                // A run of the same value.
+                run_length -= 128;
 
-                    if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
-                        throw RGBEDataLoadingError("Invalid run length in run-length encoded data.");
-                    }
-
-                    std::uint8_t value;
-                    stream.read(reinterpret_cast<char*>(&value), 1);
-                    for (std::size_t i = cur_column; i < cur_column + run_length; i++) {
-                        scanline_buffer[i].components[component_i] = value;
-                    }
-
-                    cur_column += run_length;
+                if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
+                    throw RGBEDataLoadingError("Invalid run length in run-length encoded data.");
                 }
-                else {
-                    // A run of different values.
-                    if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
-                        throw RGBEDataLoadingError("Invalid run length in run-length encoded data.");
-                    }
 
-                    std::vector<std::uint8_t> different_values(run_length);
-                    stream.read(reinterpret_cast<char*>(different_values.data()), different_values.size());
-                    for (std::size_t i = 0; i < different_values.size(); i++) {
-                        scanline_buffer[cur_column + i][component_i] = different_values[i];
-                    }
+                std::uint8_t value;
+                stream.read(reinterpret_cast<char*>(&value), 1);
+                std::fill(
+                    scanline_buffer.begin() + cur_column,
+                    scanline_buffer.begin() + cur_column + run_length,
+                    value
+                );
 
-                    cur_column += run_length;
+                cur_column += run_length;
+            }
+            else {
+                // A run of different values.
+                if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
+                    throw RGBEDataLoadingError("Invalid run length in run-length encoded data.");
                 }
+
+                stream.read(
+                    reinterpret_cast<char*>(scanline_buffer.data() + cur_column),
+                    run_length
+                );
+
+                cur_column += run_length;
             }
         }
 
@@ -161,9 +135,8 @@ std::vector<float> get_rgb_data(
         return read_run_length_encoded_data(width, height, stream);
     }
     else {
-        // Data is flat.
-        std::vector<RGBETexel> rgbe_data(width * height);
-        stream.read(reinterpret_cast<char*>(rgbe_data.data()), rgbe_data.size() * sizeof(RGBETexel));
+        std::vector<std::uint8_t> rgbe_data(width * height * 4);
+        stream.read(reinterpret_cast<char*>(rgbe_data.data()), rgbe_data.size());
 
         if (!stream) {
             throw RGBEDataLoadingError("Failed to read flat data.");
