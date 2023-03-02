@@ -25,13 +25,16 @@ public:
         USING_GENERAL_UV_TRANSFORM = 0x80,
         USING_BASE_UV_TRANSFORM = 0x100,
         USING_NORMAL_UV_TRANSFORM = 0x200,
-        USING_METALLIC_TEXTURE = 0x400,
-        USING_METALLIC_FACTOR = 0x800,
-        USING_ROUGHNESS_TEXTURE = 0x1000,
-        USING_ROUGHNESS_FACTOR = 0x2000,
-        USING_AMBIENT_OCCLUSION_TEXTURE = 0x4000,
-        USING_AMBIENT_OCCLUSION_FACTOR = 0x8000,
-        USING_ENVIRONMENT_CUBEMAP = 0x10000
+        USING_METALLIC_UV_TRANSFORM = 0x400,
+        USING_ROUGHNESS_UV_TRANSFORM = 0x800,
+        USING_AO_UV_TRANSFORM = 0x1000,
+        USING_METALLIC_TEXTURE = 0x2000,
+        USING_METALLIC_FACTOR = 0x4000,
+        USING_ROUGHNESS_TEXTURE = 0x8000,
+        USING_ROUGHNESS_FACTOR = 0x10000,
+        USING_AO_TEXTURE = 0x20000,
+        USING_AO_FACTOR = 0x40000,
+        USING_ENVIRONMENT_CUBEMAP = 0x80000
     };
 
     friend inline constexpr Flags operator|(Flags left, Flags right) noexcept {
@@ -42,8 +45,11 @@ public:
     }
 
     struct Parameters {
-        Flags flags;
         size_t point_lights_count;
+        Flags flags;
+        Channel metallic_channel;
+        Channel roughness_channel;
+        Channel ao_channel;
 
         auto operator<=>(const Parameters& other) const noexcept = default;
     };
@@ -82,6 +88,9 @@ private:
     GLuint program_id = 0;
 
     Flags flags = NO_FLAGS;
+    Channel metallic_channel = Channel::NONE;
+    Channel roughness_channel = Channel::NONE;
+    Channel ao_channel = Channel::NONE;
 
     GLint mvp_id = -1;
     GLint model_matrix_id = -1;
@@ -90,16 +99,25 @@ private:
     GLint camera_position_id = -1;
     GLint base_color_factor_id = -1;
     GLint normal_scale_id = -1;
+    GLint metallic_factor_id = -1;
+    GLint roughness_factor_id = -1;
+    GLint ao_factor_id = -1;
     GLint uv_offset_id = -1;
     GLint uv_scale_id = -1;
     GLint base_uv_offset_id = -1;
     GLint base_uv_scale_id = -1;
     GLint normal_uv_offset_id = -1;
     GLint normal_uv_scale_id = -1;
+    GLint metallic_uv_offset_id = -1;
+    GLint metallic_uv_scale_id = -1;
+    GLint roughness_uv_offset_id = -1;
+    GLint roughness_uv_scale_id = -1;
+    GLint ao_uv_offset_id = -1;
+    GLint ao_uv_scale_id = -1;
 
     GLint base_color_texture_uniform_id = -1;
     GLint normal_map_texture_uniform_id = -1;
-    GLint ambient_occlusion_texture_uniform_id = -1;
+    GLint ao_texture_uniform_id = -1;
     GLint metallic_texture_uniform_id = -1;
     GLint roughness_texture_uniform_id = -1;
     GLint emissive_texture_uniform_id = -1;

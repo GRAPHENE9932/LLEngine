@@ -27,10 +27,10 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
         }
     }
     if (material.ambient_occlusion_texture.has_value()) {
-        flags |= PBRShader::USING_AMBIENT_OCCLUSION_TEXTURE;
+        flags |= PBRShader::USING_AO_TEXTURE;
     }
     if (material.ambient_occlusion_factor != 1.0f) {
-        flags |= PBRShader::USING_AMBIENT_OCCLUSION_FACTOR;
+        flags |= PBRShader::USING_AO_FACTOR;
     }
     if (material.metallic_texture.has_value()) {
         flags |= PBRShader::USING_METALLIC_TEXTURE;
@@ -52,7 +52,7 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     }
     if ((flags & PBRShader::USING_BASE_COLOR_TEXTURE) ||
         (flags & PBRShader::USING_NORMAL_TEXTURE) ||
-        (flags & PBRShader::USING_AMBIENT_OCCLUSION_TEXTURE) ||
+        (flags & PBRShader::USING_AO_TEXTURE) ||
         (flags & PBRShader::USING_METALLIC_TEXTURE) ||
         (flags & PBRShader::USING_ROUGHNESS_TEXTURE)) {
         flags |= PBRShader::USING_UV;
@@ -64,6 +64,9 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
         else {
             flags |= PBRShader::USING_BASE_UV_TRANSFORM;
             flags |= PBRShader::USING_NORMAL_UV_TRANSFORM;
+            flags |= PBRShader::USING_METALLIC_UV_TRANSFORM;
+            flags |= PBRShader::USING_ROUGHNESS_UV_TRANSFORM;
+            flags |= PBRShader::USING_AO_UV_TRANSFORM;
         }
     }
 
@@ -71,14 +74,20 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
 }
 
 PBRShader::Parameters
-PBRShader::to_parameters(
-    RenderingServer& rs,
-    const Material& material
-) noexcept {
-    return {
-        compute_flags(rs, material),
-        static_cast<uint32_t>(rs.get_point_lights().size())
+PBRShader::to_parameters(RenderingServer& rs, const Material& material) noexcept {
+    Parameters result {
+        static_cast<uint32_t>(rs.get_point_lights().size()),
+        compute_flags(rs, material)
     };
+
+    result.metallic_channel = material.metallic_texture.has_value() ?
+        material.metallic_texture->channel : Channel::NONE;
+    result.roughness_channel = material.roughness_texture.has_value() ?
+        material.roughness_texture->channel : Channel::NONE;
+    result.ao_channel = material.ambient_occlusion_texture.has_value() ?
+        material.ambient_occlusion_texture->channel : Channel::NONE;
+
+    return result;
 }
 
 PBRShader::PBRShader(const Parameters& params) {
@@ -103,10 +112,16 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
     base_uv_scale_id = glGetUniformLocation(program_id, "base_uv_scale");
     normal_uv_offset_id = glGetUniformLocation(program_id, "normal_uv_offset");
     normal_uv_scale_id = glGetUniformLocation(program_id, "normal_uv_scale");
+    metallic_uv_offset_id = glGetUniformLocation(program_id, "metallic_uv_offset");
+    metallic_uv_scale_id = glGetUniformLocation(program_id, "metallic_uv_scale");
+    roughness_uv_offset_id = glGetUniformLocation(program_id, "roughness_uv_offset");
+    roughness_uv_scale_id = glGetUniformLocation(program_id, "roughness_uv_scale");
+    ao_uv_offset_id = glGetUniformLocation(program_id, "ao_uv_offset");
+    ao_uv_scale_id = glGetUniformLocation(program_id, "ao_uv_scale");
 
     base_color_texture_uniform_id = glGetUniformLocation(program_id, "base_color_texture");
     normal_map_texture_uniform_id = glGetUniformLocation(program_id, "normal_texture");
-    ambient_occlusion_texture_uniform_id = glGetUniformLocation(program_id, "ambient_occlusion_texture");
+    ao_texture_uniform_id = glGetUniformLocation(program_id, "ao_texture");
     metallic_texture_uniform_id = glGetUniformLocation(program_id, "metallic_texture");
     roughness_texture_uniform_id = glGetUniformLocation(program_id, "roughness_texture");
     emissive_texture_uniform_id = glGetUniformLocation(program_id, "emmisive_texture");
@@ -120,7 +135,12 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
 }
 
 void PBRShader::initialize(const Parameters& params) {
+    using std::string_literals::operator""s;
+
     flags = params.flags;
+    metallic_channel = params.metallic_channel;
+    roughness_channel = params.roughness_channel;
+    ao_channel = params.ao_channel;
 
     // Declare #defines for the shader.
     std::vector<std::string> defines {
@@ -147,18 +167,30 @@ void PBRShader::initialize(const Parameters& params) {
         defines.emplace_back("USING_BASE_UV_TRANSFORM");
     if (flags & USING_NORMAL_UV_TRANSFORM)
         defines.emplace_back("USING_NORMAL_UV_TRANSFORM");
-    if (flags & USING_METALLIC_TEXTURE)
+    if (flags & USING_METALLIC_UV_TRANSFORM)
+        defines.emplace_back("USING_METALLIC_UV_TRANSFORM");
+    if (flags & USING_ROUGHNESS_UV_TRANSFORM)
+        defines.emplace_back("USING_ROUGHNESS_UV_TRANSFORM");
+    if (flags & USING_AO_UV_TRANSFORM)
+        defines.emplace_back("USING_AO_UV_TRANSFORM");
+    if (flags & USING_METALLIC_TEXTURE) {
         defines.emplace_back("USING_METALLIC_TEXTURE");
+        defines.emplace_back("METALLIC_TEXTURE_CHANNEL "s + channel_to_char(metallic_channel));
+    }
     if (flags & USING_METALLIC_FACTOR)
         defines.emplace_back("USING_METALLIC_FACTOR");
-    if (flags & USING_ROUGHNESS_TEXTURE)
+    if (flags & USING_ROUGHNESS_TEXTURE) {
         defines.emplace_back("USING_ROUGHNESS_TEXTURE");
+        defines.emplace_back("ROUGHNESS_TEXTURE_CHANNEL "s + channel_to_char(roughness_channel));
+    }
     if (flags & USING_ROUGHNESS_FACTOR)
         defines.emplace_back("USING_ROUGHNESS_FACTOR");
-    if (flags & USING_AMBIENT_OCCLUSION_TEXTURE)
-        defines.emplace_back("USING_AMBIENT_OCCLUSION_TEXTURE");
-    if (flags & USING_AMBIENT_OCCLUSION_FACTOR)
-        defines.emplace_back("USING_AMBIENT_OCCLUSION_FACTOR");
+    if (flags & USING_AO_TEXTURE) {
+        defines.emplace_back("USING_AO_TEXTURE");
+        defines.emplace_back("AO_TEXTURE_CHANNEL "s + channel_to_char(ao_channel));
+    }
+    if (flags & USING_AO_FACTOR)
+        defines.emplace_back("USING_AO_FACTOR");
     if (flags & USING_ENVIRONMENT_CUBEMAP)
         defines.emplace_back("USING_ENVIRONMENT_CUBEMAP");
 
@@ -194,6 +226,9 @@ void PBRShader::use_shader(
     if (material.normal_map.has_value()) {
         glUniform1fv(normal_scale_id, 1, &material.normal_map->scale);
     }
+    glUniform1f(metallic_factor_id, material.metallic_factor);
+    glUniform1f(roughness_factor_id, material.roughness_factor);
+    glUniform1f(ao_factor_id, material.ambient_occlusion_factor);
     if (uv_offset_id != -1 || uv_scale_id != -1) {
         const std::pair<glm::vec2, glm::vec2> general_offset_scale =
                 material.get_general_uv_offset_and_scale();
@@ -207,6 +242,18 @@ void PBRShader::use_shader(
     if ((normal_uv_offset_id != -1 || normal_uv_scale_id != -1) && material.normal_map.has_value()) {
         glUniform2fv(normal_uv_offset_id, 1, glm::value_ptr(material.normal_map->texture.uv_offset));
         glUniform2fv(normal_uv_scale_id, 1, glm::value_ptr(material.normal_map->texture.uv_scale));
+    }
+    if ((metallic_uv_offset_id != -1 || metallic_uv_scale_id != -1) && material.metallic_texture.has_value()) {
+        glUniform2fv(metallic_uv_offset_id, 1, glm::value_ptr(material.metallic_texture->uv_offset));
+        glUniform2fv(metallic_uv_scale_id, 1, glm::value_ptr(material.metallic_texture->uv_scale));
+    }
+    if ((roughness_uv_offset_id != -1 || roughness_uv_scale_id != -1) && material.roughness_texture.has_value()) {
+        glUniform2fv(roughness_uv_offset_id, 1, glm::value_ptr(material.roughness_texture->uv_offset));
+        glUniform2fv(roughness_uv_scale_id, 1, glm::value_ptr(material.roughness_texture->uv_scale));
+    }
+    if ((ao_uv_offset_id != -1 || ao_uv_scale_id != -1) && material.ambient_occlusion_texture.has_value()) {
+        glUniform2fv(ao_uv_offset_id, 1, glm::value_ptr(material.ambient_occlusion_texture->uv_offset));
+        glUniform2fv(ao_uv_scale_id, 1, glm::value_ptr(material.ambient_occlusion_texture->uv_scale));
     }
     auto point_light_ids_iter = point_light_ids.begin();
     for (auto& cur_point_light : rs.get_point_lights()) {
@@ -226,8 +273,8 @@ void PBRShader::use_shader(
         glBindTexture(GL_TEXTURE_2D, material.normal_map.value().texture.texture->get_id());
         cur_tex_unit++;
     }
-    if (ambient_occlusion_texture_uniform_id != -1) {
-        glUniform1i(ambient_occlusion_texture_uniform_id, cur_tex_unit);
+    if (ao_texture_uniform_id != -1) {
+        glUniform1i(ao_texture_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
         glBindTexture(GL_TEXTURE_2D, material.ambient_occlusion_texture.value().texture->get_id());
         cur_tex_unit++;
@@ -268,8 +315,11 @@ void PBRShader::delete_shader() {
 
 PBRShader::Parameters PBRShader::extract_parameters() const noexcept {
     return {
+        static_cast<uint32_t>(point_light_ids.size()),
         flags,
-        static_cast<uint32_t>(point_light_ids.size())
+        metallic_channel,
+        roughness_channel,
+        ao_channel
     };
 }
 

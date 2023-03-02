@@ -35,6 +35,12 @@ uniform vec2 base_uv_offset;
 uniform vec2 base_uv_scale;
 uniform vec2 normal_uv_offset;
 uniform vec2 normal_uv_scale;
+uniform vec2 metallic_uv_offset;
+uniform vec2 metallic_uv_scale;
+uniform vec2 roughness_uv_offset;
+uniform vec2 roughness_uv_scale;
+uniform vec2 ao_uv_offset;
+uniform vec2 ao_uv_scale;
 uniform vec3 camera_position;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
@@ -100,6 +106,18 @@ void main() {
 
         #ifdef USING_NORMAL_UV_TRANSFORM
             frag_normal_uv = vertex_uv * normal_uv_scale + normal_uv_offset;
+        #endif
+
+        #ifdef USING_METALLIC_UV_TRANSFORM
+            frag_metallic_uv = vertex_uv * metallic_uv_scale + metallic_uv_offset;
+        #endif
+
+        #ifdef USING_ROUGHNESS_UV_TRANSFORM
+            frag_roughness_uv = vertex_uv * roughness_uv_scale + roughness_uv_offset;
+        #endif
+
+        #ifdef USING_AO_UV_TRANSFORM
+            frag_ao_uv = vertex_uv * ao_uv_scale + ao_uv_offset;
         #endif
     #endif
 }
