@@ -19,6 +19,10 @@ struct BasicMaterial {
         TEX_TYPE texture;
         glm::vec2 uv_offset = {0.0f, 0.0f};
         glm::vec2 uv_scale = {1.0f, 1.0f};
+
+        [[nodiscard]] bool has_default_offset_and_scale() const noexcept {
+            return uv_offset == glm::vec2(0.0f, 0.0f) && uv_scale == glm::vec2(1.0f, 1.0f);
+        }
     };
 
     struct NormalMap {
@@ -52,9 +56,7 @@ struct BasicMaterial {
         return std::any_of(
             textures.begin(), textures.end(),
             [] (const TextureInfo* tex_info) -> bool {
-                return tex_info &&
-                       (tex_info->uv_offset != glm::vec2(0.0f, 0.0f) ||
-                       tex_info->uv_scale != glm::vec2(1.0f, 1.0f));
+                return tex_info && !tex_info->has_default_offset_and_scale();
             }
         );
     }
