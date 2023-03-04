@@ -41,7 +41,6 @@ uniform vec2 roughness_uv_offset;
 uniform vec2 roughness_uv_scale;
 uniform vec2 ao_uv_offset;
 uniform vec2 ao_uv_scale;
-uniform vec3 camera_position;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -64,9 +63,6 @@ uniform vec3 camera_position;
 #ifdef USING_FRAGMENT_POSITION
     out vec3 frag_pos;
 #endif
-#ifdef USING_ENVIRONMENT_CUBEMAP
-    out vec3 frag_camera_position;
-#endif
 #ifdef USING_NORMAL_TEXTURE
     out mat3 tbn;
 #endif
@@ -87,10 +83,6 @@ void main() {
 
     #ifdef USING_FRAGMENT_POSITION
         frag_pos = (model_matrix * vec4(vertex_pos, 1.0)).xyz;
-    #endif
-
-    #ifdef USING_ENVIRONMENT_CUBEMAP
-        frag_camera_position = camera_position;
     #endif
 
     #ifdef USING_UV
