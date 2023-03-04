@@ -220,7 +220,7 @@ void PBRShader::use_shader(
         ));
         glUniformMatrix4fv(normal_matrix_id, 1, GL_FALSE, glm::value_ptr(normal_matrix));
     }
-    glUniform3fv(ambient_id, 1, glm::value_ptr(glm::vec3(0.2f, 0.2f, 0.2f)));
+    glUniform3fv(ambient_id, 1, glm::value_ptr(glm::vec3(0.01f, 0.01f, 0.01f)));
     glUniform3fv(camera_position_id, 1, glm::value_ptr(camera_position));
     glUniform4fv(base_color_factor_id, 1, glm::value_ptr(material.base_color_factor));
     if (material.normal_map.has_value()) {
