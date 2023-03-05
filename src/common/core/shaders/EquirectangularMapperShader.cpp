@@ -3,11 +3,14 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-EquirectangularMapperShader::EquirectangularMapperShader() {
-    program_id = load_shaders(
-        "res/shaders/equirectangular_mapper.vert",
-        "res/shaders/equirectangular_mapper.frag"
-    );
+EquirectangularMapperShader::EquirectangularMapperShader() :
+    EquirectangularMapperShader("res/shaders/equirectangular_mapper.vert", "res/shaders/equirectangular_mapper.frag") {}
+
+EquirectangularMapperShader::EquirectangularMapperShader(
+    std::string_view vert_shader_path,
+    std::string_view frag_shader_path
+) {
+    program_id = load_shaders(vert_shader_path, frag_shader_path);
 
     mvp_id = glGetUniformLocation(program_id, "mvp");
     panorama_sampler_id = glGetUniformLocation(program_id, "equirectangular_map");
