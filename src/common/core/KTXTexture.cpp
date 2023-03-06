@@ -140,6 +140,12 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
         static_cast<GLenum>(GL_TEXTURE_2D)
     };
 
+    const GLenum tex_img_target {
+        is_cubemap ?
+        static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X) :
+        static_cast<GLenum>(GL_TEXTURE_2D)
+    };
+
     // As in the file layout, we will go from the last mipmap level (the smallest image)
     // to the first one (the biggest). But sizes can be computed only in opposite order.
     std::vector<glm::u32vec2> sizes(std::max(header.level_count, 1u));
@@ -151,12 +157,10 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
     glGenTextures(1, &texture_id);
     glBindTexture(tex_target, texture_id);
 
-    const GLenum tex_img_target {
-        is_cubemap ?
-        static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X) :
-        static_cast<GLenum>(GL_TEXTURE_2D)
-    };
-
+    glTexStorage2D(
+        tex_img_target, header.level_count, format_info.gl_internal_format,
+        sizes[0].x, sizes[0].y
+    );
     GLint mip_level = std::max(static_cast<GLint>(header.level_count), 1);
     do {
         mip_level--;
@@ -172,17 +176,17 @@ inline GLuint load_mipmap_levels(std::istream& stream, const Header& header,
             const uint64_t mem_offset {face_size * face_i};
 
             if (format_info.is_compressed) {
-                glCompressedTexImage2D(
-                    tex_img_target + face_i, mip_level, format_info.gl_internal_format,
-                    sizes[mip_level].x, sizes[mip_level].y, 0,
+                glCompressedTexSubImage2D(
+                    tex_img_target + face_i, mip_level, 0, 0,
+                    sizes[mip_level].x, sizes[mip_level].y, format_info.gl_internal_format,
                     face_size, level_data.data() + mem_offset
                 );
             }
             else {
-                glTexImage2D(
-                    tex_img_target + face_i, mip_level, format_info.gl_internal_format,
-                    sizes[mip_level].x, sizes[mip_level].y, 0,
-                    format_info.gl_format, format_info.gl_type, level_data.data() + mem_offset
+                glTexSubImage2D(
+                    tex_img_target + face_i, mip_level, 0, 0,
+                    sizes[mip_level].x, sizes[mip_level].y, format_info.gl_format,
+                    format_info.gl_type, level_data.data() + mem_offset
                 );
             }
         }
