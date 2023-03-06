@@ -158,9 +158,13 @@ GLuint initialize_opengl_texture(
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGB32F, width, height,
-        0, GL_RGB, GL_FLOAT, rgb_data.data()
+    glTexStorage2D(
+        GL_TEXTURE_2D, 1, GL_RGB32F,
+        width, height
+    );
+    glTexSubImage2D(
+        GL_TEXTURE_2D, 0, 0, 0, width, height,
+        GL_RGB, GL_FLOAT, rgb_data.data()
     );
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
