@@ -8,11 +8,7 @@
 
 #include <array>
 
-std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, EquirectangularMapperShader& shader) {
-    if (panorama.is_cubemap()) {
-        throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
-    }
-
+auto draw_to_cubemap(glm::i32vec2 cubemap_size, std::invocable<const glm::mat4&> auto&& drawing_function) -> std::shared_ptr<Texture> {
     const glm::mat4 proj_matrix {glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f)};
     const std::array<glm::mat4, 6> mvp_matrices {
         proj_matrix * glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
@@ -22,8 +18,6 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
         proj_matrix * glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
         proj_matrix * glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
     };
-
-    glm::u32vec2 cubemap_size {panorama.get_size().x / 2u};
 
     // Allocate the cube map.
     GLuint cubemap_id;
@@ -38,45 +32,38 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
     for (std::size_t i = 0; i < 6; i++) {
         glTexImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
-            cubemap_size.x, cubemap_size.y, 0, GL_RGB, 
+            cubemap_size.x, cubemap_size.y, 0, GL_RGB,
             GL_FLOAT, nullptr
         );
     }
-    
+
     // Initialize the framebuffer.
     GLuint framebuffer_id;
     glGenFramebuffers(1, &framebuffer_id);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
-    GLuint depthrenderbuffer;
-    glGenRenderbuffers(1, &depthrenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+    GLuint depth_renderbuffer;
+    glGenRenderbuffers(1, &depth_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_renderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, cubemap_size.x, cubemap_size.y);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_renderbuffer);
 
     // Save the state of the viewport to restore it later.
     std::array<GLint, 4> original_viewport_params;
     glGetIntegerv(GL_VIEWPORT, original_viewport_params.data());
 
     glViewport(0, 0, cubemap_size.x, cubemap_size.y);
-    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
     for (std::size_t i = 0; i < 6; i++) {
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
             cubemap_id, 0
         );
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.use_shader(mvp_matrices[i], panorama);
-        
-        // Draw.
-        // Vertices.
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        // Bind the cubemap.
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
-        glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
+
+        drawing_function(mvp_matrices[i]);
     }
+    glDeleteRenderbuffers(1, &framebuffer_id);
+    glDeleteRenderbuffers(1, &depth_renderbuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Return viewport to the original state.
@@ -86,4 +73,26 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
     );
 
     return std::make_shared<Texture>(cubemap_id, cubemap_size, true);
+}
+
+std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, EquirectangularMapperShader& shader) {
+    if (panorama.is_cubemap()) {
+        throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
+    }
+
+    const glm::u32vec2 cubemap_size {panorama.get_size().x / 2u};
+    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
+
+    return draw_to_cubemap(cubemap_size, [&] (const glm::mat4& mvp) {
+        shader.use_shader(mvp, panorama);
+
+        // Draw.
+        // Vertices.
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        // Bind the cubemap.
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
+        glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
+    });
 }
