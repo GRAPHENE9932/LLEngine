@@ -19,6 +19,7 @@ set(SOURCES
     common/core/shaders/SkyboxShader.cpp
     common/core/shaders/PBRShader.cpp
     common/core/shaders/EquirectangularMapperShader.cpp
+    common/core/shaders/IrradiancePrecomputerShader.cpp
     nodes/core/rendering/DrawableNode.cpp
     nodes/core/rendering/CameraNode.cpp
     nodes/core/rendering/PBRDrawableNode.cpp

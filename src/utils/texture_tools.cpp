@@ -1,6 +1,7 @@
 #include "texture_tools.hpp"
 #include "primitive_meshes.hpp"
 #include "RenderingServer.hpp"
+#include "common/core/shaders/IrradiancePrecomputerShader.hpp"
 
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
@@ -8,7 +9,7 @@
 
 #include <array>
 
-auto draw_to_cubemap(glm::i32vec2 cubemap_size, std::invocable<const glm::mat4&> auto&& drawing_function) -> std::shared_ptr<Texture> {
+auto draw_to_cubemap(glm::i32vec2 cubemap_size, std::invocable<const glm::mat4&> auto&& drawing_function) -> std::unique_ptr<Texture> {
     const glm::mat4 proj_matrix {glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f)};
     const std::array<glm::mat4, 6> mvp_matrices {
         proj_matrix * glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
@@ -72,10 +73,10 @@ auto draw_to_cubemap(glm::i32vec2 cubemap_size, std::invocable<const glm::mat4&>
         original_viewport_params[2], original_viewport_params[3]
     );
 
-    return std::make_shared<Texture>(cubemap_id, cubemap_size, true);
+    return std::make_unique<Texture>(cubemap_id, cubemap_size, true);
 }
 
-std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, EquirectangularMapperShader& shader) {
+std::unique_ptr<Texture> panorama_to_cubemap(const Texture& panorama, EquirectangularMapperShader& shader) {
     if (panorama.is_cubemap()) {
         throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
     }
@@ -85,6 +86,28 @@ std::shared_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
 
     return draw_to_cubemap(cubemap_size, [&] (const glm::mat4& mvp) {
         shader.use_shader(mvp, panorama);
+
+        // Draw.
+        // Vertices.
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        // Bind the cubemap.
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
+        glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
+    });
+}
+
+constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {32u, 32u};
+std::unique_ptr<Texture> compute_irradiance_map(const Texture& environment_map, IrradiancePrecomputerShader& shader) {
+    if (!environment_map.is_cubemap()) {
+        throw std::runtime_error("Unable to compute irradiance map because the given environment map is not cubemap.");
+    }
+
+    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
+    
+    return draw_to_cubemap(IRRADIANCE_MAP_SIZE, [&] (const glm::mat4& mvp) {
+        shader.use_shader(mvp, environment_map);
 
         // Draw.
         // Vertices.

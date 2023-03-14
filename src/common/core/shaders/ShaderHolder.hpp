@@ -4,6 +4,7 @@
 #include "EquirectangularMapperShader.hpp"
 #include "PBRShaderManager.hpp"
 #include "SkyboxShader.hpp"
+#include "IrradiancePrecomputerShader.hpp"
 
 /**
  * @brief Stores all kinds of shaders and shader managers.
@@ -18,6 +19,10 @@ public:
 
     [[nodiscard]] EquirectangularMapperShader& get_equirectangular_mapper_shader() {
         return equirectangular_mapper_shader.get();
+    }
+
+    [[nodiscard]] IrradiancePrecomputerShader& get_irradiance_precomputer_shader() {
+        return irradiance_precomputer_shader.get();
     }
 
     [[nodiscard]] PBRShaderManager& get_pbr_shader_manager() {
@@ -45,6 +50,7 @@ private:
 
     LazyShader<ColoredTextShader> colored_text_shader;
     LazyShader<EquirectangularMapperShader> equirectangular_mapper_shader;
+    LazyShader<IrradiancePrecomputerShader> irradiance_precomputer_shader;
     LazyShader<PBRShaderManager> pbr_shader_manager;
     LazyShader<SkyboxShader> skybox_shader;
 };
