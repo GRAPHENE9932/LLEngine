@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-constexpr std::string RGBE_IDENTIFIER {"#?RADIANCE"};
+constexpr std::string_view RGBE_IDENTIFIER {"#?RADIANCE"};
 
 class RGBELoadingError : public std::runtime_error {
 public:
