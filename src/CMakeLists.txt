@@ -71,3 +71,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib zstd)
 find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIR})
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib ${BULLET_LIBRARIES})
+
+# nlohmann-json.
+find_package(nlohmann_json REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib nlohmann_json::nlohmann_json)
+
+# glm.
+find_package(glm REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib glm::glm)
