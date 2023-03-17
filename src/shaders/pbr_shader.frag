@@ -53,6 +53,7 @@ uniform sampler2D normal_texture;
 uniform sampler2D metallic_texture;
 uniform sampler2D roughness_texture;
 uniform sampler2D ao_texture;
+uniform samplerCube irradiance_map;
 uniform samplerCube environment_cubemap;
 uniform vec3 camera_position;
 uniform vec4 base_color_factor;
@@ -213,8 +214,8 @@ float get_ao() {
 
 const float PI = 3.1415926;
 
-vec3 fresnel_schlick(float cosine, vec3 surf_refl_at_zero_inc) {
-    return surf_refl_at_zero_inc + (1.0 - surf_refl_at_zero_inc) * pow(clamp(1.0 - cosine, 0.0, 1.0), 5.0);
+vec3 fresnel_schlick(float cosine, vec3 refl_ratio_at_zero_inc) {
+    return refl_ratio_at_zero_inc + (1.0 - refl_ratio_at_zero_inc) * pow(clamp(1.0 - cosine, 0.0, 1.0), 5.0);
 }
 
 float normal_distribution_ggx(float roughness, vec3 normal, vec3 halfway) {
@@ -250,11 +251,29 @@ vec3 cook_torrance_brdf(vec3 surf_refl, float ndf, float gsf, vec3 n, vec3 v, ve
     return numerator / denominator;
 }
 
+
 void main() {
-    vec3 lightning_result = ambient;
+    // Compute surface reflection ratio at zero incedence.
+    vec3 refl_ratio_at_zero_inc = vec3(0.04);
+    refl_ratio_at_zero_inc = mix(refl_ratio_at_zero_inc, vec3(get_base_color()), get_metallic());
+
+    vec3 frag_to_cam_dir = normalize(camera_position - frag_pos);
+
+    // Compute ambient.
+    vec3 lightning_result;
+    #ifdef USING_ENVIRONMENT_CUBEMAP
+    {
+        vec3 reflection_ratio = fresnel_schlick(max(dot(get_normal(), frag_to_cam_dir), 0.0), refl_ratio_at_zero_inc);
+        vec3 refraction_ratio = (vec3(1.0) - reflection_ratio) * (1.0 - get_metallic());
+        vec3 ambient_irradiance = texture(irradiance_map, get_normal()).rgb;
+        vec3 diffuse = ambient_irradiance * get_base_color().rgb;
+        lightning_result = (refraction_ratio * diffuse) * get_ao();
+    }
+    #else
+        lightning_result = ambient * get_ao();
+    #endif
     
     #if POINT_LIGHTS_COUNT > 0
-        vec3 frag_to_cam_dir = normalize(camera_position - frag_pos);
         for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
             // Calculate vectors that we will need later.
             float dist_to_frag = length(point_lights[i].position - frag_pos);
@@ -266,24 +285,20 @@ void main() {
             vec3 radiance = point_lights[i].color * attenuation;
 
             // Compute surface reflection ratio.
-            vec3 surf_refl_at_zero_inc = vec3(0.04);
-            surf_refl_at_zero_inc = mix(surf_refl_at_zero_inc, vec3(get_base_color()), get_metallic());
-            vec3 surf_refl = fresnel_schlick(max(dot(halfway, frag_to_cam_dir), 0.0), surf_refl_at_zero_inc);   
+            vec3 reflection_ratio = fresnel_schlick(max(dot(halfway, frag_to_cam_dir), 0.0), refl_ratio_at_zero_inc);   
             // Compute results of the normal distribution function and the geometric shadowing function.        
             float ndf = normal_distribution_ggx(get_roughness(), get_normal(), halfway);
             float gsf = geometric_shadowing_smith(get_normal(), frag_to_cam_dir, frag_to_light_dir, get_roughness());
 
             // Compute specular using Cook-Torrance BRDF.
-            vec3 specular = cook_torrance_brdf(surf_refl, ndf, gsf, get_normal(), frag_to_cam_dir, frag_to_light_dir);
+            vec3 specular = cook_torrance_brdf(reflection_ratio, ndf, gsf, get_normal(), frag_to_cam_dir, frag_to_light_dir);
 
-            vec3 refraction_ratio = (vec3(1.0) - surf_refl) * (1.0 - get_metallic()); 
+            vec3 refraction_ratio = (vec3(1.0) - reflection_ratio) * (1.0 - get_metallic());
 
             // Calculate the outgoing radiance (result contribution).
             float n_dot_l = dot(get_normal(), frag_to_light_dir);
-            //lightning_result += vec3(radiance);
             lightning_result += (refraction_ratio * vec3(get_base_color()) / PI + specular) * radiance * n_dot_l;
         }
     #endif
-
     color_out = vec4(lightning_result, 1.0);
 }

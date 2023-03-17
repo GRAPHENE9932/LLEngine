@@ -126,6 +126,7 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
     roughness_texture_uniform_id = glGetUniformLocation(program_id, "roughness_texture");
     emissive_texture_uniform_id = glGetUniformLocation(program_id, "emmisive_texture");
     environment_cubemap_uniform_id = glGetUniformLocation(program_id, "environment_cubemap");
+    irradiance_map_uniform_id = glGetUniformLocation(program_id, "irradiance_map");
 
     for (size_t i = 0; i < params.point_lights_count; i++) {
         point_light_ids.insert(
@@ -301,6 +302,12 @@ void PBRShader::use_shader(
         glUniform1i(environment_cubemap_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_environment_cubemap(camera_position).value().get().get_id());
+        cur_tex_unit++;
+    }
+    if (irradiance_map_uniform_id != -1) {
+        glUniform1i(irradiance_map_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_irradiance_map(camera_position).value().get().get_id());
         cur_tex_unit++;
     }
 }

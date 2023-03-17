@@ -4,6 +4,7 @@
 #include "common/core/GLFWWindow.hpp" // GLFWWindow
 #include "nodes/core/rendering/CameraNode.hpp"
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
+#include "utils/texture_tools.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -131,6 +132,19 @@ RenderingServer::get_environment_cubemap(const glm::vec3& camera_position) {
     else {
         return std::nullopt;
     }
+}
+
+std::optional<std::reference_wrapper<const Texture>>
+RenderingServer::get_irradiance_map(const glm::vec3& obj_position) {
+    auto env_cubemap {get_environment_cubemap(obj_position)};
+
+    if (!env_cubemap.has_value()) {
+        return std::nullopt;
+    }
+    if (!irradiance_map) {
+        irradiance_map = compute_irradiance_map(env_cubemap->get(), shader_holder.get_irradiance_precomputer_shader());
+    }
+    return *irradiance_map;
 }
 
 bool RenderingServer::have_environment_cubemap() {

@@ -122,6 +122,7 @@ private:
     GLint roughness_texture_uniform_id = -1;
     GLint emissive_texture_uniform_id = -1;
     GLint environment_cubemap_uniform_id = -1;
+    GLint irradiance_map_uniform_id = -1;
 
     std::set<PointLightNode::Uniforms> point_light_ids;
 
