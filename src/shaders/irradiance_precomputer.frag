@@ -33,5 +33,4 @@ void main() {
 
     irradiance = PI * irradiance / AMOUNT_OF_SAMPLES;
     color_out = vec4(irradiance, 1.0);
-    //color_out = texture(cubemap, normalize(frag_local_pos));
 }
