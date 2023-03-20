@@ -15,6 +15,8 @@ void main() {
     vec3 up = vec3(0.0, 1.0, 0.0);
     vec3 right = normalize(cross(up, normal));
     up = normalize(cross(normal, right));
+    mat3 tangent_to_world_space_matrix = mat3(right, up, normal);
+
     vec3 irradiance = vec3(0.0);
 
     for (float hor_angle = 0.0; hor_angle < 2.0 * PI; hor_angle += SAMPLE_STEP) {
@@ -24,7 +26,7 @@ void main() {
                 sin(vert_angle) * sin(hor_angle),
                 cos(vert_angle)
             );
-            vec3 world_space_vector = tangent_space_vector.x * right + tangent_space_vector.y * up + tangent_space_vector.z * normal;
+            vec3 world_space_vector = tangent_to_world_space_matrix * tangent_space_vector;
             // We are multiplying by sin(vert_angle) here because the less the vert_angle is, the smaller areas we take with each
             // sample. So, to compensate this effect, we multiply by sin(vert_angle).
             irradiance += texture(cubemap, world_space_vector).rgb * cos(vert_angle) * sin(vert_angle);
