@@ -164,3 +164,32 @@ std::shared_ptr<const Mesh> primitives::get_skybox_cube() {
 
     return cached_skybox_cube;
 }
+
+constexpr std::array<glm::vec3, 6> QUAD_VERTICES {
+    glm::vec3(1.0f, 1.0f, 0.0f),
+    glm::vec3(-1.0f, -1.0f, 0.0f),
+    glm::vec3(1.0f, -1.0f, 0.0f),
+    glm::vec3(-1.0f, -1.0f, 0.0f),
+    glm::vec3(1.0f, 1.0f, 0.0f),
+    glm::vec3(-1.0f, 1.0f, 0.0f)
+};
+
+constexpr std::array<glm::vec2, 6> QUAD_UVS {
+    glm::vec2(1.0f, 1.0f),
+    glm::vec2(0.0f, 0.0f),
+    glm::vec2(1.0f, 0.0f),
+    glm::vec2(0.0f, 0.0f),
+    glm::vec2(1.0f, 1.0f),
+    glm::vec2(0.0f, 1.0f)
+};
+
+std::shared_ptr<Mesh> cached_quad = nullptr;
+std::shared_ptr<const Mesh> primitives::get_quad() {
+    if (!cached_quad) {
+        cached_quad = std::make_shared<Mesh>();
+        cached_quad->set_vertices(std::vector(QUAD_VERTICES.begin(), QUAD_VERTICES.end()));
+        cached_quad->set_uvs(std::vector(QUAD_UVS.begin(), QUAD_UVS.end()));
+    }
+
+    return cached_quad;
+}

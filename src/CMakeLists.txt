@@ -20,6 +20,8 @@ set(SOURCES
     common/core/shaders/PBRShader.cpp
     common/core/shaders/EquirectangularMapperShader.cpp
     common/core/shaders/IrradiancePrecomputerShader.cpp
+    common/core/shaders/SpecularPrefilterShader.cpp
+    common/core/shaders/BRDFIntegrationMapperShader.cpp
     nodes/core/rendering/DrawableNode.cpp
     nodes/core/rendering/CameraNode.cpp
     nodes/core/rendering/PBRDrawableNode.cpp

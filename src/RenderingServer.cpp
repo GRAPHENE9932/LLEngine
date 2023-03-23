@@ -147,6 +147,26 @@ RenderingServer::get_irradiance_map(const glm::vec3& obj_position) {
     return *irradiance_map;
 }
 
+std::optional<std::reference_wrapper<const Texture>>
+RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
+    auto env_cubemap {get_environment_cubemap(obj_position)};
+
+    if (!env_cubemap.has_value()) {
+        return std::nullopt;
+    }
+    if (!prefiltered_specular_map) {
+        prefiltered_specular_map = prefilter_specular_map(env_cubemap->get(), shader_holder.get_specular_prefilter_shader());
+    }
+    return *prefiltered_specular_map;
+}
+
+const Texture& RenderingServer::get_brdf_integration_map() {
+    if (!brdf_integration_map) {
+        brdf_integration_map = compute_brdf_integration_map(shader_holder.get_brdf_integration_mapper_shader());
+    }
+    return *brdf_integration_map;
+}
+
 bool RenderingServer::have_environment_cubemap() {
     return skybox != nullptr;
 }

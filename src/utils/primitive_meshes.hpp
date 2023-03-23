@@ -21,4 +21,12 @@ namespace primitives {
      * visible only from inside.
      */
     std::shared_ptr<const Mesh> get_skybox_cube();
+
+    /**
+     * @brief Get the not indexed 2x2 quad mesh with UVs.
+     *
+     * This Mesh DOES NOT contain normals and tangents. Triangles are front-facing.
+     * Vertex positions have constant Z=0 (the quad is in XY plane).
+     */
+    std::shared_ptr<const Mesh> get_quad();
 }

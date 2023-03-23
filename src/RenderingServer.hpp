@@ -131,6 +131,11 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_irradiance_map(const glm::vec3& obj_position);
 
+    [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
+    get_prefiltered_specular_map(const glm::vec3& obj_position);
+
+    [[nodiscard]] const Texture& get_brdf_integration_map();
+
     [[nodiscard]] bool have_environment_cubemap();
 
 private:
@@ -145,6 +150,8 @@ private:
     CameraNode* camera = nullptr;
     std::unique_ptr<Skybox> skybox = nullptr;
     std::unique_ptr<Texture> irradiance_map = nullptr;
+    std::unique_ptr<Texture> prefiltered_specular_map = nullptr;
+    std::unique_ptr<Texture> brdf_integration_map = nullptr;
     std::vector<DrawableNode*> drawable_nodes;
     std::vector<PointLightNode*> point_lights;
 

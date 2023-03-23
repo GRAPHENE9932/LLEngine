@@ -5,6 +5,8 @@
 #include "PBRShaderManager.hpp"
 #include "SkyboxShader.hpp"
 #include "IrradiancePrecomputerShader.hpp"
+#include "SpecularPrefilterShader.hpp"
+#include "BRDFIntegrationMapperShader.hpp"
 
 /**
  * @brief Stores all kinds of shaders and shader managers.
@@ -23,6 +25,14 @@ public:
 
     [[nodiscard]] IrradiancePrecomputerShader& get_irradiance_precomputer_shader() {
         return irradiance_precomputer_shader.get();
+    }
+
+    [[nodiscard]] BRDFIntegrationMapperShader& get_brdf_integration_mapper_shader() {
+        return brdf_integration_mapper_shader.get();
+    }
+
+    [[nodiscard]] SpecularPrefilterShader& get_specular_prefilter_shader() {
+        return specular_prefilter_shader.get();
     }
 
     [[nodiscard]] PBRShaderManager& get_pbr_shader_manager() {
@@ -51,6 +61,8 @@ private:
     LazyShader<ColoredTextShader> colored_text_shader;
     LazyShader<EquirectangularMapperShader> equirectangular_mapper_shader;
     LazyShader<IrradiancePrecomputerShader> irradiance_precomputer_shader;
+    LazyShader<BRDFIntegrationMapperShader> brdf_integration_mapper_shader;
+    LazyShader<SpecularPrefilterShader> specular_prefilter_shader;
     LazyShader<PBRShaderManager> pbr_shader_manager;
     LazyShader<SkyboxShader> skybox_shader;
 };
