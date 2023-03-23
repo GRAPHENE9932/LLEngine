@@ -125,8 +125,9 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
     metallic_texture_uniform_id = glGetUniformLocation(program_id, "metallic_texture");
     roughness_texture_uniform_id = glGetUniformLocation(program_id, "roughness_texture");
     emissive_texture_uniform_id = glGetUniformLocation(program_id, "emmisive_texture");
-    environment_cubemap_uniform_id = glGetUniformLocation(program_id, "environment_cubemap");
+    prefiltered_specular_map_uniform_id = glGetUniformLocation(program_id, "prefiltered_specular_map");
     irradiance_map_uniform_id = glGetUniformLocation(program_id, "irradiance_map");
+    brdf_integration_map_uniform_id = glGetUniformLocation(program_id, "brdf_integration_map");
 
     for (size_t i = 0; i < params.point_lights_count; i++) {
         point_light_ids.insert(
@@ -298,8 +299,8 @@ void PBRShader::use_shader(
         glBindTexture(GL_TEXTURE_2D, material.emissive_texture.value().texture->get_id());
         cur_tex_unit++;
     }
-    if (environment_cubemap_uniform_id != -1) {
-        glUniform1i(environment_cubemap_uniform_id, cur_tex_unit);
+    if (prefiltered_specular_map_uniform_id != -1) {
+        glUniform1i(prefiltered_specular_map_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_environment_cubemap(camera_position).value().get().get_id());
         cur_tex_unit++;
@@ -308,6 +309,12 @@ void PBRShader::use_shader(
         glUniform1i(irradiance_map_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_irradiance_map(camera_position).value().get().get_id());
+        cur_tex_unit++;
+    }
+    if (brdf_integration_map_uniform_id != -1) {
+        glUniform1i(brdf_integration_map_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, rs.get_brdf_integration_map().get_id());
         cur_tex_unit++;
     }
 }
