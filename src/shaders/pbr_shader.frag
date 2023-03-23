@@ -26,7 +26,7 @@ out vec4 color_out;
 #ifdef USING_FRAGMENT_POSITION
     in vec3 frag_pos;
 #endif
-#ifdef USING_ENVIRONMENT_CUBEMAP
+#ifdef USING_IBL
     in vec3 frag_camera_position;
 #endif
 #ifdef USING_NORMAL_TEXTURE
@@ -268,7 +268,7 @@ void main() {
 
     // Compute ambient.
     vec3 lightning_result;
-    #ifdef USING_ENVIRONMENT_CUBEMAP
+    #ifdef USING_IBL
     {
         // Diffuse part.
         vec3 reflection_ratio = fresnel_schlick(max(dot(get_normal(), view_direction), 0.0), refl_ratio_at_zero_inc);

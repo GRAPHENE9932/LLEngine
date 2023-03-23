@@ -45,9 +45,9 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
         flags |= PBRShader::USING_ROUGHNESS_FACTOR;
     }
     if (rs.have_environment_cubemap()) {
-        flags |= PBRShader::USING_ENVIRONMENT_CUBEMAP;
+        flags |= PBRShader::USING_IBL;
     }
-    if (!rs.get_point_lights().empty() || flags & PBRShader::USING_ENVIRONMENT_CUBEMAP) {
+    if (!rs.get_point_lights().empty() || flags & PBRShader::USING_IBL) {
         flags |= PBRShader::USING_FRAGMENT_POSITION;
     }
     if ((flags & PBRShader::USING_BASE_COLOR_TEXTURE) ||
@@ -193,8 +193,8 @@ void PBRShader::initialize(const Parameters& params) {
     }
     if (flags & USING_AO_FACTOR)
         defines.emplace_back("USING_AO_FACTOR");
-    if (flags & USING_ENVIRONMENT_CUBEMAP)
-        defines.emplace_back("USING_ENVIRONMENT_CUBEMAP");
+    if (flags & USING_IBL)
+        defines.emplace_back("USING_IBL");
 
     program_id = load_shaders(
         "res/shaders/pbr_shader.vert",

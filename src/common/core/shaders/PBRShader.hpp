@@ -34,7 +34,7 @@ public:
         USING_ROUGHNESS_FACTOR = 0x10000,
         USING_AO_TEXTURE = 0x20000,
         USING_AO_FACTOR = 0x40000,
-        USING_ENVIRONMENT_CUBEMAP = 0x80000
+        USING_IBL = 0x80000
     };
 
     friend inline constexpr Flags operator|(Flags left, Flags right) noexcept {
