@@ -10,9 +10,7 @@
 		"children": [
 			{
 				"type": "point_light",
-				"color": [0.0, 0.0, 0.0],
-				"diffuse_strength": 1.0,
-				"coefficients": [1.0, 0.01, 0.001],
+				"color": [10.0, 10.0, 10.0],
 				"position": [0.0, 3.0, 0.0]
 			},
 			{

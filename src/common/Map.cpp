@@ -48,11 +48,6 @@ void from_json(const json& root_json, Transform& spat_params) {
 std::unique_ptr<PointLightNode> point_light_from_json(RenderingServer& rs, const json& root_json) {
     auto result = std::make_unique<PointLightNode>(rs, root_json.get<Transform>());
     root_json.at("color").get_to(result->color);
-    root_json.at("diffuse_strength").get_to(result->diffuse_strength);
-    const auto& coef_json = root_json.at("coefficients");
-    coef_json.at(0).get_to(result->const_coeff);
-    coef_json.at(1).get_to(result->linear_coeff);
-    coef_json.at(2).get_to(result->quadratic_coeff);
 
     return result;
 }

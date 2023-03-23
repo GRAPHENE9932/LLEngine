@@ -11,8 +11,7 @@ class RenderingServer;
 
 struct PointLightNode : public CompleteSpatialNode {
     struct Uniforms {
-        GLint position_id, color_id, diffuse_strength_id, const_coeff_id,
-              linear_coeff_id, quadratic_coeff_id;
+        GLint position_id, color_id;
         
         auto operator<=>(const Uniforms& other) const noexcept = default;
     };
@@ -20,10 +19,6 @@ struct PointLightNode : public CompleteSpatialNode {
     RenderingServer& rs;
 
     glm::vec3 color;
-    float diffuse_strength = 0.0f;
-    float const_coeff = 0.0f;
-    float linear_coeff = 0.0f;
-    float quadratic_coeff = 0.0f;
 
     PointLightNode(RenderingServer& rs, const Transform& transform = Transform());
     ~PointLightNode();

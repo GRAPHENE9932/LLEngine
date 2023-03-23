@@ -36,8 +36,6 @@ out vec4 color_out;
 struct PointLight {
     vec3 position;
     vec3 color;
-    float diffuse_strength;
-    float const_coeff, linear_coeff, quadratic_coeff;
 };
 struct SpotLight {
     vec3 position;
