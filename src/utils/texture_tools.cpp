@@ -101,7 +101,7 @@ std::unique_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
     });
 }
 
-constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {32u, 32u};
+constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {16u, 16u};
 std::unique_ptr<Texture> compute_irradiance_map(const Texture& environment_map, IrradiancePrecomputerShader& shader) {
     if (!environment_map.is_cubemap()) {
         throw std::runtime_error("Unable to compute irradiance map because the given environment map is not cubemap.");
