@@ -10,3 +10,4 @@ Really under development, it is unplayable.
 - glTF model loading.
 - KTX2 texture loading (including cubemaps).
 - Radiance RGBE (.hdr) texture loading.
+- PBR shading.
