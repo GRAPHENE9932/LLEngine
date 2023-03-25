@@ -4,6 +4,7 @@ set(SOURCES
     BulletPhysicsServer.cpp
     common/Map.cpp
     common/FPSMeter.cpp
+    common/core/logger.cpp
     common/core/Mesh.cpp
     common/core/GLTFLoading.cpp
     common/core/GLTFToNode.cpp
