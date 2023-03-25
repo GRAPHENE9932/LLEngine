@@ -81,3 +81,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib nlohmann_json::nlohmann_json)
 # glm.
 find_package(glm REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib glm::glm)
+
+# fmtlib.
+find_package(fmt REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib fmt::fmt)
