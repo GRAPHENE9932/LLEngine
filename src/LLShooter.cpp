@@ -1,6 +1,7 @@
 #include "LLShooter.hpp"
 #include "common/core/KTXTexture.hpp"
 #include "common/core/RGBETexture.hpp"
+#include "common/core/logger.hpp"
 #include "nodes/core/rendering/PBRDrawableNode.hpp"
 #include "utils/primitive_meshes.hpp"
 #include "utils/texture_tools.hpp"
@@ -22,6 +23,8 @@ void LLShooter::start() {
 }
 
 void LLShooter::init() {
+    logger::enable_console_logging();
+
     rendering_server = std::make_unique<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
@@ -29,7 +32,9 @@ void LLShooter::init() {
     EngineServers engine_servers {*rendering_server, *bullet_physics_server};
     root_node = map.to_node(engine_servers);
 
+    logger::info("Starting RGBE loading.");
     auto sky_panorama = RGBETexture("res/textures/sky.hdr");
+    logger::info("Finished RGBE loading.");
     auto sky_cubemap = std::shared_ptr(panorama_to_cubemap(
         sky_panorama,
         rendering_server->get_shader_holder().get_equirectangular_mapper_shader()
