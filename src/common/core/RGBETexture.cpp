@@ -1,5 +1,7 @@
 #include "RGBETexture.hpp"
 
+#include <fmt/format.h>
+
 #include <cmath>
 #include <tuple>
 #include <array>
@@ -21,8 +23,10 @@ public:
 private:
     std::string
     construct_full_message(std::string_view message, std::string_view file_path) {
-        return "Failed to load the RGBE file. " + std::string(message) +
-                "\n File path: \"" + std::string(file_path) + '\"';
+        return fmt::format(
+            "Failed to load the RGBE file. {}\nFile path: \"{}\"",
+            message, file_path
+        );
     }
 };
 

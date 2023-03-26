@@ -11,13 +11,16 @@
 #include <zstd.h>
 #include <glm/vec2.hpp>
 #include <glm/common.hpp>
+#include <fmt/format.h>
 
 #include "KTXTexture.hpp"
 #include "VkFormatInfo.hpp"
 
 void ktx_loading_error(std::string_view message, std::string_view file_path) {
-    throw std::runtime_error("Failed to load the KTX file. " + std::string(message) +
-            "\nFile path: \"" + std::string(file_path) + '\"');
+    throw std::runtime_error(fmt::format(
+        "Failed to load the KTX file. {}\nFile path: \"{}\"",
+        message, file_path
+    ));
 }
 
 template<typename T>

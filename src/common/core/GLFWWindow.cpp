@@ -2,6 +2,7 @@
 
 #include <GL/glew.h> // glewInit, GLEW_OK
 #include <GLFW/glfw3.h> // Various GLFW functions and constants.
+#include <fmt/format.h>
 
 #include <sstream> // std::stringstream
 
@@ -26,8 +27,10 @@ static void initialize_glew() {
     GLenum glew_init_res = glewInit();
     if (glew_init_res != GLEW_OK) {
         throw std::runtime_error(
-            std::string("Failed to initialize GLEW. Error code: " + std::to_string(glew_init_res) +
-            ". String: " + reinterpret_cast<const char*>(glewGetErrorString(glew_init_res)))
+            fmt::format(
+                "Failed to initialize GLEW. Error code: {}. String: {}",
+                glew_init_res, glewGetErrorString(glew_init_res)
+            )
         );
     }
 }
