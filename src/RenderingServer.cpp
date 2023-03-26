@@ -2,6 +2,7 @@
 #include "BulletPhysicsServer.hpp"
 #include "common/core/Skybox.hpp"
 #include "common/core/GLFWWindow.hpp" // GLFWWindow
+#include "common/core/logger.hpp"
 #include "nodes/core/rendering/CameraNode.hpp"
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
 #include "utils/texture_tools.hpp"
@@ -33,7 +34,7 @@ void RenderingServer::main_loop() {
 
         // Invoke callback.
         update_callback(delta_time);
-
+        
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         // Draw objects.
@@ -142,7 +143,9 @@ RenderingServer::get_irradiance_map(const glm::vec3& obj_position) {
         return std::nullopt;
     }
     if (!irradiance_map) {
+        logger::info("Starting computing the irradiance map.");
         irradiance_map = compute_irradiance_map(env_cubemap->get(), shader_holder.get_irradiance_precomputer_shader());
+        logger::info("Finished computing the irradiance map.");
     }
     return *irradiance_map;
 }
@@ -155,14 +158,18 @@ RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
         return std::nullopt;
     }
     if (!prefiltered_specular_map) {
+        logger::info("Starting computing the prefiltered specular map.");
         prefiltered_specular_map = prefilter_specular_map(env_cubemap->get(), shader_holder.get_specular_prefilter_shader());
+        logger::info("Finished computing the prefiltered specular map.");
     }
     return *prefiltered_specular_map;
 }
 
 const Texture& RenderingServer::get_brdf_integration_map() {
     if (!brdf_integration_map) {
+        logger::info("Starting computing the BRDF integration map.");
         brdf_integration_map = compute_brdf_integration_map(shader_holder.get_brdf_integration_mapper_shader());
+        logger::info("Finished computing the BRDF integration map.");
     }
     return *brdf_integration_map;
 }
