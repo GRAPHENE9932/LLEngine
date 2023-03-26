@@ -17,13 +17,11 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     if (material.base_color_factor != glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)) {
         flags |= PBRShader::USING_BASE_COLOR_FACTOR;
     }
-    if (!rs.get_point_lights().empty()) {
-        flags |= PBRShader::USING_VERTEX_NORMALS;
-        if (material.normal_map.has_value()) {
-            flags |= PBRShader::USING_NORMAL_TEXTURE;
-            if (material.normal_map->scale != 1.0f) {
-                flags |= PBRShader::USING_NORMAL_MAP_SCALE;
-            }
+    flags |= PBRShader::USING_VERTEX_NORMALS;
+    if (material.normal_map.has_value()) {
+        flags |= PBRShader::USING_NORMAL_TEXTURE;
+        if (material.normal_map->scale != 1.0f) {
+            flags |= PBRShader::USING_NORMAL_MAP_SCALE;
         }
     }
     if (material.ambient_occlusion_texture.has_value()) {
@@ -302,7 +300,7 @@ void PBRShader::use_shader(
     if (prefiltered_specular_map_uniform_id != -1) {
         glUniform1i(prefiltered_specular_map_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_environment_cubemap(camera_position).value().get().get_id());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, rs.get_prefiltered_specular_map(camera_position).value().get().get_id());
         cur_tex_unit++;
     }
     if (irradiance_map_uniform_id != -1) {
