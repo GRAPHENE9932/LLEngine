@@ -188,9 +188,6 @@ std::unique_ptr<Texture> compute_brdf_integration_map(BRDFIntegrationMapperShade
     shader.use_shader();
     // Vertices.
     glEnableVertexAttribArray(0);
-    // We are using UVs instead of positions because:
-    // a) The shader takes vec2 as input vertices.
-    // b) Quad's UVs and vertex positions.xy are identical.
     glBindBuffer(GL_ARRAY_BUFFER, quad_mesh->get_vertices_id());
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     // UVs.
