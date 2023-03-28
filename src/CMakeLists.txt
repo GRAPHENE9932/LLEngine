@@ -13,7 +13,6 @@ set(SOURCES
     common/core/GLFWWindow.cpp
     common/core/KTXTexture.cpp
     common/core/RGBETexture.cpp
-    common/core/BitmapFont.cpp
     common/core/VkFormatInfo.cpp
     common/core/shaders/PBRShaderManager.cpp
     common/core/shaders/ColoredTextShader.cpp
@@ -28,7 +27,6 @@ set(SOURCES
     nodes/core/rendering/PBRDrawableNode.cpp
     nodes/core/rendering/PointLightNode.cpp
     nodes/core/rendering/SpotLight.cpp
-    nodes/core/rendering/BitmapTextNode.cpp
     nodes/core/rendering/SpectatorCameraNode.cpp
     nodes/core/physics/bullet/BulletRigidBodyNode.cpp
     nodes/core/CompleteSpatialNode.cpp
