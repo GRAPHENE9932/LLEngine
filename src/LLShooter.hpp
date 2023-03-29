@@ -3,7 +3,6 @@
 #include <memory> // std::unique_ptr
 
 #include "common/FPSMeter.hpp"
-#include "nodes/core/rendering/BitmapTextNode.hpp" // BitmapTextNode
 #include "BulletPhysicsServer.hpp"
 #include "RenderingServer.hpp"
 #include "common/Map.hpp"
@@ -20,7 +19,6 @@ private:
     std::unique_ptr<BulletPhysicsServer> bullet_physics_server = nullptr;
     std::unique_ptr<SpatialNode> root_node = nullptr;
     std::unique_ptr<FPSMeter> fps_meter = nullptr;
-    std::shared_ptr<BitmapTextNode> info_display = nullptr;
 
     void init();
     void add_weapon();
