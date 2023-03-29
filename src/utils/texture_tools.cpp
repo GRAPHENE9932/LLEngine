@@ -4,8 +4,11 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/transform.hpp>
+#include <ktx.h>
+#include <fmt/format.h>
 
 #include <array>
+#include <cstdio>
 
 auto draw_to_cubemap(
     glm::i32vec2 cubemap_size, std::int32_t mipmap_levels, std::invocable<const glm::mat4&, std::int32_t> auto&& drawing_function

@@ -11,8 +11,6 @@ set(SOURCES
     common/core/Skybox.cpp
     common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
-    common/core/KTXTexture.cpp
-    common/core/RGBETexture.cpp
     common/core/VkFormatInfo.cpp
     common/core/shaders/PBRShaderManager.cpp
     common/core/shaders/ColoredTextShader.cpp
@@ -38,8 +36,11 @@ set(SOURCES
     utils/shader_loader.cpp
     utils/primitive_meshes.cpp
     utils/texture_tools.cpp
+    utils/ktx2_loader.cpp
+    utils/rgbe_loader.cpp
 )
 
+find_package(Threads)
 add_executable(${CMAKE_PROJECT_NAME}_run main.cpp)
 add_library(${CMAKE_PROJECT_NAME}_lib STATIC ${SOURCES})
 target_link_libraries(${CMAKE_PROJECT_NAME}_run ${CMAKE_PROJECT_NAME}_lib)
@@ -84,3 +85,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib glm::glm)
 # fmtlib.
 find_package(fmt REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib fmt::fmt)
+
+# libktx.
+find_package(Ktx REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib KTX::ktx)

@@ -1,6 +1,5 @@
 #include "GLTF.hpp" // GLTF
 #include "common/core/Mesh.hpp"
-#include "common/core/KTXTexture.hpp"
 #include "structs/shapes/Shape.hpp"
 #include "structs/shapes/BoxShape.hpp"
 #include "structs/shapes/SphereShape.hpp"
@@ -263,7 +262,7 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(EngineServers& servers) const {
     std::vector<std::shared_ptr<Texture>> textures;
     textures.reserve(this->textures.size());
     for (auto& cur_tex_params : this->textures)
-        textures.push_back(std::make_shared<KTXTexture>(cur_tex_params));
+        textures.push_back(texture_from_ktx2(cur_tex_params));
 
     // Construct materials.
     std::vector<std::shared_ptr<Material>> materials;

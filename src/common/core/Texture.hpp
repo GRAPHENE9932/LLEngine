@@ -8,16 +8,6 @@
 
 class Texture {
 public:
-    struct Parameters {
-        GLenum magnification_filter = GL_LINEAR;
-        GLenum minification_filter = GL_LINEAR;
-        GLenum wrap_s = GL_CLAMP_TO_EDGE;
-        GLenum wrap_t = GL_CLAMP_TO_EDGE;
-        std::string file_path;
-        std::streamsize offset = 0;
-    };
-
-    Texture() = default;
     inline Texture(GLuint texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
             texture_id(texture_id), tex_size(tex_size), cubemap(is_cubemap) {}
     Texture(const Texture& other) = delete;

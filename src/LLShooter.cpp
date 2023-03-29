@@ -1,6 +1,4 @@
 #include "LLShooter.hpp"
-#include "common/core/KTXTexture.hpp"
-#include "common/core/RGBETexture.hpp"
 #include "common/core/logger.hpp"
 #include "nodes/core/rendering/PBRDrawableNode.hpp"
 #include "utils/primitive_meshes.hpp"
@@ -33,10 +31,10 @@ void LLShooter::init() {
     root_node = map.to_node(engine_servers);
 
     logger::info("Starting RGBE loading.");
-    auto sky_panorama = RGBETexture("res/textures/sky.hdr");
+    auto sky_panorama = texture_from_rgbe("res/textures/sky.hdr");
     logger::info("Finished RGBE loading.");
     auto sky_cubemap = std::shared_ptr(panorama_to_cubemap(
-        sky_panorama,
+        *sky_panorama,
         rendering_server->get_shader_holder().get_equirectangular_mapper_shader()
     ));
     rendering_server->set_cubemap(

@@ -16,6 +16,7 @@
 #include "common/core/Texture.hpp" // Texture::Parameters
 #include "common/core/Material.hpp" // BasicMaterial
 #include "common/core/SceneFile.hpp" // SceneFile
+#include "utils/texture_tools.hpp"
 
 class GLTF : public SceneFile {
 public:
@@ -45,7 +46,7 @@ public:
     };
 
     std::vector<MeshParameters> meshes;
-    std::vector<Texture::Parameters> textures;
+    std::vector<TexLoadingParams> textures;
     std::vector<BasicMaterial<uint32_t>> materials;
     std::vector<GLTF::Node> nodes;
 

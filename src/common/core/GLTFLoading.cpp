@@ -72,7 +72,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
         return;
     
     for (const json& cur_json : gltf_json.at("textures")) {
-        Texture::Parameters result;
+        TexLoadingParams result;
 
         if (cur_json.contains("sampler")) {
             const json& cur_sampler = gltf_json.at("samplers").at(cur_json["sampler"].get<uint32_t>());
@@ -96,7 +96,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
             source = cur_json["source"];
         }
         else {
-        // TODO: Placeholder image.
+            // TODO: Placeholder image.
             throw std::runtime_error("glTF texture doesn't have the source.");
         }
         
@@ -119,6 +119,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
             
             result.offset = bin_buffer_offset +
                     get_optional<std::streamsize>(buf_view_json, "byteOffset", 0);
+            result.size = buf_view_json.at("byteLength");
             result.file_path = gltf_path;
         }
         else {
