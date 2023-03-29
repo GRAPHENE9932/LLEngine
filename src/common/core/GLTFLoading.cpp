@@ -28,8 +28,8 @@ constexpr glm::quat DEFAULT_ROTATION = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
 constexpr std::string_view TEXTURES_LOCATION = "res/textures";
 
-constexpr std::array<std::string_view, 1> SUPPORTED_EXTENSIONS {
-    "KHR_texture_transform"
+constexpr std::array<std::string_view, 2> SUPPORTED_EXTENSIONS {
+    "KHR_texture_transform", "KHR_texture_basisu"
 };
 
 struct Header {
@@ -88,11 +88,19 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
             result.wrap_t = GL_REPEAT;
         }
 
+        uint32_t source;
+        if (cur_json.contains("extensions") && cur_json["extensions"].contains("KHR_texture_basisu")) {
+            source = cur_json["extensions"]["KHR_texture_basisu"].at("source");
+        }
+        else if (cur_json.contains("source")) {
+            source = cur_json["source"];
+        }
+        else {
         // TODO: Placeholder image.
-        if (!cur_json.contains("source"))
             throw std::runtime_error("glTF texture doesn't have the source.");
+        }
         
-        const json& image_json = gltf_json.at("images").at(cur_json["source"].get<uint32_t>());
+        const json& image_json = gltf_json.at("images").at(source);
         if (image_json.contains("uri")) {
             if (image_json["uri"].get<std::string>().starts_with("data:"))
                 throw std::runtime_error("base64 data is not supported here.");
@@ -295,8 +303,12 @@ struct CommonBufferArgs {
 };
 
 template<typename T>
-std::vector<T> read_from_fine_buffer_view(const CommonBufferArgs& args,
-        const uint32_t buf_view_index, const std::streamsize offset) {
+std::vector<T> read_from_fine_buffer_view(
+    const CommonBufferArgs& args,
+    const uint32_t buf_view_index,
+    const std::uint64_t count,
+    const std::streamoff offset
+) {
     const json& buf_view_json = args.gltf_json.at("bufferViews").at(buf_view_index);
     const json& buf_json = args.gltf_json.at("buffers").at(buf_view_json.at("buffer").get<uint32_t>());
     std::string_view uri = buf_json.contains("uri") ?
@@ -319,8 +331,6 @@ std::vector<T> read_from_fine_buffer_view(const CommonBufferArgs& args,
         offset
     );
 
-    const uint64_t count = buf_view_json.at("byteLength").get<uint64_t>() / sizeof(T);
-
     std::vector<T> result;
     result.resize(count);
 
@@ -340,8 +350,11 @@ std::vector<T> read_from_fine_buffer_view(const CommonBufferArgs& args,
 }
 
 template<typename IDX_T, typename VAL_T>
-std::vector<VAL_T> read_from_sparse_buffer_view(const CommonBufferArgs& args,
-        const json& sparse_json) {
+std::vector<VAL_T> read_from_sparse_buffer_view(
+    const CommonBufferArgs& args,
+    const json& sparse_json,
+    const std::streamoff offset_in_buffer_view
+) {
     const json& indices_json = sparse_json.at("indices");
     const json& values_json = sparse_json.at("values");
     
@@ -356,11 +369,13 @@ std::vector<VAL_T> read_from_sparse_buffer_view(const CommonBufferArgs& args,
 
     std::vector<IDX_T> indices = read_from_fine_buffer_view<IDX_T>(
         args, indices_json.at("bufferView").get<uint32_t>(),
-        get_optional<std::streamsize>(indices_json, "byteOffset", 0)
+        sparse_json.at("count"),
+        get_optional<std::streamsize>(indices_json, "byteOffset", 0) + offset_in_buffer_view
     );
     std::vector<VAL_T> values = read_from_fine_buffer_view<VAL_T>(
         args, values_json.at("bufferView").get<uint32_t>(),
-        get_optional<std::streamsize>(values_json, "byteOffset", 0)
+        sparse_json.at("count"),
+        get_optional<std::streamsize>(values_json, "byteOffset", 0) + offset_in_buffer_view
     );
 
     std::vector<VAL_T> result;
@@ -379,22 +394,24 @@ std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& acce
     if (accessor_json.at("componentType") != get_component_type<T>())
         throw std::runtime_error("Unexpected accessor componentType.");
 
+    const auto offset_in_accessor = get_optional<std::streamoff>(accessor_json, "byteOffset", 0);
+
     // Handle sparse.
     if (accessor_json.contains("sparse")) {
         switch (accessor_json["sparse"].at("indices").at("componentType").get<GLenum>()) {
         case GL_UNSIGNED_BYTE:
             return read_from_sparse_buffer_view<uint8_t, T>(
-                args, accessor_json["sparse"]
+                args, accessor_json["sparse"], offset_in_accessor
             );
             break;
         case GL_UNSIGNED_SHORT:
             return read_from_sparse_buffer_view<uint16_t, T>(
-                args, accessor_json["sparse"]
+                args, accessor_json["sparse"], offset_in_accessor
             );
             break;
         case GL_UNSIGNED_INT:
             return read_from_sparse_buffer_view<uint32_t, T>(
-                args, accessor_json["sparse"]
+                args, accessor_json["sparse"], offset_in_accessor
             );
             break;
         default:
@@ -405,7 +422,7 @@ std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& acce
     // Use bufferView if there are no sparse.
     else if (accessor_json.contains("bufferView")) {
         return read_from_fine_buffer_view<T>(
-            args, accessor_json["bufferView"].get<uint32_t>(), 0
+            args, accessor_json["bufferView"].get<uint32_t>(), accessor_json.at("count"), offset_in_accessor
         );
     }
     // If there are no data source at all, use zeros.
