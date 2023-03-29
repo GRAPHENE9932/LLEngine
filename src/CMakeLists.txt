@@ -36,7 +36,7 @@ set(SOURCES
     utils/shader_loader.cpp
     utils/primitive_meshes.cpp
     utils/texture_tools.cpp
-    utils/ktx2_loader.cpp
+    utils/ktx_loader.cpp
     utils/rgbe_loader.cpp
 )
 
