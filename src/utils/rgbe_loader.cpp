@@ -8,8 +8,39 @@
 #include <array>
 #include <optional>
 #include <sstream>
+#include <queue>
+#include <mutex>
+#include <thread>
+#include <span>
+#include <algorithm>
+#include <map>
 
 constexpr std::string_view RGBE_IDENTIFIER {"#?RADIANCE"};
+constexpr std::streamsize MAX_CHUNK_SIZE {16ll * 1024ll * 1024ll};
+constexpr std::array<std::uint8_t, 2> NEW_SCANLINE_MARK {0x02, 0x02};
+
+std::streamsize calculate_bytes_left(std::ifstream& stream) {
+    const auto current_position {stream.tellg()};
+    stream.seekg(0, stream.end);
+    const auto result = stream.tellg() - current_position;
+    stream.seekg(current_position);
+    return result;
+}
+
+template<typename Iter1, typename Iter2>
+std::size_t count_occurences(Iter1 whole_begin, Iter1 whole_end, Iter2 part_begin, Iter2 part_end) {
+    std::size_t count {0};
+    Iter1 current_begin = whole_begin;
+
+    auto search_result = std::search(current_begin, whole_end, part_begin, part_end);
+    while (search_result != whole_end) {
+        current_begin = search_result + (part_end - part_begin);
+        count++;
+        search_result = std::search(current_begin, whole_end, part_begin, part_end);
+    }
+
+    return count;
+}
 
 template<typename InputIter, typename OutputIter>
 void rgbe_to_rgb(
@@ -30,74 +61,239 @@ void rgbe_to_rgb(
     }
 }
 
-std::vector<float> read_run_length_encoded_data(
+// Returns size of the encoded scanline in bytes.
+std::uint32_t load_scanline(const std::span<std::uint8_t>& chunk, const std::span<float>& output, std::uint32_t image_width) {
+    std::uint32_t offset_in_scanline {0};
+
+    std::uint16_t scanline_width = chunk[offset_in_scanline + 2] << 8 | chunk[offset_in_scanline + 3];
+    offset_in_scanline += 4;
+    if (scanline_width != image_width) {
+        throw TextureLoadingError("Failed to load RGBE data: ambiguous texture width.");
+    }
+
+    std::vector<std::uint8_t> scanline_buffer(image_width * 4);
+    for (std::uint32_t cur_column = 0; cur_column < image_width * 4;) {
+        std::uint8_t run_length {chunk[offset_in_scanline]};
+        offset_in_scanline++;
+
+        if (run_length > 128) {
+            // A run of the same value.
+            run_length -= 128;
+
+            if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
+                throw TextureLoadingError("Failed to load RGBE data: invalid run length in run-length encoded data.");
+            }
+
+            std::uint8_t value {chunk[offset_in_scanline]};
+            offset_in_scanline++;
+            std::fill(
+                scanline_buffer.begin() + cur_column,
+                scanline_buffer.begin() + cur_column + run_length,
+                value
+            );
+
+            cur_column += run_length;
+        }
+        else {
+            // A run of different values.
+            if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
+                throw TextureLoadingError("Failed to load RGBE data: invalid run length in run-length encoded data.");
+            }
+
+            std::copy(
+                chunk.begin() + offset_in_scanline,
+                chunk.begin() + offset_in_scanline + run_length,
+                scanline_buffer.begin() + cur_column
+            );
+
+            offset_in_scanline += run_length;
+            cur_column += run_length;
+        }
+    }
+
+    rgbe_to_rgb(
+        scanline_buffer.begin(), scanline_buffer.end(), output.begin()
+    );
+
+    return offset_in_scanline;
+}
+
+struct InputChunk {
+    InputChunk(
+        const std::span<std::uint8_t>& data_span,
+        std::unique_ptr<std::uint8_t[]>&& data,
+        std::uint32_t chunk_index
+    ) : data_span(data_span), data(std::move(data)), chunk_index(chunk_index) {}
+    InputChunk(InputChunk&& other) = default;
+    InputChunk& operator=(InputChunk&& other) = default;
+
+    std::span<std::uint8_t> data_span;
+    std::unique_ptr<std::uint8_t[]> data;
+    std::uint32_t chunk_index;
+};
+
+struct OutputChunk {
+    OutputChunk(
+        const std::span<float>& data_span,
+        std::unique_ptr<float[]>&& data,
+        std::uint32_t scanlines_count
+    ) : data_span(data_span), data(std::move(data)), scanlines_count(scanlines_count) {}
+    OutputChunk(OutputChunk&& other) = default;
+    OutputChunk& operator=(OutputChunk&& other) = default;
+
+    std::span<float> data_span;
+    std::unique_ptr<float[]> data;
+    std::uint32_t scanlines_count;
+};
+
+struct ThreadSharedVariables {
+    std::uint32_t image_width = 0; // Constant during the job. Can be read without locking.
+    std::mutex mutex;
+    std::queue<InputChunk> input_chunks_queue; // Must be accessed with mutex.
+    std::map<std::uint32_t, OutputChunk> output_chunks_map; // Must be accessed with mutex.
+    bool chunks_over = false; // Must be accessed with mutex.
+};
+
+template<typename T>
+struct OwningSpan {
+    OwningSpan(std::size_t size) {
+        ptr = std::make_unique_for_overwrite<T[]>(size);
+        span = std::span(ptr.get(), size);
+    }
+
+    std::span<T> span;
+    std::unique_ptr<T[]> ptr;
+};
+
+void read_run_length_encoded_data_single_thread(ThreadSharedVariables& vars) {
+    using namespace std::chrono_literals;
+
+    while (true) {
+        vars.mutex.lock();
+        if (vars.input_chunks_queue.empty()) {
+            if (vars.chunks_over) {
+                vars.mutex.unlock();
+                break;
+            }
+
+            vars.mutex.unlock();
+            std::this_thread::sleep_for(2ms);
+            continue;
+        }
+
+        // Take one chunk.
+        auto chunk_in(std::move(vars.input_chunks_queue.front()));
+        vars.input_chunks_queue.pop();
+        vars.mutex.unlock();
+
+        // Allocate output chunk.
+        auto scanlines_in_chunk {count_occurences(
+            chunk_in.data_span.begin(), chunk_in.data_span.end(), NEW_SCANLINE_MARK.begin(), NEW_SCANLINE_MARK.end()
+        )};
+        std::unique_ptr<float[]> output_chunk_data {std::make_unique_for_overwrite<float[]>(scanlines_in_chunk * vars.image_width * 3)};
+        std::span<float> output_chunk_data_span(output_chunk_data.get(), scanlines_in_chunk * vars.image_width * 3);
+
+        std::size_t offset_in_chunk {0};
+        for (std::uint32_t scanline_i = 0; scanline_i < scanlines_in_chunk; scanline_i++) {
+            offset_in_chunk += load_scanline(
+                chunk_in.data_span.subspan(offset_in_chunk),
+                output_chunk_data_span.subspan(scanline_i * vars.image_width * 3),
+                vars.image_width
+            );
+        }
+
+        // Add output chunk to the list.
+        vars.mutex.lock();
+        vars.output_chunks_map.emplace(std::make_pair(chunk_in.chunk_index, OutputChunk(output_chunk_data_span, std::move(output_chunk_data), scanlines_in_chunk)));
+        vars.mutex.unlock();
+    }
+}
+
+OwningSpan<float> read_run_length_encoded_data(
     std::uint32_t width,
     std::uint32_t height,
     std::ifstream& stream
 ) {
-    std::vector<float> result(width * height * 3);
+    const unsigned int threads_count {std::thread::hardware_concurrency() == 0 ? 4 : std::thread::hardware_concurrency()};
 
-    for (std::uint32_t scanline_i = 0; scanline_i < height; scanline_i++) {
-        std::array<std::uint8_t, 4> first_4_bytes;
-        stream.read(reinterpret_cast<char*>(first_4_bytes.data()), first_4_bytes.size());
-        std::uint16_t scanline_width = first_4_bytes[2] << 8 | first_4_bytes[3];
-        if (scanline_width != width) {
-            throw TextureLoadingError("Failed to load RGBE data: ambiguous texture width.");
-        }
+    ThreadSharedVariables vars;
+    vars.image_width = width;
 
-        std::vector<std::uint8_t> scanline_buffer(width * 4);
-
-        for (std::uint32_t cur_column = 0; cur_column < width * 4;) {
-            std::uint8_t run_length;
-            stream.read(reinterpret_cast<char*>(&run_length), 1);
-
-            if (run_length > 128) {
-                // A run of the same value.
-                run_length -= 128;
-
-                if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
-                    throw TextureLoadingError("Failed to load RGBE data: invalid run length in run-length encoded data.");
-                }
-
-                std::uint8_t value;
-                stream.read(reinterpret_cast<char*>(&value), 1);
-                std::fill(
-                    scanline_buffer.begin() + cur_column,
-                    scanline_buffer.begin() + cur_column + run_length,
-                    value
-                );
-
-                cur_column += run_length;
-            }
-            else {
-                // A run of different values.
-                if (run_length == 0 || scanline_buffer.size() < cur_column + run_length) {
-                    throw TextureLoadingError("Failed to load RGBE data: invalid run length in run-length encoded data.");
-                }
-
-                stream.read(
-                    reinterpret_cast<char*>(scanline_buffer.data() + cur_column),
-                    run_length
-                );
-
-                cur_column += run_length;
-            }
-        }
-
-        if (!stream) {
-            throw TextureLoadingError("Failed to read a scanline in the RGBE texture.");
-        }
-
-        rgbe_to_rgb(
-            scanline_buffer.begin(), scanline_buffer.end(),
-            result.begin() + width * 3 * scanline_i
-        );
+    std::vector<std::thread> threads;
+    threads.reserve(threads_count);
+    for (unsigned int i = 0; i < threads_count; i++) {
+        threads.emplace_back(read_run_length_encoded_data_single_thread, std::ref(vars));
     }
 
-    return result;
+    std::streamsize bytes_left {calculate_bytes_left(stream)};
+    const std::streamsize max_chunk_size = std::clamp(
+        (height / threads_count) * width,
+        width * 4 * 2 + 1, // The maximum possible run-length encoded scanline size in bytes + 1.
+        static_cast<std::uint32_t>(MAX_CHUNK_SIZE)
+    );
+
+    std::uint32_t index_of_chunk {0};
+    while (bytes_left > 0) {
+        bool is_last_chunk {max_chunk_size > bytes_left};
+        std::uint32_t cur_chunk_size = std::min(max_chunk_size, bytes_left);
+    
+        // I would use std::vector here, but std::vector initializes all the values and this is very slow.
+        std::unique_ptr<std::uint8_t[]> chunk_ptr {std::make_unique_for_overwrite<std::uint8_t[]>(cur_chunk_size)};
+        std::span<std::uint8_t> chunk(chunk_ptr.get(), cur_chunk_size);
+        stream.read(reinterpret_cast<char*>(chunk.data()), cur_chunk_size);
+        bytes_left -= cur_chunk_size;
+        if (!stream) {
+            throw TextureLoadingError("Failed to read a chunk of data in the RGBE file stream.");
+        }
+
+        // Chunk must be aligned with scanlines, so find the start of the last scanline that is
+        // likely corrupted (because we load just a chunk, not a whole file).
+        if (!is_last_chunk) {
+            const auto search_result = std::search(
+                chunk.rbegin(), chunk.rend(),
+                NEW_SCANLINE_MARK.begin(), NEW_SCANLINE_MARK.end()
+            );
+            if (search_result == chunk.rend()) {
+                throw TextureLoadingError("Can't find new scanline mark in the RGBE chunk.");
+            }
+            const auto end_of_the_first_scanline = search_result + (NEW_SCANLINE_MARK.size()/* + 1*/);
+            const auto alignment_difference {std::distance(chunk.rbegin(), end_of_the_first_scanline)};
+            cur_chunk_size -= alignment_difference;
+
+            chunk = chunk.subspan(0, cur_chunk_size);
+            stream.seekg(-alignment_difference, stream.cur);
+            bytes_left += alignment_difference;
+        }
+
+        // Add chunk to the queue.
+        vars.mutex.lock();
+        vars.input_chunks_queue.emplace(chunk, std::move(chunk_ptr), index_of_chunk);
+        vars.mutex.unlock();
+
+        index_of_chunk++;
+    }
+    vars.mutex.lock();
+    vars.chunks_over = true;
+    vars.mutex.unlock();
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    // Now we have a set with chunks of output data. Firstly, allocate the total output vector...
+    OwningSpan<float> total_output(height * width * 3);
+    // Secondly, copy everything from set.
+    std::uint32_t current_scanline {0};
+    for (auto& chunk : vars.output_chunks_map) {
+        std::copy(chunk.second.data_span.begin(), chunk.second.data_span.end(), total_output.span.begin() + current_scanline * width * 3);
+        chunk.second.data.reset(),
+        current_scanline += chunk.second.scanlines_count;
+    }
+    // And, finally, return the result.
+    return total_output;
 }
 
-std::vector<float> get_rgb_data(
+OwningSpan<float> get_rgb_data(
     std::uint32_t width,
     std::uint32_t height,
     std::ifstream& stream
@@ -114,15 +310,15 @@ std::vector<float> get_rgb_data(
         return read_run_length_encoded_data(width, height, stream);
     }
     else {
-        std::vector<std::uint8_t> rgbe_data(width * height * 4);
-        stream.read(reinterpret_cast<char*>(rgbe_data.data()), rgbe_data.size());
+        OwningSpan<std::uint8_t> rgbe_data(width * height * 4);
+        stream.read(reinterpret_cast<char*>(rgbe_data.span.data()), rgbe_data.span.size());
 
         if (!stream) {
             throw TextureLoadingError("Failed to read flat data in the RGBE texture.");
         }
 
-        std::vector<float> result(width * height * 3);
-        rgbe_to_rgb(rgbe_data.begin(), rgbe_data.end(), result.begin());
+        OwningSpan<float> result(width * height * 3);
+        rgbe_to_rgb(rgbe_data.span.begin(), rgbe_data.span.end(), result.span.begin());
         return result;
     }
 }
@@ -131,7 +327,7 @@ GLuint initialize_opengl_texture(
     std::uint32_t width,
     std::uint32_t height,
     const TexLoadingParams& params,
-    const std::vector<float>& rgb_data
+    const OwningSpan<float>& rgb_data
 ) {
     GLuint texture_id = 0;
     glGenTextures(1, &texture_id);
@@ -143,7 +339,7 @@ GLuint initialize_opengl_texture(
     );
     glTexSubImage2D(
         GL_TEXTURE_2D, 0, 0, 0, width, height,
-        GL_RGB, GL_FLOAT, rgb_data.data()
+        GL_RGB, GL_FLOAT, rgb_data.span.data()
     );
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
@@ -239,7 +435,7 @@ std::unique_ptr<Texture> texture_from_rgbe(const TexLoadingParams& params) {
     GLuint texture_id;
     glm::u32vec2 tex_size;
     bool is_cubemap;
-    std::vector<float> rgb_data {get_rgb_data(x_resolution, y_resolution, stream)};
+    OwningSpan<float> rgb_data {get_rgb_data(x_resolution, y_resolution, stream)};
     texture_id = initialize_opengl_texture(x_resolution, y_resolution, params, rgb_data);
     tex_size = {x_resolution, y_resolution};
     is_cubemap = false;
