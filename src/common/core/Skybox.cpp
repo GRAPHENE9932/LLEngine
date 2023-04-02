@@ -21,14 +21,11 @@ void Skybox::draw() {
     
     rs.get_shader_holder().get_skybox_shader().use_shader(mvp, *cubemap_texture);
 
-    // Vertices.
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    cube_mesh->bind_vao(false, false, false);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
     glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
     rs.report_about_drawn_triangles(cube_mesh->get_amount_of_vertices() / 3);
 
-    glDisableVertexAttribArray(0);
+    cube_mesh->unbind_vao();
 }

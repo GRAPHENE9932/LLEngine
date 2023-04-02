@@ -92,15 +92,12 @@ std::unique_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
     return draw_to_cubemap(cubemap_size, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
         shader.use_shader(mvp, panorama);
 
-        // Draw.
-        // Vertices.
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        // Bind the cubemap.
+        cube_mesh->bind_vao(false, false, false);
+        
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
-        glDisableVertexAttribArray(0);
+
+        cube_mesh->unbind_vao();
     });
 }
 
@@ -115,15 +112,12 @@ std::unique_ptr<Texture> compute_irradiance_map(const Texture& environment_map, 
     return draw_to_cubemap(IRRADIANCE_MAP_SIZE, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
         shader.use_shader(mvp, environment_map);
 
-        // Draw.
-        // Vertices.
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        // Bind the cubemap.
+        cube_mesh->bind_vao(false, false, false);
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
-        glDisableVertexAttribArray(0);
+
+        cube_mesh->unbind_vao();
     });
 }
 
@@ -140,15 +134,12 @@ std::unique_ptr<Texture> prefilter_specular_map(const Texture& environment_map, 
         float roughness = static_cast<float>(level) / (SPECULAR_MAP_MIPMAP_LEVELS - 1);
         shader.use_shader(mvp, roughness, environment_map);
 
-        // Draw.
-        // Vertices.
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, cube_mesh->get_vertices_id());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        // Bind the cubemap.
+        cube_mesh->bind_vao(false, false, false);
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
-        glDisableVertexAttribArray(0);
+
+        cube_mesh->unbind_vao();
     });
 }
 
@@ -189,17 +180,10 @@ std::unique_ptr<Texture> compute_brdf_integration_map(BRDFIntegrationMapperShade
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader.use_shader();
-    // Vertices.
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_mesh->get_vertices_id());
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    // UVs.
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_mesh->get_uvs_id());
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    quad_mesh->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, quad_mesh->get_amount_of_vertices());
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
+    quad_mesh->unbind_vao();
 
     // Clean up.
     glDeleteRenderbuffers(1, &framebuffer_id);

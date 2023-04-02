@@ -25,25 +25,7 @@ void PBRDrawableNode::draw() {
         rs, *material, mvp, model_matrix, rs.get_camera_position()
     );
 
-    // Vertices.
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // UVs.
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_uvs_id());
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // Normals.
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_normals_id());
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    // Tangents.
-    glEnableVertexAttribArray(3);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh->get_tangents_id());
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    mesh->bind_vao();
 
     if (mesh->is_indexed()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
@@ -55,10 +37,7 @@ void PBRDrawableNode::draw() {
     }
     rs.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
 
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
-    glDisableVertexAttribArray(3);
+    mesh->unbind_vao();
 }
 
 GLuint PBRDrawableNode::get_program_id() const {

@@ -26,6 +26,28 @@ GLenum Mesh::get_indices_type() const {
     }
 }
 
+void Mesh::bind_vao(bool enable_uv, bool enable_normals, bool enable_tangents) const {
+    if (vao_id == 0) {
+        initialize_vao();
+    }
+
+    glBindVertexArray(vao_id);
+    if (vertices_id != 0) glEnableVertexAttribArray(0);
+    if (uvs_id != 0 && enable_uv) glEnableVertexAttribArray(1);
+    if (normals_id != 0 && enable_normals) glEnableVertexAttribArray(2);
+    if (tangents_id != 0 && enable_tangents) glEnableVertexAttribArray(3);
+}
+
+void Mesh::unbind_vao() const {
+    if (vao_id != 0) {
+        glBindVertexArray(0);
+        if (vertices_id != 0) glDisableVertexAttribArray(0);
+        if (uvs_id != 0) glDisableVertexAttribArray(1);
+        if (normals_id != 0) glDisableVertexAttribArray(2);
+        if (tangents_id != 0) glDisableVertexAttribArray(3);
+    }
+}
+
 template<typename T, GLenum TARGET>
 void handle_buffer(std::vector<T>& buffer, GLuint& buffer_id) {
     if (!buffer_id)
@@ -48,21 +70,25 @@ void Mesh::set_indices(const std::vector<T>& new_indices) {
 void Mesh::set_vertices(const std::vector<glm::vec3>& new_vertices) {
     vertices = new_vertices;
     handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(vertices, vertices_id);
+    reset_vao_if_needed();
 }
 
 void Mesh::set_uvs(const std::vector<glm::vec2>& new_uvs) {
     uvs = new_uvs;
     handle_buffer<glm::vec2, GL_ARRAY_BUFFER>(uvs, uvs_id);
+    reset_vao_if_needed();
 }
 
 void Mesh::set_normals(const std::vector<glm::vec3>& new_normals) {
     normals = new_normals;
     handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(normals, normals_id);
+    reset_vao_if_needed();
 }
 
 void Mesh::set_tangents(const std::vector<glm::vec4>& new_tangents) {
     tangents = new_tangents;
     handle_buffer<glm::vec4, GL_ARRAY_BUFFER>(tangents, tangents_id);
+    reset_vao_if_needed();
 }
 
 struct CompleteVertex {
@@ -158,6 +184,32 @@ Mesh::~Mesh() {
         glDeleteBuffers(1, &normals_id);
     if (tangents_id)
         glDeleteBuffers(1, &tangents_id);
+    if (vao_id)
+        glDeleteVertexArrays(1, &vao_id);
+}
+
+void bind_vertex_attrib_pointer(GLuint buffer_id, GLuint vertex_attrib_index, GLint size) {
+    if (buffer_id != 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+        glVertexAttribPointer(vertex_attrib_index, size, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+}
+
+void Mesh::reset_vao_if_needed() const {
+    if (vao_id != 0) {
+        glDeleteVertexArrays(1, &vao_id);
+        initialize_vao();
+    }
+}
+
+void Mesh::initialize_vao() const {
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
+
+    bind_vertex_attrib_pointer(vertices_id, 0, 3);
+    bind_vertex_attrib_pointer(uvs_id,      1, 2);
+    bind_vertex_attrib_pointer(normals_id,  2, 3);
+    bind_vertex_attrib_pointer(tangents_id, 3, 4);
 }
 
 template void Mesh::set_indices(const std::vector<uint16_t> &new_indices);
