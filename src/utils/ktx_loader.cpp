@@ -185,17 +185,17 @@ std::unique_ptr<Texture> texture_from_ktx2(const TexLoadingParams& params) {
             ktx_error_to_string(error), gl_error
         ));
     }
-
+    
     std::unique_ptr<Texture> texture {std::make_unique<Texture>(
         texture_id,
         glm::u32vec2(ktx_texture.get()->baseWidth, ktx_texture.get()->baseHeight),
         ktx_texture.get()->isCubemap
     )};
     glBindTexture(tex_target, texture_id);
-    glTextureParameteri(tex_target, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
-    glTextureParameteri(tex_target, GL_TEXTURE_MIN_FILTER, params.minification_filter);
-    glTextureParameteri(tex_target, GL_TEXTURE_WRAP_S, params.wrap_s);
-    glTextureParameteri(tex_target, GL_TEXTURE_WRAP_T, params.wrap_t);
+    glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
+    glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, params.minification_filter);
+    glTexParameteri(tex_target, GL_TEXTURE_WRAP_S, params.wrap_s);
+    glTexParameteri(tex_target, GL_TEXTURE_WRAP_T, params.wrap_t);
     if (ktx_texture.get()->isCubemap) {
         glTexParameteri(tex_target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
