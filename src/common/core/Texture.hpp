@@ -11,7 +11,11 @@ public:
     inline Texture(GLuint texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
             texture_id(texture_id), tex_size(tex_size), cubemap(is_cubemap) {}
     Texture(const Texture& other) = delete;
-    Texture(Texture&& other) = delete;
+    Texture(Texture&& other) : Texture(other.texture_id, other.tex_size, other.cubemap) {
+        other.texture_id = 0;
+        other.tex_size = {0, 0};
+        other.cubemap = false;
+    }
     inline ~Texture() {
         // This function ignores texture ID of 0.
         glDeleteTextures(1, &texture_id);
