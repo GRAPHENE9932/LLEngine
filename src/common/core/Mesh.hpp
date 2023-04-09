@@ -22,6 +22,9 @@ public:
     [[nodiscard]] size_t get_amount_of_vertices() const;
     [[nodiscard]] GLenum get_indices_type() const;
 
+    [[nodiscard]] inline bool is_initialized() const noexcept {
+        return vertices_id != 0;
+    }
     /**
      * @brief Binds this Mesh's VAO. If this Mesh does not have a VAO,
      * one will be created.
