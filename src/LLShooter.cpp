@@ -1,5 +1,7 @@
 #include "LLShooter.hpp"
 #include "common/core/logger.hpp"
+#include "nodes/core/gui/GUINode.hpp"
+#include "nodes/core/gui/TextNode.hpp"
 #include "nodes/core/rendering/PBRDrawableNode.hpp"
 #include "utils/primitive_meshes.hpp"
 #include "utils/texture_tools.hpp"
@@ -29,6 +31,12 @@ void LLShooter::init() {
     Map map("res/maps/map_close.json");
     EngineServers engine_servers {*rendering_server, *bullet_physics_server};
     root_node = map.to_node(engine_servers);
+
+    root_gui_node = std::make_unique<GUINode>(*rendering_server);
+    auto text_node = std::make_unique<TextNode>(*rendering_server, std::make_shared<FreeTypeFont>("res/fonts/Ubuntu-Regular.ttf", 32));
+    text_node->set_text("LLShooter");
+    text_node->set_position_offset({200.0f, 200.0f});
+    root_gui_node->add_child(std::move(text_node));
 
     logger::info("Starting RGBE loading.");
     auto sky_panorama = texture_from_rgbe("res/textures/sky.hdr");

@@ -12,6 +12,7 @@ set(SOURCES
     common/core/SceneFile.cpp
     common/core/GLFWWindow.cpp
     common/core/VkFormatInfo.cpp
+    common/core/FreeTypeFont.cpp
     common/core/shaders/PBRShaderManager.cpp
     common/core/shaders/ColoredTextShader.cpp
     common/core/shaders/SkyboxShader.cpp
@@ -28,6 +29,7 @@ set(SOURCES
     nodes/core/rendering/SpectatorCameraNode.cpp
     nodes/core/physics/bullet/BulletRigidBodyNode.cpp
     nodes/core/gui/GUINode.cpp
+    nodes/core/gui/TextNode.cpp
     nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp
     structs/shapes/Shape.cpp
@@ -90,3 +92,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib fmt::fmt)
 # libktx.
 find_package(Ktx REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib KTX::ktx)
+
+# FreeType.
+find_package(Freetype REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib Freetype::Freetype)
