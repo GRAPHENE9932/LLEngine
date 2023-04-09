@@ -27,6 +27,7 @@ set(SOURCES
     nodes/core/rendering/SpotLight.cpp
     nodes/core/rendering/SpectatorCameraNode.cpp
     nodes/core/physics/bullet/BulletRigidBodyNode.cpp
+    nodes/core/gui/GUINode.cpp
     nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp
     structs/shapes/Shape.cpp

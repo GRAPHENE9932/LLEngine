@@ -17,6 +17,7 @@ class Texture;
 class RenderingNode;
 class CameraNode;
 class DrawableNode;
+class GUINode;
 struct PointLightNode;
 struct SpotLight;
 
@@ -44,6 +45,12 @@ public:
      */
     void register_drawable_node(DrawableNode* drawable_node) noexcept;
     /**
+     * @brief Must be called by every GUINode upon its creation.
+     *
+     * Does nothing if gui_node is nullptr.
+     */
+    void register_gui_node(GUINode* gui_node) noexcept;
+    /**
      * @brief Must be called by every CameraNode upon its creation.
      * @param camera_node new freshly-created camera node.
      */
@@ -61,6 +68,14 @@ public:
      * or already destroyed.
      */
     void unregister_drawable_node(DrawableNode* drawable_node) noexcept;
+    /**
+     * @brief Must be called by every GUINode upon its destruction.
+     *
+     * Does nothing if argument is nullptr.
+     * @param gui_node GUI node that's going to be destroyed
+     * or already destroyed.
+     */
+    void unregister_gui_node(GUINode* gui_node) noexcept;
     /**
      * @brief Must be called by every PointLightNode upon its destruction.
      *
@@ -113,6 +128,10 @@ public:
         return drawable_nodes;
     }
 
+    [[nodiscard]] const std::vector<GUINode*>& get_gui_nodes() const noexcept {
+        return gui_nodes;
+    }
+
     [[nodiscard]] float get_delta_time() const {
         return delta_time;
     }
@@ -153,6 +172,7 @@ private:
     std::unique_ptr<Texture> prefiltered_specular_map = nullptr;
     std::unique_ptr<Texture> brdf_integration_map = nullptr;
     std::vector<DrawableNode*> drawable_nodes;
+    std::vector<GUINode*> gui_nodes;
     std::vector<PointLightNode*> point_lights;
 
     ShaderHolder shader_holder;

@@ -5,6 +5,7 @@
 #include "common/core/logger.hpp"
 #include "nodes/core/rendering/CameraNode.hpp"
 #include "nodes/core/rendering/DrawableNode.hpp" // DrawableNode
+#include "nodes/core/gui/GUINode.hpp"
 #include "utils/texture_tools.hpp"
 
 #include <GLFW/glfw3.h>
@@ -50,6 +51,11 @@ void RenderingServer::main_loop() {
 
         // Draw overlay objects.
         glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_BLEND);
+        for (const auto& cur_gui_node : get_gui_nodes()) {
+            cur_gui_node->draw();
+        }
+        glDisable(GL_BLEND);
 
         window.swap_buffers();
         glfwPollEvents();
@@ -59,6 +65,12 @@ void RenderingServer::main_loop() {
 void RenderingServer::register_drawable_node(DrawableNode* drawable_node) noexcept {
     if (drawable_node) {
         drawable_nodes.push_back(drawable_node);
+    }
+}
+
+void RenderingServer::register_gui_node(GUINode* gui_node) noexcept {
+    if (gui_node) {
+        gui_nodes.push_back(gui_node);
     }
 }
 
@@ -78,6 +90,15 @@ void RenderingServer::unregister_drawable_node(DrawableNode* drawable_node) noex
     };
     if (iter != drawable_nodes.end()) {
         drawable_nodes.erase(iter);
+    }
+}
+
+void RenderingServer::unregister_gui_node(GUINode* gui_node) noexcept {
+    const auto iter {
+        std::find(gui_nodes.begin(), gui_nodes.end(), gui_node)
+    };
+    if (iter != gui_nodes.end()) {
+        gui_nodes.erase(iter);
     }
 }
 

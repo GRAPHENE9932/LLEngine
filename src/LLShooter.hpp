@@ -6,6 +6,7 @@
 #include "BulletPhysicsServer.hpp"
 #include "RenderingServer.hpp"
 #include "common/Map.hpp"
+#include "nodes/core/gui/GUINode.hpp"
 
 class LLShooter {
 public:
@@ -18,6 +19,7 @@ private:
     std::unique_ptr<RenderingServer> rendering_server = nullptr;
     std::unique_ptr<BulletPhysicsServer> bullet_physics_server = nullptr;
     std::unique_ptr<SpatialNode> root_node = nullptr;
+    std::unique_ptr<GUINode> root_gui_node = nullptr;
     std::unique_ptr<FPSMeter> fps_meter = nullptr;
 
     void init();
