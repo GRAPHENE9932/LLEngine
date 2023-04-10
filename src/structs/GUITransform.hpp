@@ -28,10 +28,10 @@ struct GUITransform {
     }
 
     [[nodiscard]] glm::vec3 to_opengl_position(glm::u32vec2 viewport_size) const noexcept {
-        glm::vec3 result {position_anchor, z_coordinate};
-        result += glm::vec3(position_offset / glm::vec2(viewport_size), 0.0f);
+        glm::vec2 result {position_anchor};
+        result += glm::vec2(position_offset / glm::vec2(viewport_size));
         result = result * 2.0f - 1.0f; // Go from [0; 1] range to [-1; 1].
         result.y = -result.y;
-        return result;
+        return glm::vec3(result, z_coordinate);
     }
 };
