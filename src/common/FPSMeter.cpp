@@ -7,7 +7,7 @@ FPSMeter::FPSMeter(float interval) : interval(interval) {
 FPSMeter::~FPSMeter() {
     working = false;
     cv.notify_all();
-    thread->detach();
+    thread->join();
 }
 
 void FPSMeter::frame() noexcept {
