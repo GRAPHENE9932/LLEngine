@@ -4,18 +4,14 @@
 #include <GLFW/glfw3.h> // Various GLFW functions and constants.
 #include <fmt/format.h>
 
-#include <sstream> // std::stringstream
-
 size_t GLFWWindow::glfw_windows_count = 0;
 
 static void handle_glfw_error() {
     const char* error_desc;
     const int error_code = glfwGetError(&error_desc);
-    std::stringstream ss;
-    ss << "Failed to create the window (code 0x" << std::hex <<
-        error_code << "): " << error_desc;
-
-    throw std::runtime_error(ss.str());
+    throw std::runtime_error(fmt::format(
+        "Failed to create the window (code {:x}): {}", error_code, error_desc
+    ));
 }
 
 static void initialize_glfw() {
