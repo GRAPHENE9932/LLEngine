@@ -158,7 +158,7 @@ public:
     [[nodiscard]] bool have_environment_cubemap();
 
 private:
-    Window& window;
+    Window window;
     std::function<void(float)> update_callback;
 
     // Time point of the last frame.

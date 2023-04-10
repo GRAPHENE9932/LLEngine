@@ -11,7 +11,7 @@
 #include <GLFW/glfw3.h>
 
 RenderingServer::RenderingServer(glm::ivec2 window_size) :
-    window(*new GLFWWindow(window_size, "LLShooter", 3, 3)) {}
+    window(GLFWWindow(window_size, "LLShooter", 3, 3)) {}
 
 RenderingServer::~RenderingServer() {}
 
