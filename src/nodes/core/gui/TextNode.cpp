@@ -68,7 +68,7 @@ void TextNode::draw() {
         get_absolute_transform().to_opengl_position(rs.get_window().get_window_size()) - relative_origin_opengl
     };
 
-    const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(glm::vec3(2.0f / window_size, 1.0f))};
+    const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(glm::vec3(pixels_to_opengl_scale, 1.0f))};
 
     rs.get_shader_holder().get_colored_text_shader().use_shader(mvp, get_color());
     glActiveTexture(GL_TEXTURE0);
