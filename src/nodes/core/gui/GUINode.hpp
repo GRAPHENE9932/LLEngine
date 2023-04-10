@@ -36,6 +36,9 @@ public:
     }
 
     void add_child(std::unique_ptr<GUINode>&& child);
+    [[nodiscard]] inline const std::vector<std::unique_ptr<GUINode>>& get_children() const {
+        return children;
+    }
 
     virtual void draw() {
         draw_children();
