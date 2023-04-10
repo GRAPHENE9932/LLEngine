@@ -15,7 +15,7 @@ class RenderingServer;
 class GUINode {
 public:
     GUINode(RenderingServer& rs);
-    ~GUINode();
+    virtual ~GUINode();
 
     [[nodiscard]] inline const GUITransform& get_transform() const noexcept {
         return transform;
