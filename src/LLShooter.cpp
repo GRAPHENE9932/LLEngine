@@ -7,11 +7,12 @@
 #include "utils/texture_tools.hpp"
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
 
 #include <memory>
 #include <iostream>
 
-const int WINDOW_WIDTH = 1500, WINDOW_HEIGHT = 800;
+const int WINDOW_WIDTH = 3800, WINDOW_HEIGHT = 2000;
 
 LLShooter::~LLShooter() {
     
@@ -27,6 +28,7 @@ void LLShooter::init() {
 
     rendering_server = std::make_unique<RenderingServer>(glm::ivec2(WINDOW_WIDTH, WINDOW_HEIGHT));
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
+    fps_meter = std::make_unique<FPSMeter>(1.0f);
 
     Map map("res/maps/map_close.json");
     EngineServers engine_servers {*rendering_server, *bullet_physics_server};
@@ -35,8 +37,12 @@ void LLShooter::init() {
     root_gui_node = std::make_unique<GUINode>(*rendering_server);
     auto text_node = std::make_unique<TextNode>(*rendering_server, std::make_shared<FreeTypeFont>("res/fonts/Ubuntu-Regular.ttf", 32));
     text_node->set_text("LLShooter");
-    text_node->set_position_offset({200.0f, 200.0f});
+    text_node->set_origin_x(TextNode::OriginX::LEFT);
+    text_node->set_origin_y(TextNode::OriginY::TOP);
+    text_node->set_position_offset({10.0f, 0.0f});
+    text_node->set_position_anchor({0.0f, 0.0f});
     root_gui_node->add_child(std::move(text_node));
+    fps_text = dynamic_cast<TextNode*>(root_gui_node->get_children().back().get());
 
     logger::info("Starting RGBE loading.");
     auto sky_panorama = texture_from_rgbe("res/textures/sky.hdr");
@@ -52,5 +58,7 @@ void LLShooter::init() {
     rendering_server->set_update_callback([&](float delta_time){
         bullet_physics_server->do_step(delta_time);
         root_node->update();
+        fps_meter->frame();
+        fps_text->set_text(fmt::format("{:.0f} FPS", fps_meter->get_fps()));
     });
 }

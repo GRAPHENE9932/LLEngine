@@ -8,6 +8,8 @@
 #include "common/Map.hpp"
 #include "nodes/core/gui/GUINode.hpp"
 
+class TextNode;
+
 class LLShooter {
 public:
     ~LLShooter();
@@ -21,6 +23,7 @@ private:
     std::unique_ptr<SpatialNode> root_node = nullptr;
     std::unique_ptr<GUINode> root_gui_node = nullptr;
     std::unique_ptr<FPSMeter> fps_meter = nullptr;
+    TextNode* fps_text = nullptr;
 
     void init();
     void add_weapon();
