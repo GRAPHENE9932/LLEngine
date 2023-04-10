@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <memory>
+#include <limits>
 #include <optional>
 
 class TextNode : public GUINode {
@@ -28,6 +29,13 @@ public:
         return color;
     }
 
+    void set_origin_x(OriginX new_origin_x) noexcept {
+        origin_x = new_origin_x;
+    }
+    void set_origin_y(OriginY new_origin_y) noexcept {
+        origin_y = new_origin_y;
+    }
+
     void draw() override;
 
 private:
@@ -38,7 +46,10 @@ private:
 
     std::optional<Mesh> mesh = std::nullopt;
     std::vector<std::reference_wrapper<const FreeTypeFont::FontChar>> chars;
-    std::int32_t min_x = 0, max_x = 0, min_y = 0, max_y = 0;
+    std::int32_t min_x = std::numeric_limits<std::int32_t>::max();
+    std::int32_t max_x = std::numeric_limits<std::int32_t>::min();
+    std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
+    std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
 
     [[nodiscard]] glm::vec2 get_origin() const;
 };
