@@ -30,6 +30,7 @@ set(SOURCES
     nodes/core/physics/bullet/BulletRigidBodyNode.cpp
     nodes/core/gui/GUINode.cpp
     nodes/core/gui/TextNode.cpp
+    nodes/core/gui/RectangularGUINode.cpp
     nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp
     structs/shapes/Shape.cpp

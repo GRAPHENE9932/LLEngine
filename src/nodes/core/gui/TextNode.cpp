@@ -80,6 +80,13 @@ void TextNode::draw() {
     }
 }
 
+[[nodiscard]] glm::vec2 TextNode::get_size() const {
+    return {
+        max_x - min_x,
+        max_y - min_y
+    };
+}
+
 [[nodiscard]] glm::vec2 TextNode::get_origin() const {
     glm::vec2 result;
 

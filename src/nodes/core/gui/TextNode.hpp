@@ -23,6 +23,8 @@ public:
     }
 
     void draw() override;
+    [[nodiscard]] virtual glm::vec2 get_size() const override;
+    [[nodiscard]] glm::vec2 get_origin() const override;
 
 private:
     std::shared_ptr<FreeTypeFont> font = nullptr;
@@ -34,6 +36,4 @@ private:
     std::int32_t max_x = std::numeric_limits<std::int32_t>::min();
     std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
     std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
-
-    [[nodiscard]] glm::vec2 get_origin() const;
 };
