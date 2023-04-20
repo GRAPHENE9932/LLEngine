@@ -25,7 +25,7 @@ static void initialize_glew() {
         throw std::runtime_error(
             fmt::format(
                 "Failed to initialize GLEW. Error code: {}. String: {}",
-                glew_init_res, glewGetErrorString(glew_init_res)
+                glew_init_res, reinterpret_cast<const char*>(glewGetErrorString(glew_init_res))
             )
         );
     }
