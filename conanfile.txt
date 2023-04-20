@@ -1,0 +1,15 @@
+[requires]
+glfw/3.3.8
+glew/2.2.0
+zstd/1.5.5
+bullet3/3.25
+nlohmann_json/3.11.2
+glm/cci.20230113
+fmt/9.1.0
+ktx/4.0.0
+freetype/2.13.0
+gtest/cci.20210126
+
+[generators]
+CMakeDeps
+CMakeToolchain
