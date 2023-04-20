@@ -4,7 +4,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
 
-TextNode::TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font) : GUINode(rs), font(font) {}
+TextNode::TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font) : RectangularGUINode(rs), font(font) {}
 
 void TextNode::set_text(std::string_view new_text) {
     // Do nothing if we don't have a font.
