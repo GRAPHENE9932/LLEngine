@@ -223,7 +223,7 @@ static int get_glfw_key_code(Key key) {
     case Key::NUMPAD_DOT: return GLFW_KEY_KP_DECIMAL;
     case Key::NUMPAD_DIVIDE: return GLFW_KEY_KP_DIVIDE;
     case Key::NUMPAD_MULTIPLY: return GLFW_KEY_KP_MULTIPLY;
-    case Key::NUMPAD_SUBSTRACT: return GLFW_KEY_KP_SUBTRACT;
+    case Key::NUMPAD_SUBTRACT: return GLFW_KEY_KP_SUBTRACT;
     case Key::NUMPAD_ADD: return GLFW_KEY_KP_ADD;
     case Key::NUMPAD_ENTER: return GLFW_KEY_KP_ENTER;
     case Key::NUMPAD_EQUAL: return GLFW_KEY_KP_EQUAL;
