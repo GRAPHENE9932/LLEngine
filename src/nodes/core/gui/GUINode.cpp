@@ -24,6 +24,12 @@ void GUINode::draw_children() {
     }
 }
 
+void GUINode::update_children() {
+    for (const auto& child_ptr : children) {
+        child_ptr->update();
+    }
+}
+
 void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
     child->parent = this;
     children.push_back(std::move(child));

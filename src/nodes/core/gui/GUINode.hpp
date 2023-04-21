@@ -44,7 +44,12 @@ public:
         draw_children();
     }
 
+    virtual void update() {
+        update_children();
+    }
+
     void draw_children();
+    void update_children();
 
 protected:
     RenderingServer& rs;
