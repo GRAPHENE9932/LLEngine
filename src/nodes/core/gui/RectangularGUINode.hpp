@@ -28,6 +28,11 @@ public:
      * @return glm::vec2 
      */
     [[nodiscard]] virtual glm::vec2 get_origin() const;
+    /**
+     * @param point The point position in screen (pixel) coordinates.
+     * (top left is 0, 0).
+     */
+    [[nodiscard]] bool contains_point(glm::vec2 point) const;
 
     OriginX origin_x = OriginX::LEFT;
     OriginY origin_y = OriginY::BOTTOM;
