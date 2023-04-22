@@ -34,6 +34,7 @@ public:
      */
     [[nodiscard]] bool contains_point(glm::vec2 point) const;
 
+protected:
     OriginX origin_x = OriginX::LEFT;
     OriginY origin_y = OriginY::BOTTOM;
 };
