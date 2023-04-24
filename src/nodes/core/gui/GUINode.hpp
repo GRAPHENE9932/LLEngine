@@ -40,9 +40,7 @@ public:
         return children;
     }
 
-    virtual void draw() {
-        draw_children();
-    }
+    virtual void draw() {}
 
     virtual void update() {
         update_children();

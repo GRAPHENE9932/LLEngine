@@ -13,6 +13,7 @@ set(SOURCES
     common/core/GLFWWindow.cpp
     common/core/VkFormatInfo.cpp
     common/core/FreeTypeFont.cpp
+    common/core/GUITexture.hpp
     common/core/shaders/PBRShaderManager.cpp
     common/core/shaders/ColoredTextShader.cpp
     common/core/shaders/SkyboxShader.cpp
@@ -21,6 +22,7 @@ set(SOURCES
     common/core/shaders/IrradiancePrecomputerShader.cpp
     common/core/shaders/SpecularPrefilterShader.cpp
     common/core/shaders/BRDFIntegrationMapperShader.cpp
+    common/core/shaders/GUIRectangleShader.cpp
     nodes/core/rendering/DrawableNode.cpp
     nodes/core/rendering/CameraNode.cpp
     nodes/core/rendering/PBRDrawableNode.cpp
@@ -31,6 +33,7 @@ set(SOURCES
     nodes/core/gui/GUINode.cpp
     nodes/core/gui/TextNode.cpp
     nodes/core/gui/RectangularGUINode.cpp
+    nodes/core/gui/ButtonNode.cpp
     nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp
     structs/shapes/Shape.cpp

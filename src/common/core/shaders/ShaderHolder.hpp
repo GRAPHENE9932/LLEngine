@@ -7,6 +7,7 @@
 #include "IrradiancePrecomputerShader.hpp"
 #include "SpecularPrefilterShader.hpp"
 #include "BRDFIntegrationMapperShader.hpp"
+#include "GUIRectangleShader.hpp"
 
 /**
  * @brief Stores all kinds of shaders and shader managers.
@@ -43,6 +44,10 @@ public:
         return skybox_shader.get();
     }
 
+    [[nodiscard]] GUIRectangleShader& get_gui_rectangle_shader() {
+        return gui_rectangle_shader.get();
+    }
+
 private:
     template<typename T>
     class LazyShader {
@@ -65,4 +70,5 @@ private:
     LazyShader<SpecularPrefilterShader> specular_prefilter_shader;
     LazyShader<PBRShaderManager> pbr_shader_manager;
     LazyShader<SkyboxShader> skybox_shader;
+    LazyShader<GUIRectangleShader> gui_rectangle_shader;
 };

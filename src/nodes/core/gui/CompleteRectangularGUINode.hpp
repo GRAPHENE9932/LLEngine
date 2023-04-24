@@ -2,6 +2,8 @@
 
 class CompleteRectangularGUINode : public RectangularGUINode {
 public:
+    CompleteRectangularGUINode(RenderingServer& rs) : RectangularGUINode(rs) {}
+
     void set_size(glm::vec2 new_size) {
         size = new_size;
     }

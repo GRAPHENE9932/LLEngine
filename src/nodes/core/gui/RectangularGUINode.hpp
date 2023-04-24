@@ -1,6 +1,11 @@
 #pragma once
 
 #include "GUINode.hpp"
+#include "common/core/GUITexture.hpp"
+
+#include <glm/mat4x4.hpp>
+
+class GUITexture;
 
 class RectangularGUINode : public GUINode {
 public:
@@ -37,4 +42,12 @@ public:
 protected:
     OriginX origin_x = OriginX::LEFT;
     OriginY origin_y = OriginY::BOTTOM;
+
+    void draw_rectangle(const GUITexture& texture);
+
+private:
+    void draw_texture_part(
+        const Texture& texture, glm::vec2 pos_offset_in_px, glm::vec2 tex_offset_in_px,
+        glm::vec2 quad_size_in_px, glm::vec2 tex_part_size_in_px
+    );
 };

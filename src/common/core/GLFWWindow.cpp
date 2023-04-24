@@ -4,6 +4,11 @@
 #include <GLFW/glfw3.h> // Various GLFW functions and constants.
 #include <fmt/format.h>
 
+#include <map>
+#include <algorithm>
+
+std::map<GLFWwindow*, GLFWWindow*> window_to_wrapper_map;
+
 size_t GLFWWindow::glfw_windows_count = 0;
 
 static void handle_glfw_error() {
@@ -69,6 +74,7 @@ GLFWWindow::GLFWWindow(glm::ivec2 extents, std::string_view title,
         handle_glfw_error();
 
     glfwMakeContextCurrent(glfw_window);
+    glfwSwapInterval(0);
 
     if (glfw_windows_count == 0) {
         initialize_glew();
@@ -76,6 +82,23 @@ GLFWWindow::GLFWWindow(glm::ivec2 extents, std::string_view title,
     }
 
     glfw_windows_count++;
+    window_to_wrapper_map[glfw_window] = this;
+    glfwSetMouseButtonCallback(glfw_window, mouse_button_callback);
+}
+
+void GLFWWindow::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    GLFWWindow* wrapper = window_to_wrapper_map[window];
+
+    if (action == GLFW_PRESS) {
+        wrapper->pressed_mouse_buttons.push_back(button);
+    }
+    else if (action == GLFW_RELEASE) {
+        wrapper->pressed_mouse_buttons.erase(std::find(
+            wrapper->pressed_mouse_buttons.begin(),
+            wrapper->pressed_mouse_buttons.end(),
+            static_cast<std::uint8_t>(button)
+        ));
+    }
 }
 
 GLFWWindow::~GLFWWindow() {
@@ -83,6 +106,7 @@ GLFWWindow::~GLFWWindow() {
         glfwDestroyWindow(glfw_window);
 
         glfw_windows_count--;
+        window_to_wrapper_map.erase(glfw_window);
         if (glfw_windows_count == 0)
             terminate_glfw();
     }
@@ -97,7 +121,7 @@ bool GLFWWindow::window_should_close() const {
 }
 
 void GLFWWindow::disable_cursor() {
-    glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 glm::dvec2 GLFWWindow::get_cursor_position() const {
@@ -113,7 +137,7 @@ glm::ivec2 GLFWWindow::get_window_size() const {
 }
 
 void GLFWWindow::set_cursor_position(const glm::dvec2& new_position) {
-    glfwSetCursorPos(glfw_window, new_position.x, new_position.y);
+    //glfwSetCursorPos(glfw_window, new_position.x, new_position.y);
 }
 
 static int get_glfw_key_code(Key key) {
@@ -242,4 +266,12 @@ static int get_glfw_key_code(Key key) {
 
 bool GLFWWindow::is_key_pressed(Key key) const {
     return glfwGetKey(glfw_window, get_glfw_key_code(key)) == GLFW_PRESS;
+}
+
+[[nodiscard]] bool GLFWWindow::is_mouse_button_pressed(std::uint8_t button) const {
+    return std::find(
+        pressed_mouse_buttons.begin(),
+        pressed_mouse_buttons.end(),
+        button
+    ) != pressed_mouse_buttons.end();
 }

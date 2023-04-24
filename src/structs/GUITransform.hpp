@@ -34,4 +34,10 @@ struct GUITransform {
         result.y = -result.y;
         return glm::vec3(result, z_coordinate);
     }
+
+    [[nodiscard]] glm::u32vec2 to_screen_coordinates(glm::u32vec2 viewport_size) const noexcept {
+        glm::u32vec2 result {position_offset};
+        result += position_anchor * static_cast<glm::vec2>(viewport_size);
+        return result;
+    }
 };
