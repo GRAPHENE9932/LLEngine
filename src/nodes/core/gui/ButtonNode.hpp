@@ -1,11 +1,11 @@
 #pragma once
 
 #include "common/core/GUITexture.hpp"
-#include "CompleteRectangularGUINode.hpp"
+#include "CompleteGUINode.hpp"
 
-class ButtonNode : public CompleteRectangularGUINode {
+class ButtonNode : public CompleteGUINode {
 public:
-    explicit ButtonNode(RenderingServer& rs) : CompleteRectangularGUINode(rs) {};
+    explicit ButtonNode(RenderingServer& rs) : CompleteGUINode(rs) {};
 
     void draw() override;
     void update() override;

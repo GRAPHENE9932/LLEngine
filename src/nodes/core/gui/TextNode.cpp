@@ -1,10 +1,39 @@
 #include "TextNode.hpp"
 #include "RenderingServer.hpp"
+#include "utils/math.hpp"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
 
-TextNode::TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font) : RectangularGUINode(rs), font(font) {}
+TextNode::TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font) : GUINode(rs), font(font) {}
+
+[[nodiscard]] GUITransform TextNode::get_transform() const {
+    return {
+        position_anchor,
+        position_offset,
+        z_coordinate,
+        origin_x,
+        origin_y,
+        GUITransform::SizeMode::ABSOLUTE,
+        get_absolute_size()
+    };
+}
+
+[[nodiscard]] glm::vec2 TextNode::get_absolute_size() const {
+    return {
+        max_x - min_x,
+        max_y - min_y
+    };
+}
+
+void TextNode::set_transform(const GUITransform& transform) {
+    this->position_anchor = transform.position_anchor;
+    this->position_offset = transform.position_offset;
+    this->z_coordinate = transform.z_coordinate;
+    this->origin_x = transform.origin_x;
+    this->origin_y = transform.origin_y;
+    // We can't modify the size, because it depends on the text and font.
+}
 
 void TextNode::set_text(std::string_view new_text) {
     // Do nothing if we don't have a font.
@@ -61,14 +90,12 @@ void TextNode::draw() {
     draw_children();
 
     const glm::vec2 window_size {rs.get_window().get_window_size()};
-    const glm::vec2 pixels_to_opengl_scale {2.0f / window_size};
-    const glm::vec2 relative_origin_in_pixels {get_origin()};
-    const glm::vec3 relative_origin_opengl {relative_origin_in_pixels * pixels_to_opengl_scale, 0.0};
-    const glm::vec3 absolute_position_opengl {
-        get_absolute_transform().to_opengl_position(rs.get_window().get_window_size()) - relative_origin_opengl
-    };
+    glm::vec3 absolute_position_in_pixels {get_screen_space_position()};
+    absolute_position_in_pixels.y += get_absolute_size().y;
+    const glm::vec3 absolute_position_opengl {math_utils::scr_space_pos_to_gl_space(absolute_position_in_pixels, window_size)};
 
-    const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(glm::vec3(pixels_to_opengl_scale, 1.0f))};
+    const glm::vec3 pixels_to_opengl_scale {2.0f / window_size, 1.0f};
+    const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(pixels_to_opengl_scale)};
 
     rs.get_shader_holder().get_colored_text_shader().use_shader(mvp, get_color());
     glActiveTexture(GL_TEXTURE0);
@@ -78,41 +105,4 @@ void TextNode::draw() {
         glDrawArrays(GL_TRIANGLES, char_i * 6, 6);
         mesh->unbind_vao();
     }
-}
-
-[[nodiscard]] glm::vec2 TextNode::get_size() const {
-    return {
-        max_x - min_x,
-        max_y - min_y
-    };
-}
-
-[[nodiscard]] glm::vec2 TextNode::get_origin() const {
-    glm::vec2 result;
-
-    switch (origin_x) {
-    case OriginX::LEFT:
-        result.x = min_x;
-        break;
-    case OriginX::CENTER:
-        result.x = std::lerp(min_x, max_x, 0.5f);
-        break;
-    case OriginX::RIGHT:
-        result.x = max_x;
-        break;
-    }
-
-    switch (origin_y) {
-    case OriginY::BOTTOM:
-        result.y = min_y;
-        break;
-    case OriginY::CENTER:
-        result.y = std::lerp(min_y, max_y, 0.5f);
-        break;
-    case OriginY::TOP:
-        result.y = max_y;
-        break;
-    }
-
-    return result;
 }

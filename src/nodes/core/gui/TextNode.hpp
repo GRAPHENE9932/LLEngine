@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/core/Mesh.hpp"
-#include "RectangularGUINode.hpp"
+#include "GUINode.hpp"
 #include "common/core/FreeTypeFont.hpp"
 
 #include <vector>
@@ -9,9 +9,13 @@
 #include <limits>
 #include <optional>
 
-class TextNode : public RectangularGUINode {
+class TextNode : public GUINode {
 public:
     TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font);
+
+    [[nodiscard]] GUITransform get_transform() const override;
+    [[nodiscard]] glm::vec2 get_absolute_size() const override;
+    void set_transform(const GUITransform& transform) override;
 
     void set_text(std::string_view new_text);
     void set_color(const glm::vec3& new_color) noexcept {
@@ -23,10 +27,14 @@ public:
     }
 
     void draw() override;
-    [[nodiscard]] virtual glm::vec2 get_size() const override;
-    [[nodiscard]] glm::vec2 get_origin() const override;
 
 private:
+    glm::vec2 position_anchor {0.0f, 0.0f};
+    glm::vec2 position_offset {0.0f, 0.0f};
+    float z_coordinate {0.0f};
+    GUITransform::OriginX origin_x = GUITransform::OriginX::LEFT;
+    GUITransform::OriginY origin_y = GUITransform::OriginY::BOTTOM;
+
     std::shared_ptr<FreeTypeFont> font = nullptr;
     glm::vec3 color = {0.0f, 0.0f, 0.0f};
 

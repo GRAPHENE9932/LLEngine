@@ -31,8 +31,8 @@ set(SOURCES
     nodes/core/rendering/SpectatorCameraNode.cpp
     nodes/core/physics/bullet/BulletRigidBodyNode.cpp
     nodes/core/gui/GUINode.cpp
+    nodes/core/gui/CompleteGUINode.cpp
     nodes/core/gui/TextNode.cpp
-    nodes/core/gui/RectangularGUINode.cpp
     nodes/core/gui/ButtonNode.cpp
     nodes/core/CompleteSpatialNode.cpp
     nodes/core/SpatialNode.cpp

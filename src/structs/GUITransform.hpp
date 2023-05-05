@@ -4,40 +4,42 @@
 #include <glm/vec3.hpp>
 
 struct GUITransform {
+    enum class SizeMode : std::uint8_t {
+        ABSOLUTE, RELATIVE
+    };
+    enum class OriginX : std::uint8_t {
+        LEFT, CENTER, RIGHT
+    };
+    enum class OriginY : std::uint8_t {
+        BOTTOM, CENTER, TOP
+    };
+
     glm::vec2 position_anchor {0.0f, 0.0f}; // (0, 0) is left-top, (1, 1) is right-bottom.
     glm::vec2 position_offset {0.0f, 0.0f}; // Offset from anchor in pixels.
     float z_coordinate {0.0f};
+    OriginX origin_x = OriginX::LEFT;
+    OriginY origin_y = OriginY::BOTTOM;
+    SizeMode size_mode = SizeMode::ABSOLUTE;
+    glm::vec2 size {0.0f, 0.0f};
 
-    /**
-     * @brief Combines multiple transforms similarly to
-     * matrix multiplication. Keep in mind that transformation
-     * order is opposite to operand order, just like in
-     * matrix multiplication.
-     */
-    const GUITransform& operator*=(const GUITransform& other) noexcept {
-        position_anchor += (1.0f - position_anchor) * other.position_anchor;
-        position_offset += other.position_offset;
-        z_coordinate += other.z_coordinate;
-        return *this;
-    }
+    [[nodiscard]] glm::vec3 get_screen_space_offset(glm::vec2 parent_size) const noexcept {
+        glm::vec2 result_vec2 {position_offset};
+        result_vec2 += position_anchor * static_cast<glm::vec2>(parent_size);
 
-    GUITransform operator*(const GUITransform& other) const noexcept {
-        GUITransform result(*this);
-        result *= other;
-        return result;
-    }
+        if (origin_x == OriginX::CENTER) {
+            result_vec2.x -= size.x / 2.0f;
+        }
+        else if (origin_x == OriginX::RIGHT) {
+            result_vec2.x -= size.x;
+        }
 
-    [[nodiscard]] glm::vec3 to_opengl_position(glm::u32vec2 viewport_size) const noexcept {
-        glm::vec2 result {position_anchor};
-        result += glm::vec2(position_offset / glm::vec2(viewport_size));
-        result = result * 2.0f - 1.0f; // Go from [0; 1] range to [-1; 1].
-        result.y = -result.y;
-        return glm::vec3(result, z_coordinate);
-    }
+        if (origin_y == OriginY::CENTER) {
+            result_vec2.y -= size.y / 2.0f;
+        }
+        else if (origin_y == OriginY::BOTTOM) {
+            result_vec2.y -= size.y;
+        }
 
-    [[nodiscard]] glm::u32vec2 to_screen_coordinates(glm::u32vec2 viewport_size) const noexcept {
-        glm::u32vec2 result {position_offset};
-        result += position_anchor * static_cast<glm::vec2>(viewport_size);
-        return result;
+        return {result_vec2, z_coordinate};
     }
 };
