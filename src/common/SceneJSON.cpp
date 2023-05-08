@@ -5,7 +5,7 @@
 
 #include <nlohmann/json.hpp> // nlohmann::json
 
-#include "Map.hpp" // Map
+#include "SceneJSON.hpp"
 #include "RenderingServer.hpp" // RenderingServer
 #include "utils/json_conversion.hpp" // get_optional
 #include "nodes/core/CompleteSpatialNode.hpp"
@@ -16,7 +16,7 @@ using json = nlohmann::json;
 
 constexpr uint32_t CURRENT_MAP_VERSION = 1;
 
-Map::Map(const std::string& json_path) {
+SceneJSON::SceneJSON(const std::string& json_path) {
     // Parse JSON.
     std::ifstream stream(json_path);
     json_map = json::parse(stream);
@@ -64,7 +64,7 @@ std::unique_ptr<SpectatorCameraNode> player_to_node(RenderingServer& rs, const j
     return result;
 }
 
-std::unique_ptr<SpatialNode> Map::to_node(EngineServers& servers, const json& json_node) const {
+std::unique_ptr<SpatialNode> SceneJSON::to_node(EngineServers& servers, const json& json_node) const {
     std::unique_ptr<SpatialNode> result;
     std::string type = json_node.at("type").get<std::string>();
     if (type == "scene_file") {
@@ -99,6 +99,6 @@ std::unique_ptr<SpatialNode> Map::to_node(EngineServers& servers, const json& js
     return result;
 }
 
-std::unique_ptr<SpatialNode> Map::to_node(EngineServers& servers) const {
+std::unique_ptr<SpatialNode> SceneJSON::to_node(EngineServers& servers) const {
     return to_node(servers, json_map.at("root_node"));
 }

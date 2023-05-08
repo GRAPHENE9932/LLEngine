@@ -2,7 +2,7 @@ set(SOURCES
     LLShooter.cpp
     RenderingServer.cpp
     BulletPhysicsServer.cpp
-    common/Map.cpp
+    common/SceneJSON.cpp
     common/FPSMeter.cpp
     common/core/logger.cpp
     common/core/Mesh.cpp

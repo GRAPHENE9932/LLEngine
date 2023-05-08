@@ -5,7 +5,7 @@
 #include "common/FPSMeter.hpp"
 #include "BulletPhysicsServer.hpp"
 #include "RenderingServer.hpp"
-#include "common/Map.hpp"
+#include "common/SceneJSON.hpp"
 #include "nodes/core/gui/GUINode.hpp"
 
 class TextNode;

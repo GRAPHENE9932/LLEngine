@@ -32,7 +32,7 @@ void LLShooter::init() {
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
     fps_meter = std::make_unique<FPSMeter>(1.0f);
 
-    Map map("res/maps/map_close.json");
+    SceneJSON map("res/maps/map_close.json");
     EngineServers engine_servers {*rendering_server, *bullet_physics_server};
     root_node = map.to_node(engine_servers);
 
