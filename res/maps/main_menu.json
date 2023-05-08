@@ -1,6 +1,6 @@
 {
 	"version": 1,
-	"name": "map_columns",
+	"name": "main_menu",
 	"scene_files": [
 		"res/meshes/level_0.glb"
 	],
