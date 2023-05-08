@@ -8,10 +8,10 @@
 #include "common/core/SceneFile.hpp" // SceneFile
 #include "nodes/core/SpatialNode.hpp" // SpatialNode
 
-class Map {
+class Map : public SceneFile {
 public:
     explicit Map(const std::string& json_path);
-    std::unique_ptr<SpatialNode> to_node(EngineServers& servers) const;
+    std::unique_ptr<SpatialNode> to_node(EngineServers& servers) const override;
 
 private:
     std::vector<std::unique_ptr<SceneFile>> scene_files;

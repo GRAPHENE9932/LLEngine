@@ -25,7 +25,7 @@ Map::Map(const std::string& json_path) {
     if (json_map.at("version") != CURRENT_MAP_VERSION)
         throw std::runtime_error("Invalid map version");
 
-    // Load all glTF files.
+    // Load all external scene files.
     if (json_map.contains("scene_files")) {
         scene_files.reserve(json_map["scene_files"].size());
         for (const json& cur_file_path : json_map["scene_files"])
