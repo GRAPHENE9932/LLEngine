@@ -1,5 +1,4 @@
-# The game is under development.
-Really under development, it is unplayable.
+# The engine is under development.
 
 ## Currently implemented technical features:
 - Rendering with OpenGL.
@@ -11,3 +10,4 @@ Really under development, it is unplayable.
 - KTX2 texture loading (including cubemaps).
 - Radiance RGBE (.hdr) texture loading.
 - PBR shading.
+- FreeType font loading and text rendering.
