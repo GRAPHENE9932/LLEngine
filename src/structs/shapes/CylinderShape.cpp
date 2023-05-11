@@ -1,4 +1,4 @@
-#include "CylinderShape.hpp"
+#include "physics/shapes/CylinderShape.hpp"
 #include "utils/glm_bullet_conversion.hpp"
 
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>

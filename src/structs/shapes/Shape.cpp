@@ -1,4 +1,4 @@
-#include "Shape.hpp"
+#include "physics/shapes/Shape.hpp"
 
 #include <bullet/btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>

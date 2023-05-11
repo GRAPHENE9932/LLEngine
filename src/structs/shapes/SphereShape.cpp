@@ -1,4 +1,4 @@
-#include "SphereShape.hpp"
+#include "physics/shapes/SphereShape.hpp"
 #include "utils/glm_bullet_conversion.hpp"
 
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>

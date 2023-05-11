@@ -1,4 +1,4 @@
-#include "texture_tools.hpp"
+#include "rendering/texture_tools.hpp"
 
 #include <ktx.h>
 #include <fmt/format.h>

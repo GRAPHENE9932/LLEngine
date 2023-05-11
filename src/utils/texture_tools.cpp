@@ -1,6 +1,6 @@
-#include "texture_tools.hpp"
+#include "rendering/texture_tools.hpp"
 #include "primitive_meshes.hpp"
-#include "RenderingServer.hpp"
+#include "rendering/RenderingServer.hpp"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/transform.hpp>
