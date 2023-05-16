@@ -1,18 +1,18 @@
-#include "rendering/texture_tools.hpp"
+#include "rendering/Texture.hpp"
 #include "primitive_meshes.hpp"
-#include "rendering/RenderingServer.hpp"
+#include "rendering/shaders/BRDFIntegrationMapperShader.hpp"
+#include "rendering/shaders/EquirectangularMapperShader.hpp"
+#include "rendering/shaders/IrradiancePrecomputerShader.hpp"
+#include "rendering/shaders/SpecularPrefilterShader.hpp"
 
-#include <glm/mat4x4.hpp>
 #include <glm/gtx/transform.hpp>
-#include <ktx.h>
-#include <fmt/format.h>
+#include <glm/mat4x4.hpp>
 
 #include <array>
-#include <cstdio>
 
 auto draw_to_cubemap(
     glm::i32vec2 cubemap_size, std::int32_t mipmap_levels, std::invocable<const glm::mat4&, std::int32_t> auto&& drawing_function
-) -> std::unique_ptr<Texture> {
+) -> Texture {
     const glm::mat4 proj_matrix {glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f)};
     const std::array<glm::mat4, 6> mvp_matrices {
         proj_matrix * glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
@@ -78,19 +78,19 @@ auto draw_to_cubemap(
         original_viewport_params[2], original_viewport_params[3]
     );
 
-    return std::make_unique<Texture>(cubemap_id, cubemap_size, true);
+    return Texture(cubemap_id, cubemap_size, true);
 }
 
-std::unique_ptr<Texture> panorama_to_cubemap(const Texture& panorama, EquirectangularMapperShader& shader) {
-    if (panorama.is_cubemap()) {
+Texture Texture::panorama_to_cubemap(EquirectangularMapperShader& shader) const {
+    if (is_cubemap()) {
         throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
     }
 
-    const glm::u32vec2 cubemap_size {panorama.get_size().x / 2u};
+    const glm::u32vec2 cubemap_size {get_size().x / 2u};
     const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
 
     return draw_to_cubemap(cubemap_size, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
-        shader.use_shader(mvp, panorama);
+        shader.use_shader(mvp, *this);
 
         cube_mesh->bind_vao(false, false, false);
         
@@ -102,15 +102,15 @@ std::unique_ptr<Texture> panorama_to_cubemap(const Texture& panorama, Equirectan
 }
 
 constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {16u, 16u};
-std::unique_ptr<Texture> compute_irradiance_map(const Texture& environment_map, IrradiancePrecomputerShader& shader) {
-    if (!environment_map.is_cubemap()) {
+Texture Texture::compute_irradiance_map(IrradiancePrecomputerShader& shader) const {
+    if (!is_cubemap()) {
         throw std::runtime_error("Unable to compute irradiance map because the given environment map is not cubemap.");
     }
 
     const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
     
     return draw_to_cubemap(IRRADIANCE_MAP_SIZE, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
-        shader.use_shader(mvp, environment_map);
+        shader.use_shader(mvp, *this);
 
         cube_mesh->bind_vao(false, false, false);
 
@@ -123,8 +123,8 @@ std::unique_ptr<Texture> compute_irradiance_map(const Texture& environment_map, 
 
 constexpr glm::u32vec2 SPECULAR_MAP_SIZE {256u, 256u};
 constexpr std::int32_t SPECULAR_MAP_MIPMAP_LEVELS = 9; // log2(256) + 1. Also change LAST_PREFILTERED_MIPMAP_LEVEL in pbr_shader.frag.
-std::unique_ptr<Texture> prefilter_specular_map(const Texture& environment_map, SpecularPrefilterShader& shader) {
-    if (!environment_map.is_cubemap()) {
+Texture Texture::compute_prefiltered_specular_map(SpecularPrefilterShader& shader) const {
+    if (!is_cubemap()) {
         throw std::runtime_error("Unable to compute specular map because the given environment map is not cubemap.");
     }
 
@@ -132,7 +132,7 @@ std::unique_ptr<Texture> prefilter_specular_map(const Texture& environment_map, 
     
     return draw_to_cubemap(SPECULAR_MAP_SIZE, SPECULAR_MAP_MIPMAP_LEVELS, [&] (const glm::mat4& mvp, std::int32_t level) {
         float roughness = static_cast<float>(level) / (SPECULAR_MAP_MIPMAP_LEVELS - 1);
-        shader.use_shader(mvp, roughness, environment_map);
+        shader.use_shader(mvp, roughness, *this);
 
         cube_mesh->bind_vao(false, false, false);
 
@@ -144,7 +144,7 @@ std::unique_ptr<Texture> prefilter_specular_map(const Texture& environment_map, 
 }
 
 constexpr glm::u32vec2 BRDF_INTEGRATION_MAP_SIZE = SPECULAR_MAP_SIZE;
-std::unique_ptr<Texture> compute_brdf_integration_map(BRDFIntegrationMapperShader& shader) {
+Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shader) {
     const auto& quad_mesh = primitives::get_quad(); // Alias the cube.
 
     // Create and allocate the texture.
@@ -194,5 +194,5 @@ std::unique_ptr<Texture> compute_brdf_integration_map(BRDFIntegrationMapperShade
         original_viewport_params[2], original_viewport_params[3]
     );
 
-    return std::make_unique<Texture>(texture_id, BRDF_INTEGRATION_MAP_SIZE, false);
+    return Texture(texture_id, BRDF_INTEGRATION_MAP_SIZE, false);
 }

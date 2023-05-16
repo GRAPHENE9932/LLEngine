@@ -41,17 +41,17 @@ set(SOURCES
     src/rendering/GLTFLoading.cpp
     src/rendering/RenderingServer.cpp
     src/rendering/GLTFToNode.cpp
+    src/rendering/Texture.cpp
+    src/rendering/TextureFromKTX.cpp
+    src/rendering/TextureFromRGBE.cpp
     src/uninitialized_error.hpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/json_conversion.hpp
-    src/utils/rgbe_loader.cpp
     src/utils/shader_loader.hpp
     src/utils/Channel.hpp
     src/utils/shader_loader.cpp
     src/utils/glm_bullet_conversion.hpp
-    src/utils/texture_tools.cpp
     src/utils/math.hpp
-    src/utils/ktx_loader.cpp
     src/utils/primitive_meshes.cpp
     src/structs/shapes/SphereShape.cpp
     src/structs/shapes/CylinderShape.cpp
@@ -99,7 +99,6 @@ set(PUBLIC_HEADERS
     include/LLEngine/rendering/Texture.hpp
     include/LLEngine/rendering/Mesh.hpp
     include/LLEngine/rendering/GLFWWindow.hpp
-    include/LLEngine/rendering/texture_tools.hpp
     include/LLEngine/rendering/Material.hpp
     include/LLEngine/rendering/Window.hpp
     include/LLEngine/Transform.hpp

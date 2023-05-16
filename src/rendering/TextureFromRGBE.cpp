@@ -1,4 +1,4 @@
-#include "rendering/texture_tools.hpp"
+#include "rendering/Texture.hpp"
 
 #include <fmt/format.h>
 
@@ -369,7 +369,7 @@ parse_header_variable(std::string_view line_with_variable) {
     }};
 }
 
-std::unique_ptr<Texture> texture_from_rgbe(const TexLoadingParams& params) {
+Texture Texture::from_rgbe(const TexLoadingParams& params) {
     std::ifstream stream(params.file_path, std::ios::binary | std::ios::in);
     if (!stream) {
         throw TextureLoadingError(fmt::format(
@@ -440,5 +440,5 @@ std::unique_ptr<Texture> texture_from_rgbe(const TexLoadingParams& params) {
     tex_size = {x_resolution, y_resolution};
     is_cubemap = false;
 
-    return std::make_unique<Texture>(texture_id, tex_size, is_cubemap);
+    return Texture(texture_id, tex_size, is_cubemap);
 }

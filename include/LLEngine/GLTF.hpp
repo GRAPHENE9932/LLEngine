@@ -16,7 +16,6 @@
 #include "rendering/Texture.hpp" // Texture::Parameters
 #include "rendering/Material.hpp" // BasicMaterial
 #include "SceneFile.hpp" // SceneFile
-#include "rendering/texture_tools.hpp"
 
 class GLTF : public SceneFile {
 public:

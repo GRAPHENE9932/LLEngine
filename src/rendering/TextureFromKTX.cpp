@@ -1,4 +1,4 @@
-#include "rendering/texture_tools.hpp"
+#include "rendering/Texture.hpp"
 
 #include <ktx.h>
 #include <fmt/format.h>
@@ -141,7 +141,7 @@ std::string ktx_error_to_string(KTX_error_code error) {
     return data;
 }
 
-std::unique_ptr<Texture> texture_from_ktx2(const TexLoadingParams& params) {
+Texture Texture::from_ktx2(const TexLoadingParams& params) {
     KTXTextureWrapper ktx_texture;
     KTX_error_code error;
 
@@ -186,11 +186,11 @@ std::unique_ptr<Texture> texture_from_ktx2(const TexLoadingParams& params) {
         ));
     }
     
-    std::unique_ptr<Texture> texture {std::make_unique<Texture>(
+    Texture texture {
         texture_id,
         glm::u32vec2(ktx_texture.get()->baseWidth, ktx_texture.get()->baseHeight),
         ktx_texture.get()->isCubemap
-    )};
+    };
     glBindTexture(tex_target, texture_id);
     glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
     glTexParameteri(tex_target, GL_TEXTURE_MIN_FILTER, params.minification_filter);

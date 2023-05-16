@@ -6,7 +6,6 @@
 #include "nodes/rendering/CameraNode.hpp"
 #include "nodes/rendering/DrawableNode.hpp" // DrawableNode
 #include "nodes/gui/GUINode.hpp"
-#include "rendering/texture_tools.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -165,7 +164,7 @@ RenderingServer::get_irradiance_map(const glm::vec3& obj_position) {
     }
     if (!irradiance_map) {
         logger::info("Starting computing the irradiance map.");
-        irradiance_map = compute_irradiance_map(env_cubemap->get(), shader_holder.get_irradiance_precomputer_shader());
+        irradiance_map = env_cubemap->get().compute_irradiance_map(shader_holder.get_irradiance_precomputer_shader());
         logger::info("Finished computing the irradiance map.");
     }
     return *irradiance_map;
@@ -180,7 +179,7 @@ RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
     }
     if (!prefiltered_specular_map) {
         logger::info("Starting computing the prefiltered specular map.");
-        prefiltered_specular_map = prefilter_specular_map(env_cubemap->get(), shader_holder.get_specular_prefilter_shader());
+        prefiltered_specular_map = env_cubemap->get().compute_prefiltered_specular_map(shader_holder.get_specular_prefilter_shader());
         logger::info("Finished computing the prefiltered specular map.");
     }
     return *prefiltered_specular_map;
@@ -189,7 +188,7 @@ RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
 const Texture& RenderingServer::get_brdf_integration_map() {
     if (!brdf_integration_map) {
         logger::info("Starting computing the BRDF integration map.");
-        brdf_integration_map = compute_brdf_integration_map(shader_holder.get_brdf_integration_mapper_shader());
+        brdf_integration_map = Texture::compute_brdf_integration_map(shader_holder.get_brdf_integration_mapper_shader());
         logger::info("Finished computing the BRDF integration map.");
     }
     return *brdf_integration_map;

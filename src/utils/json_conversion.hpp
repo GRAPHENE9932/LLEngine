@@ -7,6 +7,8 @@
 #include <glm/gtc/quaternion.hpp> // glm::quat
 #include <nlohmann/json.hpp> // nlohmann::json
 
+#include <optional>
+
 template<typename T>
 std::optional<T> get_optional(const nlohmann::json& upper_json, const std::string& name) {
     if (upper_json.contains(name))

@@ -169,9 +169,9 @@ private:
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
     std::unique_ptr<Skybox> skybox = nullptr;
-    std::unique_ptr<Texture> irradiance_map = nullptr;
-    std::unique_ptr<Texture> prefiltered_specular_map = nullptr;
-    std::unique_ptr<Texture> brdf_integration_map = nullptr;
+    std::optional<Texture> irradiance_map = std::nullopt;
+    std::optional<Texture> prefiltered_specular_map = std::nullopt;
+    std::optional<Texture> brdf_integration_map = std::nullopt;
     std::vector<DrawableNode*> drawable_nodes;
     std::vector<GUINode*> gui_nodes;
     std::vector<PointLightNode*> point_lights;
