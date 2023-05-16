@@ -1,7 +1,7 @@
 #include "nodes/gui/GUINode.hpp"
 #include "rendering/RenderingServer.hpp"
+#include "rendering/Mesh.hpp"
 #include "gui/GUITexture.hpp"
-#include "primitive_meshes.hpp"
 #include "utils/math.hpp"
 
 GUINode::GUINode(RenderingServer& rs) : rs(rs) {
@@ -76,7 +76,7 @@ void GUINode::draw_texture_part(
         texture, mvp, uv_scale, uv_offset, {1.0f, 1.0f, 1.0f, 1.0f}
     );
 
-    auto mesh = primitives::get_quad();
+    auto mesh = Mesh::get_quad();
     mesh->bind_vao(true, false, false);
     
     if (mesh->is_indexed()) {

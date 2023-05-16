@@ -2,7 +2,7 @@
 
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/RenderingServer.hpp" // RenderingServer
-#include "primitive_meshes.hpp"
+#include "rendering/Mesh.hpp"
 
 Skybox::Skybox(Skybox&& other) noexcept :
         Skybox(other.rs, other.cubemap_texture) {
@@ -13,7 +13,7 @@ Skybox::Skybox(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_text
     cubemap_texture(cubemap_texture), rs(rs) {};
 
 void Skybox::draw() {
-    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
+    const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
     // Uniforms.
     const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());

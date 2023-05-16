@@ -16,6 +16,7 @@ set(SOURCES
     src/rendering/VkFormatInfo.cpp
     src/rendering/GLFWWindow.cpp
     src/rendering/Mesh.cpp
+    src/rendering/MeshPrimitives.cpp
     src/rendering/Skybox.cpp
     src/rendering/shaders/EquirectangularMapperShader.hpp
     src/rendering/shaders/IrradiancePrecomputerShader.hpp
@@ -52,7 +53,6 @@ set(SOURCES
     src/utils/shader_loader.cpp
     src/utils/glm_bullet_conversion.hpp
     src/utils/math.hpp
-    src/utils/primitive_meshes.cpp
     src/structs/shapes/SphereShape.cpp
     src/structs/shapes/CylinderShape.cpp
     src/structs/shapes/BoxShape.cpp
@@ -108,7 +108,6 @@ set(PUBLIC_HEADERS
     include/LLEngine/physics/shapes/CylinderShape.hpp
     include/LLEngine/physics/BulletPhysicsServer.hpp
     include/LLEngine/SceneJSON.hpp
-    include/LLEngine/primitive_meshes.hpp
     include/LLEngine/node_registration.hpp
     include/LLEngine/Event.hpp
     include/LLEngine/SceneFile.hpp

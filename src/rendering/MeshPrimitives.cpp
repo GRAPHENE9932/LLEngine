@@ -1,4 +1,4 @@
-#include "primitive_meshes.hpp"
+#include "rendering/Mesh.hpp"
 
 #include <array>
 
@@ -141,7 +141,7 @@ constexpr std::array<glm::vec4, 24> CUBE_TANGENTS {
 };
 
 std::shared_ptr<Mesh> cached_cube = nullptr;
-std::shared_ptr<const Mesh> primitives::get_cube() {
+[[nodiscard]] std::shared_ptr<const Mesh> Mesh::get_cube() {
     if (!cached_cube) {
         cached_cube = std::make_shared<Mesh>();
         cached_cube->set_indices(std::vector(CUBE_INDEXES.begin(), CUBE_INDEXES.end()));
@@ -155,7 +155,7 @@ std::shared_ptr<const Mesh> primitives::get_cube() {
 }
 
 std::shared_ptr<Mesh> cached_skybox_cube = nullptr;
-std::shared_ptr<const Mesh> primitives::get_skybox_cube() {
+[[nodiscard]] std::shared_ptr<const Mesh> Mesh::get_skybox_cube() {
     if (!cached_skybox_cube) {
         cached_skybox_cube = std::make_shared<Mesh>();
         cached_skybox_cube->set_indices(std::vector(SKYBOX_CUBE_INDEXES.begin(), SKYBOX_CUBE_INDEXES.end()));
@@ -184,7 +184,7 @@ constexpr std::array<glm::vec2, 6> QUAD_UVS {
 };
 
 std::shared_ptr<Mesh> cached_quad = nullptr;
-std::shared_ptr<const Mesh> primitives::get_quad() {
+[[nodiscard]] std::shared_ptr<const Mesh> Mesh::get_quad() {
     if (!cached_quad) {
         cached_quad = std::make_shared<Mesh>();
         cached_quad->set_vertices(std::vector(QUAD_VERTICES.begin(), QUAD_VERTICES.end()));

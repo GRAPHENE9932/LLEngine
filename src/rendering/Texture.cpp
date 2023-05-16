@@ -1,9 +1,9 @@
 #include "rendering/Texture.hpp"
-#include "primitive_meshes.hpp"
 #include "rendering/shaders/BRDFIntegrationMapperShader.hpp"
 #include "rendering/shaders/EquirectangularMapperShader.hpp"
 #include "rendering/shaders/IrradiancePrecomputerShader.hpp"
 #include "rendering/shaders/SpecularPrefilterShader.hpp"
+#include "rendering/Mesh.hpp"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
@@ -87,7 +87,7 @@ Texture Texture::panorama_to_cubemap(EquirectangularMapperShader& shader) const 
     }
 
     const glm::u32vec2 cubemap_size {get_size().x / 2u};
-    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
+    const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
     return draw_to_cubemap(cubemap_size, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
         shader.use_shader(mvp, *this);
@@ -107,7 +107,7 @@ Texture Texture::compute_irradiance_map(IrradiancePrecomputerShader& shader) con
         throw std::runtime_error("Unable to compute irradiance map because the given environment map is not cubemap.");
     }
 
-    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
+    const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
     
     return draw_to_cubemap(IRRADIANCE_MAP_SIZE, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
         shader.use_shader(mvp, *this);
@@ -128,7 +128,7 @@ Texture Texture::compute_prefiltered_specular_map(SpecularPrefilterShader& shade
         throw std::runtime_error("Unable to compute specular map because the given environment map is not cubemap.");
     }
 
-    const auto& cube_mesh = primitives::get_skybox_cube(); // Alias the cube.
+    const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
     
     return draw_to_cubemap(SPECULAR_MAP_SIZE, SPECULAR_MAP_MIPMAP_LEVELS, [&] (const glm::mat4& mvp, std::int32_t level) {
         float roughness = static_cast<float>(level) / (SPECULAR_MAP_MIPMAP_LEVELS - 1);
@@ -145,7 +145,7 @@ Texture Texture::compute_prefiltered_specular_map(SpecularPrefilterShader& shade
 
 constexpr glm::u32vec2 BRDF_INTEGRATION_MAP_SIZE = SPECULAR_MAP_SIZE;
 Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shader) {
-    const auto& quad_mesh = primitives::get_quad(); // Alias the cube.
+    const auto& quad_mesh = Mesh::get_quad(); // Alias the cube.
 
     // Create and allocate the texture.
     GLuint texture_id {};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <variant>
 
 #include <glm/vec2.hpp> // glm::vec2
@@ -49,6 +50,31 @@ public:
     [[nodiscard]] bool is_indexed() const {
         return get_indices_id() != 0;
     }
+
+    /**
+     * @brief Get the indexed 2x2x2 cube mesh with UVs, normals and tangents.
+     *
+     * The Mesh object is being created only on the first call, after that
+     * returns shared_ptr with the same object.
+     */
+    [[nodiscard]] static std::shared_ptr<const Mesh> get_cube();
+
+    /**
+     * @brief Get the indexed 2x2x2 cube mesh that can be used as skybox mesh.
+     * 
+     * This Mesh DOES NOT contain UVs, normals or tangents. Triangles are
+     * faced inwards, so with enabled backface culling the cube will be
+     * visible only from inside.
+     */
+    [[nodiscard]] static std::shared_ptr<const Mesh> get_skybox_cube();
+
+    /**
+     * @brief Get the not indexed 2x2 quad mesh with UVs.
+     *
+     * This Mesh DOES NOT contain normals and tangents. Triangles are front-facing.
+     * Vertex positions have constant Z=0 (the quad is in XY plane).
+     */
+    [[nodiscard]] static std::shared_ptr<const Mesh> get_quad();
 
 private:
     GLuint indices_id = 0, vertices_id = 0, uvs_id = 0,
