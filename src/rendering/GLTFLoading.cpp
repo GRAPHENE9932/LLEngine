@@ -660,11 +660,16 @@ GLTF::GLTF(std::string_view file_path) {
     }
 
     // Parse the binary chunk metadata.
-    align_stream(stream, 4);
-    ChunkMetadata bin_chunk_meta;
-    stream.read(reinterpret_cast<char*>(&bin_chunk_meta), sizeof(ChunkMetadata));
-    if (bin_chunk_meta.type != CHUNK_TYPE_BIN)
-        throw std::runtime_error("The second chunk is not in BIN type.");
+    if (stream.peek() != std::ifstream::traits_type::eof()) {
+        align_stream(stream, 4);
+        ChunkMetadata bin_chunk_meta;
+        stream.read(reinterpret_cast<char*>(&bin_chunk_meta), sizeof(ChunkMetadata));
+        if (bin_chunk_meta.type != CHUNK_TYPE_BIN)
+            throw std::runtime_error("The second chunk is not in BIN type.");
+    }
+    else {
+        stream.clear();
+    }
 
     // Use JSONChunk to construct the final glTF.
     construct_texture_params(*this, json_chunk, file_path, stream.tellg());
