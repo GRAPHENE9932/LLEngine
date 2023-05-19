@@ -2,6 +2,7 @@ include(GoogleTest)
 
 add_executable(llengine_tst
     main.cpp
+    gltf_loading.cpp
 )
 
 find_package(GTest)
