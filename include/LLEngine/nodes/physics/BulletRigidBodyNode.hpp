@@ -7,9 +7,11 @@
 
 #include <memory>
 
-class Shape;
 class btRigidBody;
 class btCollisionShape;
+
+namespace llengine {
+class Shape;
 class BulletPhysicsServer;
 
 class BulletRigidBodyNode : public SpatialNode {
@@ -92,3 +94,4 @@ private:
 
     std::unique_ptr<btRigidBody> bt_rigid_body;
 };
+}

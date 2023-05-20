@@ -4,6 +4,8 @@
 
 #include <glm/gtc/type_ptr.inl>
 
+using namespace llengine;
+
 GUIRectangleShader::GUIRectangleShader() {
     program_id = load_shaders(
         "res/shaders/gui_rectangle.vert",

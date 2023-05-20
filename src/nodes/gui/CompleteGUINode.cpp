@@ -1,6 +1,8 @@
 #include "nodes/gui/CompleteGUINode.hpp"
 #include "rendering/RenderingServer.hpp"
 
+using namespace llengine;
+
 [[nodiscard]] GUITransform CompleteGUINode::get_transform() const {
     return transform;
 }

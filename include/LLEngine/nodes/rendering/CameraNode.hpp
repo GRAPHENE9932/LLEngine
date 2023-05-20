@@ -5,6 +5,7 @@
 
 #include "nodes/CompleteSpatialNode.hpp"
 
+namespace llengine {
 class RenderingServer;
 
 /**
@@ -47,3 +48,4 @@ private:
     void recompute_view_matrix() noexcept;
     void recompute_proj_matrix() noexcept;
 };
+}

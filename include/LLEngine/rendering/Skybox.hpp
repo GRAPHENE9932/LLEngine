@@ -4,6 +4,7 @@
 
 #include <GL/glew.h> // GLuint
 
+namespace llengine {
 class Texture;
 class RenderingServer;
 
@@ -24,3 +25,4 @@ private:
     RenderingServer& rs;
     std::shared_ptr<Texture> cubemap_texture;
 };
+}

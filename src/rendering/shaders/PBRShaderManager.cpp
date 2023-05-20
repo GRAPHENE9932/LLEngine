@@ -5,6 +5,8 @@
 #include "rendering/Skybox.hpp"
 #include "rendering/shaders/PBRShader.hpp"
 
+using namespace llengine;
+
 void PBRShaderManager::use_shader(
     RenderingServer& rs,
     const Material& material, const glm::mat4& mvp_matrix,

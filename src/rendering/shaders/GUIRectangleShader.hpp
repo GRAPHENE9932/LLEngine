@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
 
+namespace llengine {
 class GUIRectangleShader {
 public:
     GUIRectangleShader();
@@ -22,3 +23,4 @@ private:
     GLint color_factor_id = -1;
     GLint sampler_id = -1;
 };
+}

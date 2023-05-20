@@ -14,6 +14,7 @@
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/shaders/ShaderHolder.hpp"
 
+namespace llengine {
 class Texture;
 class RenderingNode;
 class CameraNode;
@@ -178,3 +179,4 @@ private:
 
     ShaderHolder shader_holder;
 };
+}

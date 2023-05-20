@@ -9,6 +9,8 @@
 
 #include <GLFW/glfw3.h>
 
+using namespace llengine;
+
 RenderingServer::RenderingServer(glm::ivec2 window_size) :
     window(GLFWWindow(window_size, "LLShooter", 3, 3)) {}
 

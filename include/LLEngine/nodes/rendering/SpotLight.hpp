@@ -6,6 +6,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+namespace llengine {
 struct SpotLight {
     struct Uniforms {
         GLuint position_id, direction_id, color_and_strength_id,
@@ -30,3 +31,4 @@ struct SpotLight {
 
     void set_uniforms(const Uniforms& uniforms) const;
 };
+}

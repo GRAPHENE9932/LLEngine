@@ -5,6 +5,7 @@
 
 #include <GL/glew.h>
 
+namespace llengine {
 struct ManagedShaderID {
 public:
     GLuint shader_id;
@@ -64,3 +65,4 @@ ManagedShaderID load_vertex_shader(std::string_view vertex_shader_path,
                                    const std::vector<std::string>& defines);
 ManagedShaderID load_fragment_shader(std::string_view fragment_shader_path,
                                      const std::vector<std::string>& defines);
+}

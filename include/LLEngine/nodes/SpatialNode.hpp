@@ -11,6 +11,7 @@
 #include <optional>
 #include <string_view>
 
+namespace llengine {
 class SpatialNode {
 public:
     virtual ~SpatialNode();
@@ -54,3 +55,4 @@ private:
     */
     std::vector<std::unique_ptr<SpatialNode>> children;
 };
+}

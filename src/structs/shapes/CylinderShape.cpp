@@ -4,6 +4,8 @@
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <BulletCollision/CollisionShapes/btCylinderShape.h>
 
+using namespace llengine;
+
 CylinderShape::CylinderShape(const CylinderShape& cylinder_shape) :
     CylinderShape(cylinder_shape.get_semi_axis()) {}
 

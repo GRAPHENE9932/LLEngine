@@ -5,6 +5,8 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
 
+using namespace llengine;
+
 TextNode::TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font) : GUINode(rs), font(font) {}
 
 [[nodiscard]] GUITransform TextNode::get_transform() const {

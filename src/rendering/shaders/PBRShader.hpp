@@ -11,6 +11,7 @@
 #include <cstdint> // uint8_t, uint32_t
 #include <optional> // std::optional
 
+namespace llengine {
 class PBRShader {
 public:
     enum Flags : uint32_t {
@@ -129,3 +130,4 @@ private:
 
     void initialize_uniforms(const Parameters& params);
 };
+}

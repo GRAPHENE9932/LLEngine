@@ -13,6 +13,7 @@
 #include "Texture.hpp" // Texture
 #include "utils/Channel.hpp"
 
+namespace llengine {
 template<typename TEX_TYPE>
 struct BasicMaterial {
     struct TextureInfo {
@@ -121,3 +122,4 @@ private:
 };
 
 using Material = BasicMaterial<std::shared_ptr<Texture>>;
+}

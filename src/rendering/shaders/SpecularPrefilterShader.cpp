@@ -3,6 +3,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace llengine;
+
 SpecularPrefilterShader::SpecularPrefilterShader() {
     program_id = load_shaders(
         "res/shaders/specular_prefilter.vert",

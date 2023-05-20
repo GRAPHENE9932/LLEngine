@@ -3,6 +3,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace llengine;
+
 IrradiancePrecomputerShader::IrradiancePrecomputerShader() {
     program_id = load_shaders(
         "res/shaders/irradiance_precomputer.vert",

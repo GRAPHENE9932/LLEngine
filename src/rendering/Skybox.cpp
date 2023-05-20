@@ -4,6 +4,8 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
 #include "rendering/Mesh.hpp"
 
+using namespace llengine;
+
 Skybox::Skybox(Skybox&& other) noexcept :
         Skybox(other.rs, other.cubemap_texture) {
     other.cubemap_texture = nullptr;

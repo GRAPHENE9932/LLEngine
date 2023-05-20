@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 
+namespace llengine {
 enum class Channel : std::uint8_t {
     NONE, RED, GREEN, BLUE, ALPHA
 };
@@ -25,4 +26,5 @@ constexpr char channel_to_char(Channel channel) noexcept {
     default:
         return 'e';
     }
+}
 }

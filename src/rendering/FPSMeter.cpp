@@ -1,5 +1,7 @@
 #include "FPSMeter.hpp"
 
+using namespace llengine;
+
 FPSMeter::FPSMeter(float interval) : interval(interval) {
     thread = std::make_unique<std::thread>(&FPSMeter::measure_loop, this);
 }

@@ -2,6 +2,7 @@
 
 #include "GUINode.hpp"
 
+namespace llengine {
 class CompleteGUINode : public GUINode {
 public:
     explicit CompleteGUINode(RenderingServer& rs) : GUINode(rs) {}
@@ -13,3 +14,4 @@ public:
 private:
     GUITransform transform;
 };
+}

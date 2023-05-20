@@ -6,6 +6,7 @@
 
 #include <memory>
 
+namespace llengine {
 class EquirectangularMapperShader {
 public:
     EquirectangularMapperShader();
@@ -17,3 +18,4 @@ private:
     GLint mvp_id = -1;
     GLint panorama_sampler_id = -1;
 };
+}

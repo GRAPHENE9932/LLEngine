@@ -7,6 +7,7 @@
 #include <glm/vec2.hpp> // glm::u32vec2
 #include <GL/glew.h> // GLenum
 
+namespace llengine {
 class EquirectangularMapperShader;
 class IrradiancePrecomputerShader;
 class SpecularPrefilterShader;
@@ -99,3 +100,4 @@ protected:
     glm::u32vec2 tex_size {0, 0};
     bool cubemap = false;
 };
+}

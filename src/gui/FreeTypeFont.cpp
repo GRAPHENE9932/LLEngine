@@ -6,6 +6,8 @@
 
 #include <optional>
 
+using namespace llengine;
+
 FT_Library ft_lib;
 bool is_ft_lib_initialized = false;
 

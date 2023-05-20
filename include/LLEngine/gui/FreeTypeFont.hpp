@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 
+namespace llengine {
 class FontError : public std::runtime_error {
 public:
     FontError(const std::string& message) : std::runtime_error(message) {}
@@ -29,3 +30,4 @@ public:
 private:
     std::map<char, FontChar> chars;
 };
+}

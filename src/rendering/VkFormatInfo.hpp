@@ -4,6 +4,7 @@
 
 #include <glm/vec2.hpp>
 
+namespace llengine {
 struct VkFormatInfo {
     uint32_t gl_format;
     int32_t gl_internal_format;
@@ -28,3 +29,4 @@ struct VkFormatInfo {
     /// width and height in the current format.
     [[nodiscard]] uint64_t compute_image_size(glm::u32vec2 image_extents) const;
 };
+}

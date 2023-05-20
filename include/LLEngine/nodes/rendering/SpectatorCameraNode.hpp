@@ -5,6 +5,7 @@
 #include "nodes/rendering/CameraNode.hpp" // CameraNode
 #include "rendering/Window.hpp" // Key
 
+namespace llengine {
 class SpectatorCameraNode : public CameraNode {
 public:
     static constexpr Key FORWARD_KEY = Key::W;
@@ -29,3 +30,4 @@ private:
     void update_rotation();
     void update_position();
 };
+}

@@ -4,6 +4,7 @@
 
 #include <glm/mat4x4.hpp>
 
+namespace llengine {
 class SpecularPrefilterShader {
 public:
     SpecularPrefilterShader();
@@ -19,3 +20,4 @@ private:
     GLint roughness_id = -1;
     GLint environment_cubemap_sampler_id = -1;
 };
+}

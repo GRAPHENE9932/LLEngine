@@ -5,6 +5,7 @@
 #include <bullet/LinearMath/btVector3.h>
 #include <bullet/LinearMath/btQuaternion.h>
 
+namespace llengine {
 template<typename T>
 [[nodiscard]] inline btQuaternion glm_quat_to_bullet(const glm::qua<T>& orig) {
     return btQuaternion(
@@ -41,4 +42,5 @@ template<typename T>
         static_cast<T>(orig.getY()),
         static_cast<T>(orig.getZ())
     );
+}
 }

@@ -10,6 +10,7 @@
 #include <memory>
 #include <cstdint>
 
+namespace llengine {
 class Texture;
 class GUITexture;
 class RenderingServer;
@@ -81,3 +82,4 @@ private:
         glm::vec2 quad_size_in_px, glm::vec2 tex_part_size_in_px
     );
 };
+}

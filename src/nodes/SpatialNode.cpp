@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+using namespace llengine;
+
 SpatialNode::~SpatialNode() {}
 
 void SpatialNode::set_name(std::string_view new_name) {

@@ -2,5 +2,9 @@
 
 // #ifdef GLFW_ENABLED
 #include "GLFWWindow.hpp"
-using Window = GLFWWindow;
+
+namespace llengine {
+    using Window = GLFWWindow;
+}
+
 // #endif

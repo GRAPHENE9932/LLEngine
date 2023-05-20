@@ -6,6 +6,8 @@
 
 #include "rendering/Mesh.hpp"
 
+using namespace llengine;
+
 size_t Mesh::get_amount_of_vertices() const {
     if (is_indexed()) {
         return std::visit([] (const auto& vector) -> std::size_t {

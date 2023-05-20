@@ -3,6 +3,8 @@
 #include "utils/shader_loader.hpp"
 #include "ColoredTextShader.hpp"
 
+using namespace llengine;
+
 ColoredTextShader::ColoredTextShader() {
     program_id = load_shaders(
         "res/shaders/colored_text.vert",

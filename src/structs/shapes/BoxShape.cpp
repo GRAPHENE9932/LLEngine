@@ -4,6 +4,8 @@
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 
+using namespace llengine;
+
 bool BoxShape::operator==(const Shape& other) const noexcept {
     if (this == std::addressof(other)) {
         return true;

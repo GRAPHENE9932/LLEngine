@@ -3,6 +3,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+using namespace llengine;
+
 EquirectangularMapperShader::EquirectangularMapperShader() {
     program_id = load_shaders(
         "res/shaders/equirectangular_mapper.vert",

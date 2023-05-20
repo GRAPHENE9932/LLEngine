@@ -3,6 +3,7 @@
 #include "gui/GUITexture.hpp"
 #include "CompleteGUINode.hpp"
 
+namespace llengine {
 class ButtonNode : public CompleteGUINode {
 public:
     explicit ButtonNode(RenderingServer& rs) : CompleteGUINode(rs) {};
@@ -24,3 +25,4 @@ private:
     GUITexture pressed_texture;
     bool was_pressed_in_last_update = false;
 };
+}

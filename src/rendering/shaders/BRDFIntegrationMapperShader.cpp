@@ -1,6 +1,8 @@
 #include "BRDFIntegrationMapperShader.hpp"
 #include "utils/shader_loader.hpp"
 
+using namespace llengine;
+
 BRDFIntegrationMapperShader::BRDFIntegrationMapperShader() {
     program_id = load_shaders(
         "res/shaders/brdf_integration_mapper.vert",

@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+namespace llengine {
 enum class Key : std::uint16_t {
     SPACE = ' ',
     APOSTROPHE = '\'',
@@ -71,3 +72,4 @@ enum class Key : std::uint16_t {
     RIGHT_SUPER = 347,
     MENU = 348
 };
+}

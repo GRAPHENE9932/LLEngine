@@ -4,6 +4,8 @@
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 
+using namespace llengine;
+
 bool SphereShape::operator==(const Shape& other) const noexcept {
     if (this == std::addressof(other)) {
         return true;

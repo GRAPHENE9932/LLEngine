@@ -8,6 +8,8 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
 #include "PBRShader.hpp" // TexturedShared
 
+using namespace llengine;
+
 PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     PBRShader::Flags flags = PBRShader::NO_FLAGS;
 

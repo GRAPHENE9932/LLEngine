@@ -12,6 +12,7 @@ class btDiscreteDynamicsWorld;
 class btDefaultCollisionConfiguration;
 class btSequentialImpulseConstraintSolver;
 
+namespace llengine {
 class BulletRigidBodyNode;
 
 class BulletPhysicsServer {
@@ -52,3 +53,4 @@ private:
 
     std::vector<BulletRigidBodyNode*> rigid_bodies;
 };
+}

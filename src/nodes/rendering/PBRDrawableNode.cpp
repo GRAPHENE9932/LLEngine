@@ -1,6 +1,8 @@
 #include "rendering/RenderingServer.hpp"
 #include "nodes/rendering/PBRDrawableNode.hpp" // PBRDrawableNode
 
+using namespace llengine;
+
 PBRDrawableNode::PBRDrawableNode(
     RenderingServer& rs,
     const std::shared_ptr<Material>& material,

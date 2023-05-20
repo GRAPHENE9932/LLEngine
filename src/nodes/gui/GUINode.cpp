@@ -4,6 +4,8 @@
 #include "gui/GUITexture.hpp"
 #include "utils/math.hpp"
 
+using namespace llengine;
+
 GUINode::GUINode(RenderingServer& rs) : rs(rs) {
     rs.register_gui_node(this);
 }

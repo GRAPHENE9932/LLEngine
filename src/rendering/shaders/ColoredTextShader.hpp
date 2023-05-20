@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+namespace llengine {
 class ColoredTextShader {
 public:
     ColoredTextShader();
@@ -19,3 +20,4 @@ private:
     GLuint program_id = 0;
     GLint mvp_id = 0, color_id = 0;
 };
+}

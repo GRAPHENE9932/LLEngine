@@ -4,6 +4,8 @@
 
 #include "nodes/CompleteSpatialNode.hpp"
 
+using namespace llengine;
+
 CompleteSpatialNode::CompleteSpatialNode(const Transform& p) :
     transform(p) {}
 

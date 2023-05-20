@@ -3,6 +3,8 @@
 #include "utils/shader_loader.hpp"
 #include "SkyboxShader.hpp"
 
+using namespace llengine;
+
 SkyboxShader::SkyboxShader() {
     program_id = load_shaders(
         "res/shaders/skybox.vert",

@@ -6,6 +6,8 @@
 #include <fstream>
 #include <filesystem>
 
+using namespace llengine;
+
 class KTXTextureWrapper {
 public:
     KTXTextureWrapper() = default;

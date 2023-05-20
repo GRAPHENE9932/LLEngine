@@ -4,6 +4,7 @@
 #include <condition_variable>
 #include <cstdint>
 
+namespace llengine {
 class FPSMeter {
 public:
     /// @param interval means interval between the fps updates.
@@ -28,3 +29,4 @@ private:
 
     void measure_loop();
 };
+}

@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 
+namespace llengine {
 class BRDFIntegrationMapperShader {
 public:
     BRDFIntegrationMapperShader();
@@ -11,3 +12,4 @@ public:
 private:
     GLuint program_id = 0;
 };
+}

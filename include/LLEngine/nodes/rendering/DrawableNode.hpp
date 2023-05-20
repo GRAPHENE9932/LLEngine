@@ -4,6 +4,7 @@
 
 #include <GL/glew.h> // GLuint
 
+namespace llengine {
 class RenderingServer;
 
 class DrawableNode : public CompleteSpatialNode {
@@ -17,3 +18,4 @@ public:
 protected:
     RenderingServer& rs;
 };
+}

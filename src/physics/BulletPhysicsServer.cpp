@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+using namespace llengine;
+
 BulletPhysicsServer::BulletPhysicsServer() {
     collision_configuration = std::make_unique<btDefaultCollisionConfiguration>();
     collision_dispatcher = std::make_unique<btCollisionDispatcher>(collision_configuration.get());

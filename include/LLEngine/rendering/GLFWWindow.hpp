@@ -9,6 +9,7 @@
 
 class GLFWwindow;
 
+namespace llengine {
 class GLFWWindow {
 public:
     GLFWWindow(glm::ivec2 extents, std::string_view title,
@@ -34,3 +35,4 @@ private:
 
     static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 };
+}

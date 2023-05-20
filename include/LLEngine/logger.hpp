@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 
-namespace logger {
+namespace llengine::logger {
     enum Severity : std::uint8_t {
         INFO = 0, WARNING = 1, ERROR = 2, FATAL_ERROR = 3
     };

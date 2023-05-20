@@ -4,6 +4,7 @@
 
 #include <memory>
 
+namespace llengine {
 enum class CustomPropertyType : std::uint8_t {
     INT64, FLOAT, VEC2, VEC3, VEC4, STRING,
     VECTOR_OF_INT64, VECTOR_OF_FLOAT, VECTOR_OF_VEC2,
@@ -129,3 +130,4 @@ void register_custom_property(
     const std::string& property_name,
     void(*setter_ptr)(SpatialNode*, T)
 );
+}

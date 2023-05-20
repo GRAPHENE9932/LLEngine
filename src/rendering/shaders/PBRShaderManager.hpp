@@ -8,6 +8,7 @@
 #include "SkyboxShader.hpp"
 #include "PBRShader.hpp"
 
+namespace llengine {
 class PBRShaderManager {
 public:
     PBRShaderManager() = default;
@@ -38,3 +39,4 @@ private:
     };
     std::set<PBRShader, PBRShaderComparator> pbr_shaders;
 };
+}

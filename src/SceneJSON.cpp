@@ -14,6 +14,8 @@
 
 using json = nlohmann::json;
 
+using namespace llengine;
+
 constexpr uint32_t CURRENT_MAP_VERSION = 1;
 
 SceneJSON::SceneJSON(const std::string& json_path) {
@@ -33,6 +35,7 @@ SceneJSON::SceneJSON(const std::string& json_path) {
     }
 }
 
+namespace llengine {
 void from_json(const json& root_json, Transform& spat_params) {
     const glm::quat testo({0.0f, 0.0f, 0.0f});
     spat_params = {
@@ -43,6 +46,7 @@ void from_json(const json& root_json, Transform& spat_params) {
         glm::quat(get_optional<glm::vec3>(root_json, "rotation")
                 .value_or(glm::vec3(0.0f, 0.0f, 0.0f))),
     };
+}
 }
 
 std::unique_ptr<PointLightNode> point_light_from_json(RenderingServer& rs, const json& root_json) {

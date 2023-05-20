@@ -5,6 +5,8 @@
 
 #include <string> // std::string
 
+using namespace llengine;
+
 PointLightNode::PointLightNode(RenderingServer& rs, const Transform& transform) :
     CompleteSpatialNode(transform), rs(rs) {
     rs.register_point_light(this);

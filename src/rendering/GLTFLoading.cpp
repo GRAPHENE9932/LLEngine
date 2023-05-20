@@ -10,6 +10,7 @@
 #include "GLTF.hpp"
 #include "utils/json_conversion.hpp"
 
+using namespace llengine;
 using json = nlohmann::json;
 
 constexpr uint32_t GLTF_MAGIC = 0x46546C67;

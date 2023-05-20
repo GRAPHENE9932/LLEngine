@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <functional>
 
+namespace llengine {
 template<typename... Args>
 class Event {
 public:
@@ -68,3 +69,4 @@ private:
     static inline id_type id_count {0};
     std::vector<std::pair<id_type, function_type>> functions;
 };
+}

@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include <glm/mat4x4.hpp>
 
+namespace llengine {
 class SkyboxShader {
 public:
     SkyboxShader();
@@ -19,3 +20,4 @@ private:
     GLuint program_id = 0;
     GLuint mvp_id = 0;
 };
+}

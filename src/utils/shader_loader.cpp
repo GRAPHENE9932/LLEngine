@@ -6,9 +6,11 @@
 
 #include "shader_loader.hpp"
 
+using namespace llengine;
+
 /// Loads and compiles vertex and fragment shaders from files,
 /// compiles, links them and returns the program ID.
-GLuint load_shaders(std::string_view vertex_shader_path,
+GLuint llengine::load_shaders(std::string_view vertex_shader_path,
                     std::string_view fragment_shader_path,
                     const std::vector<std::string>& defines) {
     using std::string_literals::operator""s;
@@ -47,7 +49,7 @@ GLuint load_shaders(std::string_view vertex_shader_path,
 
 /// Loads the vertex shader from file, compiles it and
 /// returns the vertex shader ID.
-ManagedShaderID load_vertex_shader(std::string_view vertex_shader_path,
+ManagedShaderID llengine::load_vertex_shader(std::string_view vertex_shader_path,
                                    const std::vector<std::string>& defines) {
     using std::string_literals::operator""s;
 
@@ -108,7 +110,7 @@ ManagedShaderID load_vertex_shader(std::string_view vertex_shader_path,
 
 /// Loads the fragment shader from file, compiles it and
 /// returns the fragment shader shader ID.
-ManagedShaderID load_fragment_shader(std::string_view fragment_shader_path,
+ManagedShaderID llengine::load_fragment_shader(std::string_view fragment_shader_path,
                                      const std::vector<std::string>& defines) {
     using std::string_literals::operator""s;
 

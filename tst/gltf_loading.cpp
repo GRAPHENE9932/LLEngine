@@ -23,7 +23,7 @@ constexpr std::array<unsigned char, 132> EMPTY_GLTF_DATA = {
 TEST(GLTFLoading, Empty) {
     const std::string file_name = create_temporary_file(std::span(EMPTY_GLTF_DATA), "empty.glb");
 
-    GLTF gltf(file_name);
+    llengine::GLTF gltf(file_name);
 
     EXPECT_TRUE(gltf.materials.empty());
     EXPECT_TRUE(gltf.textures.empty());
@@ -276,7 +276,7 @@ constexpr std::array<glm::vec3, 36> CUBE_VERTICES {
 };
 
 [[nodiscard]] bool compare_gltf_mesh_triangles(
-    const GLTF::MeshParameters& gltf_mesh, const std::span<const glm::vec3>& triangles
+    const llengine::GLTF::MeshParameters& gltf_mesh, const std::span<const glm::vec3>& triangles
 ) {
     if (std::holds_alternative<std::vector<std::uint16_t>>(gltf_mesh.indices)) {
         return compare_triangular_meshes<std::uint16_t>(
@@ -300,7 +300,7 @@ constexpr std::array<glm::vec3, 36> CUBE_VERTICES {
 TEST(GLTFLoading, SingleCube) {
     const std::string file_name = create_temporary_file(std::span(SINGLE_CUBE_GLTF_DATA), "single_cube.glb");
 
-    GLTF gltf(file_name);
+    llengine::GLTF gltf(file_name);
 
     EXPECT_TRUE(gltf.textures.empty());
     EXPECT_EQ(gltf.materials.size(), 1);
@@ -587,7 +587,7 @@ constexpr std::array<unsigned char, 3176> TWO_CUBES_GLTF_DATA {
 TEST(GLTFLoading, TwoCubes) {
     const std::string file_name = create_temporary_file(std::span(TWO_CUBES_GLTF_DATA), "two_cubes.glb");
 
-    GLTF gltf(file_name);
+    llengine::GLTF gltf(file_name);
 
     EXPECT_EQ(gltf.textures.size(), 1);
     EXPECT_EQ(gltf.materials.size(), 1);

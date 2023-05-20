@@ -4,6 +4,8 @@
 
 #include <stdexcept> // std::runtime_error
 
+using namespace llengine;
+
 std::unique_ptr<SceneFile> SceneFile::load_from_file(const std::filesystem::path& file_path) {
     const auto extension = file_path.extension().string();
 

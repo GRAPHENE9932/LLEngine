@@ -17,6 +17,7 @@
 #include "rendering/Material.hpp" // BasicMaterial
 #include "SceneFile.hpp" // SceneFile
 
+namespace llengine {
 class GLTF : public SceneFile {
 public:
     struct Node {
@@ -79,5 +80,6 @@ public:
     */
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<::SpatialNode> to_node(EngineServers& servers) const override;
+    std::unique_ptr<SpatialNode> to_node(EngineServers& servers) const override;
 };
+}

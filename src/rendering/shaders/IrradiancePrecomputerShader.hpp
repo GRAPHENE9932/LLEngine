@@ -4,6 +4,7 @@
 
 #include <glm/mat4x4.hpp>
 
+namespace llengine {
 class IrradiancePrecomputerShader {
 public:
     IrradiancePrecomputerShader();
@@ -18,3 +19,4 @@ private:
     GLint mvp_id = -1;
     GLint environment_cubemap_sampler_id = -1;
 };
+}

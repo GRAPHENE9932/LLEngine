@@ -6,6 +6,7 @@
 #include "rendering/Mesh.hpp"
 #include "rendering/Material.hpp" // Material
 
+namespace llengine {
 class PBRDrawableNode : public DrawableNode {
 public:
     std::shared_ptr<const Mesh> mesh;
@@ -21,3 +22,4 @@ public:
     void draw() override;
     GLuint get_program_id() const override;
 };
+}

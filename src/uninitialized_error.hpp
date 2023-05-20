@@ -5,6 +5,7 @@
 #include <stdexcept> // std::runtime_error
 #include <string_view> // std::string_view
 
+namespace llengine {
 /**
  * @brief Takes operation message and what is uninitialized.
  *
@@ -30,3 +31,4 @@ private:
         return ss.str();
     }
 };
+}

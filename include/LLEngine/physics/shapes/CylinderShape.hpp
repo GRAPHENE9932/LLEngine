@@ -4,6 +4,7 @@
 
 #include <glm/vec3.hpp>
 
+namespace llengine {
 class CylinderShape : public Shape {
 public:
     CylinderShape(const CylinderShape& cylinder_shape);
@@ -34,3 +35,4 @@ private:
 
     [[nodiscard]] std::unique_ptr<btCollisionShape> create_bullet_shape() const override;
 };
+}

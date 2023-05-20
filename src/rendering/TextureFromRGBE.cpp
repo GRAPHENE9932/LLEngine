@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <map>
 
+using namespace llengine;
+
 constexpr std::string_view RGBE_IDENTIFIER {"#?RADIANCE"};
 constexpr std::streamsize MAX_CHUNK_SIZE {16ll * 1024ll * 1024ll};
 constexpr std::array<std::uint8_t, 2> NEW_SCANLINE_MARK {0x02, 0x02};

@@ -4,6 +4,7 @@
 
 #include <utility>
 
+namespace llengine {
 class SphereShape : public Shape {
 public:
     SphereShape(const SphereShape& sphere_shape) : SphereShape(sphere_shape.get_axis()) {}
@@ -25,3 +26,4 @@ private:
 
     [[nodiscard]] std::unique_ptr<btCollisionShape> create_bullet_shape() const override;
 };
+}

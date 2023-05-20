@@ -9,6 +9,7 @@
 #include "BRDFIntegrationMapperShader.hpp"
 #include "GUIRectangleShader.hpp"
 
+namespace llengine {
 /**
  * @brief Stores all kinds of shaders and shader managers.
  * 
@@ -72,3 +73,4 @@ private:
     LazyShader<SkyboxShader> skybox_shader;
     LazyShader<GUIRectangleShader> gui_rectangle_shader;
 };
+}

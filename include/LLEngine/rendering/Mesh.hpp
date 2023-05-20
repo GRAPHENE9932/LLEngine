@@ -9,6 +9,7 @@
 #include <glm/vec4.hpp> // glm::vec4
 #include <GL/glew.h>
 
+namespace llengine {
 class Mesh {
 public:
     Mesh() = default;
@@ -91,3 +92,4 @@ private:
     void reset_vao_if_needed() const;
     void initialize_vao() const;
 };
+}

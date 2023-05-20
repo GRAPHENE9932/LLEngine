@@ -2,6 +2,8 @@
 
 #include <array>
 
+using namespace llengine;
+
 constexpr std::array<uint16_t, 36> CUBE_INDEXES {
     1, 13, 19,
     1, 19, 8,

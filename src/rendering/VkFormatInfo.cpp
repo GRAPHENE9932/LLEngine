@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <algorithm>
 
+using namespace llengine;
+
 enum VkFormat {
     VK_FORMAT_UNDEFINED = 0,
     VK_FORMAT_R4G4_UNORM_PACK8 = 1,

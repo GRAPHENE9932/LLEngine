@@ -6,6 +6,7 @@
 
 #include <memory>
 
+namespace llengine {
 struct GUITexture {
     std::shared_ptr<Texture> texture = nullptr;
     float left_border = 0.0f;
@@ -32,3 +33,4 @@ struct GUITexture {
         return texture == nullptr;
     }
 };
+}

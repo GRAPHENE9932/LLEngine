@@ -8,6 +8,7 @@
 #include "SceneFile.hpp" // SceneFile
 #include "nodes/SpatialNode.hpp" // SpatialNode
 
+namespace llengine {
 class SceneJSON : public SceneFile {
 public:
     explicit SceneJSON(const std::string& json_path);
@@ -21,3 +22,4 @@ private:
         EngineServers& servers, const nlohmann::json& json_node
     ) const;
 };
+}

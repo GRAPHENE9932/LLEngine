@@ -7,6 +7,7 @@
 
 #include "nodes/CompleteSpatialNode.hpp"
 
+namespace llengine {
 class RenderingServer;
 
 struct PointLightNode : public CompleteSpatialNode {
@@ -26,3 +27,4 @@ struct PointLightNode : public CompleteSpatialNode {
     static Uniforms get_uniforms_id(GLuint program_id, const std::string& var_name, GLuint index);
     void set_uniforms(const Uniforms& uniforms) const;
 };
+}

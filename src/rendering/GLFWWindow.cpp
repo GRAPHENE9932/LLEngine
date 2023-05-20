@@ -7,6 +7,8 @@
 #include <map>
 #include <algorithm>
 
+using namespace llengine;
+
 std::map<GLFWwindow*, GLFWWindow*> window_to_wrapper_map;
 
 size_t GLFWWindow::glfw_windows_count = 0;

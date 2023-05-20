@@ -11,6 +11,8 @@
 #include <fstream>
 #include <iostream>
 
+using namespace llengine;
+
 std::atomic_bool console_logging_enabled {false};
 std::atomic<logger::Severity> minimum_console_log_severity {logger::INFO};
 

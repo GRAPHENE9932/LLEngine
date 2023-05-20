@@ -6,6 +6,7 @@
 
 class btCollisionShape;
 
+namespace llengine {
 class Shape {
 public:
     Shape();
@@ -35,3 +36,4 @@ protected:
 
     [[nodiscard]] virtual std::unique_ptr<btCollisionShape> create_bullet_shape() const = 0;
 };
+}

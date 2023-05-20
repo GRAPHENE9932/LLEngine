@@ -2,6 +2,8 @@
 
 #include <map>
 
+using namespace llengine;
+
 std::map<std::string, CustomNodeType> custom_nodes_map;
 
 void add_node_factory(const std::string& node_type_name, CustomNodeFactory&& factory) {

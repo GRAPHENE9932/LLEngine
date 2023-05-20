@@ -11,6 +11,8 @@
 #include <cassert>
 #include <algorithm>
 
+using namespace llengine;
+
 // Packed parameters used across functions.
 struct ConstructionEnvironment {
     const GLTF& gltf;

@@ -3,6 +3,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+namespace llengine {
 struct GUITransform {
     enum class SizeMode : std::uint8_t {
         ABSOLUTE, RELATIVE
@@ -43,3 +44,4 @@ struct GUITransform {
         return {result_vec2, z_coordinate};
     }
 };
+}

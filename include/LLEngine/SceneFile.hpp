@@ -4,6 +4,7 @@
 
 #include <filesystem> // std::filesystem::path
 
+namespace llengine {
 class RenderingServer;
 class BulletPhysicsServer;
 
@@ -20,3 +21,4 @@ public:
 
     virtual std::unique_ptr<SpatialNode> to_node(EngineServers& servers) const = 0;
 };
+}

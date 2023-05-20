@@ -4,6 +4,7 @@
 
 #include <glm/vec3.hpp>
 
+namespace llengine {
 class BoxShape : public Shape {
 public:
     BoxShape(const BoxShape& box_shape) : BoxShape(box_shape.get_extents()) {}
@@ -24,3 +25,4 @@ private:
 
     [[nodiscard]] std::unique_ptr<btCollisionShape> create_bullet_shape() const override;
 };
+}

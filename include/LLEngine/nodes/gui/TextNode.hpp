@@ -9,6 +9,7 @@
 #include <limits>
 #include <optional>
 
+namespace llengine {
 class TextNode : public GUINode {
 public:
     TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font);
@@ -45,3 +46,4 @@ private:
     std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
     std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
 };
+}

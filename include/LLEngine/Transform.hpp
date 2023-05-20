@@ -5,6 +5,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+namespace llengine {
 struct Transform {
     glm::vec3 translation = {0.0f, 0.0f, 0.0f};
     glm::vec3 scale = {1.0f, 1.0f, 1.0f};
@@ -45,3 +46,4 @@ struct Transform {
         return !(*this == other);
     }
 };
+}

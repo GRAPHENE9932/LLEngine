@@ -2,6 +2,8 @@
 #include "rendering/RenderingServer.hpp"
 #include "logger.hpp"
 
+using namespace llengine;
+
 void ButtonNode::draw() {
     if (is_pressed()) {
         if (!pressed_texture.empty()) {

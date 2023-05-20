@@ -10,6 +10,7 @@
 #include <memory> // std::unique_ptr
 #include <string> // std::string
 
+namespace llengine {
 class CompleteSpatialNode : public SpatialNode {
 public:
     explicit CompleteSpatialNode(const Transform& transform = Transform());
@@ -39,3 +40,4 @@ protected:
 
     void recalculate_matrix() const noexcept;
 };
+}

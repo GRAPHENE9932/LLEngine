@@ -3,7 +3,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-namespace math_utils {
+namespace llengine::math_utils {
     inline glm::vec2 scr_space_pos_to_gl_space(glm::vec2 position, glm::vec2 window_size) {
         return (position / window_size * 2.0f - 1.0f) * glm::vec2(1.0f, -1.0f);
     }
