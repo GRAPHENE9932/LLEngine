@@ -1,3 +1,4 @@
+R""(
 #version 330
 
 uniform sampler2D base_color_texture;
@@ -10,3 +11,4 @@ out vec4 color_out;
 void main() {
     color_out = texture(base_color_texture, frag_uv) * color_factor;
 }
+)""

@@ -5,10 +5,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/equirectangular_mapper.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/equirectangular_mapper.frag"
+;
+
 EquirectangularMapperShader::EquirectangularMapperShader() {
     program_id = load_shaders(
-        "res/shaders/equirectangular_mapper.vert",
-        "res/shaders/equirectangular_mapper.frag"
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp");

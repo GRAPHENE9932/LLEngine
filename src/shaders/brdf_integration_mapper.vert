@@ -1,3 +1,4 @@
+R""(
 #version 330
 
 layout (location = 0) in vec3 vertex_pos;
@@ -9,3 +10,4 @@ void main() {
     frag_uv = vertex_uv;
     gl_Position = vec4(vertex_pos, 1.0);
 }
+)""

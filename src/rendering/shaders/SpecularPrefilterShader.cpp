@@ -5,10 +5,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/specular_prefilter.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/specular_prefilter.frag"
+;
+
 SpecularPrefilterShader::SpecularPrefilterShader() {
     program_id = load_shaders(
-        "res/shaders/specular_prefilter.vert",
-        "res/shaders/specular_prefilter.frag"
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp");

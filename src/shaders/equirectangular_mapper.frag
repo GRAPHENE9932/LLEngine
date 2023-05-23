@@ -1,3 +1,4 @@
+R""(
 #version 330 core
 
 in vec3 frag_local_pos;
@@ -19,3 +20,4 @@ void main() {
     vec2 uv = direction_to_equirectangular_uv(normalize(frag_local_pos));
     color_out = texture(equirectangular_map, uv);
 }
+)""

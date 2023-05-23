@@ -5,10 +5,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/skybox.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/skybox.frag"
+;
+
 SkyboxShader::SkyboxShader() {
     program_id = load_shaders(
-        "res/shaders/skybox.vert",
-        "res/shaders/skybox.frag"
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp");

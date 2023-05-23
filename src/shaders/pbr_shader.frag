@@ -1,3 +1,4 @@
+R""(
 #version 330 core
 
 out vec4 color_out;
@@ -318,3 +319,4 @@ void main() {
     #endif
     color_out = vec4(lightning_result, 1.0);
 }
+)""

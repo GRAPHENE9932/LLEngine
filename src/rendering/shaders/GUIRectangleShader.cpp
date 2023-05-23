@@ -6,10 +6,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/gui_rectangle.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/gui_rectangle.frag"
+;
+
 GUIRectangleShader::GUIRectangleShader() {
     program_id = load_shaders(
-        "res/shaders/gui_rectangle.vert",
-        "res/shaders/gui_rectangle.frag"
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp");

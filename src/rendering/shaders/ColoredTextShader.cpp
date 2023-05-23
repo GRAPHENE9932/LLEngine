@@ -5,10 +5,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/colored_text.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/colored_text.frag"
+;
+
 ColoredTextShader::ColoredTextShader() {
     program_id = load_shaders(
-        "res/shaders/colored_text.vert",
-        "res/shaders/colored_text.frag"
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp");

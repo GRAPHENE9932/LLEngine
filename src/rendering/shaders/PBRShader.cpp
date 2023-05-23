@@ -10,6 +10,13 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/pbr_shader.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/pbr_shader.frag"
+;
+
 PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     PBRShader::Flags flags = PBRShader::NO_FLAGS;
 
@@ -197,8 +204,8 @@ void PBRShader::initialize(const Parameters& params) {
         defines.emplace_back("USING_IBL");
 
     program_id = load_shaders(
-        "res/shaders/pbr_shader.vert",
-        "res/shaders/pbr_shader.frag",
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT,
         defines
     );
 

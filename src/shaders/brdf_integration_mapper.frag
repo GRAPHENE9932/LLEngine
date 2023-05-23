@@ -1,3 +1,4 @@
+R""(
 #version 330
 
 in vec2 frag_uv;
@@ -127,3 +128,4 @@ void main() {
     vec2 integrated_brdf = integrate_brdf(frag_uv.x, frag_uv.y);
     data_out = integrated_brdf;
 }
+)""

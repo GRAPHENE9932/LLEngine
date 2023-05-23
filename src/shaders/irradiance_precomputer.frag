@@ -1,3 +1,4 @@
+R""(
 #version 330
 
 in vec3 frag_local_pos;
@@ -36,3 +37,4 @@ void main() {
     irradiance = PI * irradiance / AMOUNT_OF_SAMPLES;
     color_out = vec4(irradiance, 1.0);
 }
+)""

@@ -1,3 +1,4 @@
+R""(
 #version 330 core
 
 in vec2 frag_uv;
@@ -11,3 +12,4 @@ void main() {
     color_out.rgb = text_color;
     color_out.a = texture(font_texture, frag_uv).r;
 }
+)""

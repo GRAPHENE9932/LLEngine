@@ -5,10 +5,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/irradiance_precomputer.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/irradiance_precomputer.frag"
+;
+
 IrradiancePrecomputerShader::IrradiancePrecomputerShader() {
     program_id = load_shaders(
-        "res/shaders/irradiance_precomputer.vert",
-        "res/shaders/irradiance_precomputer.frag"
+        VERTEX_SHADER_TEXT,
+        FRAGMENT_SHADER_TEXT
     );
 
     mvp_id = glGetUniformLocation(program_id, "mvp");

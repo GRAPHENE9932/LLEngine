@@ -1,3 +1,4 @@
+R""(
 #version 330
 
 layout (location = 0) in vec3 vertex_pos_modelspace;
@@ -18,3 +19,4 @@ void main() {
     // (except overlay ones).
     gl_Position = pos.xyww;
 }
+)""

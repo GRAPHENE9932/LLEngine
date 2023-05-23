@@ -58,11 +58,20 @@ private:
     bool released = false;
 };
 
-GLuint load_shaders(std::string_view vertex_shader_path,
-                    std::string_view fragment_shader_path,
-                    const std::vector<std::string>& defines = {});
-ManagedShaderID load_vertex_shader(std::string_view vertex_shader_path,
+GLuint load_shaders_from_files(
+    std::string_view vertex_shader_path,
+    std::string_view fragment_shader_path,
+    const std::vector<std::string>& defines = {}
+);
+
+GLuint load_shaders(
+    std::string_view vertex_shader_code,
+    std::string_view fragment_shader_code,
+    const std::vector<std::string>& defines = {}
+);
+
+ManagedShaderID load_vertex_shader(std::string_view vertex_shader_code,
                                    const std::vector<std::string>& defines);
-ManagedShaderID load_fragment_shader(std::string_view fragment_shader_path,
+ManagedShaderID load_fragment_shader(std::string_view fragment_shader_code,
                                      const std::vector<std::string>& defines);
 }

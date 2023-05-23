@@ -4,13 +4,27 @@ project(LLEngine)
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(src)
+include_directories(include)
 include_directories(include/LLEngine)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-enable_testing()
-add_subdirectory(tst)
+if (NOT DEFINED LLENGINE_BUILD_TESTS)
+    set(LLENGINE_BUILD_TESTS 1)
+endif()
+
+if (NOT DEFINED LLENGINE_BUILD_DEMO)
+    set(LLENGINE_BUILD_DEMO 1)
+endif()
+
+if (LLENGINE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tst)
+endif()
+
+if (LLENGINE_BUILD_DEMO)
+    add_subdirectory(demo)
+endif()
 
 set(SOURCES
     src/rendering/VkFormatInfo.cpp
@@ -91,6 +105,7 @@ set(SOURCES
     src/nodes/gui/TextNode.cpp
     src/nodes/CompleteSpatialNode.cpp
     src/logger.cpp
+    src/start.cpp
 )
 
 set(PUBLIC_HEADERS
@@ -131,6 +146,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/nodes/gui/TextNode.hpp
     include/LLEngine/nodes/gui/ButtonNode.hpp
     include/LLEngine/FPSMeter.hpp
+    include/LLEngine/start.hpp
 )
 
 find_package(Threads)
@@ -187,6 +203,5 @@ target_link_libraries(llengine KTX::ktx)
 find_package(Freetype REQUIRED)
 target_link_libraries(llengine Freetype::Freetype)
 
-# Copy resources to the binary directory.
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/res" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# Copy shaders to the binary directory.
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/res")

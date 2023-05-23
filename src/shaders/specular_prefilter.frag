@@ -1,4 +1,4 @@
-#version 330
+R""(#version 330
 
 in vec3 frag_local_pos;
 
@@ -88,3 +88,4 @@ void main() {
 
     color_out = vec4(prefiltered_color, 1.0);
 }
+)""
