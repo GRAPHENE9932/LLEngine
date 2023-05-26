@@ -1,6 +1,6 @@
 {
 	"version": 1,
-	"name": "main_menu",
+	"name": "demo_map",
 	"scene_files": [
 		"res/meshes/level_0.glb"
 	],
