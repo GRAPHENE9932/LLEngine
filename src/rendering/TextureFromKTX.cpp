@@ -143,7 +143,7 @@ std::string ktx_error_to_string(KTX_error_code error) {
     return data;
 }
 
-Texture Texture::from_ktx2(const TexLoadingParams& params) {
+Texture Texture::from_ktx(const TexLoadingParams& params) {
     KTXTextureWrapper ktx_texture;
     KTX_error_code error;
 

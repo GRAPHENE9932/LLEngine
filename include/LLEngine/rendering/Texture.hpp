@@ -83,11 +83,11 @@ public:
         return Texture::from_rgbe(params);
     }
 
-    [[nodiscard]] static Texture from_ktx2(const TexLoadingParams& params);
+    [[nodiscard]] static Texture from_ktx(const TexLoadingParams& params);
     [[nodiscard]] static inline Texture from_ktx2(const std::string& ktx_texture_path) {
         TexLoadingParams params;
         params.file_path = ktx_texture_path;
-        return Texture::from_ktx2(params);
+        return Texture::from_ktx(params);
     }
 
     /**

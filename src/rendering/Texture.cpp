@@ -201,7 +201,7 @@ Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shade
 
 [[nodiscard]] Texture Texture::from_file(const TexLoadingParams& params) {
     if (params.file_path.ends_with(".ktx") || params.file_path.ends_with(".ktx2")) {
-        return from_ktx2(params);
+        return from_ktx(params);
     }
     else if (params.file_path.ends_with(".hdr")) {
         return from_rgbe(params);
