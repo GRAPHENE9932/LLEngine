@@ -105,7 +105,7 @@ set(SOURCES
     src/nodes/gui/TextNode.cpp
     src/nodes/CompleteSpatialNode.cpp
     src/logger.cpp
-    src/start.cpp
+    src/GameInstance.cpp
 )
 
 set(PUBLIC_HEADERS
@@ -146,7 +146,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/nodes/gui/TextNode.hpp
     include/LLEngine/nodes/gui/ButtonNode.hpp
     include/LLEngine/FPSMeter.hpp
-    include/LLEngine/start.hpp
+    include/LLEngine/GameInstance.hpp
 )
 
 find_package(Threads)
