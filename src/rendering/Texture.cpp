@@ -198,3 +198,15 @@ Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shade
 
     return Texture(texture_id, BRDF_INTEGRATION_MAP_SIZE, false);
 }
+
+[[nodiscard]] Texture Texture::from_file(const TexLoadingParams& params) {
+    if (params.file_path.ends_with(".ktx") || params.file_path.ends_with(".ktx2")) {
+        return from_ktx2(params);
+    }
+    else if (params.file_path.ends_with(".hdr")) {
+        return from_rgbe(params);
+    }
+    else {
+        throw std::runtime_error("The format of the specified texture file is unsupported or invalid.");
+    }
+}

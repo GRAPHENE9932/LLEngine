@@ -90,6 +90,19 @@ public:
         return Texture::from_ktx2(params);
     }
 
+    /**
+     * @brief Loads a texture in automatically detected format.
+     */
+    [[nodiscard]] static Texture from_file(const TexLoadingParams& params);
+    /**
+     * @brief Loads a texture in automatically detected format.
+     */
+    [[nodiscard]] static inline Texture from_file(const std::string& texture_path) {
+        TexLoadingParams params;
+        params.file_path = texture_path;
+        return Texture::from_file(params);
+    }
+
     [[nodiscard]] Texture panorama_to_cubemap(EquirectangularMapperShader& shader) const;
     [[nodiscard]] Texture compute_irradiance_map(IrradiancePrecomputerShader& shader) const;
     [[nodiscard]] Texture compute_prefiltered_specular_map(SpecularPrefilterShader& shader) const;
