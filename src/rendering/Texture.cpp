@@ -9,6 +9,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <array>
+#include <fstream>
 
 using namespace llengine;
 
@@ -199,14 +200,67 @@ Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shade
     return Texture(texture_id, BRDF_INTEGRATION_MAP_SIZE, false);
 }
 
+constexpr std::array<std::uint8_t, 12> KTX1_IDENTIFIER {
+    0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
+};
+
+constexpr std::array<std::uint8_t, 12> KTX2_IDENTIFIER {
+    0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
+};
+
+constexpr std::array<std::uint8_t, 10> RADIANCE_RGBE_IDENTIFIER {
+    0x23, 0x3F, 0x52, 0x41, 0x44, 0x49, 0x41, 0x4E, 0x43, 0x45
+};
+
+template<std::size_t ArraySize>
+[[nodiscard]] bool stream_starts_with(std::istream& stream, const std::array<std::uint8_t, ArraySize> data) {
+    std::array<std::uint8_t, ArraySize> read_data;
+    stream.read(reinterpret_cast<char*>(read_data.data()), ArraySize);
+    stream.seekg(-static_cast<std::istream::off_type>(ArraySize), std::ios_base::cur);
+
+    if (!stream) {
+        stream.clear();
+        return false;
+    }
+
+    return read_data == data;
+}
+
 [[nodiscard]] Texture Texture::from_file(const TexLoadingParams& params) {
-    if (params.file_path.ends_with(".ktx") || params.file_path.ends_with(".ktx2")) {
+    // Try to determine the file type with extension, if the file must be readed as a whole.
+    if (params.offset == 0 && params.size == 0) {
+        if (params.file_path.ends_with(".ktx") || params.file_path.ends_with(".ktx2")) {
+            return from_ktx(params);
+        }
+        else if (params.file_path.ends_with(".hdr")) {
+            return from_rgbe(params);
+        }
+    }
+
+    // If the texture is just a part of some other file (for instance, glTF),
+    // determine the file type using file identifiers at start of the texture.
+    std::ifstream stream(params.file_path);
+    stream.exceptions(std::ifstream::failbit);
+    stream.seekg(params.offset);
+
+    if (stream_starts_with(stream, KTX1_IDENTIFIER) || stream_starts_with(stream, KTX2_IDENTIFIER)) {
         return from_ktx(params);
     }
-    else if (params.file_path.ends_with(".hdr")) {
+    else if (stream_starts_with(stream, RADIANCE_RGBE_IDENTIFIER)) {
         return from_rgbe(params);
     }
     else {
         throw std::runtime_error("The format of the specified texture file is unsupported or invalid.");
     }
+}
+
+[[nodiscard]] Texture Texture::from_file(const TexLoadingParams& params, const std::string& mime_type) {
+    if (mime_type == "image/ktx" || mime_type == "image/ktx2") {
+        return from_ktx(params);
+    }
+    else if (mime_type == "image/x-hdr") {
+        return from_rgbe(params);
+    }
+
+    return from_file(params);
 }

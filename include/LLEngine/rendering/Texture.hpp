@@ -92,10 +92,29 @@ public:
 
     /**
      * @brief Loads a texture in automatically detected format.
+     *
+     * If the texture takes the whole file, tries to determine it using the
+     * file extension. If extension is invalid or missing, determines by
+     * identifiers at the start of texture file.
      */
     [[nodiscard]] static Texture from_file(const TexLoadingParams& params);
     /**
      * @brief Loads a texture in automatically detected format.
+     * 
+     * Does the same thing as from_file with one parameter, but with hint of the
+     * additional parameter: mime_type it will determine the format much faster
+     * if this texture is contained inside another file, for example, in glTF.
+     *
+     * @sa llengine::Texture::from_file(const TexLoadingParams& params)
+     */
+    [[nodiscard]] static Texture from_file(const TexLoadingParams& params, const std::string& mime_type);
+    /**
+     * @brief Loads a texture in automatically detected format.
+     * 
+     * If the file extension is invalid or missing, tries to determine the file
+     * type using identifiers at the start of texture file.
+     * 
+     * @sa llengine::Texture::from_file(const TexLoadingParams& params)
      */
     [[nodiscard]] static inline Texture from_file(const std::string& texture_path) {
         TexLoadingParams params;
