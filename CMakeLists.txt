@@ -93,7 +93,7 @@ set(SOURCES
     src/node_registration.cpp
     src/nodes/rendering/SpectatorCameraNode.cpp
     src/nodes/rendering/PBRDrawableNode.cpp
-    src/nodes/rendering/DrawableNode.cpp
+    src/nodes/rendering/DrawableCompleteSpatialNode.cpp
     src/nodes/rendering/PointLightNode.cpp
     src/nodes/rendering/CameraNode.cpp
     src/nodes/rendering/SpotLight.cpp
@@ -136,6 +136,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/nodes/rendering/CameraNode.hpp
     include/LLEngine/nodes/rendering/PointLightNode.hpp
     include/LLEngine/nodes/rendering/DrawableNode.hpp
+    include/LLEngine/nodes/rendering/DrawableCompleteSpatialNode.hpp
     include/LLEngine/nodes/rendering/SpectatorCameraNode.hpp
     include/LLEngine/nodes/rendering/SpotLight.hpp
     include/LLEngine/nodes/physics/BulletRigidBodyNode.hpp

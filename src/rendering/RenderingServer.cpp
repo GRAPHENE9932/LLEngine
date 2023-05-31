@@ -4,7 +4,7 @@
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
 #include "logger.hpp"
 #include "nodes/rendering/CameraNode.hpp"
-#include "nodes/rendering/DrawableNode.hpp" // DrawableNode
+#include "nodes/rendering/Drawable.hpp"
 #include "nodes/gui/GUINode.hpp"
 
 #include <GLFW/glfw3.h>
@@ -40,7 +40,7 @@ void RenderingServer::main_loop() {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         // Draw objects.
-        for (const auto& cur_drawable : get_drawable_nodes())
+        for (const auto& cur_drawable : get_drawables())
             cur_drawable->draw();
 
         // Draw skybox.
@@ -63,9 +63,9 @@ void RenderingServer::main_loop() {
     } while (!window.window_should_close());
 }
 
-void RenderingServer::register_drawable_node(DrawableNode* drawable_node) noexcept {
-    if (drawable_node) {
-        drawable_nodes.push_back(drawable_node);
+void RenderingServer::register_drawable(Drawable* drawable) noexcept {
+    if (drawable) {
+        drawables.push_back(drawable);
     }
 }
 
@@ -85,12 +85,12 @@ void RenderingServer::register_point_light(PointLightNode* point_light) noexcept
     }
 }
 
-void RenderingServer::unregister_drawable_node(DrawableNode* drawable_node) noexcept {
+void RenderingServer::unregister_drawable_node(Drawable* drawable_node) noexcept {
     const auto iter {
-        std::find(drawable_nodes.begin(), drawable_nodes.end(), drawable_node)
+        std::find(drawables.begin(), drawables.end(), drawable_node)
     };
-    if (iter != drawable_nodes.end()) {
-        drawable_nodes.erase(iter);
+    if (iter != drawables.end()) {
+        drawables.erase(iter);
     }
 }
 

@@ -18,7 +18,7 @@ namespace llengine {
 class Texture;
 class RenderingNode;
 class CameraNode;
-class DrawableNode;
+class Drawable;
 class GUINode;
 struct PointLightNode;
 struct SpotLight;
@@ -40,12 +40,12 @@ public:
     void main_loop();
 
     /**
-     * @brief Must be called by every DrawableNode upon its creation.
+     * @brief Must be called by every Drawable upon its creation.
      *
-     * Does nothing if drawable_node is nullptr.
-     * @param drawable_node new freshly-created drawable node.
+     * Does nothing if drawable is nullptr.
+     * @param drawable new freshly-created drawable.
      */
-    void register_drawable_node(DrawableNode* drawable_node) noexcept;
+    void register_drawable(Drawable* drawable) noexcept;
     /**
      * @brief Must be called by every GUINode upon its creation.
      *
@@ -69,7 +69,7 @@ public:
      * @param drawable_node drawable node that's going to be destroyed
      * or already destroyed.
      */
-    void unregister_drawable_node(DrawableNode* drawable_node) noexcept;
+    void unregister_drawable_node(Drawable* drawable_node) noexcept;
     /**
      * @brief Must be called by every GUINode upon its destruction.
      *
@@ -126,8 +126,8 @@ public:
         return point_lights;
     }
 
-    [[nodiscard]] const std::vector<DrawableNode*>& get_drawable_nodes() const noexcept {
-        return drawable_nodes;
+    [[nodiscard]] const std::vector<Drawable*>& get_drawables() const noexcept {
+        return drawables;
     }
 
     [[nodiscard]] const std::vector<GUINode*>& get_gui_nodes() const noexcept {
@@ -173,7 +173,7 @@ private:
     std::optional<Texture> irradiance_map = std::nullopt;
     std::optional<Texture> prefiltered_specular_map = std::nullopt;
     std::optional<Texture> brdf_integration_map = std::nullopt;
-    std::vector<DrawableNode*> drawable_nodes;
+    std::vector<Drawable*> drawables;
     std::vector<GUINode*> gui_nodes;
     std::vector<PointLightNode*> point_lights;
 

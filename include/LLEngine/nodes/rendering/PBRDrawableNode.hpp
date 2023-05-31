@@ -2,12 +2,13 @@
 
 #include <memory> // std::shared_ptr
 
-#include "DrawableNode.hpp" // DrawableNode
+#include "DrawableCompleteSpatialNode.hpp" // DrawableNode
+#include "nodes/CompleteSpatialNode.hpp"
 #include "rendering/Mesh.hpp"
 #include "rendering/Material.hpp" // Material
 
 namespace llengine {
-class PBRDrawableNode : public DrawableNode {
+class PBRDrawableNode : public DrawableCompleteSpatialNode {
 public:
     std::shared_ptr<const Mesh> mesh;
     std::shared_ptr<Material> material;

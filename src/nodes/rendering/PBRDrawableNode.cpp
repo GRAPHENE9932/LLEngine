@@ -8,7 +8,7 @@ PBRDrawableNode::PBRDrawableNode(
     const std::shared_ptr<Material>& material,
     const std::shared_ptr<const Mesh>& mesh,
     const Transform& transform
-) : DrawableNode(rs, transform), mesh(mesh), material(material) {}
+) : DrawableCompleteSpatialNode(rs, transform), mesh(mesh), material(material) {}
 
 void PBRDrawableNode::draw() {
     // Do some checks.
