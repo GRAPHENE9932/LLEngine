@@ -3,6 +3,7 @@
 #include "rendering/Mesh.hpp"
 #include "gui/GUITexture.hpp"
 #include "utils/math.hpp"
+#include "nodes/gui/GUICanvas.hpp"
 
 using namespace llengine;
 
@@ -58,7 +59,8 @@ void GUINode::draw_texture_part(
     const Texture& texture, glm::vec2 pos_offset_in_px, glm::vec2 tex_offset_in_px,
     glm::vec2 quad_size_in_px, glm::vec2 tex_part_size_in_px
 ) {
-    const glm::vec2 viewport_size = rs.get_window().get_window_size();
+    GUICanvas& canvas {get_canvas()};
+    const glm::vec2 viewport_size = canvas.get_size();
 
     glm::vec2 position_in_px = get_screen_space_position();
     // The quad mesh is in range from -1.0 to 1.0, but
@@ -67,7 +69,7 @@ void GUINode::draw_texture_part(
 
     const glm::mat4 mvp = glm::translate(
         math_utils::scr_space_pos_to_gl_space(glm::vec3(position_in_px, get_transform().z_coordinate), viewport_size)
-    ) * glm::scale(glm::vec3(quad_size_in_px / viewport_size, 1.0f));
+    ) * glm::scale(glm::vec3(quad_size_in_px / viewport_size, 1.0f)) * canvas.get_global_matrix();
 
     glm::vec2 uv_scale = tex_part_size_in_px / static_cast<glm::vec2>(texture.get_size());
     glm::vec2 uv_offset = tex_offset_in_px / static_cast<glm::vec2>(texture.get_size());
@@ -126,12 +128,39 @@ void GUINode::draw_rectangle(const GUITexture& texture) {
     }
 }
 
-[[nodiscard]] glm::vec2 GUINode::get_parent_size() const {
-    GUINode* parent = get_parent();
-    if (parent) {
-        return parent->get_absolute_size();
+void GUINode::assign_canvas_parent(GUICanvas& canvas) {
+    parent = &canvas;
+}
+
+[[nodiscard]] GUINode* GUINode::get_parent() const {
+    if (std::holds_alternative<GUINode*>(parent)) {
+        return std::get<GUINode*>(parent);
     }
     else {
-        return rs.get_window().get_window_size();
+        return nullptr;
+    }
+}
+
+[[nodiscard]] GUICanvas& GUINode::get_canvas() const {
+    if (std::holds_alternative<GUICanvas*>(parent)) {
+        return *std::get<GUICanvas*>(parent);
+    }
+    else {
+        return std::get<GUINode*>(parent)->get_canvas();
+    }
+}
+
+[[nodiscard]] glm::vec2 GUINode::get_parent_size() const {
+    if (std::holds_alternative<GUINode*>(parent)) {
+        return std::get<GUINode*>(parent)->get_absolute_size();
+    }
+    else if (std::holds_alternative<GUICanvas*>(parent)) {
+        return std::get<GUICanvas*>(parent)->get_size();
+    }
+    else {
+        throw std::runtime_error(
+            "Can not get GUI node parent size because the node "
+            "doesn't have a parent node or assigned canvas."
+        );
     }
 }

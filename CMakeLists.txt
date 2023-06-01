@@ -103,6 +103,7 @@ set(SOURCES
     src/nodes/gui/CompleteGUINode.cpp
     src/nodes/gui/ButtonNode.cpp
     src/nodes/gui/TextNode.cpp
+    src/nodes/gui/GUICanvas.cpp
     src/nodes/CompleteSpatialNode.cpp
     src/logger.cpp
     src/GameInstance.cpp

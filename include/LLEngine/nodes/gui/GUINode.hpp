@@ -9,9 +9,11 @@
 #include <vector>
 #include <memory>
 #include <cstdint>
+#include <variant>
 
 namespace llengine {
 class Texture;
+class GUICanvas;
 class GUITexture;
 class RenderingServer;
 
@@ -59,10 +61,33 @@ public:
         update_children();
     }
 
-    [[nodiscard]] inline GUINode* get_parent() const noexcept {
-        return parent;
-    }
+    /**
+     * @brief Get the parent GUI node if exists.
+     * 
+     * @returns Non-owning pointer to the parent,
+     * or nullptr if this GUI node is root or
+     * doesn't have a parent GUI node for another reason.
+     */
+    [[nodiscard]] GUINode* get_parent() const;
+    /**
+     * @brief Get the parent size.
+     *
+     * May throw if the current GUI node doesn't have neither canvas or parent.
+     * 
+     * @returns Size of the parent or size of the canvas, if
+     * this node doesn't have a parent.
+     */
     [[nodiscard]] glm::vec2 get_parent_size() const;
+
+    /**
+     * @brief Get the GUI canvas if assigned.
+     * 
+     * May throw if the current GUI node and it's parent doesn't
+     * have a canvas assigned.
+     */
+    [[nodiscard]] GUICanvas& get_canvas() const;
+
+    void assign_canvas_parent(GUICanvas& canvas);
 
     void draw_children();
     void update_children();
@@ -73,7 +98,7 @@ protected:
     void draw_rectangle(const GUITexture& texture);
 
 private:
-    GUINode* parent {nullptr};
+    std::variant<GUINode*, GUICanvas*, std::monostate> parent = std::monostate();
     std::string name;
     std::vector<std::unique_ptr<GUINode>> children;
 
