@@ -37,7 +37,6 @@ SceneJSON::SceneJSON(const std::string& json_path) {
 
 namespace llengine {
 void from_json(const json& root_json, Transform& spat_params) {
-    const glm::quat testo({0.0f, 0.0f, 0.0f});
     spat_params = {
         get_optional<glm::vec3>(root_json, "position")
                 .value_or(glm::vec3(0.0f, 0.0f, 0.0f)),
