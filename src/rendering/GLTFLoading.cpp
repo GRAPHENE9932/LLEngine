@@ -651,7 +651,7 @@ GLTF::GLTF(std::string_view file_path) {
     if (json_chunk.contains("extensionsRequired")) {
         for (const json& cur_extension : json_chunk["extensionsRequired"]) {
             const bool is_extension_supported {
-                std::find(SUPPORTED_EXTENSIONS.begin(), SUPPORTED_EXTENSIONS.end(), cur_extension) !=
+                std::find(SUPPORTED_EXTENSIONS.begin(), SUPPORTED_EXTENSIONS.end(), cur_extension.get<std::string_view>()) !=
                 SUPPORTED_EXTENSIONS.end()
             };
             
