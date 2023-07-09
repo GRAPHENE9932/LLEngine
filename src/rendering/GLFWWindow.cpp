@@ -139,7 +139,7 @@ glm::ivec2 GLFWWindow::get_window_size() const {
 }
 
 void GLFWWindow::set_cursor_position(const glm::dvec2& new_position) {
-    //glfwSetCursorPos(glfw_window, new_position.x, new_position.y);
+    glfwSetCursorPos(glfw_window, new_position.x, new_position.y);
 }
 
 static int get_glfw_key_code(Key key) {

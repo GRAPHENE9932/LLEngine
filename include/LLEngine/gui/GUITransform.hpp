@@ -4,6 +4,8 @@
 #include <glm/vec3.hpp>
 
 namespace llengine {
+class NodeProperty;
+
 struct GUITransform {
     enum class SizeMode : std::uint8_t {
         ABSOLUTE, RELATIVE
@@ -23,25 +25,8 @@ struct GUITransform {
     SizeMode size_mode = SizeMode::ABSOLUTE;
     glm::vec2 size {0.0f, 0.0f};
 
-    [[nodiscard]] glm::vec3 get_screen_space_offset(glm::vec2 parent_size) const noexcept {
-        glm::vec2 result_vec2 {position_offset};
-        result_vec2 += position_anchor * static_cast<glm::vec2>(parent_size);
+    [[nodiscard]] glm::vec3 get_screen_space_offset(glm::vec2 parent_size) const noexcept;
 
-        if (origin_x == OriginX::CENTER) {
-            result_vec2.x -= size.x / 2.0f;
-        }
-        else if (origin_x == OriginX::RIGHT) {
-            result_vec2.x -= size.x;
-        }
-
-        if (origin_y == OriginY::CENTER) {
-            result_vec2.y -= size.y / 2.0f;
-        }
-        else if (origin_y == OriginY::BOTTOM) {
-            result_vec2.y -= size.y;
-        }
-
-        return {result_vec2, z_coordinate};
-    }
+    [[nodiscard]] static GUITransform from_property(const NodeProperty& property);
 };
 }

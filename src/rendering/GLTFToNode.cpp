@@ -16,7 +16,6 @@ using namespace llengine;
 // Packed parameters used across functions.
 struct ConstructionEnvironment {
     const GLTF& gltf;
-    EngineServers& servers;
     const std::vector<std::shared_ptr<Mesh>>& meshes;
     const std::vector<std::shared_ptr<Material>>& materials;
     std::vector<std::shared_ptr<Shape>> shapes_pool;
@@ -41,10 +40,8 @@ std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
     assert(gltf_node.is_drawable());
 
     auto result = std::make_unique<PBRDrawableNode>(
-        constr_env.servers.rs,
         constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
-        constr_env.meshes.at(*gltf_node.mesh_index),
-        gltf_node.transform
+        constr_env.meshes.at(*gltf_node.mesh_index)
     );
 
     result->set_name(gltf_node.name);
@@ -126,12 +123,10 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
 ) {
     assert(gltf_node.is_rigid_body());
 
-    auto result = std::make_unique<BulletRigidBodyNode>(
-        constr_env.servers.bps,
-        extract_shape(constr_env, gltf_node),
-        get_optional<float>(gltf_node.extras.value(), "mass").value_or(0.0f),
-        gltf_node.transform
-    );
+    auto result = std::make_unique<BulletRigidBodyNode>();
+    result->set_mass(get_optional<float>(gltf_node.extras.value(), "mass").value_or(0.0f));
+    result->set_transform(gltf_node.transform);
+    result->set_shape(extract_shape(constr_env, gltf_node));
 
     if (gltf_node.is_drawable()) {
         // If our GLTF::Node is rigid body and drawable at the same time,
@@ -140,7 +135,7 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
         drawable->set_transform(Transform());
         drawable->set_name(drawable->get_name() + "_drawable");
 
-        result->add_child(std::move(drawable));
+        result->add_child(static_cast<std::unique_ptr<SpatialNode>&&>(std::move(drawable)));
     }
 
     result->set_name(gltf_node.name);
@@ -252,7 +247,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::SpatialNode> GLTF::to_node(EngineServers& servers) const {
+std::unique_ptr<::Node> GLTF::to_node() const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -276,7 +271,6 @@ std::unique_ptr<::SpatialNode> GLTF::to_node(EngineServers& servers) const {
     // Pack this into a ConstructionEnvironment.
     ConstructionEnvironment constr_env {
         *this,
-        servers,
         meshes,
         materials,
         {}

@@ -1,107 +1,192 @@
-#include <string> // std::string
-#include <fstream> // std::ifstream
-#include <cstdint> // uint32_t
-#include <stdexcept> // std::runtime_error
-
-#include <nlohmann/json.hpp> // nlohmann::json
-
 #include "SceneJSON.hpp"
-#include "rendering/RenderingServer.hpp" // RenderingServer
-#include "utils/json_conversion.hpp" // get_optional
-#include "nodes/CompleteSpatialNode.hpp"
-#include "nodes/rendering/PointLightNode.hpp" // PointLightNode
-#include "nodes/rendering/SpectatorCameraNode.hpp" // SpectatorCameraNode
+#include "nodes/gui/GUICanvas.hpp"
+#include "utils/json_conversion.hpp"
+#include "node_registration.hpp"
 
-using json = nlohmann::json;
+#include <nlohmann/json.hpp>
+#include <fmt/format.h>
+
+#include <map>
+#include <cstdint>
+#include <cstddef>
+#include <fstream>
+#include <utility>
+#include <string_view>
 
 using namespace llengine;
 
-constexpr uint32_t CURRENT_MAP_VERSION = 1;
+constexpr std::uint64_t CURRENT_VERSION = 1;
 
-SceneJSON::SceneJSON(const std::string& json_path) {
-    // Parse JSON.
-    std::ifstream stream(json_path);
-    json_map = json::parse(stream);
-
-    // Check version.
-    if (json_map.at("version") != CURRENT_MAP_VERSION)
-        throw std::runtime_error("Invalid map version");
-
-    // Load all external scene files.
-    if (json_map.contains("scene_files")) {
-        scene_files.reserve(json_map["scene_files"].size());
-        for (const json& cur_file_path : json_map["scene_files"])
-            scene_files.push_back(SceneFile::load_from_file(cur_file_path));
+NodeProperty node_property_from_json(std::string_view key, const nlohmann::json& value) {
+    if (value.is_number_integer()) {
+        return NodeProperty(key, value.get<std::int64_t>());
     }
-}
-
-namespace llengine {
-void from_json(const json& root_json, Transform& spat_params) {
-    spat_params = {
-        get_optional<glm::vec3>(root_json, "position")
-                .value_or(glm::vec3(0.0f, 0.0f, 0.0f)),
-        get_optional<glm::vec3>(root_json, "scale")
-                .value_or(glm::vec3(1.0f, 1.0f, 1.0f)),
-        glm::quat(get_optional<glm::vec3>(root_json, "rotation")
-                .value_or(glm::vec3(0.0f, 0.0f, 0.0f))),
-    };
-}
-}
-
-std::unique_ptr<PointLightNode> point_light_from_json(RenderingServer& rs, const json& root_json) {
-    auto result = std::make_unique<PointLightNode>(rs, root_json.get<Transform>());
-    root_json.at("color").get_to(result->color);
-
-    return result;
-}
-
-std::unique_ptr<SpectatorCameraNode> player_to_node(RenderingServer& rs, const json& root_json) {
-    const auto& extents = rs.get_window().get_window_size();
-    const float aspect_ratio {static_cast<float>(extents.x) / extents.y};
-
-    auto result = std::make_unique<SpectatorCameraNode>(
-        rs, aspect_ratio,
-        glm::radians(root_json.at("fov").get<float>()),
-        root_json.get<Transform>()
-    );
-    return result;
-}
-
-std::unique_ptr<SpatialNode> SceneJSON::to_node(EngineServers& servers, const json& json_node) const {
-    std::unique_ptr<SpatialNode> result;
-    std::string type = json_node.at("type").get<std::string>();
-    if (type == "scene_file") {
-        const Transform spat_params = json_node.get<Transform>();
-        result = scene_files.at(json_node.at("scene_file_index").get<size_t>())->to_node(servers);
-        result->set_translation(spat_params.translation + result->get_translation());
-        result->set_scale(spat_params.scale * result->get_scale());
-        result->set_rotation(spat_params.rotation * result->get_rotation());
+    else if (value.is_number_float()) {
+        return NodeProperty(key, value.get<float>());
     }
-    else if (type == "empty") {
-        const Transform spat_params = json_node.get<Transform>();
-        result = std::make_unique<CompleteSpatialNode>(spat_params);
+    else if (value.is_boolean()) {
+        return NodeProperty(key, value.get<bool>());
     }
-    else if (type == "point_light") {
-        result = point_light_from_json(servers.rs, json_node);
+    else if (value.is_string()) {
+        return NodeProperty(key, value.get<std::string>());
     }
-    else if (type == "player") {
-        result = player_to_node(servers.rs, json_node);
+    else if (value.is_object()) {
+        std::vector<NodeProperty> sub_properties;
+        for (const auto& element : value.items()) {
+            sub_properties.push_back(node_property_from_json(element.key(), element.value()));
+        }
+        return NodeProperty(key, std::move(sub_properties));
     }
-    else {
-        throw std::runtime_error("Unknown node type.");
-    }
-
-    if (json_node.contains("children")) {
-        for (const json& cur_json_child : json_node["children"]) {
-            result->add_child(
-                to_node(servers, cur_json_child)
-            );
+    else if (value.is_array()) {
+        if (value.size() == 0 || value[0].is_number_integer()) {
+            return NodeProperty(key, value.get<std::vector<std::int64_t>>());
+        }
+        else if (value[0].is_number_float()) {
+            return NodeProperty(key, value.get<std::vector<float>>());
+        }
+        else if (value[0].is_string()) {
+            return NodeProperty(key, value.get<std::vector<std::string>>());
+        }
+        else if (value[0].is_array()) {
+            if (value[0].size() == 2) {
+                if (value[0][0].is_number_integer()) {
+                    return NodeProperty(key, value.get<std::vector<glm::i32vec2>>());
+                }
+                else if (value[0][0].is_number_float()) {
+                    return NodeProperty(key, value.get<std::vector<glm::vec2>>());
+                }
+                else {
+                    throw std::runtime_error("Invalid vec2 type.");
+                }
+            }
+            else if (value[0].size() == 3) {
+                return NodeProperty(key, value.get<std::vector<glm::vec3>>());
+            }
+            else if (value[0].size() == 4) {
+                return NodeProperty(key, value.get<std::vector<glm::vec4>>());
+            }
+            else {
+                throw std::runtime_error("Invalid subvector size.");
+            }
+        }
+        else {
+            throw std::runtime_error("Unknown element type of the JSON array property.");
         }
     }
-
-    return result;
+    else {
+        throw std::runtime_error("Unknown JSON property type.");
+    }
 }
 
-std::unique_ptr<SpatialNode> SceneJSON::to_node(EngineServers& servers) const {
-    return to_node(servers, json_map.at("root_node"));
+std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>
+create_nodes_map(const nlohmann::json& json) {
+    std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>> nodes;
+
+    for (const nlohmann::json& node_json : json) {
+        std::uint64_t id = node_json.at("id");
+        std::optional<std::uint64_t> parent_id = get_optional<std::uint64_t>(node_json, "parent_id");
+        std::string type = node_json.at("type");
+
+        std::vector<NodeProperty> properties;
+        properties.reserve(node_json.size() - 3);
+        for (const auto& element : node_json.items()) {
+            if (element.key() == "id" || element.key() == "parent_id" || element.key() == "type") {
+                continue;
+            }
+
+            try {
+                properties.emplace_back(node_property_from_json(element.key(), element.value()));
+            }
+            catch (const std::exception& e) {
+                throw std::runtime_error(fmt::format(
+                    "Failed to read a node property from a JSON piece because: \"{}\".",
+                    e.what()
+                ));
+            }
+            catch (...) {
+                throw std::runtime_error("Failed to read a node property from a JSON piece.");
+            }
+        }
+
+        nodes[id] = {{type, std::move(properties), {}}, parent_id};
+    }
+
+    return nodes;
+}
+
+SceneJSON::NodeData initialize_root_node_data(const nlohmann::json& json) {
+    auto nodes = create_nodes_map(json);
+
+    std::size_t roots_count = std::count_if(nodes.begin(), nodes.end(), [] (const auto& pair) {
+        return !pair.second.second.has_value();
+    });
+    if (roots_count != 1) {
+        throw std::runtime_error(fmt::format(
+            "There must be one node root, but we have {} of them.", roots_count
+        ));
+    }
+    auto root_node_iter = std::find_if(nodes.begin(), nodes.end(), [] (const auto& pair) -> bool {
+        return !pair.second.second.has_value();
+    });
+
+    for (auto& pair : nodes) {
+        if (pair.first == root_node_iter->first) {
+            continue;
+        };
+        nodes[*pair.second.second].first.children.emplace_back(std::move(pair.second.first));
+    }
+
+    return std::move(root_node_iter->second.first);
+}
+
+SceneJSON::SceneJSON(std::string_view json_path) {
+    std::ifstream json_stream;
+    json_stream.exceptions(std::ios::failbit);
+    json_stream.open(std::string(json_path));
+    nlohmann::json root_json = nlohmann::json::parse(json_stream);
+
+    std::uint64_t scene_version = root_json.at("version").get<std::uint64_t>();
+    if (scene_version != CURRENT_VERSION) {
+        throw std::runtime_error(fmt::format(
+            "Unsupported JSON scene version: {}. Only version {} is supported.",
+            scene_version, CURRENT_VERSION
+        ));
+    }
+
+    name = root_json.at("name");
+
+    root_node_data = initialize_root_node_data(root_json.at("nodes"));
+}
+
+std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
+    std::unique_ptr<Node> result = nullptr;
+
+    if (data.type == "scene_file") {
+        auto prop_iter = std::find_if(
+            data.properties.begin(), data.properties.end(),
+            [] (const NodeProperty& prop) -> bool {
+                return prop.get_name() == "scene_file_path";
+            }
+        );
+        if (prop_iter == data.properties.end()) {
+            throw std::runtime_error("scene_file_path is not specified for a scene_file node.");
+        }
+        std::string scene_file_path = prop_iter->get<std::string>();
+
+        result = SceneFile::load_from_file(scene_file_path)->to_node();
+
+    }
+    else {
+        result = construct_node(data.type, data.properties);
+    }
+    
+    for (const auto& child_data : data.children) {
+        auto child_ptr = to_node(child_data);
+        result->add_child(std::move(child_ptr));
+    }
+    return std::move(result);
+}
+
+std::unique_ptr<Node> SceneJSON::to_node() const {
+    return std::move(::to_node(root_node_data));
 }

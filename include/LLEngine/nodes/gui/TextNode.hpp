@@ -12,7 +12,7 @@
 namespace llengine {
 class TextNode : public GUINode {
 public:
-    TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font);
+    TextNode(const std::shared_ptr<FreeTypeFont>& font);
 
     [[nodiscard]] GUITransform get_transform() const override;
     [[nodiscard]] glm::vec2 get_absolute_size() const override;

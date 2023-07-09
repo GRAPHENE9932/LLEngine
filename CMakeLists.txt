@@ -88,6 +88,8 @@ set(SOURCES
     src/shaders/irradiance_precomputer.vert
     src/shaders/equirectangular_mapper.vert
     src/gui/FreeTypeFont.cpp
+    src/gui/GUITexture.cpp
+    src/gui/GUITransform.cpp
     src/SceneFile.cpp
     src/SceneJSON.cpp
     src/node_registration.cpp
@@ -105,8 +107,13 @@ set(SOURCES
     src/nodes/gui/TextNode.cpp
     src/nodes/gui/GUICanvas.cpp
     src/nodes/CompleteSpatialNode.cpp
+    src/nodes/Node.cpp
     src/logger.cpp
     src/GameInstance.cpp
+    src/NodeProperty.cpp
+    src/SceneJSON.cpp
+    src/node_registration.cpp
+    src/builtin_node_registration.cpp
 )
 
 set(PUBLIC_HEADERS

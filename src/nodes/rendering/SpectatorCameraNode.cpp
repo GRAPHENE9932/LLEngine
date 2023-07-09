@@ -11,14 +11,6 @@ using namespace llengine;
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
-SpectatorCameraNode::SpectatorCameraNode(
-    RenderingServer& rs, float display_ratio,
-    float fov, const Transform& transform
-) :
-    CameraNode(rs, display_ratio, fov, transform) {
-    rs.get_window().disable_cursor();
-}
-
 void SpectatorCameraNode::update() {
     CameraNode::update();
 
@@ -89,7 +81,7 @@ void clamp_x_angle(float& x_angle) {
 }
 
 void SpectatorCameraNode::update_rotation() {
-    auto& window {rs.get_window()};
+    auto& window {get_rendering_server().get_window()};
 
     // Get the current cursor position.
     glm::dvec2 cursor_pos = window.get_cursor_position();
@@ -109,6 +101,8 @@ void SpectatorCameraNode::update_rotation() {
 }
 
 void SpectatorCameraNode::update_position() {
+    RenderingServer& rs = get_rendering_server();
+
     // Compute directions.
     const glm::vec3 forward_dir = get_rotation() * FORWARD;
     const glm::vec3 right_dir = get_rotation() * RIGHT;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Transform.hpp"
+#include "nodes/Node.hpp"
 
 #include <glm/vec3.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -12,18 +13,21 @@
 #include <string_view>
 
 namespace llengine {
-class SpatialNode {
+class SpatialNode : public Node {
 public:
     virtual ~SpatialNode();
 
-    void set_name(std::string_view new_name);
-    [[nodiscard]] const std::string& get_name() const;
-
     void update_children();
+    void add_child(std::unique_ptr<Node>&& child) override;
     void add_child(std::unique_ptr<SpatialNode>&& child);
     void remove_child(const size_t index);
     void remove_child(SpatialNode* const ptr);
     [[nodiscard]] SpatialNode* get_parent() const;
+
+    [[nodiscard]] virtual const RootNode& get_root_node() const override;
+    [[nodiscard]] virtual RootNode& get_root_node() override;
+
+    [[nodiscard]] virtual bool is_attached_to_tree() const override;
 
     const std::vector<std::unique_ptr<SpatialNode>>& get_children() const;
 
@@ -32,6 +36,10 @@ public:
     virtual void set_scale(const glm::vec3& new_scale) = 0;
     virtual void set_rotation(const glm::quat& new_rotation) = 0;
     virtual void set_transform(const Transform& new_transform) = 0;
+
+    void set_translation_property(const NodeProperty& property);
+    void set_scale_property(const NodeProperty& property);
+    void set_rotation_property(const NodeProperty& property);
 
     [[nodiscard]] virtual glm::vec3 get_translation() const noexcept = 0;
     [[nodiscard]] virtual glm::vec3 get_global_position() const noexcept = 0;
@@ -46,9 +54,12 @@ public:
 
     virtual void update();
 
+    virtual void on_attachment_to_tree() override;
+
+    static void register_properties();
+
 private:
     SpatialNode* parent {nullptr};
-    std::string name;
     /**
      * This vector MUST NOT be changed outside the
      * add_child and remove_child functions.

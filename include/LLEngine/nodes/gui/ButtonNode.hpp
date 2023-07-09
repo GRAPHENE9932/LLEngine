@@ -6,8 +6,6 @@
 namespace llengine {
 class ButtonNode : public CompleteGUINode {
 public:
-    explicit ButtonNode(RenderingServer& rs) : CompleteGUINode(rs) {};
-
     void draw() override;
     void update() override;
 
@@ -19,6 +17,10 @@ public:
     void set_pressed_texture(const GUITexture& new_texture) {
         pressed_texture = new_texture;
     }
+
+    static void register_properties();
+    void set_idle_texture_property(const NodeProperty& property);
+    void set_pressed_texture_property(const NodeProperty& property);
 
 private:
     GUITexture idle_texture;

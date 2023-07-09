@@ -36,6 +36,19 @@ struct Transform {
         return result;
     }
 
+    Transform operator/=(const Transform& other) noexcept {
+        translation -= other.translation;
+        scale /= other.scale;
+        rotation *= glm::inverse(other.rotation);
+        return *this;
+    }
+
+    Transform operator/(const Transform& other) const noexcept {
+        Transform result(*this);
+        result /= other;
+        return result;
+    }
+
     bool operator==(const Transform& other) const noexcept {
         return translation == other.translation &&
             scale == other.scale &&

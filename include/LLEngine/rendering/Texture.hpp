@@ -12,6 +12,7 @@ class EquirectangularMapperShader;
 class IrradiancePrecomputerShader;
 class SpecularPrefilterShader;
 class BRDFIntegrationMapperShader;
+class NodeProperty;
 
 struct TexLoadingParams {
     GLenum magnification_filter = GL_LINEAR;
@@ -121,6 +122,8 @@ public:
         params.file_path = texture_path;
         return Texture::from_file(params);
     }
+
+    [[nodiscard]] static Texture from_property(const NodeProperty& property);
 
     [[nodiscard]] Texture panorama_to_cubemap(EquirectangularMapperShader& shader) const;
     [[nodiscard]] Texture compute_irradiance_map(IrradiancePrecomputerShader& shader) const;

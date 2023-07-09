@@ -1,25 +1,26 @@
 #pragma once
 
-#include <vector> // std::vector
-#include <string> // std::string
+#include "SceneFile.hpp"
+#include "NodeProperty.hpp"
+#include "nodes/RootNode.hpp"
 
-#include <nlohmann/json.hpp> // nlohmann::json
-
-#include "SceneFile.hpp" // SceneFile
-#include "nodes/SpatialNode.hpp" // SpatialNode
+#include <vector>
 
 namespace llengine {
 class SceneJSON : public SceneFile {
 public:
-    explicit SceneJSON(const std::string& json_path);
-    std::unique_ptr<SpatialNode> to_node(EngineServers& servers) const override;
+    struct NodeData {
+        std::string type;
+        std::vector<NodeProperty> properties;
+        std::vector<NodeData> children;
+    };
+
+    SceneJSON(std::string_view json_path);
+
+    std::unique_ptr<Node> to_node() const override;
 
 private:
-    std::vector<std::unique_ptr<SceneFile>> scene_files;
-    nlohmann::json json_map;
-
-    std::unique_ptr<SpatialNode> to_node(
-        EngineServers& servers, const nlohmann::json& json_node
-    ) const;
+    NodeData root_node_data;
+    std::string name;
 };
 }

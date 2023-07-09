@@ -3,14 +3,16 @@
 
 using namespace llengine;
 
+PBRDrawableNode::PBRDrawableNode() = default;
+
 PBRDrawableNode::PBRDrawableNode(
-    RenderingServer& rs,
     const std::shared_ptr<Material>& material,
-    const std::shared_ptr<const Mesh>& mesh,
-    const Transform& transform
-) : DrawableCompleteSpatialNode(rs, transform), mesh(mesh), material(material) {}
+    const std::shared_ptr<const Mesh>& mesh
+) : DrawableCompleteSpatialNode(), mesh(mesh), material(material) {}
 
 void PBRDrawableNode::draw() {
+    RenderingServer& rs = get_rendering_server();
+
     // Do some checks.
     if (material->normal_map.has_value() &&
         (mesh->get_normals_id() == 0 || mesh->get_tangents_id() == 0)) {
@@ -43,5 +45,6 @@ void PBRDrawableNode::draw() {
 }
 
 GLuint PBRDrawableNode::get_program_id() const {
+    RenderingServer& rs = get_rendering_server();
     return rs.get_shader_holder().get_pbr_shader_manager().get_program_id(rs, *material);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/GUITransform.hpp"
+#include "nodes/Node.hpp"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -17,7 +18,7 @@ class GUICanvas;
 class GUITexture;
 class RenderingServer;
 
-class GUINode {
+class GUINode : public Node {
 public:
     enum class SizeMode : std::uint8_t {
         ABSOLUTE, RELATIVE
@@ -29,8 +30,7 @@ public:
         BOTTOM, CENTER, TOP
     };
 
-    explicit GUINode(RenderingServer& rs);
-    virtual ~GUINode();
+    ~GUINode();
 
     [[nodiscard]] virtual GUITransform get_transform() const = 0;
     [[nodiscard]] virtual glm::vec2 get_absolute_size() const = 0;
@@ -42,6 +42,7 @@ public:
      */
     [[nodiscard]] virtual glm::vec3 get_screen_space_position() const;
     virtual void set_transform(const GUITransform& transform) = 0;
+    void set_transform_property(const NodeProperty& property);
 
     /**
      * @param point The point position in screen (pixel) coordinates.
@@ -49,11 +50,14 @@ public:
      */
     [[nodiscard]] bool contains_point(glm::vec2 point) const;
 
+    void add_child(std::unique_ptr<Node>&& child) override;
     void add_child(std::unique_ptr<GUINode>&& child);
 
     [[nodiscard]] inline const std::vector<std::unique_ptr<GUINode>>& get_children() const {
         return children;
     }
+
+    [[nodiscard]] bool is_attached_to_tree() const override;
 
     virtual void draw() {}
 
@@ -92,19 +96,21 @@ public:
     void draw_children();
     void update_children();
 
-protected:
-    RenderingServer& rs;
+    static void register_properties();
 
+protected:
     void draw_rectangle(const GUITexture& texture);
+    void on_attachment_to_tree() override final;
 
 private:
     std::variant<GUINode*, GUICanvas*, std::monostate> parent = std::monostate();
-    std::string name;
     std::vector<std::unique_ptr<GUINode>> children;
 
     void draw_texture_part(
         const Texture& texture, glm::vec2 pos_offset_in_px, glm::vec2 tex_offset_in_px,
         glm::vec2 quad_size_in_px, glm::vec2 tex_part_size_in_px
     );
+
+    friend class GUICanvas;
 };
 }

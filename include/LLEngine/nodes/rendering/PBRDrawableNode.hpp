@@ -10,14 +10,13 @@
 namespace llengine {
 class PBRDrawableNode : public DrawableCompleteSpatialNode {
 public:
-    std::shared_ptr<const Mesh> mesh;
-    std::shared_ptr<Material> material;
+    std::shared_ptr<const Mesh> mesh = nullptr;
+    std::shared_ptr<Material> material = nullptr;
 
+    PBRDrawableNode();
     PBRDrawableNode(
-        RenderingServer& rs,
         const std::shared_ptr<Material>& material,
-        const std::shared_ptr<const Mesh>& mesh,
-        const Transform& transform = Transform()
+        const std::shared_ptr<const Mesh>& mesh
     );
 
     void draw() override;

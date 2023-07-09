@@ -8,10 +8,9 @@ class RenderingServer;
 
 class DrawableCompleteSpatialNode : public Drawable, public CompleteSpatialNode {
 public:
-    DrawableCompleteSpatialNode(RenderingServer& rs, const Transform& transform = Transform());
     ~DrawableCompleteSpatialNode();
 
 protected:
-    RenderingServer& rs;
+    void on_attachment_to_tree() override final;
 };
 }

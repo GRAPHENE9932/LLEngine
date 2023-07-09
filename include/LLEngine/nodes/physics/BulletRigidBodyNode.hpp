@@ -16,22 +16,9 @@ class BulletPhysicsServer;
 
 class BulletRigidBodyNode : public SpatialNode {
 public:
-    /**
-     * @brief Creates new bullet rigid body.
-     *
-     * @param mass mass of the rigid body. If mass is in
-     * range (0, +infinity) then it will be dynamic. If
-     * mass equals to 0, then it will be static.
-     * Otherwise, an error will be thrown.
-     *
-     * @throws std::invalid_argument if mass value is invalid.
-     */
-    BulletRigidBodyNode(
-        BulletPhysicsServer& bps,
-        const std::shared_ptr<Shape>& shape,
-        float mass, const Transform& transform = Transform()
-    );
+    BulletRigidBodyNode();
     BulletRigidBodyNode(const BulletRigidBodyNode& node) = delete;
+    BulletRigidBodyNode& operator=(const BulletRigidBodyNode& node) = delete;
     ~BulletRigidBodyNode() noexcept override;
 
     void update() override {
@@ -83,15 +70,21 @@ public:
     void set_mass(float new_mass);
     [[nodiscard]] float get_mass() const noexcept;
 
+    void set_shape(const Shape& shape);
+    void create_bullet_body(const Shape& new_shape, const Transform& transform, float new_mass);
+
+    void on_attachment_to_tree() override;
+
 private:
-    BulletPhysicsServer& bps;
-
-    glm::vec3 scale = {1.0f, 1.0f, 1.0f};
-
     Transform previous_parent_transform;
 
     std::shared_ptr<Shape> shape;
 
     std::unique_ptr<btRigidBody> bt_rigid_body;
+
+    glm::vec3 scale = {1.0f, 1.0f, 1.0f};
+    float cached_set_mass = 0.0f;
+    glm::quat cached_set_rotation = glm::quat({0.0f, 0.0f, 0.0f});
+    glm::vec3 cached_set_translation = {0.0f, 0.0f, 0.0f};
 };
 }

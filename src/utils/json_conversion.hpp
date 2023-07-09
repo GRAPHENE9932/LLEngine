@@ -26,6 +26,13 @@ T get_optional(const nlohmann::json& upper_json, std::string_view name, const T&
 }
 
 namespace glm {
+    inline void from_json(const nlohmann::json& root_json, glm::i32vec2& vec) {
+        vec = {
+            root_json.at(0).get<std::int32_t>(),
+            root_json.at(1).get<std::int32_t>()
+        };
+    }
+
     inline void from_json(const nlohmann::json& root_json, glm::vec2& vec) {
         vec = {
             root_json.at(0).get<float>(),

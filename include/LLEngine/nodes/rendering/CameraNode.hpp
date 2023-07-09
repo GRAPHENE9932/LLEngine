@@ -14,14 +14,7 @@ class RenderingServer;
  */
 class CameraNode : public CompleteSpatialNode {
 public:
-    /**
-     * @param display_ratio Width / height viewport ratio.
-     * @param fov Field of view in radians.
-     */
-    CameraNode(
-        RenderingServer& rs, float display_ratio,
-        float fov = glm::radians(90.0f), const Transform& transform = Transform()
-    ) noexcept;
+    CameraNode();
 
     glm::mat4 get_view_matrix() noexcept;
     glm::mat4 get_proj_matrix() noexcept;
@@ -34,11 +27,11 @@ public:
     void set_aspect_ratio(float new_aspect_ratio);
 
 protected:
-    RenderingServer& rs;
+    void on_attachment_to_tree() override final;
 
 private:
-    float field_of_view;
-    float aspect_ratio;
+    float field_of_view = glm::radians(90.0f);
+    float aspect_ratio = 1920.0f / 1080.f;
     
     bool is_cached_view_matrix_valid = false;
     bool is_cached_proj_matrix_valid = false;

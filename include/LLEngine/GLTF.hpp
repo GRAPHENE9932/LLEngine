@@ -33,7 +33,7 @@ public:
 
         [[nodiscard]] bool is_drawable() const;
         [[nodiscard]] bool is_rigid_body() const;
-        [[nodiscard]] std::unique_ptr<SpatialNode> to_node() const;
+        [[nodiscard]] std::unique_ptr<Node> to_node() const;
     };
     struct MeshParameters {
         std::variant<std::vector<uint16_t>, std::vector<uint32_t>, std::monostate> indices;
@@ -80,6 +80,6 @@ public:
     */
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<SpatialNode> to_node(EngineServers& servers) const override;
+    std::unique_ptr<llengine::Node> to_node() const override;
 };
 }

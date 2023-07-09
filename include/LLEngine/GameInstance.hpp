@@ -8,7 +8,7 @@
 namespace llengine {
 class RenderingServer;
 class BulletPhysicsServer;
-class SpatialNode;
+class RootNode;
 
 class GameInstance {
 public:
@@ -19,6 +19,6 @@ public:
 private:
     std::unique_ptr<RenderingServer> rendering_server;
     std::unique_ptr<BulletPhysicsServer> bullet_physics_server;
-    std::unique_ptr<SpatialNode> root_node;
+    std::unique_ptr<RootNode> root_node;
 };
 }

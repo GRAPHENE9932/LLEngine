@@ -4,15 +4,13 @@
 #include "gui/GUITexture.hpp"
 #include "utils/math.hpp"
 #include "nodes/gui/GUICanvas.hpp"
+#include "node_registration.hpp"
+#include "node_cast.hpp"
 
 using namespace llengine;
 
-GUINode::GUINode(RenderingServer& rs) : rs(rs) {
-    rs.register_gui_node(this);
-}
-
 GUINode::~GUINode() {
-    rs.unregister_gui_node(this);
+    get_rendering_server().unregister_gui_node(this);
 }
 
 [[nodiscard]] glm::vec3 GUINode::get_screen_space_position() const {
@@ -27,6 +25,10 @@ GUINode::~GUINode() {
     else {
         return local_position;
     }
+}
+
+void GUINode::set_transform_property(const NodeProperty& property) {
+    set_transform(GUITransform::from_property(property));
 }
 
 [[nodiscard]] bool GUINode::contains_point(glm::vec2 point) const {
@@ -50,9 +52,35 @@ void GUINode::update_children() {
     }
 }
 
+void GUINode::add_child(std::unique_ptr<Node>&& child) {
+    add_child(throwing_node_cast<GUINode>(std::move(child)));
+}
+
 void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
     child->parent = this;
     children.push_back(std::move(child));
+}
+
+[[nodiscard]] bool GUINode::is_attached_to_tree() const {
+    if (std::holds_alternative<GUINode*>(parent)) {
+        if (auto gui_parent_ptr = std::get<GUINode*>(parent)) {
+            return gui_parent_ptr->is_attached_to_tree();
+        }
+        else {
+            return false;
+        }
+    }
+    else if (std::holds_alternative<GUICanvas*>(parent)) {
+        if (auto canvas_parent_ptr = std::get<GUICanvas*>(parent)) {
+            return canvas_parent_ptr->is_attached_to_tree();
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
 }
 
 void GUINode::draw_texture_part(
@@ -76,7 +104,8 @@ void GUINode::draw_texture_part(
     uv_offset.y += uv_scale.y; // Invert UV's y. If (scale * y) goes from 0 to scale when y goes from 0 to 1,
     uv_scale.y = -uv_scale.y; // then (scale - scale * y) goes from scale to 0.
 
-    rs.get_shader_holder().get_gui_rectangle_shader().use_shader(
+    
+    get_rendering_server().get_shader_holder().get_gui_rectangle_shader().use_shader(
         texture, mvp, uv_scale, uv_offset, {1.0f, 1.0f, 1.0f, 1.0f}
     );
 
@@ -91,7 +120,7 @@ void GUINode::draw_texture_part(
         glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
         glDrawArrays(GL_TRIANGLES, 0, mesh->get_amount_of_vertices());
     }
-    rs.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
+    get_rendering_server().report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
 
     mesh->unbind_vao();
 }
@@ -126,6 +155,18 @@ void GUINode::draw_rectangle(const GUITexture& texture) {
         offset_of_quad.x += quad_sizes[x].x;
         offset_of_quad.y = 0.0f;
     }
+}
+
+void GUINode::on_attachment_to_tree() {
+    Node::on_attachment_to_tree();
+    get_rendering_server().register_gui_node(this);
+
+    std::for_each(
+        children.begin(), children.end(),
+        [] (const auto& child) {
+            child->on_attachment_to_tree();
+        }
+    );
 }
 
 void GUINode::assign_canvas_parent(GUICanvas& canvas) {
@@ -163,4 +204,8 @@ void GUINode::assign_canvas_parent(GUICanvas& canvas) {
             "doesn't have a parent node or assigned canvas."
         );
     }
+}
+
+void GUINode::register_properties() {
+    register_custom_property<GUINode>("gui_node", "transform", &GUINode::set_transform_property);
 }

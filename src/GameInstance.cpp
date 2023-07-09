@@ -1,6 +1,6 @@
 #include "GameInstance.hpp"
 #include "SceneJSON.hpp"
-#include "nodes/SpatialNode.hpp"
+#include "nodes/RootNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "physics/BulletPhysicsServer.hpp"
 
@@ -12,9 +12,10 @@ GameInstance::GameInstance(const GameSettings& settings) {
     rendering_server = std::make_unique<RenderingServer>(settings.window_resolution);
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
+    root_node = std::make_unique<RootNode>(*rendering_server, *bullet_physics_server);
+
     SceneJSON scene(settings.json_scene_path);
-    EngineServers servers {*rendering_server, *bullet_physics_server};
-    root_node = scene.to_node(servers);
+    root_node->add_child(std::move(scene.to_node()));
 
     auto sky_panorama = Texture::from_file(settings.skybox_path);
     auto sky_cubemap = sky_panorama.panorama_to_cubemap(rendering_server->get_shader_holder().get_equirectangular_mapper_shader());

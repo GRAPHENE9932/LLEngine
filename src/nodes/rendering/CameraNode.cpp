@@ -2,6 +2,7 @@
 #include <glm/gtx/transform.hpp>
 #include <type_traits>
 
+#include "nodes/SpatialNode.hpp"
 #include "nodes/rendering/CameraNode.hpp" // CameraNode
 #include "rendering/RenderingServer.hpp" // RenderingServer
 #include "nodes/CompleteSpatialNode.hpp"
@@ -11,13 +12,7 @@ using namespace llengine;
 constexpr glm::vec3 UP(0.0f, 1.0f, 0.0f);
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 
-CameraNode::CameraNode(
-    RenderingServer& rs, float display_ratio,
-    float fov, const Transform& transform
-) noexcept :
-    CompleteSpatialNode(transform), field_of_view(fov), aspect_ratio(display_ratio), rs(rs) {
-    rs.register_camera_node(this);
-}
+CameraNode::CameraNode() = default;
 
 glm::mat4 CameraNode::get_view_matrix() noexcept {
     if (!is_cached_view_matrix_valid) {
@@ -63,6 +58,19 @@ void CameraNode::set_aspect_ratio(float new_aspect_ratio) {
     aspect_ratio = new_aspect_ratio;
 
     is_cached_proj_matrix_valid = false;
+}
+
+void CameraNode::on_attachment_to_tree() {
+    SpatialNode::on_attachment_to_tree();
+    get_rendering_server().register_camera_node(this);
+
+    const auto& children = get_children();
+    std::for_each(
+        children.begin(), children.end(),
+        [] (const auto& child) {
+            child->on_attachment_to_tree();
+        }
+    );
 }
 
 void CameraNode::recompute_view_matrix() noexcept {

@@ -4,6 +4,7 @@
 #include "rendering/shaders/IrradiancePrecomputerShader.hpp"
 #include "rendering/shaders/SpecularPrefilterShader.hpp"
 #include "rendering/Mesh.hpp"
+#include "NodeProperty.hpp"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
@@ -261,6 +262,19 @@ template<std::size_t ArraySize>
     else if (mime_type == "image/x-hdr") {
         return from_rgbe(params);
     }
+
+    return from_file(params);
+}
+
+[[nodiscard]] Texture Texture::from_property(const NodeProperty& property) {
+    if (property.get<std::string>("type") != "texture") {
+        throw std::runtime_error("Failed to load a texture from node property: invalid property type.");
+    }
+
+    TexLoadingParams params;
+    params.file_path = property.get<std::string>("path");
+    params.offset = property.get_optional<std::int64_t>("offset").value_or(0);
+    params.size = property.get_optional<std::int64_t>("size").value_or(0);
 
     return from_file(params);
 }

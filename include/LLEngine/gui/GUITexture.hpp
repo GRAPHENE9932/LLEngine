@@ -32,5 +32,7 @@ struct GUITexture {
     [[nodiscard]] bool empty() const noexcept {
         return texture == nullptr;
     }
+
+    [[nodiscard]] static GUITexture from_property(const NodeProperty& property);
 };
 }

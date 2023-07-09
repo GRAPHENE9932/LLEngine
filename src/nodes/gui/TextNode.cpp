@@ -7,7 +7,7 @@
 
 using namespace llengine;
 
-TextNode::TextNode(RenderingServer& rs, const std::shared_ptr<FreeTypeFont>& font) : GUINode(rs), font(font) {}
+TextNode::TextNode(const std::shared_ptr<FreeTypeFont>& font) : GUINode(), font(font) {}
 
 [[nodiscard]] GUITransform TextNode::get_transform() const {
     return {
@@ -91,7 +91,7 @@ void TextNode::set_text(std::string_view new_text) {
 void TextNode::draw() {
     draw_children();
 
-    const glm::vec2 window_size {rs.get_window().get_window_size()};
+    const glm::vec2 window_size {get_rendering_server().get_window().get_window_size()};
     glm::vec3 absolute_position_in_pixels {get_screen_space_position()};
     absolute_position_in_pixels.y += get_absolute_size().y;
     const glm::vec3 absolute_position_opengl {math_utils::scr_space_pos_to_gl_space(absolute_position_in_pixels, window_size)};
@@ -99,7 +99,7 @@ void TextNode::draw() {
     const glm::vec3 pixels_to_opengl_scale {2.0f / window_size, 1.0f};
     const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(pixels_to_opengl_scale)};
 
-    rs.get_shader_holder().get_colored_text_shader().use_shader(mvp, get_color());
+    get_rendering_server().get_shader_holder().get_colored_text_shader().use_shader(mvp, get_color());
     glActiveTexture(GL_TEXTURE0);
     for (std::size_t char_i = 0; char_i < chars.size(); char_i++) {
         glBindTexture(GL_TEXTURE_2D, chars[char_i].get().texture);

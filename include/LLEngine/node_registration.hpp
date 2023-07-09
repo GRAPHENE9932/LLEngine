@@ -1,133 +1,138 @@
 #pragma once
 
-#include "nodes/SpatialNode.hpp"
+#include "nodes/Node.hpp"
 
+#include <functional>
+#include <typeindex>
+#include <typeinfo>
 #include <memory>
+#include <vector>
+#include <map>
 
 namespace llengine {
-enum class CustomPropertyType : std::uint8_t {
-    INT64, FLOAT, VEC2, VEC3, VEC4, STRING,
-    VECTOR_OF_INT64, VECTOR_OF_FLOAT, VECTOR_OF_VEC2,
-    VECTOR_OF_VEC3, VECTOR_OF_VEC4, VECTOR_OF_STRING
-};
+namespace internal {
+class PropertySetter {
+public:
+    template<typename T>
+    [[nodiscard]] static PropertySetter create(std::function<void(T&, const NodeProperty& property)> function) {
+        return PropertySetter(std::make_unique<ConcreteHolder<T>>(function));
+    }
 
-namespace {
-    class CustomNodeFactory {
+    void call(Node& node, const NodeProperty& property) const {
+        holder->call(node, property);
+    }
+
+private:
+    class Holder {
     public:
-        CustomNodeFactory() = default;
+        virtual ~Holder() = default;
+        virtual void call(Node&, const NodeProperty& property) const = 0;
+    };
 
-        template<typename T>
-        static CustomNodeFactory construct_factory() {
-            return {
-                std::make_unique<ConcreteConstructor<T>>()
-            };
-        }
-
-        [[nodiscard]] std::unique_ptr<SpatialNode> construct() {
-            return abstract->construct();
+    template<typename T>
+    class ConcreteHolder : public Holder {
+    public:
+        ConcreteHolder(std::function<void(T&, const NodeProperty& property)> function) :
+            function(function) {}
+        
+        void call(Node& node, const NodeProperty& property) const {
+            function(dynamic_cast<T&>(node), property);
         }
 
     private:
-        class AbstractConstructor {
-        public:
-            virtual ~AbstractConstructor() = default;
-            [[nodiscard]] virtual std::unique_ptr<SpatialNode> construct() = 0;
-        };
-
-        template<typename T>
-        class ConcreteConstructor : public AbstractConstructor {
-        public:
-            std::unique_ptr<SpatialNode> construct() override {
-                return std::make_unique<T>();
-            }
-        };
-
-        CustomNodeFactory(std::unique_ptr<AbstractConstructor>&& abstract) :
-            abstract(std::move(abstract)) {}
-
-        std::unique_ptr<AbstractConstructor> abstract = nullptr;
+        std::function<void(T&, const NodeProperty& property)> function;
     };
 
-    void add_node_factory(const std::string& node_type_name, CustomNodeFactory&& factory);
-    void add_custom_property(
-        const std::string& node_type_name, CustomPropertyType type,
-        const std::string& property_name, void(*abstract_setter_ptr)(SpatialNode*)
-    );
-}
+    std::unique_ptr<Holder> holder = nullptr;
 
-template<typename T>
-consteval CustomPropertyType get_custom_property_type() {
-    if (std::is_same_v<T, std::int64_t>()) {
-        return CustomPropertyType::INT64;
-    }
-    else if (std::is_same_v<T, float>()) {
-        return CustomPropertyType::FLOAT;
-    }
-    else if (std::is_same_v<T, glm::vec2>()) {
-        return CustomPropertyType::VEC2;
-    }
-    else if (std::is_same_v<T, glm::vec3>()) {
-        return CustomPropertyType::VEC3;
-    }
-    else if (std::is_same_v<T, glm::vec4>()) {
-        return CustomPropertyType::VEC4;
-    }
-    else if (std::is_same_v<T, std::string>()) {
-        return CustomPropertyType::STRING;
-    }
-    else if (std::is_same_v<T, std::vector<std::int64_t>>()) {
-        return CustomPropertyType::VECTOR_OF_INT64;
-    }
-    else if (std::is_same_v<T, std::vector<float>>()) {
-        return CustomPropertyType::VECTOR_OF_FLOAT;
-    }
-    else if (std::is_same_v<T, std::vector<glm::vec2>>()) {
-        return CustomPropertyType::VECTOR_OF_VEC2;
-    }
-    else if (std::is_same_v<T, std::vector<glm::vec3>>()) {
-        return CustomPropertyType::VECTOR_OF_VEC3;
-    }
-    else if (std::is_same_v<T, std::vector<glm::vec4>>()) {
-        return CustomPropertyType::VECTOR_OF_VEC4;
-    }
-    else if (std::is_same_v<T, std::vector<std::string>>()) {
-        return CustomPropertyType::VECTOR_OF_STRING;
-    }
-    else {
-        static_assert(true, "Invalid/unsupported property type provided.");
-    }
-}
+    PropertySetter(std::unique_ptr<Holder>&& holder) :
+        holder(std::move(holder)) {}
+};
 
-struct CustomNodeType {
-    struct CustomProperty {
-        CustomPropertyType type;
-        std::string name;
-        void(*abstract_setter_ptr)(SpatialNode*);
+class CustomNodeType {
+public:
+    template<typename T, typename Base>
+    static CustomNodeType create_from_type() {
+        return CustomNodeType(std::make_unique<ConcreteHolder<T>>(), typeid(Base));
+    }
 
-        template<typename T>
-        void set_property(SpatialNode* node_ptr, const T& value) const {
-            if (get_custom_property_type<T>() != type) {
-                throw std::runtime_error("Tried to call custom property setter with invalid value type.");
+    [[nodiscard]] std::unique_ptr<Node> construct_node() const;
+    void add_setter(std::string_view name, PropertySetter&& setter);
+    bool call_setter(Node& node, const NodeProperty& property);
+    [[nodiscard]] bool has_setter_for(std::string_view name) const;
+    [[nodiscard]] bool is_parent_of(const CustomNodeType& other) const;
+    [[nodiscard]] std::type_index get_type_index() const;
+    void assign_parent(CustomNodeType* parent);
+    [[nodiscard]] CustomNodeType* get_parent() const;
+
+    [[nodiscard]] bool operator==(const CustomNodeType& other) const;
+    [[nodiscard]] bool operator!=(const CustomNodeType& other) const;
+
+private:
+    class Holder {
+    public:
+        virtual ~Holder() = default;
+        [[nodiscard]] virtual std::unique_ptr<Node> construct() const = 0;
+        [[nodiscard]] virtual const std::type_info& get_type_info() const = 0;
+    };
+
+    template<typename T>
+    class ConcreteHolder : public Holder {
+    public:
+        [[nodiscard]] std::unique_ptr<Node> construct() const override final  {
+            if constexpr (!std::is_abstract_v<T>) {
+                return std::make_unique<T>();
             }
-
-            auto setter_ptr = reinterpret_cast<void(*)(SpatialNode*, const T&)>(abstract_setter_ptr);
-            setter_ptr(node_ptr, value);
+            else {
+                throw std::runtime_error("Can't construct an abstract node class.");
+            }
+        }
+        [[nodiscard]] const std::type_info& get_type_info() const override final {
+            return typeid(T);
         }
     };
 
-    CustomNodeFactory factory;
-    std::vector<CustomProperty> properties;
+    std::unique_ptr<Holder> holder = nullptr;
+    std::map<std::string, PropertySetter> property_setters;
+    std::variant<std::type_index, CustomNodeType*> parent;
+
+    CustomNodeType(std::unique_ptr<Holder>&& holder, std::type_index base_type_index) :
+        holder(std::move(holder)), parent(base_type_index) {}
+    
+    [[nodiscard]] bool has_own_setter_for(std::string_view name) const;
 };
 
+void add_node_type(std::string_view node_type_name, CustomNodeType&& node_type);
+void add_node_setter(std::string_view node_type_name, std::string_view property_name, PropertySetter&& setter);
+void register_builtin_nodes();
+
 template<typename T>
-void register_node_type(const std::string& node_type_name) {
-    add_node_factory(node_type_name, CustomNodeFactory::construct_factory<T>());
+concept has_register_properties = requires(T) {
+    T::register_properties();
+};
+}
+
+void begin_nodes_registration();
+void end_nodes_registration();
+
+template<typename T, typename Base>
+void register_node_type(std::string_view node_type_name) {
+    internal::add_node_type(node_type_name, internal::CustomNodeType::create_from_type<T, Base>());
+    if constexpr (internal::has_register_properties<T>) {
+        T::register_properties();
+    }
 }
 
 template<typename T>
 void register_custom_property(
-    const std::string& node_type_name,
-    const std::string& property_name,
-    void(*setter_ptr)(SpatialNode*, T)
-);
+    std::string_view node_type_name,
+    std::string_view property_name,
+    std::function<void(T&, const NodeProperty&)> setter
+) {
+    internal::add_node_setter(node_type_name, property_name, internal::PropertySetter::create<T>(setter));
+}
+
+[[nodiscard]] std::unique_ptr<Node> construct_node(std::string_view node_type_name);
+[[nodiscard]] std::unique_ptr<Node> construct_node(std::string_view node_type_name, const std::vector<NodeProperty>& properties);
+void call_setter(std::string_view node_type_name, const NodeProperty& property, Node& node);
 }

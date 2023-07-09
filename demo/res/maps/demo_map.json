@@ -1,24 +1,54 @@
 {
 	"version": 1,
 	"name": "demo_map",
-	"scene_files": [
-		"res/meshes/level_0.glb"
-	],
-	"root_node": {
-		"type": "scene_file",
-		"scene_file_index": 0,
-		"children": [
-			{
-				"type": "point_light",
-				"color": [10.0, 10.0, 10.0],
-				"position": [0.0, 3.0, 0.0]
+	"nodes": [
+		{
+			"id": 0,
+			"type": "scene_file",
+			"scene_file_path": "res/meshes/level_0.glb"
+		},
+		{
+			"id": 2,
+			"parent_id": 0,
+			"type": "gui_canvas",
+			"translation": [0.0, 0.0, 0.0]
+		},
+		{
+			"id": 3,
+			"parent_id": 2,
+			"type": "button",
+			"transform": {
+				"type": "gui_transform",
+				"position_anchor": [0.5, 0.5],
+				"position_offset": [0.0, 0.0],
+				"z_coordinate": 0.0,
+				"origin": ["left", "bottom"],
+				"size_mode": "absolute",
+				"size": [200.0, 100.0]
 			},
-			{
-				"type": "player",
-				"fov": 90,
-				"position": [0.0, 0.0, -3.0],
-				"rotation": [0.0, 0.0, 0.0]
+			"idle_texture": {
+				"type": "gui_texture",
+				"borders": [24.0, 24.0, 24.0, 24.0],
+				"color_factor": [1.0, 1.0, 1.0, 1.0],
+				"texture": {
+					"type": "texture",
+					"path": "res/textures/button_idle.ktx2"
+				}
+			},
+			"pressed_texture": {
+				"type": "gui_texture",
+				"borders": [24.0, 24.0, 24.0, 24.0],
+				"color_factor": [1.0, 1.0, 1.0, 1.0],
+				"texture": {
+					"type": "texture",
+					"path": "res/textures/button_pressed.ktx2"
+				}
 			}
-		]
-	}
+		},
+		{
+			"id": 5,
+			"parent_id": 0,
+			"type": "spectator_camera_node"
+		}
+	]
 }
