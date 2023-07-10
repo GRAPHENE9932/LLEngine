@@ -13,7 +13,12 @@ namespace llengine {
 class Mesh {
 public:
     Mesh() = default;
+    Mesh(const Mesh& other);
+    Mesh(Mesh&& other) noexcept;
     ~Mesh();
+
+    Mesh& operator=(const Mesh& other);
+    Mesh& operator=(Mesh&& other) noexcept;
 
     [[nodiscard]] GLuint get_indices_id() const { return indices_id; }
     [[nodiscard]] GLuint get_vertices_id() const { return vertices_id; }

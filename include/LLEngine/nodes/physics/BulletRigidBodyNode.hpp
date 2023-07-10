@@ -18,7 +18,9 @@ class BulletRigidBodyNode : public SpatialNode {
 public:
     BulletRigidBodyNode();
     BulletRigidBodyNode(const BulletRigidBodyNode& node) = delete;
+    BulletRigidBodyNode(BulletRigidBodyNode&& node) = delete;
     BulletRigidBodyNode& operator=(const BulletRigidBodyNode& node) = delete;
+    BulletRigidBodyNode& operator=(BulletRigidBodyNode&& node) = delete;
     ~BulletRigidBodyNode() noexcept override;
 
     void update() override {

@@ -175,6 +175,29 @@ void Mesh::index_data() {
     }
 }
 
+Mesh::Mesh(const Mesh& other) {
+    std::visit([this] (const auto& vector) {
+        this->set_indices(vector);
+    }, other.indices);
+    set_vertices(other.vertices);
+    set_uvs(other.uvs);
+    set_normals(other.normals);
+    set_tangents(other.tangents);
+}
+
+Mesh::Mesh(Mesh&& other) noexcept :
+    indices(std::move(other.indices)),
+    vertices(std::move(other.vertices)),
+    uvs(std::move(other.uvs)),
+    normals(std::move(other.normals)),
+    tangents(std::move(other.tangents)),
+    vao_id(other.vao_id),
+    indices_id(other.indices_id),
+    vertices_id(other.vertices_id),
+    uvs_id(other.uvs_id),
+    normals_id(other.normals_id),
+    tangents_id(other.tangents_id) {}
+
 Mesh::~Mesh() {
     if (indices_id)
         glDeleteBuffers(1, &indices_id);
@@ -188,6 +211,34 @@ Mesh::~Mesh() {
         glDeleteBuffers(1, &tangents_id);
     if (vao_id)
         glDeleteVertexArrays(1, &vao_id);
+}
+
+Mesh& Mesh::operator=(const Mesh& other) {
+    std::visit([this] (const auto& vector) {
+        this->set_indices(vector);
+    }, other.indices);
+    set_vertices(other.vertices);
+    set_uvs(other.uvs);
+    set_normals(other.normals);
+    set_tangents(other.tangents);
+
+    return *this;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept {
+    indices = std::move(other.indices);
+    vertices = std::move(other.vertices);
+    uvs = std::move(other.uvs);
+    normals = std::move(other.normals);
+    tangents = std::move(other.tangents);
+
+    indices_id = other.indices_id;
+    vertices_id = other.vertices_id;
+    uvs_id = other.uvs_id;
+    normals_id = other.normals_id;
+    tangents_id = other.tangents_id;
+
+    return *this;
 }
 
 void bind_vertex_attrib_pointer(GLuint buffer_id, GLuint vertex_attrib_index, GLint size) {

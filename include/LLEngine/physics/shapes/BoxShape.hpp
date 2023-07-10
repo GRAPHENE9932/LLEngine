@@ -7,12 +7,14 @@
 namespace llengine {
 class BoxShape : public Shape {
 public:
+    explicit BoxShape(const glm::vec3& extents) noexcept : extents(extents) {}
     BoxShape(const BoxShape& box_shape) : BoxShape(box_shape.get_extents()) {}
     BoxShape(BoxShape&& box_shape) noexcept : extents(box_shape.extents), Shape(std::move(box_shape)) {}
-    explicit BoxShape(const glm::vec3& extents) noexcept : extents(extents) {}
+    BoxShape& operator=(const BoxShape& other);
+    BoxShape& operator=(BoxShape&& other) noexcept;
 
     [[nodiscard]] bool operator==(const Shape& other) const noexcept override;
-    [[nodiscard]] std::shared_ptr<Shape> deep_copy() const override;
+    [[nodiscard]] std::shared_ptr<Shape> copy() const override;
 
     [[nodiscard]] inline const glm::vec3& get_extents() const noexcept {
         return extents;

@@ -98,7 +98,7 @@ void BulletRigidBodyNode::set_scale(const glm::vec3& new_scale) {
     const glm::vec3 relative_scale = new_scale / get_scale();
 
     // Make the new shape and scale it.
-    std::shared_ptr<Shape> shape_copy = shape->deep_copy();
+    std::shared_ptr<Shape> shape_copy = shape->copy();
     shape_copy->scale(relative_scale);
     this->set_shape(shape_copy);
 

@@ -9,7 +9,12 @@ class FPSMeter {
 public:
     /// @param interval means interval between the fps updates.
     explicit FPSMeter(float interval);
+    FPSMeter(const FPSMeter& other) = delete;
+    FPSMeter(FPSMeter&& other) = delete;
     ~FPSMeter();
+
+    FPSMeter& operator=(const FPSMeter& other) = delete;
+    FPSMeter& operator=(FPSMeter&& other) = delete;
 
     /// Call this function once on every frame.
     void frame() noexcept;

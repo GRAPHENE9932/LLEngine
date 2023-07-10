@@ -20,7 +20,9 @@ public:
     BulletPhysicsServer();
     ~BulletPhysicsServer();
     BulletPhysicsServer(const BulletPhysicsServer& other) = delete;
-    void operator=(const BulletPhysicsServer& other) = delete;
+    BulletPhysicsServer(BulletPhysicsServer&& other) = delete;
+    BulletPhysicsServer& operator=(const BulletPhysicsServer& other) = delete;
+    BulletPhysicsServer& operator=(BulletPhysicsServer&& other) = delete;
 
     void do_step(float delta_time);
     /**

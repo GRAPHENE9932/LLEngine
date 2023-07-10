@@ -13,6 +13,8 @@ public:
     Shape(const Shape& shape) = delete;
     Shape(Shape&& shape) noexcept;
     virtual ~Shape();
+    Shape& operator=(const Shape& other) = delete;
+    Shape& operator=(Shape&& other) noexcept;
 
     virtual bool operator==(const Shape& other) const noexcept = 0;
 
@@ -24,7 +26,7 @@ public:
      */
     btCollisionShape* get_bullet_collision_shape();
 
-    [[nodiscard]] virtual std::shared_ptr<Shape> deep_copy() const = 0;
+    [[nodiscard]] virtual std::shared_ptr<Shape> copy() const = 0;
 
     /**
      * @brief Scales the shape in-place.
@@ -35,5 +37,6 @@ protected:
     std::unique_ptr<btCollisionShape> cached_bullet_shape;
 
     [[nodiscard]] virtual std::unique_ptr<btCollisionShape> create_bullet_shape() const = 0;
+    void invalidate_shape_cache();
 };
 }

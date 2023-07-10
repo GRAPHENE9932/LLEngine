@@ -15,8 +15,6 @@ RenderingServer::RenderingServer(glm::ivec2 window_size) :
     window(GLFWWindow(window_size, "LLShooter", 3, 3)) {
 }
 
-RenderingServer::~RenderingServer() {}
-
 void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
     if (!cubemap->is_cubemap()) {
         throw std::invalid_argument("Specified cubemap texture for skybox is not actually a cubemap.");

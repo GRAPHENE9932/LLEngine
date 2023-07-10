@@ -7,7 +7,9 @@
 using namespace llengine;
 
 CylinderShape::CylinderShape(const CylinderShape& cylinder_shape) :
-    CylinderShape(cylinder_shape.get_semi_axis()) {}
+    CylinderShape(cylinder_shape.get_semi_axis()) {
+    invalidate_shape_cache();
+}
 
 CylinderShape::CylinderShape(CylinderShape&& cylinder_shape) noexcept :
     semi_axis(cylinder_shape.semi_axis), Shape(std::move(cylinder_shape)) {}
@@ -17,6 +19,18 @@ CylinderShape::CylinderShape(float radius_x, float radius_z, float height) noexc
 
 CylinderShape::CylinderShape(const glm::vec3& semi_axis) noexcept:
     semi_axis(semi_axis) {}
+
+CylinderShape& CylinderShape::operator=(const CylinderShape& other) {
+    semi_axis = other.get_semi_axis();
+    invalidate_shape_cache();
+    return *this;
+}
+
+CylinderShape& CylinderShape::operator=(CylinderShape&& other) noexcept {
+    semi_axis = other.get_semi_axis();
+    Shape::operator=(std::move(other));
+    return *this;
+}
 
 bool CylinderShape::operator==(const Shape& other) const noexcept {
     if (this == std::addressof(other)) {
@@ -30,7 +44,7 @@ bool CylinderShape::operator==(const Shape& other) const noexcept {
     return this->get_semi_axis() == other_ptr->get_semi_axis();
 }
 
-std::shared_ptr<Shape> CylinderShape::deep_copy() const {
+std::shared_ptr<Shape> CylinderShape::copy() const {
     return std::make_shared<CylinderShape>(*this);
 }
 

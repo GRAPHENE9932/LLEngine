@@ -14,6 +14,10 @@ namespace llengine {
 class CompleteSpatialNode : public SpatialNode {
 public:
     explicit CompleteSpatialNode(const Transform& transform = Transform());
+    CompleteSpatialNode(const CompleteSpatialNode& other) = delete;
+    CompleteSpatialNode(CompleteSpatialNode&& other) = delete;
+    CompleteSpatialNode& operator=(const CompleteSpatialNode& other) = delete;
+    CompleteSpatialNode& operator=(CompleteSpatialNode&& other) = delete;
     virtual ~CompleteSpatialNode();
 
     void set_translation(const glm::vec3& new_trans) override;

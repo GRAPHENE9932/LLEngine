@@ -30,7 +30,12 @@ public:
         BOTTOM, CENTER, TOP
     };
 
+    GUINode() = default;
+    GUINode(const GUINode& other) = delete;
+    GUINode(GUINode&& other) = delete;
     ~GUINode();
+    GUINode& operator=(const GUINode& other) = delete;
+    GUINode& operator=(GUINode&& other) = delete;
 
     [[nodiscard]] virtual GUITransform get_transform() const = 0;
     [[nodiscard]] virtual glm::vec2 get_absolute_size() const = 0;

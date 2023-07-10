@@ -6,6 +6,18 @@
 
 using namespace llengine;
 
+BoxShape& BoxShape::operator=(const BoxShape& other) {
+    extents = other.get_extents();
+    invalidate_shape_cache();
+    return *this;
+}
+
+BoxShape& BoxShape::operator=(BoxShape&& other) noexcept {
+    extents = other.get_extents();
+    Shape::operator=(std::move(other));
+    return *this;
+}
+
 bool BoxShape::operator==(const Shape& other) const noexcept {
     if (this == std::addressof(other)) {
         return true;
@@ -18,7 +30,7 @@ bool BoxShape::operator==(const Shape& other) const noexcept {
     return this->get_extents() == other_ptr->get_extents();
 }
 
-std::shared_ptr<Shape> BoxShape::deep_copy() const {
+std::shared_ptr<Shape> BoxShape::copy() const {
     return std::make_shared<BoxShape>(*this);
 }
 

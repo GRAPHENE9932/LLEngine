@@ -7,13 +7,13 @@
 
 using namespace llengine;
 
-PointLightNode::PointLightNode(RenderingServer& rs, const Transform& transform) :
-    CompleteSpatialNode(transform), rs(rs) {
-    rs.register_point_light(this);
+PointLightNode::~PointLightNode() {
+    get_rendering_server().unregister_point_light(this);
 }
 
-PointLightNode::~PointLightNode() {
-    rs.unregister_point_light(this);
+void PointLightNode::on_attachment_to_tree() {
+    SpatialNode::on_attachment_to_tree();
+    get_rendering_server().register_point_light(this);
 }
 
 PointLightNode::Uniforms PointLightNode::get_uniforms_id(

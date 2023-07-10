@@ -14,6 +14,7 @@ public:
     Skybox(const Skybox& other) = delete;
     Skybox(Skybox&& other) noexcept;
     Skybox& operator=(const Skybox& other) = delete;
+    Skybox& operator=(Skybox&& other) = delete;
 
     const Texture& get_texture() {
         return *cubemap_texture;

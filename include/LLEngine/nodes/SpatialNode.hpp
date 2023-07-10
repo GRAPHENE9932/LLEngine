@@ -15,6 +15,11 @@
 namespace llengine {
 class SpatialNode : public Node {
 public:
+    SpatialNode() = default;
+    SpatialNode(const SpatialNode& other) = delete;
+    SpatialNode(SpatialNode&& other) = delete;
+    SpatialNode& operator=(const SpatialNode& other) = delete;
+    SpatialNode& operator=(SpatialNode&& other) = delete;
     virtual ~SpatialNode();
 
     void update_children();

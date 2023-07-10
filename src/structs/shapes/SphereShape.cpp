@@ -6,6 +6,18 @@
 
 using namespace llengine;
 
+SphereShape& SphereShape::operator=(const SphereShape& other) {
+    axis = get_axis();
+    invalidate_shape_cache();
+    return *this;
+}
+
+SphereShape& SphereShape::operator=(SphereShape&& other) noexcept {
+    axis = get_axis();
+    Shape::operator=(std::move(other));
+    return *this;
+}
+
 bool SphereShape::operator==(const Shape& other) const noexcept {
     if (this == std::addressof(other)) {
         return true;
@@ -18,7 +30,7 @@ bool SphereShape::operator==(const Shape& other) const noexcept {
     return this->get_axis() == other_ptr->get_axis();
 }
 
-std::shared_ptr<Shape> SphereShape::deep_copy() const {
+std::shared_ptr<Shape> SphereShape::copy() const {
     return std::make_shared<SphereShape>(*this);
 }
 

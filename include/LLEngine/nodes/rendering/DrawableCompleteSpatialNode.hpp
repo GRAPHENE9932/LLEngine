@@ -8,6 +8,11 @@ class RenderingServer;
 
 class DrawableCompleteSpatialNode : public Drawable, public CompleteSpatialNode {
 public:
+    DrawableCompleteSpatialNode() = default;
+    DrawableCompleteSpatialNode(const DrawableCompleteSpatialNode& other) = delete;
+    DrawableCompleteSpatialNode(DrawableCompleteSpatialNode&& other) = delete;
+    DrawableCompleteSpatialNode& operator=(const DrawableCompleteSpatialNode& other) = delete;
+    DrawableCompleteSpatialNode& operator=(DrawableCompleteSpatialNode&& other) = delete;
     ~DrawableCompleteSpatialNode();
 
 protected:

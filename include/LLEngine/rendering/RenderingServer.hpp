@@ -29,8 +29,13 @@ struct SpotLight;
  */
 class RenderingServer {
 public:
-    RenderingServer(glm::ivec2 window_size);
-    ~RenderingServer();
+    explicit RenderingServer(glm::ivec2 window_size);
+    RenderingServer(const RenderingServer& other) = delete;
+    RenderingServer(RenderingServer&& other) = delete;
+    ~RenderingServer() = default;
+
+    RenderingServer& operator=(const RenderingServer& other) = delete;
+    RenderingServer& operator=(RenderingServer&& other) = delete;
 
     void set_cubemap(const std::shared_ptr<Texture>& cubemap);
     void set_update_callback(const std::function<void(float)> callback) {

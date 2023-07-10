@@ -14,7 +14,12 @@ class GLFWWindow {
 public:
     GLFWWindow(glm::ivec2 extents, std::string_view title,
                int gl_version_major, int gl_version_minor);
+    GLFWWindow(const GLFWWindow& other) = delete;
+    GLFWWindow(GLFWWindow&& other) = delete;
     ~GLFWWindow();
+
+    GLFWWindow& operator=(const GLFWWindow& other) = delete;
+    GLFWWindow& operator=(GLFWWindow&& other) = delete;
 
     void swap_buffers();
     [[nodiscard]] bool window_should_close() const;

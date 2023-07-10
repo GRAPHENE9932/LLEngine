@@ -21,6 +21,9 @@ public:
     NodeProperty(const NodeProperty& other) = default;
     NodeProperty(NodeProperty&& other) = default;
 
+    NodeProperty& operator=(const NodeProperty& other) = default;
+    NodeProperty& operator=(NodeProperty&& other) = default;
+
     template<typename T>
     [[nodiscard]] T get() const;
 

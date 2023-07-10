@@ -15,7 +15,9 @@ public:
     Node() = default;
     virtual ~Node() = default;
     Node(const Node& other) = delete;
+    Node(Node&& other) = delete;
     Node& operator=(const Node& other) = delete;
+    Node& operator=(Node&& other) = delete;
 
     /**
      * @brief Sets the node property. Either basic or custom.
