@@ -46,11 +46,15 @@ public:
 
 protected:
     virtual void on_attachment_to_tree();
+    virtual void update() {};
+    virtual void internal_update() {};
 
 private:
     std::string name;
 
     mutable RenderingServer* cached_rendering_server = nullptr;
     mutable BulletPhysicsServer* cached_bullet_physics_server = nullptr;
+
+    friend class GameInstance;
 };
 }

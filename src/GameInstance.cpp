@@ -25,7 +25,7 @@ GameInstance::GameInstance(const GameSettings& settings) {
         if (bullet_physics_server) {
             bullet_physics_server->do_step(delta);
         }
-        root_node->update();
+        root_node->internal_update();
     });
 }
 

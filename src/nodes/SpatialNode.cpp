@@ -12,7 +12,7 @@ SpatialNode::~SpatialNode() {}
 
 void SpatialNode::update_children() {
     for (const auto& child : children) {
-        child->update();
+        child->internal_update();
     }
 }
 
@@ -105,8 +105,9 @@ void SpatialNode::set_rotation_property(const NodeProperty& property) {
     set_rotation(property.get<glm::quat>());
 }
 
-void SpatialNode::update() {
+void SpatialNode::internal_update() {
     update_children();
+    update();
 }
 
 void SpatialNode::on_attachment_to_tree() {

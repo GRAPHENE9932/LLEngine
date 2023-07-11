@@ -66,8 +66,9 @@ public:
 
     virtual void draw() {}
 
-    virtual void update() {
+    void internal_update() override {
         update_children();
+        update();
     }
 
     /**

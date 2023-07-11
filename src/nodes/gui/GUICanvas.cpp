@@ -46,8 +46,11 @@ bool GUICanvas::remove_gui_node(GUINode* const gui_node) {
     }
 }
 
-void GUICanvas::update() {
+void GUICanvas::internal_update() {
+    update_children();
     for (auto& gui_node : gui_nodes) {
-        gui_node->update();
+        gui_node->internal_update();
     }
+
+    update();
 }

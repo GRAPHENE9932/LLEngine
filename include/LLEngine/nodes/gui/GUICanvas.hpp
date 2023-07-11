@@ -35,7 +35,7 @@ public:
      */
     [[nodiscard]] glm::vec2 get_size() const;
 
-    void update() override final;
+    void internal_update() override final;
 
 private:
     std::optional<glm::vec2> canvas_size;
