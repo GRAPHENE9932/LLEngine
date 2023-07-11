@@ -74,9 +74,9 @@ void CameraNode::on_attachment_to_tree() {
 }
 
 void CameraNode::recompute_view_matrix() noexcept {
-    const glm::vec3 forward = get_rotation() * FORWARD;
-    const glm::vec3 up = get_rotation() * UP;
-    const glm::vec3 position = get_translation();
+    const glm::vec3 forward = get_global_rotation() * FORWARD;
+    const glm::vec3 up = get_global_rotation() * UP;
+    const glm::vec3 position = get_global_position();
     cached_view_matrix = glm::lookAt(position, position + forward, up);
 
     is_cached_view_matrix_valid = true;
