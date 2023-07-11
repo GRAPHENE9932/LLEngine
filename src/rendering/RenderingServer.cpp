@@ -1,5 +1,4 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
-#include "physics/BulletPhysicsServer.hpp"
 #include "rendering/Skybox.hpp"
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
 #include "logger.hpp"
