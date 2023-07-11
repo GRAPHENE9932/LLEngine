@@ -72,7 +72,7 @@ glm::quat CompleteSpatialNode::get_global_rotation() const noexcept {
     const auto parent = get_parent();
 
     if (parent) {
-        return get_rotation() * get_global_rotation();
+        return get_rotation() * parent->get_global_rotation();
     }
     else {
         return get_rotation();
