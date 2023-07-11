@@ -88,7 +88,6 @@ create_nodes_map(const nlohmann::json& json) {
         std::string type = node_json.at("type");
 
         std::vector<NodeProperty> properties;
-        properties.reserve(node_json.size() - 3);
         for (const auto& element : node_json.items()) {
             if (element.key() == "id" || element.key() == "parent_id" || element.key() == "type") {
                 continue;
@@ -114,6 +113,40 @@ create_nodes_map(const nlohmann::json& json) {
     return nodes;
 }
 
+auto take_children_for(
+    SceneJSON::NodeData& local_root,
+    std::uint64_t local_root_id,
+    std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>& all_nodes
+) -> std::optional<std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>::iterator> {
+    auto iter = all_nodes.begin();
+    bool had_one_child_taken = false;
+
+    while (iter != all_nodes.end()) {
+        if (!iter->second.second.has_value() || *iter->second.second != local_root_id) {
+            ++iter;
+            continue;
+        }
+
+        auto& child = local_root.children.emplace_back(std::move(iter->second.first));
+        std::uint64_t child_id = iter->first;
+        iter = all_nodes.erase(iter);
+
+        auto returned_iter = take_children_for(child, child_id, all_nodes);
+        if (returned_iter.has_value()) {
+            iter = *returned_iter;
+        }
+
+        had_one_child_taken = true;
+    }
+
+    if (had_one_child_taken) {
+        return iter;
+    }
+    else {
+        return std::nullopt;
+    }
+}
+
 SceneJSON::NodeData initialize_root_node_data(const nlohmann::json& json) {
     auto nodes = create_nodes_map(json);
 
@@ -129,14 +162,13 @@ SceneJSON::NodeData initialize_root_node_data(const nlohmann::json& json) {
         return !pair.second.second.has_value();
     });
 
-    for (auto& pair : nodes) {
-        if (pair.first == root_node_iter->first) {
-            continue;
-        };
-        nodes[*pair.second.second].first.children.emplace_back(std::move(pair.second.first));
-    }
+    SceneJSON::NodeData root_node = std::move(root_node_iter->second.first);
+    std::uint64_t root_node_id = root_node_iter->first;
+    nodes.erase(root_node_iter);
 
-    return std::move(root_node_iter->second.first);
+    take_children_for(root_node, root_node_id, nodes);
+
+    return root_node;
 }
 
 SceneJSON::SceneJSON(std::string_view json_path) {
