@@ -1,5 +1,4 @@
 #include "SceneJSON.hpp"
-#include "nodes/gui/GUICanvas.hpp"
 #include "utils/json_conversion.hpp"
 #include "node_registration.hpp"
 
