@@ -165,8 +165,8 @@ Texture Texture::from_ktx(const TexLoadingParams& params) {
     }
 
     // Transcode the texture if needed.
-    if (ktx_texture.get()->classId == ktxTexture2_c && ktxTexture2_NeedsTranscoding(reinterpret_cast<ktxTexture2*>(ktx_texture.get()))) {
-        error = ktxTexture2_TranscodeBasis(reinterpret_cast<ktxTexture2*>(ktx_texture.get()), KTX_TTF_BC3_RGBA, 0);
+    if (ktx_texture.get()->classId == ktxTexture2_c && ktxTexture2_NeedsTranscoding((ktxTexture2*)ktx_texture.get())) {
+        error = ktxTexture2_TranscodeBasis((ktxTexture2*)ktx_texture.get(), KTX_TTF_BC3_RGBA, 0);
 
         if (error != KTX_SUCCESS) {
             throw TextureLoadingError(fmt::format(
