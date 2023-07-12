@@ -112,11 +112,11 @@ create_nodes_map(const nlohmann::json& json) {
     return nodes;
 }
 
-auto take_children_for(
+bool take_children_for(
     SceneJSON::NodeData& local_root,
     std::uint64_t local_root_id,
     std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>& all_nodes
-) -> std::optional<std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>::iterator> {
+) {
     auto iter = all_nodes.begin();
     bool had_one_child_taken = false;
 
@@ -130,20 +130,15 @@ auto take_children_for(
         std::uint64_t child_id = iter->first;
         iter = all_nodes.erase(iter);
 
-        auto returned_iter = take_children_for(child, child_id, all_nodes);
-        if (returned_iter.has_value()) {
-            iter = *returned_iter;
+        const bool is_child_has_children = take_children_for(child, child_id, all_nodes);
+        if (is_child_has_children) {
+            iter = all_nodes.begin();
         }
 
         had_one_child_taken = true;
     }
 
-    if (had_one_child_taken) {
-        return iter;
-    }
-    else {
-        return std::nullopt;
-    }
+    return had_one_child_taken;
 }
 
 SceneJSON::NodeData initialize_root_node_data(const nlohmann::json& json) {
