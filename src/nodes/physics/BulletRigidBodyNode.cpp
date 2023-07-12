@@ -38,15 +38,13 @@ void BulletRigidBodyNode::before_simulation_step() {
         const auto current_parent_transform {get_parent()->get_global_transform()};
         
         if (current_parent_transform != previous_parent_transform) {
-            // Now we know that parent's global transform has changed.
-            // We don't store the local transform here, but only the global one.
-            // So, calculate the local transform relatively to the previous
-            // parent's transform and apply it relatively to the new
-            // parent's transform.
-            const auto local_transform {
-                get_relative_transform(*this, previous_parent_transform)
-            };
-            set_global_transform(local_transform * current_parent_transform);
+            // Bullet rigid bodies do not obey the node system with relative transforms we have.
+            // The consequence is unchanged global position when parent's transform had changed.
+            // To fix this, every simulation step we apply difference between previous and current parent transforms
+            // to our global transform.
+            set_global_transform((current_parent_transform / previous_parent_transform) * get_global_transform());
+
+            previous_parent_transform = current_parent_transform;
         }
     }
 }
@@ -70,6 +68,7 @@ void BulletRigidBodyNode::set_translation(const glm::vec3& new_trans) {
     btTransform cur_transform;
     get_bt_rigid_body()->getMotionState()->getWorldTransform(cur_transform);
     cur_transform.setOrigin(glm_vec3_to_bullet(new_global_position));
+    get_bt_rigid_body()->setWorldTransform(cur_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(cur_transform);
 }
 
@@ -82,6 +81,7 @@ void BulletRigidBodyNode::translate(const glm::vec3& translation) {
     btTransform cur_transform;
     get_bt_rigid_body()->getMotionState()->getWorldTransform(cur_transform);
     cur_transform.setOrigin(cur_transform.getOrigin() + glm_vec3_to_bullet(translation));
+    get_bt_rigid_body()->setWorldTransform(cur_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(cur_transform);
 }
 
@@ -124,6 +124,7 @@ void BulletRigidBodyNode::set_rotation(const glm::quat& new_rotation) {
     btTransform cur_transform;
     get_bt_rigid_body()->getMotionState()->getWorldTransform(cur_transform);
     cur_transform.setRotation(glm_quat_to_bullet(new_global_rotation));
+    get_bt_rigid_body()->setWorldTransform(cur_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(cur_transform);
 }
 
@@ -155,6 +156,7 @@ void BulletRigidBodyNode::set_transform(const Transform &new_transform) {
         ));
     }
 
+    get_bt_rigid_body()->setWorldTransform(new_bt_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(new_bt_transform);
 
     set_scale(new_transform.scale);
@@ -188,6 +190,7 @@ void BulletRigidBodyNode::set_global_transform(const Transform& new_transform) {
     btTransform new_bt_transform;
     new_bt_transform.setOrigin(glm_vec3_to_bullet(new_transform.translation));
     new_bt_transform.setRotation(glm_quat_to_bullet(new_transform.rotation));
+    get_bt_rigid_body()->setWorldTransform(new_bt_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(new_bt_transform);
 
     set_global_scale(new_transform.scale);
