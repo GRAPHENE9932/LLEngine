@@ -72,7 +72,7 @@ void main() {
     gl_Position = mvp * vec4(vertex_pos, 1.0);
 
     #ifdef USING_VERTEX_NORMALS
-        vec3 normal = (normal_matrix * vec4(vertex_normal, 0.0)).xyz;
+        vec3 normal = normalize((normal_matrix * vec4(vertex_normal, 0.0)).xyz);
         frag_normal = normal;
 
         #ifdef USING_NORMAL_TEXTURE
