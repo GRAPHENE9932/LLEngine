@@ -125,37 +125,42 @@ set(PUBLIC_HEADERS
     include/LLEngine/rendering/Material.hpp
     include/LLEngine/rendering/Window.hpp
     include/LLEngine/Transform.hpp
+    include/LLEngine/GameInstance.hpp
     include/LLEngine/physics/shapes/BoxShape.hpp
     include/LLEngine/physics/shapes/SphereShape.hpp
     include/LLEngine/physics/shapes/Shape.hpp
     include/LLEngine/physics/shapes/CylinderShape.hpp
     include/LLEngine/physics/BulletPhysicsServer.hpp
+    include/LLEngine/node_cast.hpp
     include/LLEngine/SceneJSON.hpp
     include/LLEngine/node_registration.hpp
     include/LLEngine/Event.hpp
     include/LLEngine/SceneFile.hpp
+    include/LLEngine/GameSettings.hpp
     include/LLEngine/gui/FreeTypeFont.hpp
     include/LLEngine/gui/GUITexture.hpp
     include/LLEngine/gui/GUITransform.hpp
     include/LLEngine/GLTF.hpp
     include/LLEngine/logger.hpp
+    include/LLEngine/NodeProperty.hpp
     include/LLEngine/Key.hpp
     include/LLEngine/nodes/rendering/PBRDrawableNode.hpp
     include/LLEngine/nodes/rendering/CameraNode.hpp
     include/LLEngine/nodes/rendering/PointLightNode.hpp
-    include/LLEngine/nodes/rendering/DrawableNode.hpp
+    include/LLEngine/nodes/rendering/Drawable.hpp
     include/LLEngine/nodes/rendering/DrawableCompleteSpatialNode.hpp
     include/LLEngine/nodes/rendering/SpectatorCameraNode.hpp
     include/LLEngine/nodes/rendering/SpotLight.hpp
     include/LLEngine/nodes/physics/BulletRigidBodyNode.hpp
     include/LLEngine/nodes/SpatialNode.hpp
     include/LLEngine/nodes/CompleteSpatialNode.hpp
+    include/LLEngine/nodes/gui/GUICanvas.hpp
     include/LLEngine/nodes/gui/GUINode.hpp
     include/LLEngine/nodes/gui/CompleteGUINode.hpp
     include/LLEngine/nodes/gui/TextNode.hpp
     include/LLEngine/nodes/gui/ButtonNode.hpp
+    include/LLEngine/nodes/Node.hpp
     include/LLEngine/FPSMeter.hpp
-    include/LLEngine/GameInstance.hpp
 )
 
 find_package(Threads)
