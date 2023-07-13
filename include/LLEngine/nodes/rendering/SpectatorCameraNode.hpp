@@ -14,7 +14,7 @@ public:
     static constexpr Key LEFT_KEY = Key::A;
 
     float sensivity = 0.001f;
-    float speed = 1.0f;
+    float speed = 10.0f;
 
     float x_angle = 0.0f;
     float y_angle = 0.0f;
