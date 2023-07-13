@@ -19,7 +19,7 @@ void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
         throw std::invalid_argument("Specified cubemap texture for skybox is not actually a cubemap.");
     }
 
-    this->skybox = std::make_unique<Skybox>(*this, cubemap);
+    this->skybox = std::make_unique<Skybox>(cubemap);
 }
 void RenderingServer::main_loop() {
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
@@ -44,7 +44,7 @@ void RenderingServer::main_loop() {
         // Draw skybox.
         if (skybox != nullptr) {
             glDepthMask(GL_FALSE);
-            skybox->draw();
+            skybox->draw(*this);
             glDepthMask(GL_TRUE);
         }
 

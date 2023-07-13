@@ -7,14 +7,17 @@
 using namespace llengine;
 
 Skybox::Skybox(Skybox&& other) noexcept :
-        Skybox(other.rs, other.cubemap_texture) {
-    other.cubemap_texture = nullptr;
+    Skybox(std::move(other.cubemap_texture)) {}
+
+Skybox::Skybox(const std::shared_ptr<Texture>& cubemap_texture) :
+    cubemap_texture(cubemap_texture) {};
+
+Skybox& Skybox::operator=(Skybox&& other) noexcept {
+    cubemap_texture = std::move(other.cubemap_texture);
+    return *this;
 }
 
-Skybox::Skybox(RenderingServer& rs, const std::shared_ptr<Texture>& cubemap_texture) :
-    cubemap_texture(cubemap_texture), rs(rs) {};
-
-void Skybox::draw() {
+void Skybox::draw(RenderingServer& rs) {
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
     // Uniforms.
