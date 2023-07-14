@@ -1,7 +1,6 @@
 #include "nodes/gui/ButtonNode.hpp"
 #include "node_registration.hpp"
 #include "rendering/RenderingServer.hpp"
-#include "logger.hpp"
 
 using namespace llengine;
 
