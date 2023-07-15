@@ -30,11 +30,11 @@ void GUICanvas::add_gui_node(std::unique_ptr<GUINode>&& gui_node) {
     gui_node->assign_canvas_parent(*this);
     gui_nodes.emplace_back(std::move(gui_node));
 }
-    
+
 void GUICanvas::remove_gui_node(std::size_t index) {
     if (index > gui_nodes.size()) {
         throw std::out_of_range("Can not remove child: invalid child index specified.");
-}
+    }
 
     gui_nodes.erase(gui_nodes.begin() + index);
 }
@@ -48,7 +48,7 @@ void GUICanvas::remove_gui_node(GUINode* gui_node) {
     );
     if (iter == gui_nodes.end()) {
         throw std::invalid_argument("Can't remove the non-existent child.");
-}
+    }
 
     gui_nodes.erase(iter);
 }
@@ -59,6 +59,15 @@ void GUICanvas::remove_gui_node(GUINode* gui_node) {
     }
     else {
         return get_rendering_server().get_window().get_window_size();
+    }
+}
+
+[[nodiscard]] glm::mat4 GUICanvas::get_mvp_matrix() const {
+    if (is_screen_overlayed()) {
+        return glm::mat4(1.0f);
+    }
+    else {
+        return get_rendering_server().get_view_proj_matrix() * get_global_matrix();
     }
 }
 

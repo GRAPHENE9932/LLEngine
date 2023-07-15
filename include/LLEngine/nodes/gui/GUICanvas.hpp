@@ -33,6 +33,8 @@ public:
      */
     [[nodiscard]] glm::vec2 get_size() const;
 
+    [[nodiscard]] glm::mat4 get_mvp_matrix() const;
+
     [[nodiscard]] bool is_screen_overlayed() const {
         return screen_overlayed;
     }
