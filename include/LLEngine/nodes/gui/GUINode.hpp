@@ -104,6 +104,9 @@ public:
 
     static void register_properties();
 
+    [[nodiscard]] const RootNode& get_root_node() const final override;
+    [[nodiscard]] RootNode& get_root_node() final override;
+
 protected:
     void draw_rectangle(const GUITexture& texture);
     void on_attachment_to_tree() override final;

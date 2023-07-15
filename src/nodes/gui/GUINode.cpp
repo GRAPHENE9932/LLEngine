@@ -7,6 +7,10 @@
 #include "node_registration.hpp"
 #include "node_cast.hpp"
 
+#include <fmt/format.h>
+
+#include <utility>
+
 using namespace llengine;
 
 GUINode::~GUINode() {
@@ -81,6 +85,25 @@ void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
     else {
         return false;
     }
+}
+
+[[nodiscard]] const RootNode& GUINode::get_root_node() const {
+    if (std::holds_alternative<GUINode*>(parent)) {
+        return std::get<GUINode*>(parent)->get_root_node();
+    }
+    else if (std::holds_alternative<GUICanvas*>(parent)) {
+        return std::get<GUICanvas*>(parent)->get_root_node();
+    }
+    else {
+        throw std::runtime_error(fmt::format(
+            "Failed to get root node. Is node \"{}\" attached to the tree?",
+            get_name()
+        ));
+    }
+}
+
+[[nodiscard]] RootNode& GUINode::get_root_node() {
+    return const_cast<RootNode&>(std::as_const(*this).get_root_node());
 }
 
 void GUINode::draw_texture_part(
