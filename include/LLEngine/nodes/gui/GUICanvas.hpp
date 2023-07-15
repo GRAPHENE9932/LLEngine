@@ -35,9 +35,22 @@ public:
      */
     [[nodiscard]] glm::vec2 get_size() const;
 
+    [[nodiscard]] bool is_screen_overlayed() const {
+        return screen_overlayed;
+    }
+
+    void set_screen_overlayed(bool screen_overlayed) {
+        this->screen_overlayed = screen_overlayed;
+    }
+
+    void set_screen_overlayed_property(const NodeProperty& property);
+
     void internal_update() override final;
 
+    static void register_properties();
+
 private:
+    bool screen_overlayed = true;
     std::optional<glm::vec2> canvas_size;
     std::vector<std::unique_ptr<GUINode>> gui_nodes;
 };

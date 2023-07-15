@@ -1,4 +1,5 @@
 #include "nodes/gui/GUICanvas.hpp"
+#include "node_registration.hpp"
 #include "nodes/SpatialNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "node_cast.hpp"
@@ -46,6 +47,10 @@ bool GUICanvas::remove_gui_node(GUINode* const gui_node) {
     }
 }
 
+void GUICanvas::set_screen_overlayed_property(const NodeProperty& property) {
+    set_screen_overlayed(property.get<bool>());
+}
+
 void GUICanvas::internal_update() {
     update_children();
     for (auto& gui_node : gui_nodes) {
@@ -53,4 +58,8 @@ void GUICanvas::internal_update() {
     }
 
     update();
+}
+
+void GUICanvas::register_properties() {
+    register_custom_property<GUICanvas>("gui_canvas", "screen_overlayed", &GUICanvas::set_screen_overlayed_property);
 }
