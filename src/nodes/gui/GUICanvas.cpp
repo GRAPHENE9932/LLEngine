@@ -27,15 +27,30 @@ void GUICanvas::add_child(std::unique_ptr<Node>&& child) {
 }
 
 void GUICanvas::add_gui_node(std::unique_ptr<GUINode>&& gui_node) {
+    gui_node->assign_canvas_parent(*this);
+    gui_nodes.emplace_back(std::move(gui_node));
+}
     
+void GUICanvas::remove_gui_node(std::size_t index) {
+    if (index > gui_nodes.size()) {
+        throw std::out_of_range("Can not remove child: invalid child index specified.");
 }
 
-bool GUICanvas::remove_gui_node(std::size_t index) {
-
+    gui_nodes.erase(gui_nodes.begin() + index);
 }
 
-bool GUICanvas::remove_gui_node(GUINode* const gui_node) {
+void GUICanvas::remove_gui_node(GUINode* gui_node) {
+    const auto iter = std::find_if(
+        gui_nodes.begin(), gui_nodes.end(),
+        [&gui_node](const auto& cur_unique) {
+            return cur_unique.get() == gui_node;
+        }
+    );
+    if (iter == gui_nodes.end()) {
+        throw std::invalid_argument("Can't remove the non-existent child.");
+}
 
+    gui_nodes.erase(iter);
 }
 
 [[nodiscard]] glm::vec2 GUICanvas::get_size() const {

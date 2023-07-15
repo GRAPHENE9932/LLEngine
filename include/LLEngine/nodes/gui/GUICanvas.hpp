@@ -18,17 +18,15 @@ public:
     /**
      * @brief Removes a root GUI node from canvas.
      * 
-     * @returns true if removal was successful.
-     * @returns false if specified index is out of range.
+     * @throws std::out_of_range if the specified index is out of range.
      */
-    bool remove_gui_node(std::size_t index);
+    void remove_gui_node(std::size_t index);
     /**
      * @brief Removes a root GUI node from canvas.
      * 
-     * @returns true if removal was successful.
-     * @returns false if specified GUI node was not found.
+     * @throws std::invalid_argument if the specified node is not a child of this canvas.
      */
-    bool remove_gui_node(GUINode* const gui_node);
+    void remove_gui_node(GUINode* gui_node);
 
     /**
      * @brief Returns the canvas size in pixels.
