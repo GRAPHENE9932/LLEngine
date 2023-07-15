@@ -1,6 +1,7 @@
 #include "node_registration.hpp"
 
 #include <fmt/format.h>
+#include <logger.hpp>
 
 #include <map>
 
@@ -149,7 +150,12 @@ void internal::add_node_setter(std::string_view node_type_name, std::string_view
     CustomNodeType& type = custom_nodes_map.at(std::string(node_type_name));
     std::unique_ptr<Node> result = type.construct_node();
     for (const auto& property : properties) {
-        type.call_setter(*result, property);
+        if (!type.call_setter(*result, property)) {
+            logger::warning(fmt::format(
+                "Tried to set inexistent/unregistered property \"{}\" to a node of type \"{}\"",
+                property.get_name(), node_type_name
+            ));
+        }
     }
     return result;
 }
