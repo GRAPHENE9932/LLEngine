@@ -5,6 +5,7 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <utility>
 
 using namespace llengine;
 
@@ -69,15 +70,7 @@ SpatialNode* SpatialNode::get_parent() const {
 }
 
 [[nodiscard]] RootNode& SpatialNode::get_root_node() {
-    if (parent) {
-        return parent->get_root_node();
-    }
-    else {
-        throw std::runtime_error(fmt::format(
-            "Failed to get root node. Is node \"{}\" attached to the tree?",
-            get_name()
-        ));
-    }
+    return const_cast<RootNode&>(std::as_const(*this).get_root_node());
 }
 
 [[nodiscard]] bool SpatialNode::is_attached_to_tree() const {
