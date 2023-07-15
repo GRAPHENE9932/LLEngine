@@ -107,9 +107,7 @@ void add_node_setter(std::string_view node_type_name, std::string_view property_
 void register_builtin_nodes();
 
 template<typename T>
-concept has_register_properties = requires(T) {
-    T::register_properties();
-};
+concept has_register_properties = std::is_same_v<decltype(T::register_properties()), void>;
 }
 
 void begin_nodes_registration();
