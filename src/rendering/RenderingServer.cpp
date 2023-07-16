@@ -32,6 +32,8 @@ void RenderingServer::main_loop() {
         prev_frame_time = now;
         delta_time = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
 
+        unblock_mouse_press();
+
         // Invoke callback.
         update_callback(delta_time);
         
@@ -61,6 +63,26 @@ void RenderingServer::main_loop() {
     } while (!window.window_should_close());
 }
 
+[[nodiscard]] bool RenderingServer::is_mouse_button_pressed(std::uint8_t button) const {
+    if (mouse_button_blocked) {
+        return false;
+    }
+
+    return window.is_mouse_button_pressed(button);
+}
+
+[[nodiscard]] glm::dvec2 RenderingServer::get_cursor_position() const {
+    return window.get_cursor_position();
+}
+
+void RenderingServer::block_mouse_press() {
+    mouse_button_blocked = true;
+}
+
+void RenderingServer::unblock_mouse_press() {
+    mouse_button_blocked = false;
+}
+
 void RenderingServer::register_drawable(Drawable* drawable) noexcept {
     if (drawable) {
         drawables.push_back(drawable);
@@ -68,9 +90,17 @@ void RenderingServer::register_drawable(Drawable* drawable) noexcept {
 }
 
 void RenderingServer::register_gui_node(GUINode* gui_node) noexcept {
-    if (gui_node) {
-        gui_nodes.push_back(gui_node);
+    if (!gui_node) {
+        return;
     }
+
+    // We need all the gui nodes to be sorted by Z coordinate descending.
+    float new_gui_node_z = gui_node->get_transform().z_coordinate;
+    auto iter = std::find_if(gui_nodes.begin(), gui_nodes.end(), [&new_gui_node_z] (GUINode* current) {
+        return new_gui_node_z >= current->get_transform().z_coordinate;
+    });
+    
+    gui_nodes.insert(iter, gui_node);
 }
 
 void RenderingServer::register_camera_node(CameraNode* camera_node) noexcept {

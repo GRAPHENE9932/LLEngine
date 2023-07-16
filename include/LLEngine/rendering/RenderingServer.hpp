@@ -44,6 +44,10 @@ public:
 
     void main_loop();
 
+    [[nodiscard]] bool is_mouse_button_pressed(std::uint8_t button) const;
+    [[nodiscard]] glm::dvec2 get_cursor_position() const;
+    void block_mouse_press();
+
     /**
      * @brief Must be called by every Drawable upon its creation.
      *
@@ -168,6 +172,8 @@ private:
     Window window;
     std::function<void(float)> update_callback;
 
+    bool mouse_button_blocked = false;
+
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;
     float delta_time = 1.0f;
@@ -183,5 +189,7 @@ private:
     std::vector<PointLightNode*> point_lights;
 
     ShaderHolder shader_holder;
+
+    void unblock_mouse_press();
 };
 }
