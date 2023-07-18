@@ -19,7 +19,7 @@ class Texture;
 class RenderingNode;
 class CameraNode;
 class Drawable;
-class GUINode;
+class GUICanvas;
 struct PointLightNode;
 struct SpotLight;
 
@@ -56,11 +56,11 @@ public:
      */
     void register_drawable(Drawable* drawable) noexcept;
     /**
-     * @brief Must be called by every GUINode upon its creation.
+     * @brief Must be called by every GUICanvas upon its creation.
      *
-     * Does nothing if gui_node is nullptr.
+     * Does nothing if gui_canvas is nullptr.
      */
-    void register_gui_node(GUINode* gui_node) noexcept;
+    void register_gui_canvas(GUICanvas* gui_canvas) noexcept;
     /**
      * @brief Must be called by every CameraNode upon its creation.
      * @param camera_node new freshly-created camera node.
@@ -80,13 +80,13 @@ public:
      */
     void unregister_drawable_node(Drawable* drawable_node) noexcept;
     /**
-     * @brief Must be called by every GUINode upon its destruction.
+     * @brief Must be called by every GUICanvas upon its destruction.
      *
      * Does nothing if argument is nullptr.
-     * @param gui_node GUI node that's going to be destroyed
+     * @param gui_canvas GUI canvas that's going to be destroyed
      * or already destroyed.
      */
-    void unregister_gui_node(GUINode* gui_node) noexcept;
+    void unregister_gui_canvas(GUICanvas* gui_canvas) noexcept;
     /**
      * @brief Must be called by every PointLightNode upon its destruction.
      *
@@ -139,8 +139,8 @@ public:
         return drawables;
     }
 
-    [[nodiscard]] const std::vector<GUINode*>& get_gui_nodes() const noexcept {
-        return gui_nodes;
+    [[nodiscard]] const std::vector<GUICanvas*>& get_canvases() const noexcept {
+        return gui_canvases;
     }
 
     [[nodiscard]] float get_delta_time() const {
@@ -185,7 +185,7 @@ private:
     std::optional<Texture> prefiltered_specular_map = std::nullopt;
     std::optional<Texture> brdf_integration_map = std::nullopt;
     std::vector<Drawable*> drawables;
-    std::vector<GUINode*> gui_nodes;
+    std::vector<GUICanvas*> gui_canvases;
     std::vector<PointLightNode*> point_lights;
 
     ShaderHolder shader_holder;

@@ -110,6 +110,7 @@ public:
 protected:
     void draw_rectangle(const GUITexture& texture);
     void on_attachment_to_tree() override final;
+    virtual void on_attachment_to_canvas();
 
 private:
     std::variant<GUINode*, GUICanvas*, std::monostate> parent = std::monostate();

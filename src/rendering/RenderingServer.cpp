@@ -4,7 +4,7 @@
 #include "logger.hpp"
 #include "nodes/rendering/CameraNode.hpp"
 #include "nodes/rendering/Drawable.hpp"
-#include "nodes/gui/GUINode.hpp"
+#include "nodes/gui/GUICanvas.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -53,8 +53,8 @@ void RenderingServer::main_loop() {
         // Draw overlay objects.
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_BLEND);
-        for (const auto& cur_gui_node : get_gui_nodes()) {
-            cur_gui_node->draw();
+        for (GUICanvas* canvas : gui_canvases) {
+            canvas->draw();
         }
         glDisable(GL_BLEND);
 
@@ -89,18 +89,8 @@ void RenderingServer::register_drawable(Drawable* drawable) noexcept {
     }
 }
 
-void RenderingServer::register_gui_node(GUINode* gui_node) noexcept {
-    if (!gui_node) {
-        return;
-    }
-
-    // We need all the gui nodes to be sorted by Z coordinate descending.
-    float new_gui_node_z = gui_node->get_transform().z_coordinate;
-    auto iter = std::find_if(gui_nodes.begin(), gui_nodes.end(), [&new_gui_node_z] (GUINode* current) {
-        return new_gui_node_z >= current->get_transform().z_coordinate;
-    });
-    
-    gui_nodes.insert(iter, gui_node);
+void RenderingServer::register_gui_canvas(GUICanvas* gui_node) noexcept {
+    gui_canvases.push_back(gui_node);
 }
 
 void RenderingServer::register_camera_node(CameraNode* camera_node) noexcept {
@@ -122,12 +112,12 @@ void RenderingServer::unregister_drawable_node(Drawable* drawable_node) noexcept
     }
 }
 
-void RenderingServer::unregister_gui_node(GUINode* gui_node) noexcept {
+void RenderingServer::unregister_gui_canvas(GUICanvas* gui_canvas) noexcept {
     const auto iter {
-        std::find(gui_nodes.begin(), gui_nodes.end(), gui_node)
+        std::find(gui_canvases.begin(), gui_canvases.end(), gui_canvas)
     };
-    if (iter != gui_nodes.end()) {
-        gui_nodes.erase(iter);
+    if (iter != gui_canvases.end()) {
+        gui_canvases.erase(iter);
     }
 }
 

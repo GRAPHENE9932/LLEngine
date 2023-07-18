@@ -4,10 +4,24 @@
 #include "rendering/RenderingServer.hpp"
 #include "node_cast.hpp"
 
+#include <algorithm>
+
 using namespace llengine;
+
+GUICanvas::~GUICanvas() {
+    get_rendering_server().unregister_gui_canvas(this);
+}
+
+void GUICanvas::draw() {
+    for (const auto& cur_gui_node : gui_nodes) {
+        cur_gui_node->draw();
+    }
+}
 
 void GUICanvas::on_attachment_to_tree() {
     SpatialNode::on_attachment_to_tree();
+
+    get_rendering_server().register_gui_canvas(this);
 
     std::for_each(
         gui_nodes.begin(), gui_nodes.end(),
@@ -51,6 +65,29 @@ void GUICanvas::remove_gui_node(GUINode* gui_node) {
     }
 
     gui_nodes.erase(iter);
+}
+
+void GUICanvas::register_gui_node(GUINode* gui_node) {
+    if (!gui_node) {
+        return;
+    }
+
+    // We need all the gui nodes to be sorted by Z coordinate descending.
+    float new_gui_node_z = gui_node->get_transform().z_coordinate;
+    auto iter = std::find_if(all_sorted_gui_nodes.begin(), all_sorted_gui_nodes.end(), [&new_gui_node_z] (GUINode* current) {
+        return new_gui_node_z >= current->get_transform().z_coordinate;
+    });
+    
+    all_sorted_gui_nodes.insert(iter, gui_node);
+}
+
+void GUICanvas::unregister_gui_node(GUINode* gui_node) {
+    const auto iter {
+        std::find(all_sorted_gui_nodes.begin(), all_sorted_gui_nodes.end(), gui_node)
+    };
+    if (iter != all_sorted_gui_nodes.end()) {
+        all_sorted_gui_nodes.erase(iter);
+    }
 }
 
 [[nodiscard]] glm::vec2 GUICanvas::get_size() const {

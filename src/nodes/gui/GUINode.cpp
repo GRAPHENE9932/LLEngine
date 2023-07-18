@@ -14,7 +14,7 @@
 using namespace llengine;
 
 GUINode::~GUINode() {
-    get_rendering_server().unregister_gui_node(this);
+    get_canvas().unregister_gui_node(this);
 }
 
 [[nodiscard]] glm::vec3 GUINode::get_screen_space_position() const {
@@ -183,7 +183,6 @@ void GUINode::draw_rectangle(const GUITexture& texture) {
 
 void GUINode::on_attachment_to_tree() {
     Node::on_attachment_to_tree();
-    get_rendering_server().register_gui_node(this);
 
     std::for_each(
         children.begin(), children.end(),
@@ -191,6 +190,10 @@ void GUINode::on_attachment_to_tree() {
             child->on_attachment_to_tree();
         }
     );
+}
+
+void GUINode::on_attachment_to_canvas() {
+    get_canvas().register_gui_node(this);
 }
 
 void GUINode::assign_canvas_parent(GUICanvas& canvas) {

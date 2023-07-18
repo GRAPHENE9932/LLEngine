@@ -9,6 +9,14 @@ class RenderingServer;
 class GUICanvas : public CompleteSpatialNode {
 public:
     GUICanvas() = default;
+    GUICanvas(const GUICanvas& other) = delete;
+    GUICanvas(GUICanvas&& other) = delete;
+    ~GUICanvas();
+
+    GUICanvas& operator=(const GUICanvas& other) = delete;
+    GUICanvas& operator=(GUICanvas&& other) = delete;
+
+    void draw();
 
     void on_attachment_to_tree() final override;
 
@@ -27,6 +35,9 @@ public:
      * @throws std::invalid_argument if the specified node is not a child of this canvas.
      */
     void remove_gui_node(GUINode* gui_node);
+
+    void register_gui_node(GUINode* gui_node);
+    void unregister_gui_node(GUINode* gui_node);
 
     /**
      * @brief Returns the canvas size in pixels.
@@ -53,5 +64,6 @@ private:
     bool screen_overlayed = true;
     std::optional<glm::vec2> canvas_size;
     std::vector<std::unique_ptr<GUINode>> gui_nodes;
+    std::vector<GUINode*> all_sorted_gui_nodes;
 };
 };
