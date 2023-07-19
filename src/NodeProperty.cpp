@@ -31,6 +31,35 @@ template<>
 }
 
 template<>
+[[nodiscard]] std::int8_t NodeProperty::get() const {
+    return static_cast<std::int8_t>(get<std::int64_t>());
+}
+template<>
+[[nodiscard]] std::uint8_t NodeProperty::get() const {
+    return static_cast<std::uint8_t>(get<std::int64_t>());
+}
+template<>
+[[nodiscard]] std::int16_t NodeProperty::get() const {
+    return static_cast<std::int8_t>(get<std::int64_t>());
+}
+template<>
+[[nodiscard]] std::uint16_t NodeProperty::get() const {
+    return static_cast<std::uint8_t>(get<std::int64_t>());
+}
+template<>
+[[nodiscard]] std::int32_t NodeProperty::get() const {
+    return static_cast<std::int8_t>(get<std::int64_t>());
+}
+template<>
+[[nodiscard]] std::uint32_t NodeProperty::get() const {
+    return static_cast<std::uint8_t>(get<std::int64_t>());
+}
+template<>
+[[nodiscard]] std::uint64_t NodeProperty::get() const {
+    return static_cast<std::int8_t>(get<std::int64_t>());
+}
+
+template<>
 [[nodiscard]] float NodeProperty::get() const {
     if (std::holds_alternative<std::int64_t>(property)) {
         return static_cast<float>(std::get<std::int64_t>(property));
