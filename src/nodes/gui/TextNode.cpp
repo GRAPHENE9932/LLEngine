@@ -1,4 +1,5 @@
 #include "nodes/gui/TextNode.hpp"
+#include "node_registration.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "utils/math.hpp"
 
@@ -6,8 +7,6 @@
 #include <glm/mat4x4.hpp>
 
 using namespace llengine;
-
-TextNode::TextNode(const std::shared_ptr<FreeTypeFont>& font) : GUINode(), font(font) {}
 
 [[nodiscard]] GUITransform TextNode::get_transform() const {
     return {
@@ -38,6 +37,8 @@ void TextNode::set_transform(const GUITransform& transform) {
 }
 
 void TextNode::set_text(std::string_view new_text) {
+    cached_text = new_text;
+
     // Do nothing if we don't have a font.
     if (font == nullptr) {
         return;
@@ -88,6 +89,23 @@ void TextNode::set_text(std::string_view new_text) {
     mesh->set_uvs(uvs);
 }
 
+void TextNode::set_text_property(const NodeProperty& property) {
+    set_text(property.get<std::string>());
+}
+
+void TextNode::set_color_property(const NodeProperty& property) {
+    set_color(property.get<glm::vec3>());
+}
+
+void TextNode::set_font(const std::shared_ptr<FreeTypeFont>& new_font) {
+    font = new_font;
+    set_text(cached_text);
+}
+
+void TextNode::set_font_property(const NodeProperty& property) {
+    set_font(FreeTypeFont::from_property(property));
+}
+
 void TextNode::draw() {
     draw_children();
 
@@ -107,4 +125,10 @@ void TextNode::draw() {
         glDrawArrays(GL_TRIANGLES, char_i * 6, 6);
         mesh->unbind_vao();
     }
+}
+
+void TextNode::register_properties() {
+    register_custom_property<TextNode>("text_node", "text_color", &TextNode::set_color_property);
+    register_custom_property<TextNode>("text_node", "text", &TextNode::set_text_property);
+    register_custom_property<TextNode>("text_node", "font", &TextNode::set_font_property);
 }

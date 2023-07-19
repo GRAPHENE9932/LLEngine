@@ -12,16 +12,20 @@
 namespace llengine {
 class TextNode : public GUINode {
 public:
-    TextNode(const std::shared_ptr<FreeTypeFont>& font);
+    TextNode() = default;
 
     [[nodiscard]] GUITransform get_transform() const override;
     [[nodiscard]] glm::vec2 get_absolute_size() const override;
     void set_transform(const GUITransform& transform) override;
 
     void set_text(std::string_view new_text);
+    void set_text_property(const NodeProperty& property);
     void set_color(const glm::vec3& new_color) noexcept {
         color = new_color;
     }
+    void set_color_property(const NodeProperty& property);
+    void set_font(const std::shared_ptr<FreeTypeFont>& new_font);
+    void set_font_property(const NodeProperty& property);
 
     [[nodiscard]] glm::vec3 get_color() const noexcept {
         return color;
@@ -29,15 +33,18 @@ public:
 
     void draw() override;
 
+    static void register_properties();
+
 private:
     glm::vec2 position_anchor {0.0f, 0.0f};
     glm::vec2 position_offset {0.0f, 0.0f};
     float z_coordinate {0.0f};
     GUITransform::OriginX origin_x = GUITransform::OriginX::LEFT;
-    GUITransform::OriginY origin_y = GUITransform::OriginY::BOTTOM;
+    GUITransform::OriginY origin_y = GUITransform::OriginY::TOP;
 
     std::shared_ptr<FreeTypeFont> font = nullptr;
     glm::vec3 color = {0.0f, 0.0f, 0.0f};
+    std::string cached_text;
 
     std::optional<Mesh> mesh = std::nullopt;
     std::vector<std::reference_wrapper<const FreeTypeFont::FontChar>> chars;
