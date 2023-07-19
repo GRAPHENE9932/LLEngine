@@ -27,6 +27,8 @@ public:
         return chars.at(character);
     }
 
+    static std::shared_ptr<FreeTypeFont> from_property(const NodeProperty& property);
+
 private:
     std::map<char, FontChar> chars;
 };

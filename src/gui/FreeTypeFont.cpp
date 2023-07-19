@@ -1,4 +1,5 @@
 #include "gui/FreeTypeFont.hpp"
+#include "NodeProperty.hpp"
 
 #include <fmt/format.h>
 #include <ft2build.h>
@@ -123,4 +124,19 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
         );
     }
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Return to the default value.
+}
+
+std::shared_ptr<FreeTypeFont> FreeTypeFont::from_property(const NodeProperty& property) {
+    std::string type = property.get_subproperty("type").get<std::string>();
+    if (type != "font") {
+        throw std::runtime_error(fmt::format(
+            "Failed to convert node property into FreeType font: invalid type: \"{}\".",
+            type
+        ));
+    }
+
+    std::string file_path = property.get_subproperty("path").get<std::string>();
+    std::uint32_t font_size = property.get_subproperty("size").get<std::uint32_t>();
+
+    return std::make_shared<FreeTypeFont>(file_path, font_size);
 }
