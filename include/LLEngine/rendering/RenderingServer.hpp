@@ -43,6 +43,7 @@ public:
     }
 
     void main_loop();
+    void stop();
 
     [[nodiscard]] bool is_mouse_button_pressed(std::uint8_t button) const;
     [[nodiscard]] glm::dvec2 get_cursor_position() const;
@@ -173,6 +174,7 @@ private:
     std::function<void(float)> update_callback;
 
     bool mouse_button_blocked = false;
+    bool stop_requested = false;
 
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;

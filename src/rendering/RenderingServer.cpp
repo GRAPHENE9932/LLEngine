@@ -60,7 +60,11 @@ void RenderingServer::main_loop() {
 
         window.swap_buffers();
         glfwPollEvents();
-    } while (!window.window_should_close());
+    } while (!window.window_should_close() && !stop_requested);
+}
+
+void RenderingServer::stop() {
+    stop_requested = true;
 }
 
 [[nodiscard]] bool RenderingServer::is_mouse_button_pressed(std::uint8_t button) const {
