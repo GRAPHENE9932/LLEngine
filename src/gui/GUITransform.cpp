@@ -91,8 +91,10 @@ using namespace llengine;
     transform.position_anchor = property.get_optional<glm::vec2>("position_anchor").value_or(glm::vec2(0.0f, 0.0f));
     transform.position_offset = property.get_optional<glm::vec2>("position_offset").value_or(glm::vec2(0.0f, 0.0f));
     transform.z_coordinate = property.get_optional<float>("z_coordinate").value_or(0.0f);
-    transform.origin_x = origin_x_from_string(property.get_optional<std::string>("origin_x").value_or("left"));
-    transform.origin_y = origin_y_from_string(property.get_optional<std::string>("origin_y").value_or("bottom"));
+    std::vector<std::string> origin = property.get_optional<std::vector<std::string>>("origin")
+        .value_or(std::vector<std::string>({"left", "bottom"}));
+    transform.origin_x = origin_x_from_string(origin.at(0));
+    transform.origin_y = origin_y_from_string(origin.at(1));
     transform.size_mode = size_mode_from_string(property.get_optional<std::string>("size_mode").value_or("absolute"));
     transform.size = property.get_optional<glm::vec2>("size").value_or(glm::vec2(0.0f, 0.0f));
 
