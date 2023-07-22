@@ -44,6 +44,7 @@ std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
         constr_env.meshes.at(*gltf_node.mesh_index)
     );
 
+    result->set_transform(gltf_node.transform);
     result->set_name(gltf_node.name);
 
     if constexpr (with_children) {
