@@ -200,7 +200,6 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
         std::string scene_file_path = prop_iter->get<std::string>();
 
         result = SceneFile::load_from_file(scene_file_path)->to_node();
-
     }
     else {
         result = construct_node(data.type, data.properties);
