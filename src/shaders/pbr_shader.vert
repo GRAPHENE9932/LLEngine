@@ -55,6 +55,15 @@ uniform vec2 ao_uv_scale;
 #ifdef USING_NORMAL_UV_TRANSFORM
     out vec2 frag_normal_uv;
 #endif
+#ifdef USING_METALLIC_UV_TRANSFORM
+    out vec2 frag_metallic_uv;
+#endif
+#ifdef USING_ROUGHNESS_UV_TRANSFORM
+    out vec2 frag_roughness_uv;
+#endif
+#ifdef USING_AO_UV_TRANSFORM
+    out vec2 frag_ao_uv;
+#endif
 #ifdef USING_UV
     out vec2 frag_uv;
 #endif
