@@ -13,8 +13,8 @@ struct Transform {
 
     [[nodiscard]] glm::mat4 calculate_matrix() const {
         return glm::translate(translation) *
-            glm::scale(scale) *
-            glm::toMat4(rotation);
+            glm::toMat4(rotation) *
+            glm::scale(scale);
     }
 
     /**
