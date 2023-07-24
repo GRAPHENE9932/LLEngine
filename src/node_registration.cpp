@@ -163,3 +163,18 @@ void internal::add_node_setter(std::string_view node_type_name, std::string_view
 void llengine::call_setter(std::string_view node_type_name, const NodeProperty& property, Node& node) {
     custom_nodes_map.at(std::string(node_type_name)).call_setter(node, property);
 }
+
+[[nodiscard]] std::optional<std::string_view> llengine::find_node_type_name(const Node& node) {
+    const auto iter = std::find_if(
+        custom_nodes_map.begin(), custom_nodes_map.end(),
+        [&node] (const auto& pair) {
+            return pair.second.get_type_index() == typeid(node);
+        }
+    );
+
+    if (iter == custom_nodes_map.end()) {
+        return std::nullopt;
+    }
+
+    return iter->first;
+}

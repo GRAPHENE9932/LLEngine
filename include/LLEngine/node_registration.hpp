@@ -133,4 +133,5 @@ void register_custom_property(
 [[nodiscard]] std::unique_ptr<Node> construct_node(std::string_view node_type_name);
 [[nodiscard]] std::unique_ptr<Node> construct_node(std::string_view node_type_name, const std::vector<NodeProperty>& properties);
 void call_setter(std::string_view node_type_name, const NodeProperty& property, Node& node);
+[[nodiscard]] std::optional<std::string_view> find_node_type_name(const Node& node);
 }
