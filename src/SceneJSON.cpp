@@ -16,6 +16,10 @@ using namespace llengine;
 
 constexpr std::uint64_t CURRENT_VERSION = 1;
 
+[[nodiscard]] static bool is_basic_property(std::string_view property_name) {
+    return property_name == "id" || property_name == "parent_id" || property_name == "type";
+}
+
 NodeProperty node_property_from_json(std::string_view key, const nlohmann::json& value) {
     if (value.is_number_integer()) {
         return NodeProperty(key, value.get<std::int64_t>());
@@ -88,7 +92,7 @@ create_nodes_map(const nlohmann::json& json) {
 
         std::vector<NodeProperty> properties;
         for (const auto& element : node_json.items()) {
-            if (element.key() == "id" || element.key() == "parent_id" || element.key() == "type") {
+            if (is_basic_property(element.key())) {
                 continue;
             }
 
@@ -200,6 +204,17 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
         std::string scene_file_path = prop_iter->get<std::string>();
 
         result = SceneFile::load_from_file(scene_file_path)->to_node();
+
+        auto node_name = find_node_type_name(*result);
+        if (node_name.has_value()) {
+            for (const auto& property : data.properties) {
+                if (is_basic_property(property.get_name()) || property.get_name() == "scene_file_path") {
+                    continue;
+                }
+
+                call_setter(*node_name, property, *result);
+            }
+        }
     }
     else {
         result = construct_node(data.type, data.properties);
