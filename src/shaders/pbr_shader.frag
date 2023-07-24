@@ -218,6 +218,11 @@ vec3 fresnel_schlick(float cosine, vec3 refl_ratio_at_zero_inc) {
     return refl_ratio_at_zero_inc + (1.0 - refl_ratio_at_zero_inc) * pow(clamp(1.0 - cosine, 0.0, 1.0), 5.0);
 }
 
+vec3 fresnel_schlick_considering_roughness(float cosine, vec3 refl_ratio_at_zero_inc, float roughness) {
+    return refl_ratio_at_zero_inc + (max(vec3((1.0 - roughness)), refl_ratio_at_zero_inc) - refl_ratio_at_zero_inc)
+    * pow(clamp(1.0 - cosine, 0.0, 1.0), 5.0);
+}
+
 float normal_distribution_ggx(float roughness, vec3 normal, vec3 halfway) {
     float alpha = roughness * roughness;
 
@@ -270,7 +275,7 @@ void main() {
     #ifdef USING_IBL
     {
         // Diffuse part.
-        vec3 reflection_ratio = fresnel_schlick(max(dot(get_normal(), view_direction), 0.0), refl_ratio_at_zero_inc);
+        vec3 reflection_ratio = fresnel_schlick_considering_roughness(max(dot(get_normal(), view_direction), 0.0), refl_ratio_at_zero_inc, get_roughness());
         vec3 refraction_ratio = (vec3(1.0) - reflection_ratio) * (1.0 - get_metallic());
         vec3 ambient_irradiance = texture(irradiance_map, get_normal()).rgb;
         vec3 diffuse = ambient_irradiance * get_base_color().rgb;
