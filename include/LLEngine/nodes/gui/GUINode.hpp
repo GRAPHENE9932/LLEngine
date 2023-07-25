@@ -64,12 +64,9 @@ public:
 
     [[nodiscard]] bool is_attached_to_tree() const override;
 
-    virtual void draw() {}
+    virtual void draw() {};
 
-    void internal_update() override {
-        update_children();
-        update();
-    }
+    void internal_update() override;
 
     /**
      * @brief Get the parent GUI node if exists.
@@ -111,6 +108,8 @@ protected:
     void draw_rectangle(const GUITexture& texture);
     void on_attachment_to_tree() override final;
     virtual void on_attachment_to_canvas();
+    virtual void internal_on_enable() override;
+    virtual void internal_on_disable() override;
 
 private:
     std::variant<GUINode*, GUICanvas*, std::monostate> parent = std::monostate();

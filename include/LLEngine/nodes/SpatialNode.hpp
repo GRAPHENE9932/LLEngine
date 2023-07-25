@@ -63,6 +63,10 @@ public:
 
     static void register_properties();
 
+protected:
+    virtual void internal_on_enable() override;
+    virtual void internal_on_disable() override;
+
 private:
     SpatialNode* parent {nullptr};
     /**

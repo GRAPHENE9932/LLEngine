@@ -99,8 +99,10 @@ void SpatialNode::set_rotation_property(const NodeProperty& property) {
 }
 
 void SpatialNode::internal_update() {
-    update_children();
-    update();
+    if (is_enabled()) {
+        update_children();
+        update();
+    }
 }
 
 void SpatialNode::on_attachment_to_tree() {
@@ -118,4 +120,16 @@ void SpatialNode::register_properties() {
     register_custom_property<SpatialNode>("spatial_node", "translation", &SpatialNode::set_translation_property);
     register_custom_property<SpatialNode>("spatial_node", "scale", &SpatialNode::set_scale_property);
     register_custom_property<SpatialNode>("spatial_node", "rotation", &SpatialNode::set_rotation_property);
+}
+
+void SpatialNode::internal_on_enable() {
+    for (const auto& child : children) {
+        child->on_parent_enable_disable(true);
+    }
+}
+
+void SpatialNode::internal_on_disable() {
+    for (const auto& child : children) {
+        child->on_parent_enable_disable(false);
+    }
 }

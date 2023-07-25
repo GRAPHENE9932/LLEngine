@@ -60,6 +60,10 @@ public:
 
     static void register_properties();
 
+protected:
+    void internal_on_enable() override;
+    void internal_on_disable() override;
+
 private:
     bool screen_overlayed = true;
     std::optional<glm::vec2> canvas_size;

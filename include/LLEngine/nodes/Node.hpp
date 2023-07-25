@@ -32,6 +32,11 @@ public:
         name = property.get<std::string>();
     }
 
+    void enable();
+    void disable();
+    void set_enabled_property(const NodeProperty& property);
+    [[nodiscard]] bool is_enabled() const;
+
     static void register_properties();
 
     [[nodiscard]] RenderingServer& get_rendering_server() const;
@@ -43,9 +48,15 @@ protected:
     virtual void on_attachment_to_tree();
     virtual void update() {};
     virtual void internal_update() {};
+    void on_parent_enable_disable(bool enabled);
+    virtual void internal_on_enable() {};
+    virtual void internal_on_disable() {};
 
 private:
     std::string name;
+    bool enabled = true;
+    bool parent_enabled = true;
+    bool was_enabled_before = true;
 
     mutable RenderingServer* cached_rendering_server = nullptr;
     mutable BulletPhysicsServer* cached_bullet_physics_server = nullptr;

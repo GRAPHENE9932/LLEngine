@@ -87,6 +87,13 @@ void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
     }
 }
 
+void GUINode::internal_update() {
+    if (is_enabled()) {
+        update_children();
+        update();
+    }
+}
+
 [[nodiscard]] const RootNode& GUINode::get_root_node() const {
     if (std::holds_alternative<GUINode*>(parent)) {
         return std::get<GUINode*>(parent)->get_root_node();
@@ -237,4 +244,16 @@ void GUINode::assign_canvas_parent(GUICanvas& canvas) {
 
 void GUINode::register_properties() {
     register_custom_property<GUINode>("gui_node", "transform", &GUINode::set_transform_property);
+}
+
+void GUINode::internal_on_enable() {
+    for (const auto& child : children) {
+        child->on_parent_enable_disable(true);
+    }
+}
+
+void GUINode::internal_on_disable() {
+    for (const auto& child : children) {
+        child->on_parent_enable_disable(false);
+    }
 }

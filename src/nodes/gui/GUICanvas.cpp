@@ -13,7 +13,11 @@ GUICanvas::~GUICanvas() {
 }
 
 void GUICanvas::draw() {
-    for (const auto& cur_gui_node : gui_nodes) {
+    if (!is_enabled()) {
+        return;
+    }
+
+    for (const auto& cur_gui_node : all_sorted_gui_nodes) {
         cur_gui_node->draw();
     }
 }
@@ -113,6 +117,10 @@ void GUICanvas::set_screen_overlayed_property(const NodeProperty& property) {
 }
 
 void GUICanvas::internal_update() {
+    if (!is_enabled()) {
+        return;
+    }
+
     update_children();
     for (auto& gui_node : gui_nodes) {
         gui_node->internal_update();
@@ -123,4 +131,20 @@ void GUICanvas::internal_update() {
 
 void GUICanvas::register_properties() {
     register_custom_property<GUICanvas>("gui_canvas", "screen_overlayed", &GUICanvas::set_screen_overlayed_property);
+}
+
+void GUICanvas::internal_on_enable() {
+    SpatialNode::internal_on_enable();
+
+    for (const auto& gui_node : gui_nodes) {
+        gui_node->on_parent_enable_disable(true);
+    }
+}
+
+void GUICanvas::internal_on_disable() {
+    SpatialNode::internal_on_disable();
+
+    for (const auto& gui_node : gui_nodes) {
+        gui_node->on_parent_enable_disable(true);
+    }
 }
