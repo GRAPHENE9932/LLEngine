@@ -57,6 +57,10 @@ bool CustomNodeType::call_setter(Node& node, const NodeProperty& property) {
 
 [[nodiscard]] bool CustomNodeType::is_parent_of(const CustomNodeType& other) const {
     if (std::holds_alternative<CustomNodeType*>(other.parent)) {
+        if (std::get<CustomNodeType*>(other.parent) == nullptr) {
+            return false;
+        }
+        
         return *this == *std::get<CustomNodeType*>(other.parent);
     }
     else {

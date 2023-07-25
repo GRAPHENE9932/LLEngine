@@ -56,6 +56,11 @@ public:
         return CustomNodeType(std::make_unique<ConcreteHolder<T>>(), typeid(Base));
     }
 
+    template<typename T>
+    static CustomNodeType create_from_type() {
+        return CustomNodeType(std::make_unique<ConcreteHolder<T>>());
+    }
+
     [[nodiscard]] std::unique_ptr<Node> construct_node() const;
     void add_setter(std::string_view name, PropertySetter&& setter);
     bool call_setter(Node& node, const NodeProperty& property);
@@ -98,6 +103,8 @@ private:
 
     CustomNodeType(std::unique_ptr<Holder>&& holder, std::type_index base_type_index) :
         holder(std::move(holder)), parent(base_type_index) {}
+    CustomNodeType(std::unique_ptr<Holder>&& holder) :
+        holder(std::move(holder)), parent(nullptr) {}
     
     [[nodiscard]] bool has_own_setter_for(std::string_view name) const;
 };
@@ -108,6 +115,14 @@ void register_builtin_nodes();
 
 template<typename T>
 concept has_register_properties = std::is_same_v<decltype(T::register_properties()), void>;
+
+template<typename T>
+void register_baseless_node_type(std::string_view node_type_name) {
+    internal::add_node_type(node_type_name, internal::CustomNodeType::create_from_type<T>());
+    if constexpr (internal::has_register_properties<T>) {
+        T::register_properties();
+    }
+}
 }
 
 void begin_nodes_registration();

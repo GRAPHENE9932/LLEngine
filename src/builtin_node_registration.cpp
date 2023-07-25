@@ -12,6 +12,7 @@ using namespace llengine;
 using namespace llengine::internal;
 
 void internal::register_builtin_nodes() {
+    internal::register_baseless_node_type<Node>("node");
     register_node_type<SpatialNode, Node>("spatial_node");
     register_node_type<CompleteSpatialNode, SpatialNode>("complete_spatial_node");
     register_node_type<CameraNode, SpatialNode>("camera_node");
