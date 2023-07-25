@@ -19,11 +19,6 @@ public:
     Node& operator=(const Node& other) = delete;
     Node& operator=(Node&& other) = delete;
 
-    /**
-     * @brief Sets the node property. Either basic or custom.
-     */
-    void set_property(const NodeProperty& property);
-
     virtual void add_child(std::unique_ptr<Node>&& child) = 0;
     [[nodiscard]] virtual bool is_attached_to_tree() const = 0;
 
