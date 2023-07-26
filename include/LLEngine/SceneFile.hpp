@@ -9,6 +9,6 @@ public:
 
     static std::unique_ptr<SceneFile> load_from_file(std::string_view file_path);
 
-    virtual std::unique_ptr<Node> to_node() const = 0;
+    virtual std::unique_ptr<Node> to_node(const std::vector<NodeProperty>& properties = {}) const = 0;
 };
 }

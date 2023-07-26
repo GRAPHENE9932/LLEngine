@@ -168,6 +168,18 @@ void llengine::call_setter(std::string_view node_type_name, const NodeProperty& 
     custom_nodes_map.at(std::string(node_type_name)).call_setter(node, property);
 }
 
+void llengine::set_properties_to_node(Node& node, const std::vector<NodeProperty>& properties) {
+    std::optional<std::string_view> node_name = find_node_type_name(node);
+    if (!node_name.has_value()) {
+        logger::warning("Tried to set properties to a node of unregistered type.");
+        return;
+    }
+
+    for (const NodeProperty& property : properties) {
+        call_setter(*node_name, property, node);
+    }
+}
+
 [[nodiscard]] std::optional<std::string_view> llengine::find_node_type_name(const Node& node) {
     const auto iter = std::find_if(
         custom_nodes_map.begin(), custom_nodes_map.end(),

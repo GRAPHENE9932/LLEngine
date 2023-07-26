@@ -227,6 +227,8 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
     return std::move(result);
 }
 
-std::unique_ptr<Node> SceneJSON::to_node() const {
-    return std::move(::to_node(root_node_data));
+std::unique_ptr<Node> SceneJSON::to_node(const std::vector<NodeProperty>& properties) const {
+    std::unique_ptr<Node> result = ::to_node(root_node_data);
+    set_properties_to_node(*result, properties);
+    return result;
 }

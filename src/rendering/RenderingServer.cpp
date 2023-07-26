@@ -40,8 +40,11 @@ void RenderingServer::main_loop() {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         // Draw objects.
-        for (const auto& cur_drawable : get_drawables())
-            cur_drawable->draw();
+        for (const auto& cur_drawable : get_drawables()) {
+            if (cur_drawable->is_enabled()) {
+                cur_drawable->draw();
+            }
+        }
 
         // Draw skybox.
         if (skybox != nullptr) {

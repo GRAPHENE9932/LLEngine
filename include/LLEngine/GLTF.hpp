@@ -80,6 +80,6 @@ public:
     */
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<llengine::Node> to_node() const override;
+    std::unique_ptr<llengine::Node> to_node(const std::vector<NodeProperty>& properties) const override;
 };
 }

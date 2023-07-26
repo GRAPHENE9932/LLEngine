@@ -1,4 +1,5 @@
 #include "GLTF.hpp" // GLTF
+#include "node_registration.hpp"
 #include "rendering/Mesh.hpp"
 #include "physics/shapes/Shape.hpp"
 #include "physics/shapes/BoxShape.hpp"
@@ -248,7 +249,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::Node> GLTF::to_node() const {
+std::unique_ptr<::Node> GLTF::to_node(const std::vector<NodeProperty>& properties) const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -277,24 +278,28 @@ std::unique_ptr<::Node> GLTF::to_node() const {
         {}
     };
 
+    std::unique_ptr<::Node> result = nullptr;
+
     // Convert glTF to node.
     if (this->nodes.size() == 1) {
-        return ::to_node(constr_env, this->nodes[0]);
+        result = ::to_node(constr_env, this->nodes[0]);
     }
     else if (this->nodes.size() > 1) {
         // We have multiple root nodes in this glTF, but
         // we must return only one root node.
         // So, create the spatial node with default
         // transform and make it root.
-        auto result = std::make_unique<CompleteSpatialNode>(Transform());
+        result = std::make_unique<CompleteSpatialNode>(Transform());
         for (const auto& cur_gltf_node : this->nodes) {
             result->add_child(::to_node(constr_env, cur_gltf_node));
         }
-        return result;
     }
     else {
         // If there are 0 nodes, then just create a complete spatial node
         // with identity transform.
-        return std::make_unique<CompleteSpatialNode>(Transform());
+        result = std::make_unique<CompleteSpatialNode>(Transform());
     }
+
+    set_properties_to_node(*result, properties);
+    return result;
 }
