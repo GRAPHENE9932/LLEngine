@@ -4,6 +4,7 @@
 #include "nodes/gui/GUINode.hpp"
 #include "nodes/gui/TextNode.hpp"
 #include "nodes/gui/GUICanvas.hpp"
+#include "nodes/physics/BulletRigidBodyNode.hpp"
 #include "nodes/rendering/SpectatorCameraNode.hpp"
 #include "nodes/rendering/PBRDrawableNode.hpp"
 //#include "nodes/rendering/PointLightNode.hpp"
@@ -18,6 +19,7 @@ void internal::register_builtin_nodes() {
     register_node_type<CameraNode, SpatialNode>("camera_node");
     register_node_type<SpectatorCameraNode, SpatialNode>("spectator_camera_node");
     register_node_type<PBRDrawableNode, SpatialNode>("pbr_drawable_node");
+    register_node_type<BulletRigidBodyNode, CompleteSpatialNode>("rigid_body_node");
     //register_node_type<PointLightNode>("point_light_node");
 
     register_node_type<GUINode, Node>("gui_node");
