@@ -15,7 +15,7 @@ CylinderShape::CylinderShape(CylinderShape&& cylinder_shape) noexcept :
     semi_axis(cylinder_shape.semi_axis), Shape(std::move(cylinder_shape)) {}
 
 CylinderShape::CylinderShape(float radius_x, float radius_z, float height) noexcept :
-    semi_axis(radius_x / 2.0f, height / 2.0f, radius_z / 2.0f) {}
+    semi_axis(radius_x, height / 2.0f, radius_z) {}
 
 CylinderShape::CylinderShape(const glm::vec3& semi_axis) noexcept:
     semi_axis(semi_axis) {}
