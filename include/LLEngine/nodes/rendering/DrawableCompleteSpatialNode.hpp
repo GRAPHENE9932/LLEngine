@@ -15,6 +15,10 @@ public:
     DrawableCompleteSpatialNode& operator=(DrawableCompleteSpatialNode&& other) = delete;
     ~DrawableCompleteSpatialNode();
 
+    [[nodiscard]] bool is_enabled() const final override {
+        return CompleteSpatialNode::is_enabled();
+    }
+
 protected:
     void on_attachment_to_tree() override final;
 };
