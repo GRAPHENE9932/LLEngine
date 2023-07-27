@@ -2,6 +2,7 @@
 #include "utils/glm_bullet_conversion.hpp"
 #include "nodes/physics/BulletRigidBodyNode.hpp"
 
+#include <bullet/BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
 #include <bullet/btBulletDynamicsCommon.h>
 
 #include <algorithm>
@@ -50,4 +51,21 @@ void BulletPhysicsServer::set_gravity(const glm::vec3& gravity) {
 
 [[nodiscard]] glm::vec3 BulletPhysicsServer::get_gravity() const {
     return bullet_vec3_to_glm<float>(dynamics_world->getGravity());
+}
+
+[[nodiscard]] std::optional<glm::vec3> BulletPhysicsServer::raycast_closest(const glm::vec3& from, const glm::vec3& to) const {
+    btVector3 bt_from = glm_vec3_to_bullet(from);
+    btVector3 bt_to = glm_vec3_to_bullet(to);
+
+    btCollisionWorld::ClosestRayResultCallback result(bt_from, bt_to);
+    result.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
+
+    dynamics_world->rayTest(bt_from, bt_to, result);
+
+    if (!result.hasHit()) {
+        return std::nullopt;
+    }
+
+    btVector3 bt_point = bt_from.lerp(bt_to, result.m_closestHitFraction);
+    return bullet_vec3_to_glm<float>(bt_point);
 }

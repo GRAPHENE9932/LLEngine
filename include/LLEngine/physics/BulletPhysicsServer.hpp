@@ -46,6 +46,8 @@ public:
     void set_gravity(const glm::vec3& gravity);
     [[nodiscard]] glm::vec3 get_gravity() const;
 
+    [[nodiscard]] std::optional<glm::vec3> raycast_closest(const glm::vec3& from, const glm::vec3& to) const;
+
 private:
     std::unique_ptr<btDefaultCollisionConfiguration> collision_configuration;
     std::unique_ptr<btCollisionDispatcher> collision_dispatcher;
