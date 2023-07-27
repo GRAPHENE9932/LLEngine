@@ -61,8 +61,7 @@ void GUINode::add_child(std::unique_ptr<Node>&& child) {
 }
 
 void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
-    child->parent = this;
-    children.push_back(std::move(child));
+    children_queued_to_add.push_back(std::move(child));
 }
 
 [[nodiscard]] bool GUINode::is_attached_to_tree() const {
@@ -89,6 +88,7 @@ void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
 
 void GUINode::internal_update() {
     if (is_enabled()) {
+        flush_children_from_queue();
         update_children();
         update();
     }
@@ -256,4 +256,22 @@ void GUINode::internal_on_disable() {
     for (const auto& child : children) {
         child->on_parent_enable_disable(false);
     }
+}
+
+void GUINode::flush_children_from_queue() {
+    if (children_queued_to_add.empty()) {
+        return;
+    }
+
+    const bool attached_to_tree = is_attached_to_tree();
+
+    for (auto& child_in_queue : children_queued_to_add) {
+        children.push_back(std::move(child_in_queue));
+        children.back()->parent = this;
+        if (attached_to_tree) {
+            children.back()->on_attachment_to_tree();
+        }
+    }
+
+    children_queued_to_add.clear();
 }

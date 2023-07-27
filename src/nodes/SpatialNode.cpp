@@ -22,11 +22,7 @@ void SpatialNode::add_child(std::unique_ptr<Node>&& child) {
 }
 
 void SpatialNode::add_child(std::unique_ptr<SpatialNode>&& child) {
-    child->parent = this;
-    children.push_back(std::move(child));
-    if (is_attached_to_tree()) {
-        children.back()->on_attachment_to_tree();
-    }
+    children_queued_to_add.push_back(std::move(child));
 }
 
 void SpatialNode::remove_child(const size_t index) {
@@ -100,6 +96,7 @@ void SpatialNode::set_rotation_property(const NodeProperty& property) {
 
 void SpatialNode::internal_update() {
     if (is_enabled()) {
+        flush_children_from_queue();
         update_children();
         update();
     }
@@ -132,4 +129,22 @@ void SpatialNode::internal_on_disable() {
     for (const auto& child : children) {
         child->on_parent_enable_disable(false);
     }
+}
+
+void SpatialNode::flush_children_from_queue() {
+    if (children_queued_to_add.empty()) {
+        return;
+    }
+
+    const bool attached_to_tree = is_attached_to_tree();
+
+    for (auto& child_in_queue : children_queued_to_add) {
+        child_in_queue->parent = this;
+        children.emplace_back(std::move(child_in_queue));
+        if (attached_to_tree) {
+            children.back()->on_attachment_to_tree();
+        }
+    }
+
+    children_queued_to_add.clear();
 }

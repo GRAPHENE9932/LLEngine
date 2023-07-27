@@ -74,5 +74,8 @@ private:
      * add_child and remove_child functions.
     */
     std::vector<std::unique_ptr<SpatialNode>> children;
+    std::vector<std::unique_ptr<SpatialNode>> children_queued_to_add;
+
+    void flush_children_from_queue();
 };
 }
