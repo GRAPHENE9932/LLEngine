@@ -11,8 +11,8 @@ using namespace llengine;
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 constexpr glm::vec3 RIGHT(-1.0f, 0.0f, 0.0f);
 
-void SpectatorCameraNode::update() {
-    CameraNode::update();
+void SpectatorCameraNode::internal_update() {
+    CameraNode::internal_update();
 
     update_rotation();
     update_position();

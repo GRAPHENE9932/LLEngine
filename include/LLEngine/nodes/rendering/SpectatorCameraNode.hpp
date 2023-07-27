@@ -19,7 +19,7 @@ public:
     float x_angle = 0.0f;
     float y_angle = 0.0f;
 
-    void update() override;
+    void internal_update() override;
 
 private:
     void update_rotation();
