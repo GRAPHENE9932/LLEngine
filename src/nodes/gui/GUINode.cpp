@@ -14,7 +14,9 @@
 using namespace llengine;
 
 GUINode::~GUINode() {
-    get_canvas().unregister_gui_node(this);
+    if (GUICanvas* canvas = get_canvas_optional()) {
+        canvas->unregister_gui_node(this);
+    }
 }
 
 [[nodiscard]] glm::vec3 GUINode::get_screen_space_position() const {
@@ -219,11 +221,24 @@ void GUINode::assign_canvas_parent(GUICanvas& canvas) {
 }
 
 [[nodiscard]] GUICanvas& GUINode::get_canvas() const {
+    GUICanvas* result = get_canvas_optional();
+    if (!result) {
+        throw std::runtime_error(fmt::format(
+            "Can't get canvas for GUI node \"{}\".", get_name()
+        ));
+    }
+    return *result;
+}
+
+[[nodiscard]] GUICanvas* GUINode::get_canvas_optional() const {
     if (std::holds_alternative<GUICanvas*>(parent)) {
-        return *std::get<GUICanvas*>(parent);
+        return std::get<GUICanvas*>(parent);
+    }
+    else if (std::holds_alternative<GUINode*>(parent)) {
+        return std::get<GUINode*>(parent)->get_canvas_optional();
     }
     else {
-        return std::get<GUINode*>(parent)->get_canvas();
+        return nullptr;
     }
 }
 

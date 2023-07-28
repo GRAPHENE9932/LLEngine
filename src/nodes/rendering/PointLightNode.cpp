@@ -8,7 +8,9 @@
 using namespace llengine;
 
 PointLightNode::~PointLightNode() {
-    get_rendering_server().unregister_point_light(this);
+    if (is_attached_to_tree()) {
+        get_rendering_server().unregister_point_light(this);
+    }
 }
 
 void PointLightNode::on_attachment_to_tree() {

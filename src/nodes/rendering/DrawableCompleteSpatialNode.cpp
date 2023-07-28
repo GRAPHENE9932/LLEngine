@@ -5,7 +5,9 @@
 using namespace llengine;
 
 DrawableCompleteSpatialNode::~DrawableCompleteSpatialNode() {
-    get_rendering_server().unregister_drawable_node(this);
+    if (is_attached_to_tree()) {
+        get_rendering_server().unregister_drawable_node(this);
+    }
 }
 
 void DrawableCompleteSpatialNode::on_attachment_to_tree() {

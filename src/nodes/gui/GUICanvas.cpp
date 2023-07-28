@@ -9,7 +9,9 @@
 using namespace llengine;
 
 GUICanvas::~GUICanvas() {
-    get_rendering_server().unregister_gui_canvas(this);
+    if (is_attached_to_tree()) {
+        get_rendering_server().unregister_gui_canvas(this);
+    }
 }
 
 void GUICanvas::draw() {
