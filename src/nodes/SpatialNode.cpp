@@ -94,6 +94,19 @@ void SpatialNode::set_rotation_property(const NodeProperty& property) {
     set_rotation(property.get<glm::quat>());
 }
 
+void SpatialNode::copy_to(Node& node) const {
+    Node::copy_to(node);
+
+    SpatialNode& spatial = dynamic_cast<SpatialNode&>(node);
+    spatial.set_transform(get_transform());
+    for (const auto& child : children) {
+        spatial.add_child(child->copy());
+    }
+    for (const auto& child : children_queued_to_add) {
+        spatial.add_child(child->copy());
+    }
+}
+
 void SpatialNode::internal_update() {
     if (is_enabled()) {
         flush_children_from_queue();

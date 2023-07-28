@@ -75,6 +75,9 @@ public:
     void set_shape(const Shape& shape);
     void create_bullet_body(const Shape& new_shape, const Transform& transform, float new_mass);
 
+    virtual void copy_to(Node& node) const override;
+    virtual std::unique_ptr<Node> copy() const override;
+
     void on_attachment_to_tree() override;
 
 private:

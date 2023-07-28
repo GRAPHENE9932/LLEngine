@@ -37,6 +37,8 @@ public:
     glm::mat4 get_local_matrix() const noexcept override final;
     glm::mat4 get_global_matrix() const noexcept override final;
 
+    virtual std::unique_ptr<Node> copy() const override;
+
 protected:
     Transform transform = Transform();
     mutable glm::mat4 cached_local_matrix = glm::mat4();

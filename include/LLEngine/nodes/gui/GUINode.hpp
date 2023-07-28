@@ -93,6 +93,7 @@ public:
      * have a canvas assigned.
      */
     [[nodiscard]] GUICanvas& get_canvas() const;
+    [[nodiscard]] GUICanvas* get_canvas_optional() const;
 
     void assign_canvas_parent(GUICanvas& canvas);
 

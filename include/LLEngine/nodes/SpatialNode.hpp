@@ -57,6 +57,8 @@ public:
     [[nodiscard]] virtual glm::mat4 get_local_matrix() const noexcept = 0;
     [[nodiscard]] virtual glm::mat4 get_global_matrix() const noexcept = 0;
 
+    virtual void copy_to(Node& node) const override;
+
     virtual void internal_update() override;
 
     virtual void on_attachment_to_tree() override;

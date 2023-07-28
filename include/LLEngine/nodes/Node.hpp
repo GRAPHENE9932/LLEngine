@@ -37,6 +37,9 @@ public:
     void set_enabled_property(const NodeProperty& property);
     [[nodiscard]] bool is_enabled() const;
 
+    virtual void copy_to(Node& node) const;
+    virtual std::unique_ptr<Node> copy() const { return nullptr; }
+
     static void register_properties();
 
     [[nodiscard]] RenderingServer& get_rendering_server() const;

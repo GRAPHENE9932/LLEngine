@@ -48,3 +48,17 @@ GLuint PBRDrawableNode::get_program_id() const {
     RenderingServer& rs = get_rendering_server();
     return rs.get_shader_holder().get_pbr_shader_manager().get_program_id(rs, *material);
 }
+
+void PBRDrawableNode::copy_to(Node& node) const {
+    CompleteSpatialNode::copy_to(node);
+
+    PBRDrawableNode& pbr_node = dynamic_cast<PBRDrawableNode&>(node);
+    pbr_node.material = material;
+    pbr_node.mesh = mesh;
+}
+
+std::unique_ptr<Node> PBRDrawableNode::copy() const {
+    std::unique_ptr<Node> result = std::make_unique<PBRDrawableNode>();
+    copy_to(*result);
+    return result;
+}

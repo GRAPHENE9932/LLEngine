@@ -380,6 +380,24 @@ void BulletRigidBodyNode::create_bullet_body(const Shape& new_shape, const Trans
     bt_rigid_body = std::make_unique<btRigidBody>(rb_info);
 }
 
+void BulletRigidBodyNode::copy_to(Node& node) const {
+    SpatialNode::copy_to(node);
+
+    BulletRigidBodyNode& rigid_body = dynamic_cast<BulletRigidBodyNode&>(node);
+    rigid_body.set_shape(shape);
+    rigid_body.set_mass(get_mass());
+    rigid_body.cached_set_mass = cached_set_mass;
+    rigid_body.cached_set_rotation = cached_set_rotation;
+    rigid_body.cached_set_translation = cached_set_translation;
+}
+
+std::unique_ptr<Node> BulletRigidBodyNode::copy() const {
+    std::unique_ptr<Node> result { std::make_unique<BulletRigidBodyNode>() };
+    copy_to(*result);
+    auto t = static_cast<BulletRigidBodyNode*>(result.get())->get_transform();
+    return result;
+}
+
 void BulletRigidBodyNode::on_attachment_to_tree() {
     SpatialNode::on_attachment_to_tree();
     get_bullet_physics_server().register_rigid_body(this);

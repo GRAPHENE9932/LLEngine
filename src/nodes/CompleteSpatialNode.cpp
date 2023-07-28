@@ -110,6 +110,12 @@ glm::mat4 CompleteSpatialNode::get_global_matrix() const noexcept {
         return get_local_matrix() * parent->get_global_matrix();
 }
 
+std::unique_ptr<Node> CompleteSpatialNode::copy() const {
+    std::unique_ptr<Node> result { std::make_unique<CompleteSpatialNode>() };
+    copy_to(*result);
+    return result;
+}
+
 void CompleteSpatialNode::recalculate_matrix() const noexcept {
     cached_local_matrix = transform.calculate_matrix();
     needs_recalculation = false;

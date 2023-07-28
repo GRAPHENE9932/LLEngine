@@ -21,5 +21,8 @@ public:
 
     void draw() override;
     GLuint get_program_id() const override;
+
+    void copy_to(Node& node) const override;
+    std::unique_ptr<Node> copy() const override;
 };
 }

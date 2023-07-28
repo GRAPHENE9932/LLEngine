@@ -38,6 +38,11 @@ void Node::set_enabled_property(const NodeProperty& property) {
     return parent_enabled && enabled;
 }
 
+void Node::copy_to(Node& node) const {
+    node.enabled = enabled;
+    node.set_name(name);
+}
+
 void Node::register_properties() {
     register_custom_property<Node>("node", "name", &Node::set_name_property);
     register_custom_property<Node>("node", "enabled", &Node::set_enabled_property);
