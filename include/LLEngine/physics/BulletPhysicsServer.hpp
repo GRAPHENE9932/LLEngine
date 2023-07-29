@@ -49,9 +49,9 @@ public:
     [[nodiscard]] std::optional<glm::vec3> raycast_closest(const glm::vec3& from, const glm::vec3& to) const;
 
 private:
-    std::unique_ptr<btDefaultCollisionConfiguration> collision_configuration;
-    std::unique_ptr<btCollisionDispatcher> collision_dispatcher;
     std::unique_ptr<btBroadphaseInterface> broadphase_interface;
+    std::unique_ptr<btCollisionDispatcher> collision_dispatcher;
+    std::unique_ptr<btDefaultCollisionConfiguration> collision_configuration;
     std::unique_ptr<btSequentialImpulseConstraintSolver> impulse_constraint_solver;
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
