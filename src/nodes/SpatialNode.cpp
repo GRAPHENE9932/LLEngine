@@ -26,13 +26,11 @@ void SpatialNode::add_child(std::unique_ptr<SpatialNode>&& child) {
 }
 
 void SpatialNode::remove_child(const size_t index) {
-    if (index > children.size()) {
+    if (index >= children.size()) {
         throw std::out_of_range("Can not remove child: invalid child index specified.");
     }
 
-    auto iter = children.begin() + index;
-    iter->get()->parent = nullptr;
-    children.erase(iter);
+    children_queued_to_remove.push_back(children[index].get());
 }
 
 void SpatialNode::remove_child(SpatialNode* const ptr) {
@@ -42,11 +40,11 @@ void SpatialNode::remove_child(SpatialNode* const ptr) {
             return cur_unique.get() == ptr;
         }
     );
-    if (iter == children.end())
-        throw std::invalid_argument("Can't remove the non-existent child.");
+    if (iter == children.end()) {
+        throw std::invalid_argument("Can't remove a non-existent child.");
+    }
 
-    iter->get()->parent = nullptr;
-    children.erase(iter);
+    children_queued_to_remove.push_back(ptr);
 }
 
 SpatialNode* SpatialNode::get_parent() const {
@@ -93,7 +91,8 @@ void SpatialNode::copy_to(Node& node) const {
 
 void SpatialNode::internal_update() {
     if (is_enabled()) {
-        flush_children_from_queue();
+        add_children_from_queue();
+        remove_children_from_queue();
         update_children();
         update();
     }
@@ -128,7 +127,7 @@ void SpatialNode::internal_on_disable() {
     }
 }
 
-void SpatialNode::flush_children_from_queue() {
+void SpatialNode::add_children_from_queue() {
     if (children_queued_to_add.empty()) {
         return;
     }
@@ -144,4 +143,27 @@ void SpatialNode::flush_children_from_queue() {
     }
 
     children_queued_to_add.clear();
+}
+
+void SpatialNode::remove_children_from_queue() {
+    if (children_queued_to_remove.empty()) {
+        return;
+    }
+
+    std::size_t handled_children = 0;
+    while (handled_children < children_queued_to_remove.size()) {
+        std::size_t index_in_queue = 0;
+        for (std::size_t index_in_children = 0; index_in_children < children.size();) {
+            if (children[index_in_children].get() == children_queued_to_remove[index_in_queue]) {
+                children.erase(children.begin() + index_in_children);
+                index_in_queue++;
+                handled_children++;
+            }
+            else {
+                index_in_children++;
+            }
+        }
+    }
+
+    children_queued_to_remove.clear();
 }
