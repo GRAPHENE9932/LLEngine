@@ -113,13 +113,15 @@ private:
     std::variant<GUINode*, GUICanvas*, std::monostate> parent = std::monostate();
     std::vector<std::unique_ptr<GUINode>> children;
     std::vector<std::unique_ptr<GUINode>> children_queued_to_add;
+    std::vector<GUINode*> children_queued_to_remove;
 
     void draw_texture_part(
         const Texture& texture, glm::vec2 pos_offset_in_px, glm::vec2 tex_offset_in_px,
         glm::vec2 quad_size_in_px, glm::vec2 tex_part_size_in_px
     );
 
-    void flush_children_from_queue();
+    void add_children_from_queue();
+    void remove_children_from_queue();
 
     friend class GUICanvas;
 };

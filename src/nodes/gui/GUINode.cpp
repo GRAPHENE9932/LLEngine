@@ -68,7 +68,8 @@ void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
 
 void GUINode::internal_update() {
     if (is_enabled()) {
-        flush_children_from_queue();
+        add_children_from_queue();
+        remove_children_from_queue();
         update_children();
         update();
     }
@@ -244,7 +245,7 @@ void GUINode::internal_on_disable() {
     }
 }
 
-void GUINode::flush_children_from_queue() {
+void GUINode::add_children_from_queue() {
     if (children_queued_to_add.empty()) {
         return;
     }
@@ -252,12 +253,35 @@ void GUINode::flush_children_from_queue() {
     const bool attached_to_tree = is_attached_to_tree();
 
     for (auto& child_in_queue : children_queued_to_add) {
-        children.push_back(std::move(child_in_queue));
-        children.back()->parent = this;
+        child_in_queue->parent = this;
+        children.emplace_back(std::move(child_in_queue));
         if (attached_to_tree) {
             children.back()->on_attachment_to_tree();
         }
     }
 
     children_queued_to_add.clear();
+}
+
+void GUINode::remove_children_from_queue() {
+    if (children_queued_to_remove.empty()) {
+        return;
+    }
+
+    std::size_t handled_children = 0;
+    while (handled_children < children_queued_to_remove.size()) {
+        std::size_t index_in_queue = 0;
+        for (std::size_t index_in_children = 0; index_in_children < children.size();) {
+            if (children[index_in_children].get() == children_queued_to_remove[index_in_queue]) {
+                children.erase(children.begin() + index_in_children);
+                index_in_queue++;
+                handled_children++;
+            }
+            else {
+                index_in_children++;
+            }
+        }
+    }
+
+    children_queued_to_remove.clear();
 }
