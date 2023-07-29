@@ -29,10 +29,7 @@ public:
     void remove_child(SpatialNode* const ptr);
     [[nodiscard]] SpatialNode* get_parent() const;
 
-    [[nodiscard]] virtual const RootNode& get_root_node() const override;
-    [[nodiscard]] virtual RootNode& get_root_node() override;
-
-    [[nodiscard]] virtual bool is_attached_to_tree() const override;
+    [[nodiscard]] virtual RootNode* get_root_node_optional() const override;
 
     const std::vector<std::unique_ptr<SpatialNode>>& get_children() const;
 

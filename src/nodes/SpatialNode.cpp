@@ -53,28 +53,12 @@ SpatialNode* SpatialNode::get_parent() const {
     return parent;
 }
 
-[[nodiscard]] const RootNode& SpatialNode::get_root_node() const {
+[[nodiscard]] RootNode* SpatialNode::get_root_node_optional() const {
     if (parent) {
-        return parent->get_root_node();
+        return parent->get_root_node_optional();
     }
     else {
-        throw std::runtime_error(fmt::format(
-            "Failed to get root node. Is node \"{}\" attached to the tree?",
-            get_name()
-        ));
-    }
-}
-
-[[nodiscard]] RootNode& SpatialNode::get_root_node() {
-    return const_cast<RootNode&>(std::as_const(*this).get_root_node());
-}
-
-[[nodiscard]] bool SpatialNode::is_attached_to_tree() const {
-    if (parent) {
-        return parent->is_attached_to_tree();
-    }
-    else {
-        return false;
+        return nullptr;
     }
 }
 

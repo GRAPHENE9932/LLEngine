@@ -62,8 +62,6 @@ public:
         return children;
     }
 
-    [[nodiscard]] bool is_attached_to_tree() const override;
-
     virtual void draw() {};
 
     void internal_update() override;
@@ -102,8 +100,7 @@ public:
 
     static void register_properties();
 
-    [[nodiscard]] const RootNode& get_root_node() const final override;
-    [[nodiscard]] RootNode& get_root_node() final override;
+    [[nodiscard]] RootNode* get_root_node_optional() const final override;
 
 protected:
     void draw_rectangle(const GUITexture& texture);

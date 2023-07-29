@@ -20,7 +20,9 @@ public:
     Node& operator=(Node&& other) = delete;
 
     virtual void add_child(std::unique_ptr<Node>&& child) = 0;
-    [[nodiscard]] virtual bool is_attached_to_tree() const = 0;
+    [[nodiscard]] bool is_attached_to_tree() const {
+        return get_root_node_optional();
+    };
 
     [[nodiscard]] inline const std::string& get_name() const {
         return name;
@@ -43,9 +45,11 @@ public:
     static void register_properties();
 
     [[nodiscard]] RenderingServer& get_rendering_server() const;
+    [[nodiscard]] RenderingServer* get_rendering_server_optional() const;
     [[nodiscard]] BulletPhysicsServer& get_bullet_physics_server() const;
-    [[nodiscard]] virtual const RootNode& get_root_node() const = 0;
-    [[nodiscard]] virtual RootNode& get_root_node() = 0;
+    [[nodiscard]] BulletPhysicsServer* get_bullet_physics_server_optional() const;
+    [[nodiscard]] RootNode& get_root_node() const;
+    [[nodiscard]] virtual RootNode* get_root_node_optional() const = 0;
 
 protected:
     virtual void on_attachment_to_tree();

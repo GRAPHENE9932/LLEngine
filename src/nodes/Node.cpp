@@ -49,35 +49,59 @@ void Node::register_properties() {
 }
 
 [[nodiscard]] RenderingServer& Node::get_rendering_server() const {
+    if (auto result = get_rendering_server_optional()) {
+        return *result;
+    }
+    else {
+        throw std::runtime_error(fmt::format(
+            "Failed to get rendering server for a node \"{}\".",
+            get_name()
+        ));
+    }
+}
+
+[[nodiscard]] RenderingServer* Node::get_rendering_server_optional() const {
     if (cached_rendering_server == nullptr) {
-        try {
-            cached_rendering_server = &get_root_node().get_rendering_server();
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error(fmt::format(
-                "Failed to get rendering server for a node because: \"{}\".",
-                e.what()
-            ));
+        if (RootNode* root = get_root_node_optional()) {
+            cached_rendering_server = &root->get_rendering_server();
         }
     }
 
-    return *cached_rendering_server;
+    return cached_rendering_server;
+}
+
+[[nodiscard]] RootNode& Node::get_root_node() const {
+    if (RootNode* result = get_root_node_optional()) {
+        return *result;
+    }
+    else {
+        throw std::runtime_error(fmt::format(
+            "Failed to get root node. Is node \"{}\" attached to the tree?",
+            get_name()
+        ));
+    }
 }
 
 [[nodiscard]] BulletPhysicsServer& Node::get_bullet_physics_server() const {
+    if (auto result = get_bullet_physics_server_optional()) {
+        return *result;
+    }
+    else {
+        throw std::runtime_error(fmt::format(
+            "Failed to get physics server for a node \"{}\".",
+            get_name()
+        ));
+    }
+}
+
+[[nodiscard]] BulletPhysicsServer* Node::get_bullet_physics_server_optional() const {
     if (cached_bullet_physics_server == nullptr) {
-        try {
-            cached_bullet_physics_server = &get_root_node().get_bullet_physics_server();
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error(fmt::format(
-                "Failed to get physics server for a node because: \"{}\".",
-                e.what()
-            ));
+        if (RootNode* root = get_root_node_optional()) {
+            cached_bullet_physics_server = &root->get_bullet_physics_server();
         }
     }
 
-    return *cached_bullet_physics_server;
+    return cached_bullet_physics_server;
 }
 
 void Node::on_attachment_to_tree() {

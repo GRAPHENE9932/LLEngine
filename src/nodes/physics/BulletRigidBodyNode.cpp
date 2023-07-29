@@ -26,8 +26,8 @@ BulletRigidBodyNode::BulletRigidBodyNode() {
 }
 
 BulletRigidBodyNode::~BulletRigidBodyNode() noexcept {
-    if (is_attached_to_tree()) {
-        get_bullet_physics_server().unregister_rigid_body(this);
+    if (auto bullet_physics_server = get_bullet_physics_server_optional()) {
+        bullet_physics_server->unregister_rigid_body(this);
     }
 
     if (get_bt_rigid_body()->getMotionState()) {

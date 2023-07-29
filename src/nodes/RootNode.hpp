@@ -54,14 +54,8 @@ public:
         return bullet_physics_server;
     }
 
-    [[nodiscard]] bool is_attached_to_tree() const final override {
-        return true;
-    }
-    [[nodiscard]] const RootNode& get_root_node() const final override {
-        return *this;
-    }
-    [[nodiscard]] RootNode& get_root_node() final override {
-        return *this;
+    [[nodiscard]] RootNode* get_root_node_optional() const final override {
+        return const_cast<RootNode*>(this);
     }
 
 private:

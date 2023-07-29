@@ -66,28 +66,6 @@ void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
     children_queued_to_add.push_back(std::move(child));
 }
 
-[[nodiscard]] bool GUINode::is_attached_to_tree() const {
-    if (std::holds_alternative<GUINode*>(parent)) {
-        if (auto gui_parent_ptr = std::get<GUINode*>(parent)) {
-            return gui_parent_ptr->is_attached_to_tree();
-        }
-        else {
-            return false;
-        }
-    }
-    else if (std::holds_alternative<GUICanvas*>(parent)) {
-        if (auto canvas_parent_ptr = std::get<GUICanvas*>(parent)) {
-            return canvas_parent_ptr->is_attached_to_tree();
-        }
-        else {
-            return false;
-        }
-    }
-    else {
-        return false;
-    }
-}
-
 void GUINode::internal_update() {
     if (is_enabled()) {
         flush_children_from_queue();
@@ -96,23 +74,16 @@ void GUINode::internal_update() {
     }
 }
 
-[[nodiscard]] const RootNode& GUINode::get_root_node() const {
+[[nodiscard]] RootNode* GUINode::get_root_node_optional() const {
     if (std::holds_alternative<GUINode*>(parent)) {
-        return std::get<GUINode*>(parent)->get_root_node();
+        return std::get<GUINode*>(parent)->get_root_node_optional();
     }
     else if (std::holds_alternative<GUICanvas*>(parent)) {
-        return std::get<GUICanvas*>(parent)->get_root_node();
+        return std::get<GUICanvas*>(parent)->get_root_node_optional();
     }
     else {
-        throw std::runtime_error(fmt::format(
-            "Failed to get root node. Is node \"{}\" attached to the tree?",
-            get_name()
-        ));
+        return nullptr;
     }
-}
-
-[[nodiscard]] RootNode& GUINode::get_root_node() {
-    return const_cast<RootNode&>(std::as_const(*this).get_root_node());
 }
 
 void GUINode::draw_texture_part(
