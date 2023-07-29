@@ -23,10 +23,10 @@ public:
     virtual ~SpatialNode();
 
     void update_children();
-    void add_child(std::unique_ptr<Node>&& child) override;
-    void add_child(std::unique_ptr<SpatialNode>&& child);
-    void remove_child(const size_t index);
-    void remove_child(SpatialNode* const ptr);
+    void queue_add_child(std::unique_ptr<Node>&& child) override;
+    void queue_add_child(std::unique_ptr<SpatialNode>&& child);
+    void queue_remove_child(const size_t index);
+    void queue_remove_child(SpatialNode* const ptr);
     [[nodiscard]] SpatialNode* get_parent() const;
 
     [[nodiscard]] virtual RootNode* get_root_node_optional() const override;

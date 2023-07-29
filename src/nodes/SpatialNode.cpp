@@ -17,15 +17,15 @@ void SpatialNode::update_children() {
     }
 }
 
-void SpatialNode::add_child(std::unique_ptr<Node>&& child) {
-    add_child(throwing_node_cast<SpatialNode>(std::move(child)));
+void SpatialNode::queue_add_child(std::unique_ptr<Node>&& child) {
+    queue_add_child(throwing_node_cast<SpatialNode>(std::move(child)));
 }
 
-void SpatialNode::add_child(std::unique_ptr<SpatialNode>&& child) {
+void SpatialNode::queue_add_child(std::unique_ptr<SpatialNode>&& child) {
     children_queued_to_add.push_back(std::move(child));
 }
 
-void SpatialNode::remove_child(const size_t index) {
+void SpatialNode::queue_remove_child(const size_t index) {
     if (index >= children.size()) {
         throw std::out_of_range("Can not remove child: invalid child index specified.");
     }
@@ -33,7 +33,7 @@ void SpatialNode::remove_child(const size_t index) {
     children_queued_to_remove.push_back(children[index].get());
 }
 
-void SpatialNode::remove_child(SpatialNode* const ptr) {
+void SpatialNode::queue_remove_child(SpatialNode* const ptr) {
     const auto iter = std::find_if(
         children.begin(), children.end(),
         [&ptr](const auto& cur_unique) {
@@ -82,10 +82,10 @@ void SpatialNode::copy_to(Node& node) const {
     SpatialNode& spatial = dynamic_cast<SpatialNode&>(node);
     spatial.set_transform(get_transform());
     for (const auto& child : children) {
-        spatial.add_child(child->copy());
+        spatial.queue_add_child(child->copy());
     }
     for (const auto& child : children_queued_to_add) {
-        spatial.add_child(child->copy());
+        spatial.queue_add_child(child->copy());
     }
 }
 

@@ -50,7 +50,7 @@ std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
 
     if constexpr (with_children) {
         for (const GLTF::Node& cur_child : gltf_node.children) {
-            result->add_child(to_node(constr_env, cur_child));
+            result->queue_add_child(to_node(constr_env, cur_child));
         }
     }
 
@@ -65,7 +65,7 @@ std::unique_ptr<CompleteSpatialNode> construct_complete_spatial(
     result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->add_child(to_node(constr_env, cur_child));
+        result->queue_add_child(to_node(constr_env, cur_child));
     }
 
     return result;
@@ -137,13 +137,13 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
         drawable->set_transform(Transform());
         drawable->set_name(drawable->get_name() + "_drawable");
 
-        result->add_child(static_cast<std::unique_ptr<SpatialNode>&&>(std::move(drawable)));
+        result->queue_add_child(static_cast<std::unique_ptr<SpatialNode>&&>(std::move(drawable)));
     }
 
     result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->add_child(to_node(constr_env, cur_child));
+        result->queue_add_child(to_node(constr_env, cur_child));
     }
 
     return result;
@@ -291,7 +291,7 @@ std::unique_ptr<::Node> GLTF::to_node(const std::vector<NodeProperty>& propertie
         // transform and make it root.
         result = std::make_unique<CompleteSpatialNode>(Transform());
         for (const auto& cur_gltf_node : this->nodes) {
-            result->add_child(::to_node(constr_env, cur_gltf_node));
+            result->queue_add_child(::to_node(constr_env, cur_gltf_node));
         }
     }
     else {

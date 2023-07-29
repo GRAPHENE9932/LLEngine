@@ -15,7 +15,7 @@ GameInstance::GameInstance(const GameSettings& settings) {
     root_node = std::make_unique<RootNode>(*rendering_server, *bullet_physics_server);
 
     SceneJSON scene(settings.json_scene_path);
-    root_node->add_child(std::move(scene.to_node()));
+    root_node->queue_add_child(std::move(scene.to_node()));
 
     auto sky_panorama = Texture::from_file(settings.skybox_path);
     auto sky_cubemap = sky_panorama.panorama_to_cubemap(rendering_server->get_shader_holder().get_equirectangular_mapper_shader());

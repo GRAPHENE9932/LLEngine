@@ -55,8 +55,8 @@ public:
      */
     [[nodiscard]] bool contains_point(glm::vec2 point) const;
 
-    void add_child(std::unique_ptr<Node>&& child) override;
-    void add_child(std::unique_ptr<GUINode>&& child);
+    void queue_add_child(std::unique_ptr<Node>&& child) override;
+    void queue_add_child(std::unique_ptr<GUINode>&& child);
 
     [[nodiscard]] inline const std::vector<std::unique_ptr<GUINode>>& get_children() const {
         return children;

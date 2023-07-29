@@ -20,21 +20,21 @@ public:
 
     void on_attachment_to_tree() final override;
 
-    void add_child(std::unique_ptr<Node>&& child) override;
+    void queue_add_child(std::unique_ptr<Node>&& child) override;
 
-    void add_gui_node(std::unique_ptr<GUINode>&& gui_node);
+    void queue_add_gui_node(std::unique_ptr<GUINode>&& gui_node);
     /**
      * @brief Removes a root GUI node from canvas.
      * 
      * @throws std::out_of_range if the specified index is out of range.
      */
-    void remove_gui_node(std::size_t index);
+    void queue_remove_gui_node(std::size_t index);
     /**
      * @brief Removes a root GUI node from canvas.
      * 
      * @throws std::invalid_argument if the specified node is not a child of this canvas.
      */
-    void remove_gui_node(GUINode* gui_node);
+    void queue_remove_gui_node(GUINode* gui_node);
 
     void register_gui_node(GUINode* gui_node);
     void unregister_gui_node(GUINode* gui_node);

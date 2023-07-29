@@ -58,11 +58,11 @@ void GUINode::update_children() {
     }
 }
 
-void GUINode::add_child(std::unique_ptr<Node>&& child) {
-    add_child(throwing_node_cast<GUINode>(std::move(child)));
+void GUINode::queue_add_child(std::unique_ptr<Node>&& child) {
+    queue_add_child(throwing_node_cast<GUINode>(std::move(child)));
 }
 
-void GUINode::add_child(std::unique_ptr<GUINode>&& child) {
+void GUINode::queue_add_child(std::unique_ptr<GUINode>&& child) {
     children_queued_to_add.push_back(std::move(child));
 }
 

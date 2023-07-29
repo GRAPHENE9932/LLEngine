@@ -222,7 +222,7 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
     
     for (const auto& child_data : data.children) {
         auto child_ptr = to_node(child_data);
-        result->add_child(std::move(child_ptr));
+        result->queue_add_child(std::move(child_ptr));
     }
     return std::move(result);
 }

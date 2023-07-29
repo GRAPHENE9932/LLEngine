@@ -19,7 +19,7 @@ public:
     Node& operator=(const Node& other) = delete;
     Node& operator=(Node&& other) = delete;
 
-    virtual void add_child(std::unique_ptr<Node>&& child) = 0;
+    virtual void queue_add_child(std::unique_ptr<Node>&& child) = 0;
     [[nodiscard]] bool is_attached_to_tree() const {
         return get_root_node_optional();
     };

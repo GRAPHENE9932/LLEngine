@@ -37,20 +37,20 @@ void GUICanvas::on_attachment_to_tree() {
     );
 }
 
-void GUICanvas::add_child(std::unique_ptr<Node>&& child) {
+void GUICanvas::queue_add_child(std::unique_ptr<Node>&& child) {
     if (auto gui_child = node_cast<GUINode>(std::move(child))) {
-        add_gui_node(std::move(gui_child));
+        queue_add_gui_node(std::move(gui_child));
     }
     else {
-        SpatialNode::add_child(throwing_node_cast<SpatialNode>(std::move(child)));
+        SpatialNode::queue_add_child(throwing_node_cast<SpatialNode>(std::move(child)));
     }
 }
 
-void GUICanvas::add_gui_node(std::unique_ptr<GUINode>&& gui_node) {
+void GUICanvas::queue_add_gui_node(std::unique_ptr<GUINode>&& gui_node) {
     gui_nodes_queued_to_add.emplace_back(std::move(gui_node));
 }
 
-void GUICanvas::remove_gui_node(std::size_t index) {
+void GUICanvas::queue_remove_gui_node(std::size_t index) {
     if (index > gui_nodes.size()) {
         throw std::out_of_range("Can not remove child: invalid child index specified.");
     }
@@ -58,7 +58,7 @@ void GUICanvas::remove_gui_node(std::size_t index) {
     gui_nodes_queued_to_remove.push_back(gui_nodes[index].get());
 }
 
-void GUICanvas::remove_gui_node(GUINode* gui_node) {
+void GUICanvas::queue_remove_gui_node(GUINode* gui_node) {
     const auto iter = std::find_if(
         gui_nodes.begin(), gui_nodes.end(),
         [&gui_node](const auto& cur_unique) {
