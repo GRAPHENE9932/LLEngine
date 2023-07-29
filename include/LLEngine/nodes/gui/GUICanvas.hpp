@@ -69,5 +69,10 @@ private:
     std::optional<glm::vec2> canvas_size;
     std::vector<std::unique_ptr<GUINode>> gui_nodes;
     std::vector<GUINode*> all_sorted_gui_nodes;
+    std::vector<std::unique_ptr<GUINode>> gui_nodes_queued_to_add;
+    std::vector<GUINode*> gui_nodes_queued_to_remove;
+
+    void add_gui_nodes_from_queue();
+    void remove_gui_nodes_from_queue();
 };
 };

@@ -47,8 +47,7 @@ void GUICanvas::add_child(std::unique_ptr<Node>&& child) {
 }
 
 void GUICanvas::add_gui_node(std::unique_ptr<GUINode>&& gui_node) {
-    gui_node->assign_canvas_parent(*this);
-    gui_nodes.emplace_back(std::move(gui_node));
+    gui_nodes_queued_to_add.emplace_back(std::move(gui_node));
 }
 
 void GUICanvas::remove_gui_node(std::size_t index) {
@@ -56,7 +55,7 @@ void GUICanvas::remove_gui_node(std::size_t index) {
         throw std::out_of_range("Can not remove child: invalid child index specified.");
     }
 
-    gui_nodes.erase(gui_nodes.begin() + index);
+    gui_nodes_queued_to_remove.push_back(gui_nodes[index].get());
 }
 
 void GUICanvas::remove_gui_node(GUINode* gui_node) {
@@ -70,7 +69,7 @@ void GUICanvas::remove_gui_node(GUINode* gui_node) {
         throw std::invalid_argument("Can't remove the non-existent child.");
     }
 
-    gui_nodes.erase(iter);
+    gui_nodes_queued_to_remove.push_back(gui_node);
 }
 
 void GUICanvas::register_gui_node(GUINode* gui_node) {
@@ -123,6 +122,8 @@ void GUICanvas::internal_update() {
         return;
     }
 
+    add_gui_nodes_from_queue();
+    remove_gui_nodes_from_queue();
     update_children();
     for (auto& gui_node : gui_nodes) {
         gui_node->internal_update();
@@ -149,4 +150,45 @@ void GUICanvas::internal_on_disable() {
     for (const auto& gui_node : gui_nodes) {
         gui_node->on_parent_enable_disable(true);
     }
+}
+
+void GUICanvas::add_gui_nodes_from_queue() {
+    if (gui_nodes_queued_to_add.empty()) {
+        return;
+    }
+
+    const bool attached_to_tree = is_attached_to_tree();
+
+    for (auto& gui_node_in_queue : gui_nodes_queued_to_add) {
+        gui_node_in_queue->parent = this;
+        gui_nodes.emplace_back(std::move(gui_node_in_queue));
+        if (attached_to_tree) {
+            gui_nodes.back()->on_attachment_to_tree();
+        }
+    }
+
+    gui_nodes_queued_to_add.clear();
+}
+
+void GUICanvas::remove_gui_nodes_from_queue() {
+    if (gui_nodes_queued_to_remove.empty()) {
+        return;
+    }
+
+    std::size_t handled_children = 0;
+    while (handled_children < gui_nodes_queued_to_remove.size()) {
+        std::size_t index_in_queue = 0;
+        for (std::size_t index_in_children = 0; index_in_children < gui_nodes.size();) {
+            if (gui_nodes[index_in_children].get() == gui_nodes_queued_to_remove[index_in_queue]) {
+                gui_nodes.erase(gui_nodes.begin() + index_in_children);
+                index_in_queue++;
+                handled_children++;
+            }
+            else {
+                index_in_children++;
+            }
+        }
+    }
+
+    gui_nodes_queued_to_remove.clear();
 }
