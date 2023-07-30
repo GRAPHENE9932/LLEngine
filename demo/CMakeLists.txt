@@ -1,5 +1,7 @@
 add_executable(llengine_demo
     src/main.cpp
+    src/FPSTextNode.cpp
+    src/MainCamera.cpp
 )
 
 target_link_libraries(llengine_demo llengine)

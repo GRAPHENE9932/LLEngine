@@ -4,51 +4,57 @@
 	"nodes": [
 		{
 			"id": 0,
-			"type": "scene_file",
-			"scene_file_path": "res/meshes/level_0.glb"
+			"type": "complete_spatial_node"
 		},
 		{
 			"id": 2,
 			"parent_id": 0,
-			"type": "gui_canvas",
-			"translation": [0.0, 0.0, 0.0]
+			"type": "scene_file",
+			"scene_file_path": "res/meshes/level_demo.glb"
+		},
+		{
+			"id": 8,
+			"parent_id": 0,
+			"type": "scene_file",
+			"scene_file_path": "res/meshes/barrel.glb",
+			"translation": [0.0, 15.0, 0.0]
 		},
 		{
 			"id": 3,
-			"parent_id": 2,
-			"type": "button",
-			"transform": {
-				"type": "gui_transform",
-				"position_anchor": [0.5, 0.5],
-				"position_offset": [0.0, 0.0],
-				"z_coordinate": 0.0,
-				"origin": ["left", "bottom"],
-				"size_mode": "absolute",
-				"size": [200.0, 100.0]
-			},
-			"idle_texture": {
-				"type": "gui_texture",
-				"borders": [24.0, 24.0, 24.0, 24.0],
-				"color_factor": [1.0, 1.0, 1.0, 1.0],
-				"texture": {
-					"type": "texture",
-					"path": "res/textures/button_idle.ktx2"
-				}
-			},
-			"pressed_texture": {
-				"type": "gui_texture",
-				"borders": [24.0, 24.0, 24.0, 24.0],
-				"color_factor": [1.0, 1.0, 1.0, 1.0],
-				"texture": {
-					"type": "texture",
-					"path": "res/textures/button_pressed.ktx2"
-				}
+			"parent_id": 0,
+			"type": "main_camera"
+		},
+		{
+			"id": 4,
+			"parent_id": 0,
+			"type": "gui_canvas",
+			"screen_overlayed": true
+		},
+		{
+			"id": 6,
+			"parent_id": 4,
+			"type": "fps_text_node",
+			"font": {
+				"type": "font",
+				"path": "res/fonts/Ubuntu-Regular.ttf",
+				"size": 32
 			}
 		},
 		{
-			"id": 5,
-			"parent_id": 0,
-			"type": "spectator_camera_node"
+			"id": 7,
+			"parent_id": 4,
+			"type": "text_node",
+			"text": "Press ESCAPE or ALT+F4 to quit.",
+			"font": {
+				"type": "font",
+				"path": "res/fonts/Ubuntu-Regular.ttf",
+				"size": 32
+			},
+			"transform": {
+				"type": "gui_transform",
+				"position_anchor": [0.5, 0.1],
+				"origin": ["center", "center"]
+			}
 		}
 	]
 }

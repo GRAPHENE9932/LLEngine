@@ -1,8 +1,13 @@
+#include "FPSTextNode.hpp"
+#include "MainCamera.hpp"
+
 #include <LLEngine/GameInstance.hpp>
 #include <LLEngine/node_registration.hpp>
 
 void register_nodes() {
     llengine::begin_nodes_registration();
+    llengine::register_node_type<FPSTextNode, llengine::TextNode>("fps_text_node");
+    llengine::register_node_type<MainCamera, llengine::SpectatorCameraNode>("main_camera");
     llengine::end_nodes_registration();
 }
 
