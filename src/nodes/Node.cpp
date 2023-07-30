@@ -105,6 +105,11 @@ void Node::register_properties() {
 }
 
 void Node::on_attachment_to_tree() {
+    on_attachment_to_tree_without_start();
+    start();
+}
+
+void Node::on_attachment_to_tree_without_start() {
     cached_rendering_server = nullptr;
     cached_bullet_physics_server = nullptr;
 }

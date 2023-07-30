@@ -162,8 +162,8 @@ void GUINode::draw_rectangle(const GUITexture& texture) {
     }
 }
 
-void GUINode::on_attachment_to_tree() {
-    Node::on_attachment_to_tree();
+void GUINode::on_attachment_to_tree_without_start() {
+    Node::on_attachment_to_tree_without_start();
 
     get_canvas().register_gui_node(this);
 

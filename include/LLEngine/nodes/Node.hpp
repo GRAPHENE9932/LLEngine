@@ -52,7 +52,9 @@ public:
     [[nodiscard]] virtual RootNode* get_root_node_optional() const = 0;
 
 protected:
-    virtual void on_attachment_to_tree();
+    void on_attachment_to_tree();
+    virtual void on_attachment_to_tree_without_start();
+    virtual void start() {};
     virtual void update() {};
     virtual void internal_update() {};
     void on_parent_enable_disable(bool enabled);

@@ -13,8 +13,8 @@ PointLightNode::~PointLightNode() {
     }
 }
 
-void PointLightNode::on_attachment_to_tree() {
-    SpatialNode::on_attachment_to_tree();
+void PointLightNode::on_attachment_to_tree_without_start() {
+    SpatialNode::on_attachment_to_tree_without_start();
     get_rendering_server().register_point_light(this);
 }
 

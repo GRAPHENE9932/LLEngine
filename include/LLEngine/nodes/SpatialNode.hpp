@@ -58,7 +58,7 @@ public:
 
     virtual void internal_update() override;
 
-    virtual void on_attachment_to_tree() override;
+    virtual void on_attachment_to_tree_without_start() override;
 
     static void register_properties();
 

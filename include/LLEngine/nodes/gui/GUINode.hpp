@@ -104,7 +104,7 @@ public:
 
 protected:
     void draw_rectangle(const GUITexture& texture);
-    void on_attachment_to_tree() override final;
+    void on_attachment_to_tree_without_start() override final;
     virtual void on_attachment_to_canvas();
     virtual void internal_on_enable() override;
     virtual void internal_on_disable() override;

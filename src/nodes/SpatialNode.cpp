@@ -98,8 +98,8 @@ void SpatialNode::internal_update() {
     }
 }
 
-void SpatialNode::on_attachment_to_tree() {
-    Node::on_attachment_to_tree();
+void SpatialNode::on_attachment_to_tree_without_start() {
+    Node::on_attachment_to_tree_without_start();
     
     std::for_each(
         children.begin(), children.end(),

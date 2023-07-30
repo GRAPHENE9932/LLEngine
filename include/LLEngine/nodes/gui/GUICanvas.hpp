@@ -18,7 +18,7 @@ public:
 
     void draw();
 
-    void on_attachment_to_tree() final override;
+    void on_attachment_to_tree_without_start() final override;
 
     void queue_add_child(std::unique_ptr<Node>&& child) override;
 

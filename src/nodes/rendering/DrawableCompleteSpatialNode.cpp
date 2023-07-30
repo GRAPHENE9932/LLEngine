@@ -10,15 +10,7 @@ DrawableCompleteSpatialNode::~DrawableCompleteSpatialNode() {
     }
 }
 
-void DrawableCompleteSpatialNode::on_attachment_to_tree() {
-    SpatialNode::on_attachment_to_tree();
+void DrawableCompleteSpatialNode::on_attachment_to_tree_without_start() {
+    SpatialNode::on_attachment_to_tree_without_start();
     get_rendering_server().register_drawable(this);
-
-    const auto& children = get_children();
-    std::for_each(
-        children.begin(), children.end(),
-        [] (const auto& child) {
-            child->on_attachment_to_tree();
-        }
-    );
 }
