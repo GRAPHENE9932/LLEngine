@@ -8,11 +8,6 @@
 #include <string>
 
 namespace llengine {
-class FontError : public std::runtime_error {
-public:
-    FontError(const std::string& message) : std::runtime_error(message) {}
-};
-
 class FreeTypeFont {
 public:
     struct FontChar {

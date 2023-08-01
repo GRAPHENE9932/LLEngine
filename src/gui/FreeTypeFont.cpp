@@ -6,6 +6,7 @@
 #include FT_FREETYPE_H
 
 #include <optional>
+#include <stdexcept>
 
 using namespace llengine;
 
@@ -19,7 +20,7 @@ void destroy_freetype() {
 
     const auto done_result {FT_Done_FreeType(ft_lib)};
     if (done_result != 0) {
-        throw FontError(fmt::format(
+        throw std::runtime_error(fmt::format(
             "Failed to destroy the FreeType library. Error code: {}", done_result
         ));
     }
@@ -28,7 +29,7 @@ void destroy_freetype() {
 void initialize_freetype() {
     const auto init_result {FT_Init_FreeType(&ft_lib)};
     if (init_result != 0) {
-        throw FontError(fmt::format(
+        throw std::runtime_error(fmt::format(
             "Failed to initialize the FreeType library. Error code: {}", init_result
         ));
     }
@@ -73,14 +74,14 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
     ManagedFTFace face;
     FT_Error error {FT_New_Face(ft_lib, file_path.c_str(), 0, &face)};
     if (error != 0) {
-        throw FontError(fmt::format(
+        throw std::runtime_error(fmt::format(
             "Failed to initialize the FreeType face from file \"{}\". Error code: {}",
             file_path, error
         ));
     }
     error = FT_Set_Pixel_Sizes(face, 0, font_size);
     if (error != 0) {
-        throw FontError(fmt::format(
+        throw std::runtime_error(fmt::format(
             "Failed to set FreeType font size. File path: \"{}\", error code: {}, font size: {}.",
             file_path, error, font_size
         ));
@@ -91,7 +92,7 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
     for (char c = 0; c < 127; c++) {
         error = FT_Load_Char(face, c, FT_LOAD_RENDER);
         if (error != 0) {
-            throw FontError(fmt::format(
+            throw std::runtime_error(fmt::format(
                 "Failed to load character {:x}. Font path: \"{}\", error code: {}.",
                 c, file_path, error
             ));
