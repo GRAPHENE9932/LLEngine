@@ -5,6 +5,7 @@
 #include <memory>
 #include <chrono>
 #include <vector>
+#include <optional>
 
 class btBroadphaseInterface;
 class btCollisionDispatcher;
