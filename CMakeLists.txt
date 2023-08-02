@@ -188,10 +188,6 @@ set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 target_link_libraries(llengine OpenGL)
 
-# Zstd.
-find_package(zstd CONFIG REQUIRED)
-target_link_libraries(llengine $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>)
-
 # Bullet.
 find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIR})
