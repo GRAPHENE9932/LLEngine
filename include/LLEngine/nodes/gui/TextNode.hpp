@@ -26,6 +26,8 @@ public:
     void set_color_property(const NodeProperty& property);
     void set_font(const std::shared_ptr<FreeTypeFont>& new_font);
     void set_font_property(const NodeProperty& property);
+    void set_max_width(float max_width);
+    void set_max_width_property(const NodeProperty& property);
 
     [[nodiscard]] glm::vec3 get_color() const noexcept {
         return color;
@@ -41,6 +43,7 @@ private:
     float z_coordinate {0.0f};
     GUITransform::OriginX origin_x = GUITransform::OriginX::LEFT;
     GUITransform::OriginY origin_y = GUITransform::OriginY::TOP;
+    float max_width {0.0f};
 
     std::shared_ptr<FreeTypeFont> font = nullptr;
     glm::vec3 color = {0.0f, 0.0f, 0.0f};
@@ -52,5 +55,10 @@ private:
     std::int32_t max_x = std::numeric_limits<std::int32_t>::min();
     std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
     std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
+
+    void add_line(
+        glm::vec2 offset, std::string_view line,
+        std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs
+    );
 };
 }

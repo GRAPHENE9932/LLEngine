@@ -22,9 +22,14 @@ public:
         return chars.at(character);
     }
 
+    [[nodiscard]] inline std::uint32_t get_font_size() const {
+        return font_size;
+    }
+
     static std::shared_ptr<FreeTypeFont> from_property(const NodeProperty& property);
 
 private:
     std::map<char, FontChar> chars;
+    std::uint32_t font_size;
 };
 }

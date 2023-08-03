@@ -66,7 +66,7 @@ private:
     FT_Face face;
 };
 
-FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size) {
+FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size) : font_size(font_size) {
     if (!is_ft_lib_initialized) {
         initialize_freetype();
     }
