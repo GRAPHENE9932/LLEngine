@@ -1,5 +1,6 @@
 #include "GameInstance.hpp"
 #include "SceneJSON.hpp"
+#include "logger.hpp"
 #include "nodes/RootNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "physics/BulletPhysicsServer.hpp"
@@ -9,6 +10,8 @@
 using namespace llengine;
 
 GameInstance::GameInstance(const GameSettings& settings) {
+    logger::enable_console_logging();
+
     rendering_server = std::make_unique<RenderingServer>(settings.window_resolution);
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
