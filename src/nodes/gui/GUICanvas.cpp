@@ -3,6 +3,9 @@
 #include "nodes/SpatialNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "node_cast.hpp"
+#include "logger.hpp"
+
+#include <fmt/format.h>
 
 #include <algorithm>
 
@@ -124,12 +127,21 @@ void GUICanvas::internal_update() {
 
     add_gui_nodes_from_queue();
     remove_gui_nodes_from_queue();
-    update_children();
-    for (auto& gui_node : gui_nodes) {
-        gui_node->internal_update();
-    }
 
-    update();
+    try {
+        update_children();
+        for (auto& gui_node : gui_nodes) {
+            gui_node->internal_update();
+        }
+
+        update();
+    }
+    catch (const std::exception& e) {
+        logger::error(fmt::format("update: {}", e.what()));
+    }
+    catch (...) {
+        logger::error("Unknown error in update.");
+    }
 }
 
 void GUICanvas::register_properties() {

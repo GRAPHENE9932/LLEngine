@@ -6,6 +6,7 @@
 #include "nodes/gui/GUICanvas.hpp"
 #include "node_registration.hpp"
 #include "node_cast.hpp"
+#include "logger.hpp"
 
 #include <fmt/format.h>
 
@@ -70,8 +71,17 @@ void GUINode::internal_update() {
     if (is_enabled()) {
         add_children_from_queue();
         remove_children_from_queue();
-        update_children();
-        update();
+
+        try {
+            update_children();
+            update();
+        }
+        catch (const std::exception& e) {
+            logger::error(fmt::format("update: {}", e.what()));
+        }
+        catch (...) {
+            logger::error("Unknown error in update.");
+        }
     }
 }
 

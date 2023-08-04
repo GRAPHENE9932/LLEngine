@@ -1,6 +1,7 @@
 #include "nodes/Node.hpp"
 #include "nodes/RootNode.hpp"
 #include "node_registration.hpp"
+#include "logger.hpp"
 
 #include <fmt/format.h>
 
@@ -106,7 +107,16 @@ void Node::register_properties() {
 
 void Node::on_attachment_to_tree() {
     on_attachment_to_tree_without_start();
-    start();
+
+    try {
+        start();
+    }
+    catch (const std::exception& e) {
+        logger::error(fmt::format("start: {}", e.what()));
+    }
+    catch (...) {
+        logger::error("Unknown error in start.");
+    }
 }
 
 void Node::on_attachment_to_tree_without_start() {
