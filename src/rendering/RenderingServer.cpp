@@ -39,12 +39,7 @@ void RenderingServer::main_loop() {
         
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-        // Draw objects.
-        for (const auto& cur_drawable : get_drawables()) {
-            if (cur_drawable->is_enabled()) {
-                cur_drawable->draw();
-            }
-        }
+        draw_non_overlay_objects();
 
         // Draw skybox.
         if (skybox != nullptr) {
@@ -223,4 +218,12 @@ const Texture& RenderingServer::get_brdf_integration_map() {
 
 bool RenderingServer::have_environment_cubemap() {
     return skybox != nullptr;
+}
+
+void RenderingServer::draw_non_overlay_objects() {
+    for (const auto& cur_drawable : get_drawables()) {
+        if (cur_drawable->is_enabled()) {
+            cur_drawable->draw();
+        }
+    }
 }

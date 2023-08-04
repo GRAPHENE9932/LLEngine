@@ -179,6 +179,7 @@ private:
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;
     float delta_time = 1.0f;
+    std::optional<glm::vec3> sun_direction;
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
@@ -193,5 +194,6 @@ private:
     ShaderHolder shader_holder;
 
     void unblock_mouse_press();
+    void draw_non_overlay_objects();
 };
 }
