@@ -20,6 +20,7 @@ public:
     );
 
     void draw() override;
+    void draw_to_shadow_map() override;
     GLuint get_program_id() const override;
 
     void copy_to(Node& node) const override;

@@ -32,26 +32,16 @@ set(SOURCES
     src/rendering/Mesh.cpp
     src/rendering/MeshPrimitives.cpp
     src/rendering/Skybox.cpp
-    src/rendering/shaders/EquirectangularMapperShader.hpp
-    src/rendering/shaders/IrradiancePrecomputerShader.hpp
     src/rendering/shaders/SkyboxShader.cpp
     src/rendering/shaders/GUIRectangleShader.cpp
-    src/rendering/shaders/SkyboxShader.hpp
-    src/rendering/shaders/ShaderHolder.hpp
     src/rendering/shaders/PBRShaderManager.cpp
     src/rendering/shaders/PBRShader.cpp
-    src/rendering/shaders/GUIRectangleShader.hpp
     src/rendering/shaders/IrradiancePrecomputerShader.cpp
     src/rendering/shaders/SpecularPrefilterShader.cpp
     src/rendering/shaders/EquirectangularMapperShader.cpp
     src/rendering/shaders/BRDFIntegrationMapperShader.cpp
     src/rendering/shaders/ColoredTextShader.cpp
-    src/rendering/shaders/PBRShader.hpp
-    src/rendering/shaders/PBRShaderManager.hpp
-    src/rendering/shaders/ColoredTextShader.hpp
-    src/rendering/shaders/SpecularPrefilterShader.hpp
-    src/rendering/shaders/BRDFIntegrationMapperShader.hpp
-    src/rendering/VkFormatInfo.hpp
+    src/rendering/shaders/ShadowMappingShader.cpp
     src/rendering/FPSMeter.cpp
     src/rendering/GLTFLoading.cpp
     src/rendering/RenderingServer.cpp
@@ -59,34 +49,12 @@ set(SOURCES
     src/rendering/Texture.cpp
     src/rendering/TextureFromKTX.cpp
     src/rendering/TextureFromRGBE.cpp
-    src/uninitialized_error.hpp
     src/physics/BulletPhysicsServer.cpp
-    src/utils/json_conversion.hpp
-    src/utils/shader_loader.hpp
-    src/utils/Channel.hpp
     src/utils/shader_loader.cpp
-    src/utils/glm_bullet_conversion.hpp
-    src/utils/math.hpp
     src/structs/shapes/SphereShape.cpp
     src/structs/shapes/CylinderShape.cpp
     src/structs/shapes/BoxShape.cpp
     src/structs/shapes/Shape.cpp
-    src/shaders/equirectangular_mapper.frag
-    src/shaders/skybox.frag
-    src/shaders/pbr_shader.vert
-    src/shaders/colored_text.vert
-    src/shaders/skybox.vert
-    src/shaders/gui_rectangle.vert
-    src/shaders/pbr_shader.frag
-    src/shaders/colored_text.frag
-    src/shaders/gui_rectangle.frag
-    src/shaders/brdf_integration_mapper.frag
-    src/shaders/specular_prefilter.vert
-    src/shaders/brdf_integration_mapper.vert
-    src/shaders/irradiance_precomputer.frag
-    src/shaders/specular_prefilter.frag
-    src/shaders/irradiance_precomputer.vert
-    src/shaders/equirectangular_mapper.vert
     src/gui/FreeTypeFont.cpp
     src/gui/GUITexture.cpp
     src/gui/GUITransform.cpp

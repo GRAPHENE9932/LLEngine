@@ -7,6 +7,7 @@
 #include "nodes/gui/GUICanvas.hpp"
 
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace llengine;
 
@@ -39,6 +40,7 @@ void RenderingServer::main_loop() {
         
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+        update_shadow_map();
         draw_non_overlay_objects();
 
         // Draw skybox.
@@ -167,6 +169,41 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return get_proj_matrix() * get_view_matrix();
 }
 
+[[nodiscard]] glm::mat4 RenderingServer::get_dir_light_view_proj_matrix() const {
+    const glm::mat4 projection { glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 50.0f) };
+    const glm::mat4 view { glm::lookAt(
+        -*dir_light_direction * 30.0f,
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f}
+    ) };
+
+    return projection * view;
+}
+
+[[nodiscard]] bool RenderingServer::shadow_mapping_enabled() const {
+    return dir_light_direction.has_value();
+}
+
+[[nodiscard]] GLuint RenderingServer::get_shadow_map_texture_id() const {
+    if (!dir_light_direction.has_value()) {
+        throw std::runtime_error("Can't get shadow map texture ID, because shadows are disabled.");
+    }
+
+    if (shadow_map_texture_id == 0) {
+        throw std::runtime_error("Can't get shadow map texture ID, bacause shadows map texture is uninitialized.");
+    }
+
+    return shadow_map_texture_id;
+}
+
+[[nodiscard]] float RenderingServer::get_shadow_map_bias() const {
+    if (!dir_light_direction.has_value()) {
+        throw std::runtime_error("Can't get shadow map texture ID, because shadows are disabled.");
+    }
+
+    return shadow_map_bias;
+}
+
 std::optional<std::reference_wrapper<const Texture>>
 RenderingServer::get_environment_cubemap(const glm::vec3& camera_position) {
     if (skybox) {
@@ -226,4 +263,44 @@ void RenderingServer::draw_non_overlay_objects() {
             cur_drawable->draw();
         }
     }
+}
+
+void RenderingServer::initialize_shadow_map() {
+    glGenFramebuffers(1, &shadow_map_framebuffer);
+    glGenTextures(1, &shadow_map_texture_id);
+    glBindTexture(GL_TEXTURE_2D, shadow_map_texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map_texture_id, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+}
+
+void RenderingServer::update_shadow_map() {
+    if (!dir_light_direction.has_value()) {
+        return;
+    }
+
+    if (shadow_map_framebuffer == 0) {
+        initialize_shadow_map();
+    }
+
+    glViewport(0, 0, 2048, 2048);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
+    if (dir_light_direction.has_value()) {
+        for (const auto& cur_drawable : get_drawables()) {
+            if (cur_drawable->is_enabled()) {
+                cur_drawable->draw_to_shadow_map();
+            }
+        }
+    }
+    glEnable(GL_CULL_FACE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, 1600, 1000);
 }

@@ -42,6 +42,7 @@ uniform vec2 roughness_uv_offset;
 uniform vec2 roughness_uv_scale;
 uniform vec2 ao_uv_offset;
 uniform vec2 ao_uv_scale;
+uniform mat4 dir_light_view_proj_matrix;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -75,6 +76,9 @@ uniform vec2 ao_uv_scale;
 #endif
 #ifdef USING_NORMAL_TEXTURE
     out mat3 tbn;
+#endif
+#ifdef USING_SHADOW_MAP
+    out vec4 dir_light_space_frag_pos;
 #endif
 
 void main() {
@@ -121,6 +125,10 @@ void main() {
         #ifdef USING_AO_UV_TRANSFORM
             frag_ao_uv = vertex_uv * ao_uv_scale + ao_uv_offset;
         #endif
+    #endif
+
+    #ifdef USING_SHADOW_MAP
+        dir_light_space_frag_pos = dir_light_view_proj_matrix * vec4(frag_pos, 1.0);
     #endif
 }
 )""

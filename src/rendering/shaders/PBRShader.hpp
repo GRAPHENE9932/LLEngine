@@ -35,7 +35,8 @@ public:
         USING_ROUGHNESS_FACTOR = 0x10000,
         USING_AO_TEXTURE = 0x20000,
         USING_AO_FACTOR = 0x40000,
-        USING_IBL = 0x80000
+        USING_IBL = 0x80000,
+        USING_SHADOW_MAP = 0x100000
     };
 
     friend inline constexpr Flags operator|(Flags left, Flags right) noexcept {
@@ -115,6 +116,8 @@ private:
     GLint roughness_uv_scale_id = -1;
     GLint ao_uv_offset_id = -1;
     GLint ao_uv_scale_id = -1;
+    GLint dir_light_view_proj_matrix_id = -1;
+    GLint shadow_map_bias_id = -1;
 
     GLint base_color_texture_uniform_id = -1;
     GLint normal_map_texture_uniform_id = -1;
@@ -125,6 +128,7 @@ private:
     GLint prefiltered_specular_map_uniform_id = -1;
     GLint brdf_integration_map_uniform_id = -1;
     GLint irradiance_map_uniform_id = -1;
+    GLint shadow_map_uniform_id = -1;
 
     std::set<PointLightNode::Uniforms> point_light_ids;
 

@@ -131,6 +131,11 @@ public:
      * get_view_matrix() and get_proj_matrix().
      */
     [[nodiscard]] glm::mat4 get_view_proj_matrix() const noexcept;
+    [[nodiscard]] glm::mat4 get_dir_light_view_proj_matrix() const;
+
+    [[nodiscard]] bool shadow_mapping_enabled() const;
+    [[nodiscard]] GLuint get_shadow_map_texture_id() const;
+    [[nodiscard]] float get_shadow_map_bias() const;
 
     [[nodiscard]] const std::vector<PointLightNode*>& get_point_lights() const noexcept {
         return point_lights;
@@ -179,7 +184,11 @@ private:
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;
     float delta_time = 1.0f;
-    std::optional<glm::vec3> sun_direction;
+    std::optional<glm::vec3> dir_light_direction {{-0.577350f, -0.577350f, -0.577350f}};
+
+    GLuint shadow_map_framebuffer = 0;
+    GLuint shadow_map_texture_id = 0;
+    float shadow_map_bias = 0.005f;
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
@@ -195,5 +204,8 @@ private:
 
     void unblock_mouse_press();
     void draw_non_overlay_objects();
+
+    void initialize_shadow_map();
+    void update_shadow_map();
 };
 }

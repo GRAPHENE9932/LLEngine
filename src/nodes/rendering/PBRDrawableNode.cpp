@@ -10,6 +10,22 @@ PBRDrawableNode::PBRDrawableNode(
     const std::shared_ptr<const Mesh>& mesh
 ) : DrawableCompleteSpatialNode(), mesh(mesh), material(material) {}
 
+static void draw_mesh(const Mesh& mesh, RenderingServer& rs) {
+    mesh.bind_vao();
+
+    if (mesh.is_indexed()) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.get_indices_id());
+        glDrawElements(GL_TRIANGLES, mesh.get_amount_of_vertices(), mesh.get_indices_type(), 0);
+    }
+    else {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.get_vertices_id());
+        glDrawArrays(GL_TRIANGLES, 0, mesh.get_amount_of_vertices());
+    }
+    rs.report_about_drawn_triangles(mesh.get_amount_of_vertices() / 3);
+
+    mesh.unbind_vao();
+}
+
 void PBRDrawableNode::draw() {
     RenderingServer& rs = get_rendering_server();
 
@@ -29,19 +45,17 @@ void PBRDrawableNode::draw() {
         rs, *material, mvp, model_matrix, rs.get_camera_position()
     );
 
-    mesh->bind_vao();
+    draw_mesh(*mesh, rs);
+}
 
-    if (mesh->is_indexed()) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
-        glDrawElements(GL_TRIANGLES, mesh->get_amount_of_vertices(), mesh->get_indices_type(), 0);
-    }
-    else {
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
-        glDrawArrays(GL_TRIANGLES, 0, mesh->get_amount_of_vertices());
-    }
-    rs.report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
+void PBRDrawableNode::draw_to_shadow_map() {
+    RenderingServer& rs = get_rendering_server();
 
-    mesh->unbind_vao();
+    const glm::mat4 model_matrix = get_global_matrix();
+    const glm::mat4 mvp = rs.get_dir_light_view_proj_matrix() * model_matrix;
+    rs.get_shader_holder().get_shadow_mapping_shader().use_shader(mvp);
+
+    draw_mesh(*mesh, rs);
 }
 
 GLuint PBRDrawableNode::get_program_id() const {

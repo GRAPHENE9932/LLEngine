@@ -6,6 +6,7 @@ namespace llengine {
 class Drawable {
 public:
     virtual void draw() = 0;
+    virtual void draw_to_shadow_map() {}
     [[nodiscard]] virtual bool is_enabled() const = 0;
     /**
      * @brief Get the shader program ID from the drawable object if there any.

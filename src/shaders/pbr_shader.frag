@@ -33,6 +33,9 @@ out vec4 color_out;
 #ifdef USING_NORMAL_TEXTURE
     in mat3 tbn;
 #endif
+#ifdef USING_SHADOW_MAP
+    in vec4 dir_light_space_frag_pos;
+#endif
 
 struct PointLight {
     vec3 position;
@@ -52,6 +55,7 @@ uniform sampler2D normal_texture;
 uniform sampler2D metallic_texture;
 uniform sampler2D roughness_texture;
 uniform sampler2D ao_texture;
+uniform sampler2D shadow_map;
 uniform samplerCube irradiance_map;
 uniform samplerCube prefiltered_specular_map;
 uniform sampler2D brdf_integration_map;
@@ -62,6 +66,7 @@ uniform float metallic_factor;
 uniform float roughness_factor;
 uniform float ao_factor;
 uniform vec3 ambient;
+uniform float shadow_map_bias;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -212,6 +217,19 @@ float get_ao() {
     #endif
 }
 
+#ifdef USING_SHADOW_MAP
+    float compute_shadow_coefficient() {
+        vec3 projection_clip_space = dir_light_space_frag_pos.xyz / dir_light_space_frag_pos.w;
+        projection_clip_space = projection_clip_space * 0.5 + 0.5; // Convert from [-1; 1] range to [0; 1].
+
+        float closest_depth = texture(shadow_map, projection_clip_space.xy).r;
+        float real_depth = projection_clip_space.z - shadow_map_bias;
+        float shadow_coeff = closest_depth > real_depth ? 1.0 : 0.0;
+
+        return shadow_coeff;
+    }
+#endif
+
 const float PI = 3.1415926;
 
 vec3 fresnel_schlick(float cosine, vec3 refl_ratio_at_zero_inc) {
@@ -270,6 +288,8 @@ void main() {
 
     vec3 view_direction = normalize(camera_position - frag_pos);
 
+    float shadow_coeff = compute_shadow_coefficient();
+
     // Compute ambient.
     vec3 lightning_result;
     #ifdef USING_IBL
@@ -289,7 +309,7 @@ void main() {
         // Combine diffuse part, specular part and ambient occlusion.
         // We are not muliplying specular with reflection_ratio because we already
         // did it earlier.
-        lightning_result = (refraction_ratio * diffuse + specular) * get_ao();
+        lightning_result = (refraction_ratio * diffuse + specular * shadow_coeff) * get_ao();
     }
     #else
         lightning_result = ambient * get_ao();

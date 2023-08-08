@@ -76,6 +76,9 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
             flags |= PBRShader::USING_AO_UV_TRANSFORM;
         }
     }
+    if (rs.shadow_mapping_enabled()) {
+        flags |= PBRShader::USING_SHADOW_MAP;
+    }
 
     return flags;
 }
@@ -125,6 +128,8 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
     roughness_uv_scale_id = glGetUniformLocation(program_id, "roughness_uv_scale");
     ao_uv_offset_id = glGetUniformLocation(program_id, "ao_uv_offset");
     ao_uv_scale_id = glGetUniformLocation(program_id, "ao_uv_scale");
+    dir_light_view_proj_matrix_id = glGetUniformLocation(program_id, "dir_light_view_proj_matrix");
+    shadow_map_bias_id = glGetUniformLocation(program_id, "shadow_map_bias");
 
     base_color_texture_uniform_id = glGetUniformLocation(program_id, "base_color_texture");
     normal_map_texture_uniform_id = glGetUniformLocation(program_id, "normal_texture");
@@ -135,6 +140,7 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
     prefiltered_specular_map_uniform_id = glGetUniformLocation(program_id, "prefiltered_specular_map");
     irradiance_map_uniform_id = glGetUniformLocation(program_id, "irradiance_map");
     brdf_integration_map_uniform_id = glGetUniformLocation(program_id, "brdf_integration_map");
+    shadow_map_uniform_id = glGetUniformLocation(program_id, "shadow_map");
 
     for (size_t i = 0; i < params.point_lights_count; i++) {
         point_light_ids.insert(
@@ -202,6 +208,9 @@ void PBRShader::initialize(const Parameters& params) {
         defines.emplace_back("USING_AO_FACTOR");
     if (flags & USING_IBL)
         defines.emplace_back("USING_IBL");
+    if (flags & USING_SHADOW_MAP) {
+        defines.emplace_back("USING_SHADOW_MAP");
+    }
 
     program_id = load_shaders(
         VERTEX_SHADER_TEXT,
@@ -238,6 +247,7 @@ void PBRShader::use_shader(
     glUniform1f(metallic_factor_id, material.metallic_factor);
     glUniform1f(roughness_factor_id, material.roughness_factor);
     glUniform1f(ao_factor_id, material.ambient_occlusion_factor);
+    glUniformMatrix4fv(dir_light_view_proj_matrix_id, 1, GL_FALSE, glm::value_ptr(rs.get_dir_light_view_proj_matrix()));
     if (uv_offset_id != -1 || uv_scale_id != -1) {
         const std::pair<glm::vec2, glm::vec2> general_offset_scale =
                 material.get_general_uv_offset_and_scale();
@@ -263,6 +273,9 @@ void PBRShader::use_shader(
     if ((ao_uv_offset_id != -1 || ao_uv_scale_id != -1) && material.ambient_occlusion_texture.has_value()) {
         glUniform2fv(ao_uv_offset_id, 1, glm::value_ptr(material.ambient_occlusion_texture->uv_offset));
         glUniform2fv(ao_uv_scale_id, 1, glm::value_ptr(material.ambient_occlusion_texture->uv_scale));
+    }
+    if (shadow_map_bias_id != -1) {
+        glUniform1f(shadow_map_bias_id, rs.get_shadow_map_bias());
     }
     auto point_light_ids_iter = point_light_ids.begin();
     for (auto& cur_point_light : rs.get_point_lights()) {
@@ -322,6 +335,12 @@ void PBRShader::use_shader(
         glUniform1i(brdf_integration_map_uniform_id, cur_tex_unit);
         glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
         glBindTexture(GL_TEXTURE_2D, rs.get_brdf_integration_map().get_id());
+        cur_tex_unit++;
+    }
+    if (shadow_map_uniform_id != -1) {
+        glUniform1i(shadow_map_uniform_id, cur_tex_unit);
+        glActiveTexture(GL_TEXTURE0 + cur_tex_unit);
+        glBindTexture(GL_TEXTURE_2D, rs.get_shadow_map_texture_id());
         cur_tex_unit++;
     }
 }

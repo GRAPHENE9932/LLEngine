@@ -8,6 +8,7 @@
 #include "SpecularPrefilterShader.hpp"
 #include "BRDFIntegrationMapperShader.hpp"
 #include "GUIRectangleShader.hpp"
+#include "ShadowMappingShader.hpp"
 
 namespace llengine {
 /**
@@ -49,6 +50,10 @@ public:
         return gui_rectangle_shader.get();
     }
 
+    [[nodiscard]] ShadowMappingShader& get_shadow_mapping_shader() {
+        return shadow_mapping_shader.get();
+    }
+
 private:
     template<typename T>
     class LazyShader {
@@ -72,5 +77,6 @@ private:
     LazyShader<PBRShaderManager> pbr_shader_manager;
     LazyShader<SkyboxShader> skybox_shader;
     LazyShader<GUIRectangleShader> gui_rectangle_shader;
+    LazyShader<ShadowMappingShader> shadow_mapping_shader;
 };
 }
