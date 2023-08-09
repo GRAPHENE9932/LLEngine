@@ -129,7 +129,8 @@ void PBRShader::initialize_uniforms(const Parameters& params) {
     ao_uv_offset_id = glGetUniformLocation(program_id, "ao_uv_offset");
     ao_uv_scale_id = glGetUniformLocation(program_id, "ao_uv_scale");
     dir_light_view_proj_matrix_id = glGetUniformLocation(program_id, "dir_light_view_proj_matrix");
-    shadow_map_bias_id = glGetUniformLocation(program_id, "shadow_map_bias");
+    shadow_map_bias_at_45_deg_id = glGetUniformLocation(program_id, "shadow_map_bias_at_45_deg");
+    dir_light_direction_id = glGetUniformLocation(program_id, "dir_light_direction");
 
     base_color_texture_uniform_id = glGetUniformLocation(program_id, "base_color_texture");
     normal_map_texture_uniform_id = glGetUniformLocation(program_id, "normal_texture");
@@ -274,8 +275,11 @@ void PBRShader::use_shader(
         glUniform2fv(ao_uv_offset_id, 1, glm::value_ptr(material.ambient_occlusion_texture->uv_offset));
         glUniform2fv(ao_uv_scale_id, 1, glm::value_ptr(material.ambient_occlusion_texture->uv_scale));
     }
-    if (shadow_map_bias_id != -1) {
-        glUniform1f(shadow_map_bias_id, rs.get_shadow_map_bias());
+    if (shadow_map_bias_at_45_deg_id != -1) {
+        glUniform1f(shadow_map_bias_at_45_deg_id, rs.get_adjusted_shadow_map_bias_at_45_deg());
+    }
+    if (dir_light_direction_id != -1) {
+        glUniform3fv(dir_light_direction_id, 1, glm::value_ptr(rs.get_dir_light_direction()));
     }
     auto point_light_ids_iter = point_light_ids.begin();
     for (auto& cur_point_light : rs.get_point_lights()) {

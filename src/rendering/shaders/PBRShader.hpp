@@ -117,7 +117,8 @@ private:
     GLint ao_uv_offset_id = -1;
     GLint ao_uv_scale_id = -1;
     GLint dir_light_view_proj_matrix_id = -1;
-    GLint shadow_map_bias_id = -1;
+    GLint shadow_map_bias_at_45_deg_id = -1;
+    GLint dir_light_direction_id = -1;
 
     GLint base_color_texture_uniform_id = -1;
     GLint normal_map_texture_uniform_id = -1;

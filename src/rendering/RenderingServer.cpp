@@ -5,6 +5,7 @@
 #include "nodes/rendering/CameraNode.hpp"
 #include "nodes/rendering/Drawable.hpp"
 #include "nodes/gui/GUICanvas.hpp"
+#include "utils/math.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -198,10 +199,41 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
 
 [[nodiscard]] float RenderingServer::get_shadow_map_bias() const {
     if (!dir_light_direction.has_value()) {
-        throw std::runtime_error("Can't get shadow map texture ID, because shadows are disabled.");
+        throw std::runtime_error("Can't get shadow map bias, because shadows are disabled.");
     }
 
-    return shadow_map_bias;
+    return shadow_map_bias_at_45_deg;
+}
+
+[[nodiscard]] float RenderingServer::get_adjusted_shadow_map_bias_at_45_deg() const {
+    float size_ratio = 1024.0f / shadow_map_size.x;
+    float result = shadow_map_bias_at_45_deg * size_ratio;
+    return result;
+}
+
+[[nodiscard]] glm::u32vec2 RenderingServer::get_shadow_map_size() const {
+    return shadow_map_size;
+}
+
+void RenderingServer::set_shadow_map_size(glm::u32vec2 new_size) {
+    if (new_size.x != new_size.y || !llengine::math_utils::is_power_of_two(new_size.x)) {
+        throw std::runtime_error(
+            "Invalid shadow map size specified. "
+            "Shadow map must be square, bigger or equal to 4x4 and "
+            "all extends must equal to a power of 2."
+        );
+    }
+
+    shadow_map_size = new_size;
+    initialize_shadow_map();
+}
+
+[[nodiscard]] glm::vec3 RenderingServer::get_dir_light_direction() const {
+    if (!dir_light_direction.has_value()) {
+        throw std::runtime_error("Can't get directional light direction, because shadows are disabled.");
+    }
+
+    return *dir_light_direction;
 }
 
 std::optional<std::reference_wrapper<const Texture>>
@@ -266,10 +298,13 @@ void RenderingServer::draw_non_overlay_objects() {
 }
 
 void RenderingServer::initialize_shadow_map() {
+    glDeleteTextures(1, &shadow_map_texture_id);
+    glDeleteFramebuffers(1, & shadow_map_framebuffer);
+
     glGenFramebuffers(1, &shadow_map_framebuffer);
     glGenTextures(1, &shadow_map_texture_id);
     glBindTexture(GL_TEXTURE_2D, shadow_map_texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_map_size.x, shadow_map_size.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -289,7 +324,7 @@ void RenderingServer::update_shadow_map() {
         initialize_shadow_map();
     }
 
-    glViewport(0, 0, 2048, 2048);
+    glViewport(0, 0, shadow_map_size.x, shadow_map_size.y);
     glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
     glClear(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_CULL_FACE);
@@ -302,5 +337,6 @@ void RenderingServer::update_shadow_map() {
     }
     glEnable(GL_CULL_FACE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, 1600, 1000);
+    const auto window_size = get_window().get_window_size();
+    glViewport(0, 0, window_size.x, window_size.y);
 }

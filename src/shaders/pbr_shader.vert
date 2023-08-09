@@ -43,6 +43,8 @@ uniform vec2 roughness_uv_scale;
 uniform vec2 ao_uv_offset;
 uniform vec2 ao_uv_scale;
 uniform mat4 dir_light_view_proj_matrix;
+uniform float shadow_map_bias_at_45_deg;
+uniform vec3 dir_light_direction;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -79,7 +81,10 @@ uniform mat4 dir_light_view_proj_matrix;
 #endif
 #ifdef USING_SHADOW_MAP
     out vec4 dir_light_space_frag_pos;
+    out float shadow_map_bias;
 #endif
+
+const float COS_45_DEG = 0.7071067812;
 
 void main() {
     gl_Position = mvp * vec4(vertex_pos, 1.0);
@@ -129,6 +134,7 @@ void main() {
 
     #ifdef USING_SHADOW_MAP
         dir_light_space_frag_pos = dir_light_view_proj_matrix * vec4(frag_pos, 1.0);
+        shadow_map_bias = COS_45_DEG / dot(normal, -dir_light_direction) * shadow_map_bias_at_45_deg;
     #endif
 }
 )""

@@ -135,7 +135,18 @@ public:
 
     [[nodiscard]] bool shadow_mapping_enabled() const;
     [[nodiscard]] GLuint get_shadow_map_texture_id() const;
+    /**
+     * @brief Get user-defined unadjusted shadow map bias
+     *
+     * Returns the shadow map bias that coincides with real shadow
+     * map bias used in the shader at 45 degrees between the normal
+     * and a light source with shadow map size of 1024x1024.
+     */
     [[nodiscard]] float get_shadow_map_bias() const;
+    [[nodiscard]] float get_adjusted_shadow_map_bias_at_45_deg() const;
+    [[nodiscard]] glm::u32vec2 get_shadow_map_size() const;
+    void set_shadow_map_size(glm::u32vec2 new_size);
+    [[nodiscard]] glm::vec3 get_dir_light_direction() const;
 
     [[nodiscard]] const std::vector<PointLightNode*>& get_point_lights() const noexcept {
         return point_lights;
@@ -188,7 +199,8 @@ private:
 
     GLuint shadow_map_framebuffer = 0;
     GLuint shadow_map_texture_id = 0;
-    float shadow_map_bias = 0.005f;
+    float shadow_map_bias_at_45_deg = 0.0006f;
+    glm::u32vec2 shadow_map_size { 1024, 1024 };
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;

@@ -35,6 +35,7 @@ out vec4 color_out;
 #endif
 #ifdef USING_SHADOW_MAP
     in vec4 dir_light_space_frag_pos;
+    in float shadow_map_bias;
 #endif
 
 struct PointLight {
@@ -66,7 +67,6 @@ uniform float metallic_factor;
 uniform float roughness_factor;
 uniform float ao_factor;
 uniform vec3 ambient;
-uniform float shadow_map_bias;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -309,7 +309,7 @@ void main() {
         // Combine diffuse part, specular part and ambient occlusion.
         // We are not muliplying specular with reflection_ratio because we already
         // did it earlier.
-        lightning_result = (refraction_ratio * diffuse + specular * shadow_coeff) * get_ao();
+        lightning_result = (refraction_ratio * diffuse * (shadow_coeff * 0.5 + 0.5) + specular * shadow_coeff) * get_ao();
     }
     #else
         lightning_result = ambient * get_ao();
