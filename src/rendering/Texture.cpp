@@ -59,6 +59,10 @@ void ManagedTextureID::set_id(TextureID id) {
     return id;
 }
 
+[[nodiscard]] TextureID& ManagedTextureID::get_ref() {
+    return id;
+}
+
 void ManagedTextureID::delete_texture() {
     glDeleteTextures(1, &id);
     id = 0;

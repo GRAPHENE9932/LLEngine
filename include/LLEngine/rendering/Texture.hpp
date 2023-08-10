@@ -46,17 +46,20 @@ public:
 
     void set_id(TextureID id);
     [[nodiscard]] TextureID get() const;
+    [[nodiscard]] TextureID& get_ref();
+    
+    void delete_texture();
 
 private:
     TextureID id = 0;
-    
-    void delete_texture();
 };
 
 class Texture {
 public:
-    inline Texture(VertexArrayID texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
+    Texture(TextureID texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
             texture_id(texture_id), tex_size(tex_size), cubemap(is_cubemap) {}
+    Texture(ManagedTextureID&& texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
+            texture_id(std::move(texture_id)), tex_size(tex_size), cubemap(is_cubemap) {}
     Texture(const Texture& other) = delete;
     Texture(Texture&& other) noexcept = default;
     ~Texture() = default;

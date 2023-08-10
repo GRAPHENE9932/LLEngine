@@ -322,7 +322,7 @@ void RenderingServer::initialize_shadow_map() {
     delete_shadow_map();
 
     glGenFramebuffers(1, &shadow_map_framebuffer.get_ref());
-    glGenTextures(1, &shadow_map_texture_id);
+    glGenTextures(1, &shadow_map_texture_id.get_ref());
     glBindTexture(GL_TEXTURE_2D, shadow_map_texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_map_size.x, shadow_map_size.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -360,6 +360,6 @@ void RenderingServer::update_shadow_map() {
 }
 
 void RenderingServer::delete_shadow_map() {
-    glDeleteTextures(1, &shadow_map_texture_id);
+    shadow_map_texture_id.delete_texture();
     shadow_map_framebuffer.delete_framebuffer();
 }

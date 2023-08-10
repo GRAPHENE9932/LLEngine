@@ -104,8 +104,8 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
             face->glyph->bitmap.rows
         };
 
-        GLuint texture_id {0};
-        glGenTextures(1, &texture_id);
+        ManagedTextureID texture_id;
+        glGenTextures(1, &texture_id.get_ref());
         glBindTexture(GL_TEXTURE_2D, texture_id);
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_RED, tex_size.x, tex_size.y, 0,
@@ -119,7 +119,7 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
         chars.emplace(
             c,
             FontChar {
-                Texture(texture_id, tex_size, false),
+                Texture(std::move(texture_id), tex_size, false),
                 glm::u32vec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                 static_cast<std::uint32_t>(face->glyph->advance.x)
             }

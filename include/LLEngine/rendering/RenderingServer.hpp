@@ -13,6 +13,7 @@
 #include "QualitySettings.hpp"
 #include "rendering/Window.hpp" // Window
 #include "rendering/Skybox.hpp" // Skybox
+#include "rendering/Texture.hpp"
 #include "rendering/shaders/ShaderHolder.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
 
@@ -204,7 +205,7 @@ private:
 
     bool shadow_mapping_enabled = true;
     ManagedFramebufferID shadow_map_framebuffer;
-    TextureID shadow_map_texture_id = 0;
+    ManagedTextureID shadow_map_texture_id = 0;
     float shadow_map_bias_at_45_deg = 0.0008f;
     glm::u32vec2 shadow_map_size { 1024, 1024 };
 
