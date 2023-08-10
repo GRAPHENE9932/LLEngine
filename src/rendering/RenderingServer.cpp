@@ -321,7 +321,7 @@ void RenderingServer::draw_non_overlay_objects() {
 void RenderingServer::initialize_shadow_map() {
     delete_shadow_map();
 
-    glGenFramebuffers(1, &shadow_map_framebuffer);
+    glGenFramebuffers(1, &shadow_map_framebuffer.get_ref());
     glGenTextures(1, &shadow_map_texture_id);
     glBindTexture(GL_TEXTURE_2D, shadow_map_texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_map_size.x, shadow_map_size.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
@@ -361,5 +361,5 @@ void RenderingServer::update_shadow_map() {
 
 void RenderingServer::delete_shadow_map() {
     glDeleteTextures(1, &shadow_map_texture_id);
-    glDeleteFramebuffers(1, & shadow_map_framebuffer);
+    shadow_map_framebuffer.delete_framebuffer();
 }

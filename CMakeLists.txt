@@ -49,6 +49,7 @@ set(SOURCES
     src/rendering/Texture.cpp
     src/rendering/TextureFromKTX.cpp
     src/rendering/TextureFromRGBE.cpp
+    src/rendering/ManagedFramebufferID.cpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/shader_loader.cpp
     src/structs/shapes/SphereShape.cpp
@@ -92,6 +93,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/rendering/GLFWWindow.hpp
     include/LLEngine/rendering/Material.hpp
     include/LLEngine/rendering/Window.hpp
+    include/LLEngine/rendering/ManagedFramebufferID.hpp
     include/LLEngine/Transform.hpp
     include/LLEngine/GameInstance.hpp
     include/LLEngine/physics/shapes/BoxShape.hpp

@@ -5,6 +5,7 @@
 #include "rendering/shaders/SpecularPrefilterShader.hpp"
 #include "rendering/Mesh.hpp"
 #include "NodeProperty.hpp"
+#include "rendering/ManagedFramebufferID.hpp"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
@@ -60,6 +61,7 @@ void ManagedTextureID::set_id(TextureID id) {
 
 void ManagedTextureID::delete_texture() {
     glDeleteTextures(1, &id);
+    id = 0;
 }
 
 void Texture::set_id(TextureID new_id) {
@@ -104,8 +106,8 @@ auto draw_to_cubemap(
     }
 
     // Initialize the framebuffer.
-    GLuint framebuffer_id;
-    glGenFramebuffers(1, &framebuffer_id);
+    ManagedFramebufferID framebuffer_id;
+    glGenFramebuffers(1, &framebuffer_id.get_ref());
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
     // Save the state of the viewport to restore it later.
@@ -127,7 +129,6 @@ auto draw_to_cubemap(
         }
         cur_cubemap_size /= 2;
     }
-    glDeleteRenderbuffers(1, &framebuffer_id);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Return viewport to the original state.
@@ -220,8 +221,8 @@ Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shade
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // Initialize the framebuffer.
-    GLuint framebuffer_id;
-    glGenFramebuffers(1, &framebuffer_id);
+    ManagedFramebufferID framebuffer_id;
+    glGenFramebuffers(1, &framebuffer_id.get_ref());
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
     // Save the state of the viewport to restore it later.
@@ -243,7 +244,6 @@ Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shade
     quad_mesh->unbind_vao();
 
     // Clean up.
-    glDeleteRenderbuffers(1, &framebuffer_id);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Return viewport to the original state.
