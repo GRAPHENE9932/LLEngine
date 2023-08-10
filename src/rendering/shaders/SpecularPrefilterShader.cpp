@@ -2,6 +2,7 @@
 #include "utils/shader_loader.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <GL/glew.h>
 
 using namespace llengine;
 

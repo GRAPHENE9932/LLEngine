@@ -1,5 +1,7 @@
 #include <array> // std::array
 
+#include <GL/glew.h>
+
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/RenderingServer.hpp" // RenderingServer
 #include "rendering/Mesh.hpp"

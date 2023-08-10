@@ -1,6 +1,7 @@
 #include "EquirectangularMapperShader.hpp"
 #include "utils/shader_loader.hpp"
 
+#include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace llengine;

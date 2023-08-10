@@ -7,7 +7,8 @@
 #include <glm/vec2.hpp> // glm::vec2
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/vec4.hpp> // glm::vec4
-#include <GL/glew.h>
+
+#include "datatypes.hpp"
 
 namespace llengine {
 class Mesh {
@@ -20,14 +21,14 @@ public:
     Mesh& operator=(const Mesh& other);
     Mesh& operator=(Mesh&& other) noexcept;
 
-    [[nodiscard]] GLuint get_indices_id() const { return indices_id; }
-    [[nodiscard]] GLuint get_vertices_id() const { return vertices_id; }
-    [[nodiscard]] GLuint get_uvs_id() const { return uvs_id; }
-    [[nodiscard]] GLuint get_normals_id() const { return normals_id; }
-    [[nodiscard]] GLuint get_tangents_id() const { return tangents_id; }
+    [[nodiscard]] BufferID get_indices_id() const { return indices_id; }
+    [[nodiscard]] BufferID get_vertices_id() const { return vertices_id; }
+    [[nodiscard]] BufferID get_uvs_id() const { return uvs_id; }
+    [[nodiscard]] BufferID get_normals_id() const { return normals_id; }
+    [[nodiscard]] BufferID get_tangents_id() const { return tangents_id; }
 
     [[nodiscard]] size_t get_amount_of_vertices() const;
-    [[nodiscard]] GLenum get_indices_type() const;
+    [[nodiscard]] GraphicsAPIEnum get_indices_type() const;
 
     [[nodiscard]] inline bool is_initialized() const noexcept {
         return vertices_id != 0;
@@ -83,9 +84,9 @@ public:
     [[nodiscard]] static std::shared_ptr<const Mesh> get_quad();
 
 private:
-    GLuint indices_id = 0, vertices_id = 0, uvs_id = 0,
+    BufferID indices_id = 0, vertices_id = 0, uvs_id = 0,
            normals_id = 0, tangents_id = 0;
-    mutable GLuint vao_id = 0;
+    mutable VertexArrayID vao_id = 0;
 
     std::variant<std::vector<uint16_t>, std::vector<uint32_t>> indices;
     std::vector<glm::vec3> vertices;

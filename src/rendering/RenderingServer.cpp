@@ -7,6 +7,7 @@
 #include "nodes/gui/GUICanvas.hpp"
 #include "utils/math.hpp"
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 

@@ -4,6 +4,8 @@
 #include <sstream>
 #include <array>
 
+#include <GL/glew.h>
+
 #include "rendering/Mesh.hpp"
 
 using namespace llengine;

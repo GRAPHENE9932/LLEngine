@@ -2,8 +2,9 @@
 
 #include "rendering/Texture.hpp"
 
-#include <GL/glew.h>
 #include <glm/mat4x4.hpp>
+
+#include "datatypes.hpp"
 
 namespace llengine {
 class GUIRectangleShader {
@@ -16,11 +17,11 @@ public:
     );
 
 private:
-    GLuint program_id = 0;
-    GLint mvp_id = -1;
-    GLint uv_scale_id = -1;
-    GLint uv_offset_id = -1;
-    GLint color_factor_id = -1;
-    GLint sampler_id = -1;
+    ShaderID program_id = 0;
+    ShaderUniformID mvp_id = -1;
+    ShaderUniformID uv_scale_id = -1;
+    ShaderUniformID uv_offset_id = -1;
+    ShaderUniformID color_factor_id = -1;
+    ShaderUniformID sampler_id = -1;
 };
 }

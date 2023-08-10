@@ -8,11 +8,34 @@
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
+#include <GL/glew.h>
 
 #include <array>
 #include <fstream>
 
 using namespace llengine;
+
+void TexLoadingParams::set_to_defaults() {
+    magnification_filter = GL_LINEAR;
+    minification_filter = GL_LINEAR;
+    wrap_s = GL_CLAMP_TO_EDGE;
+    wrap_t = GL_CLAMP_TO_EDGE;
+    file_path = "";
+    offset = 0;
+    size = 0;
+}
+
+Texture::~Texture() {
+    // This function ignores texture ID of 0.
+    glDeleteTextures(1, &texture_id);
+}
+
+void Texture::set_id(TextureID new_id) {
+    // This function ignores texture ID of 0.
+    glDeleteTextures(1, &texture_id);
+
+    texture_id = new_id;
+}
 
 auto draw_to_cubemap(
     glm::i32vec2 cubemap_size, std::int32_t mipmap_levels, std::invocable<const glm::mat4&, std::int32_t> auto&& drawing_function

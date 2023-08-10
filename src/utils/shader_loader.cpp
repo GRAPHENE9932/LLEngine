@@ -24,7 +24,7 @@ using namespace llengine;
 
 /// Loads and compiles vertex and fragment shaders from files,
 /// compiles, links them and returns the program ID.
-GLuint llengine::load_shaders_from_files(
+ShaderID llengine::load_shaders_from_files(
     std::string_view vertex_shader_path,
     std::string_view fragment_shader_path,
     const std::vector<std::string>& defines
@@ -36,7 +36,7 @@ GLuint llengine::load_shaders_from_files(
     );
 }
 
-GLuint llengine::load_shaders(
+ShaderID llengine::load_shaders(
     std::string_view vertex_shader_code,
     std::string_view fragment_shader_code,
     const std::vector<std::string>& defines

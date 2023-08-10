@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rendering/Texture.hpp"
+#include "datatypes.hpp"
 
 #include <glm/mat4x4.hpp>
 
@@ -15,8 +16,8 @@ public:
     );
 
 private:
-    GLuint program_id = 0;
-    GLint mvp_id = -1;
-    GLint environment_cubemap_sampler_id = -1;
+    ShaderID program_id = 0;
+    ShaderUniformID mvp_id = -1;
+    ShaderUniformID environment_cubemap_sampler_id = -1;
 };
 }

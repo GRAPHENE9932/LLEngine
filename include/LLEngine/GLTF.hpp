@@ -9,7 +9,6 @@
 #include <string_view> // std::string_view
 #include <unordered_map> // std::unordered_map
 
-#include <GL/glew.h> // GLenum
 #include <nlohmann/json.hpp> // nlohmann::json
 
 #include "Transform.hpp"

@@ -4,7 +4,6 @@
 #include <glm/ext/vector_int2.hpp> // glm::ivec2
 #include <glm/ext/vector_double2.hpp> // glm::dvec2
 #include <glm/ext/quaternion_exponential.hpp> // glm::pow
-#include <GLFW/glfw3.h> // glfwGetCursorPos, glfwSetCursorPos
 
 using namespace llengine;
 

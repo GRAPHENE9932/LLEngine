@@ -1,6 +1,8 @@
 #include "rendering/RenderingServer.hpp"
 #include "nodes/rendering/PBRDrawableNode.hpp" // PBRDrawableNode
 
+#include <GL/glew.h>
+
 using namespace llengine;
 
 PBRDrawableNode::PBRDrawableNode() = default;

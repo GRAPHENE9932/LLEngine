@@ -6,6 +6,7 @@
 #include "nodes/CompleteSpatialNode.hpp"
 #include "rendering/Mesh.hpp"
 #include "rendering/Material.hpp" // Material
+#include "datatypes.hpp"
 
 namespace llengine {
 class PBRDrawableNode : public DrawableCompleteSpatialNode {
@@ -21,7 +22,7 @@ public:
 
     void draw() override;
     void draw_to_shadow_map() override;
-    GLuint get_program_id() const override;
+    ShaderID get_program_id() const override;
 
     void copy_to(Node& node) const override;
     std::unique_ptr<Node> copy() const override;

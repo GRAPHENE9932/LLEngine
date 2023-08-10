@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <GL/glew.h>
 
 #include <optional>
 #include <stdexcept>

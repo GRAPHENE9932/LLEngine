@@ -5,6 +5,7 @@
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
+#include <GL/glew.h>
 
 using namespace llengine;
 

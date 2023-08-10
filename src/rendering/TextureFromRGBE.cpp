@@ -1,6 +1,7 @@
 #include "rendering/Texture.hpp"
 
 #include <fmt/format.h>
+#include <GL/glew.h>
 
 #include <vector>
 #include <cmath>

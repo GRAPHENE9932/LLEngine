@@ -16,7 +16,7 @@ void PBRShaderManager::use_shader(
         .use_shader(rs, material, mvp_matrix, model_matrix, camera_position);
 }
 
-GLuint PBRShaderManager::get_program_id(RenderingServer& rs, const Material& material) {
+ShaderID PBRShaderManager::get_program_id(RenderingServer& rs, const Material& material) {
     return get_shader(rs, material).get_program_id();
 }
 

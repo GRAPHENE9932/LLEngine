@@ -2,6 +2,7 @@
 
 #include <ktx.h>
 #include <fmt/format.h>
+#include <GL/glew.h>
 
 #include <fstream>
 #include <filesystem>

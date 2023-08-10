@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "datatypes.hpp"
 
 namespace llengine {
 class BRDFIntegrationMapperShader {
@@ -10,6 +10,6 @@ public:
     void use_shader() const;
 
 private:
-    GLuint program_id = 0;
+    ShaderID program_id = 0;
 };
 }

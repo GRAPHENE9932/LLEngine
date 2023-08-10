@@ -139,7 +139,7 @@ public:
     void enable_shadow_mapping();
     void disable_shadow_mapping();
     [[nodiscard]] bool is_shadow_mapping_enabled() const;
-    [[nodiscard]] GLuint get_shadow_map_texture_id() const;
+    [[nodiscard]] TextureID get_shadow_map_texture_id() const;
     /**
      * @brief Get user-defined unadjusted shadow map bias
      *
@@ -202,8 +202,8 @@ private:
     glm::vec3 dir_light_direction {-0.577350f, -0.577350f, -0.577350f};
 
     bool shadow_mapping_enabled = true;
-    GLuint shadow_map_framebuffer = 0;
-    GLuint shadow_map_texture_id = 0;
+    FramebufferID shadow_map_framebuffer = 0;
+    TextureID shadow_map_texture_id = 0;
     float shadow_map_bias_at_45_deg = 0.0008f;
     glm::u32vec2 shadow_map_size { 1024, 1024 };
 

@@ -7,6 +7,7 @@
 #include "ColoredTextShader.hpp"
 #include "SkyboxShader.hpp"
 #include "PBRShader.hpp"
+#include "datatypes.hpp"
 
 namespace llengine {
 class PBRShaderManager {
@@ -19,7 +20,7 @@ public:
         const glm::mat4& model_matrix, const glm::vec3& camera_position
     );
 
-    GLuint get_program_id(RenderingServer& rs, const Material& material);
+    ShaderID get_program_id(RenderingServer& rs, const Material& material);
 
 private:
     const PBRShader& get_shader(RenderingServer& rs, const Material& material);

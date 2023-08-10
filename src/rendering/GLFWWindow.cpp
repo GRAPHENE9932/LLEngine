@@ -1,6 +1,6 @@
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
 
-#include <GL/glew.h> // glewInit, GLEW_OK
+#include <GL/glew.h>
 #include <GLFW/glfw3.h> // Various GLFW functions and constants.
 #include <fmt/format.h>
 

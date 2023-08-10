@@ -2,8 +2,6 @@
 
 #include <memory> // std::shared_ptr
 
-#include <GL/glew.h> // GLuint
-
 namespace llengine {
 class Texture;
 class RenderingServer;

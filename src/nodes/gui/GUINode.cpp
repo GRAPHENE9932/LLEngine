@@ -9,6 +9,7 @@
 #include "logger.hpp"
 
 #include <fmt/format.h>
+#include <GL/glew.h>
 
 #include <utility>
 

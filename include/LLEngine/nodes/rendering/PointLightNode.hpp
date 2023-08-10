@@ -3,16 +3,16 @@
 #include <string> // std::string
 
 #include <glm/vec3.hpp> // glm::vec3
-#include <GL/glew.h> // GLint
 
 #include "nodes/CompleteSpatialNode.hpp"
+#include "datatypes.hpp"
 
 namespace llengine {
 class RenderingServer;
 
 struct PointLightNode : public CompleteSpatialNode {
     struct Uniforms {
-        GLint position_id, color_id;
+        ShaderUniformID position_id, color_id;
         
         auto operator<=>(const Uniforms& other) const noexcept = default;
     };
@@ -28,7 +28,7 @@ struct PointLightNode : public CompleteSpatialNode {
 
     void on_attachment_to_tree_without_start() final override;
 
-    static Uniforms get_uniforms_id(GLuint program_id, const std::string& var_name, GLuint index);
+    static Uniforms get_uniforms_id(ShaderID program_id, const std::string& var_name, std::uint32_t index);
     void set_uniforms(const Uniforms& uniforms) const;
 };
 }

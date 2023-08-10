@@ -7,6 +7,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
+#include <GL/glew.h>
 #include "GLTF.hpp"
 #include "utils/json_conversion.hpp"
 

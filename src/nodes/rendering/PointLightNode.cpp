@@ -2,6 +2,7 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
 
 #include <glm/gtc/type_ptr.hpp> // glm::value_ptr
+#include <GL/glew.h>
 
 #include <string> // std::string
 
@@ -19,7 +20,8 @@ void PointLightNode::on_attachment_to_tree_without_start() {
 }
 
 PointLightNode::Uniforms PointLightNode::get_uniforms_id(
-    GLuint program_id, const std::string& var_name, GLuint index) {
+    ShaderID program_id, const std::string& var_name, std::uint32_t index
+) {
     PointLightNode::Uniforms result;
 
     // Position.

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h> // GLuint
+#include "datatypes.hpp"
 
 namespace llengine {
 class Drawable {
@@ -16,6 +16,6 @@ public:
      * @returns Shader program ID if there are one concrete shader used in this drawable
      * node, or 0 if there are a lot of shaders used.
      */
-    virtual GLuint get_program_id() const = 0;
+    virtual ShaderID get_program_id() const = 0;
 };
 }

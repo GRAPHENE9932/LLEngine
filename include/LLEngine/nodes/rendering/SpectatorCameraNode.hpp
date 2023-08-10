@@ -1,7 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3.h> // Macros.
-
 #include "nodes/rendering/CameraNode.hpp" // CameraNode
 #include "Key.hpp"
 
