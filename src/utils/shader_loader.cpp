@@ -62,7 +62,7 @@ ShaderID llengine::load_shaders(
         glGetProgramInfoLog(program_id, info_log_length, nullptr, error_message.get());
 
         throw std::runtime_error(
-            "Failed to link the program.\n"
+            "Failed to link a shader program.\n"
             "Error message: "s + error_message.get()
         );
     }
@@ -91,7 +91,7 @@ ManagedShaderID llengine::load_vertex_shader(
         const std::size_t version_pos {modified_shader_code.find("#version")};
         if (version_pos == std::string::npos) {
             throw std::runtime_error(
-                "Shader doesn't contains the \"#version\" directive.\n"
+                "Shader doesn't contain the \"#version\" directive.\n"
             );
         }
         const std::size_t pos {modified_shader_code.find('\n', version_pos) + 1};
@@ -115,7 +115,8 @@ ManagedShaderID llengine::load_vertex_shader(
         glGetShaderInfoLog(vertex_shader_id, info_log_length, nullptr, error_message.get());
 
         throw std::runtime_error(
-            "Failed to compile the vertex shader.\n"
+            "Failed to compile a vertex shader.\n"
+            "Shader code:\n"s + modified_shader_code + '\n' +
             "Error message: "s + error_message.get()
         );
     }
@@ -165,8 +166,8 @@ ManagedShaderID llengine::load_fragment_shader(
         glGetShaderInfoLog(fragment_shader_id, info_log_length, nullptr, error_message.get());
 
         throw std::runtime_error(
-            "Failed to compile the fragment shader.\n"
-            "Path to the file: "s + modified_shader_code.data() + '\n' +
+            "Failed to compile a fragment shader.\n"
+            "Shader code:\n"s + modified_shader_code + '\n' +
             "Error message: "s + error_message.get()
         );
     }
