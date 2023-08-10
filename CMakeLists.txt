@@ -105,6 +105,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/Event.hpp
     include/LLEngine/SceneFile.hpp
     include/LLEngine/GameSettings.hpp
+    include/LLEngine/QualitySettings.hpp
     include/LLEngine/gui/FreeTypeFont.hpp
     include/LLEngine/gui/GUITexture.hpp
     include/LLEngine/gui/GUITransform.hpp

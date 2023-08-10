@@ -76,7 +76,7 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
             flags |= PBRShader::USING_AO_UV_TRANSFORM;
         }
     }
-    if (rs.shadow_mapping_enabled()) {
+    if (rs.is_shadow_mapping_enabled()) {
         flags |= PBRShader::USING_SHADOW_MAP;
     }
 

@@ -24,6 +24,8 @@ GameInstance::GameInstance(const GameSettings& settings) {
     auto sky_cubemap = sky_panorama.panorama_to_cubemap(rendering_server->get_shader_holder().get_equirectangular_mapper_shader());
     rendering_server->set_cubemap(std::make_shared<Texture>(std::move(sky_cubemap)));
 
+    rendering_server->apply_quality_settings(settings.quality_settings);
+
     rendering_server->set_update_callback([&] (float delta) {
         if (bullet_physics_server) {
             bullet_physics_server->do_step(delta);

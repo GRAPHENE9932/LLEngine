@@ -88,6 +88,17 @@ void RenderingServer::unblock_mouse_press() {
     mouse_button_blocked = false;
 }
 
+void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
+    if (settings.shadow_mapping_enabled) {
+        enable_shadow_mapping();
+    }
+    else {
+        disable_shadow_mapping();
+    }
+
+    set_shadow_map_size(settings.shadow_map_size);
+}
+
 void RenderingServer::register_drawable(Drawable* drawable) noexcept {
     if (drawable) {
         drawables.push_back(drawable);
@@ -173,7 +184,7 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
 [[nodiscard]] glm::mat4 RenderingServer::get_dir_light_view_proj_matrix() const {
     const glm::mat4 projection { glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 50.0f) };
     const glm::mat4 view { glm::lookAt(
-        -*dir_light_direction * 30.0f,
+        -dir_light_direction * 30.0f,
         {0.0f, 0.0f, 0.0f},
         {0.0f, 1.0f, 0.0f}
     ) };
@@ -181,12 +192,21 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return projection * view;
 }
 
-[[nodiscard]] bool RenderingServer::shadow_mapping_enabled() const {
-    return dir_light_direction.has_value();
+void RenderingServer::enable_shadow_mapping() {
+    shadow_mapping_enabled = true;
+}
+
+void RenderingServer::disable_shadow_mapping() {
+    shadow_mapping_enabled = false;
+    delete_shadow_map();
+}
+
+[[nodiscard]] bool RenderingServer::is_shadow_mapping_enabled() const {
+    return shadow_mapping_enabled;
 }
 
 [[nodiscard]] GLuint RenderingServer::get_shadow_map_texture_id() const {
-    if (!dir_light_direction.has_value()) {
+    if (!is_shadow_mapping_enabled()) {
         throw std::runtime_error("Can't get shadow map texture ID, because shadows are disabled.");
     }
 
@@ -198,7 +218,7 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
 }
 
 [[nodiscard]] float RenderingServer::get_shadow_map_bias() const {
-    if (!dir_light_direction.has_value()) {
+    if (!is_shadow_mapping_enabled()) {
         throw std::runtime_error("Can't get shadow map bias, because shadows are disabled.");
     }
 
@@ -229,11 +249,11 @@ void RenderingServer::set_shadow_map_size(glm::u32vec2 new_size) {
 }
 
 [[nodiscard]] glm::vec3 RenderingServer::get_dir_light_direction() const {
-    if (!dir_light_direction.has_value()) {
+    if (!is_shadow_mapping_enabled()) {
         throw std::runtime_error("Can't get directional light direction, because shadows are disabled.");
     }
 
-    return *dir_light_direction;
+    return dir_light_direction;
 }
 
 std::optional<std::reference_wrapper<const Texture>>
@@ -298,8 +318,7 @@ void RenderingServer::draw_non_overlay_objects() {
 }
 
 void RenderingServer::initialize_shadow_map() {
-    glDeleteTextures(1, &shadow_map_texture_id);
-    glDeleteFramebuffers(1, & shadow_map_framebuffer);
+    delete_shadow_map();
 
     glGenFramebuffers(1, &shadow_map_framebuffer);
     glGenTextures(1, &shadow_map_texture_id);
@@ -316,7 +335,7 @@ void RenderingServer::initialize_shadow_map() {
 }
 
 void RenderingServer::update_shadow_map() {
-    if (!dir_light_direction.has_value()) {
+    if (!is_shadow_mapping_enabled()) {
         return;
     }
 
@@ -328,15 +347,18 @@ void RenderingServer::update_shadow_map() {
     glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
     glClear(GL_DEPTH_BUFFER_BIT);
     glDisable(GL_CULL_FACE);
-    if (dir_light_direction.has_value()) {
-        for (const auto& cur_drawable : get_drawables()) {
-            if (cur_drawable->is_enabled()) {
-                cur_drawable->draw_to_shadow_map();
-            }
+    for (const auto& cur_drawable : get_drawables()) {
+        if (cur_drawable->is_enabled()) {
+            cur_drawable->draw_to_shadow_map();
         }
     }
     glEnable(GL_CULL_FACE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     const auto window_size = get_window().get_window_size();
     glViewport(0, 0, window_size.x, window_size.y);
+}
+
+void RenderingServer::delete_shadow_map() {
+    glDeleteTextures(1, &shadow_map_texture_id);
+    glDeleteFramebuffers(1, & shadow_map_framebuffer);
 }

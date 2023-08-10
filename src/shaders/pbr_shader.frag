@@ -288,7 +288,11 @@ void main() {
 
     vec3 view_direction = normalize(camera_position - frag_pos);
 
-    float shadow_coeff = compute_shadow_coefficient();
+    #ifdef USING_SHADOW_MAP
+        float shadow_coeff = compute_shadow_coefficient();
+    #else
+        float shadow_coeff = 1.0;
+    #endif
 
     // Compute ambient.
     vec3 lightning_result;

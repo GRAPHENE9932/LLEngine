@@ -16,6 +16,8 @@ int main() {
     settings.json_scene_path = "res/maps/demo_map.json";
     settings.skybox_path = "res/textures/sky.hdr";
     settings.window_resolution = {1600, 1000};
+    settings.quality_settings.shadow_mapping_enabled = true;
+    settings.quality_settings.shadow_map_size = {2048, 2048};
 
     register_nodes();
 

@@ -10,6 +10,7 @@
 #include <glm/vec2.hpp> // glm::ivec2
 #include <glm/mat4x4.hpp> // glm::mat4
 
+#include "QualitySettings.hpp"
 #include "rendering/Window.hpp" // Window
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/shaders/ShaderHolder.hpp"
@@ -48,6 +49,8 @@ public:
     [[nodiscard]] bool is_mouse_button_pressed(std::uint8_t button) const;
     [[nodiscard]] glm::dvec2 get_cursor_position() const;
     void block_mouse_press();
+
+    void apply_quality_settings(const QualitySettings& settings);
 
     /**
      * @brief Must be called by every Drawable upon its creation.
@@ -133,7 +136,9 @@ public:
     [[nodiscard]] glm::mat4 get_view_proj_matrix() const noexcept;
     [[nodiscard]] glm::mat4 get_dir_light_view_proj_matrix() const;
 
-    [[nodiscard]] bool shadow_mapping_enabled() const;
+    void enable_shadow_mapping();
+    void disable_shadow_mapping();
+    [[nodiscard]] bool is_shadow_mapping_enabled() const;
     [[nodiscard]] GLuint get_shadow_map_texture_id() const;
     /**
      * @brief Get user-defined unadjusted shadow map bias
@@ -174,6 +179,7 @@ public:
 
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
+    [[nodiscard]] bool have_environment_cubemap();
 
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_irradiance_map(const glm::vec3& obj_position);
@@ -182,8 +188,6 @@ public:
     get_prefiltered_specular_map(const glm::vec3& obj_position);
 
     [[nodiscard]] const Texture& get_brdf_integration_map();
-
-    [[nodiscard]] bool have_environment_cubemap();
 
 private:
     Window window;
@@ -195,11 +199,12 @@ private:
     // Time point of the last frame.
     std::chrono::high_resolution_clock::time_point prev_frame_time;
     float delta_time = 1.0f;
-    std::optional<glm::vec3> dir_light_direction {{-0.577350f, -0.577350f, -0.577350f}};
+    glm::vec3 dir_light_direction {-0.577350f, -0.577350f, -0.577350f};
 
+    bool shadow_mapping_enabled = true;
     GLuint shadow_map_framebuffer = 0;
     GLuint shadow_map_texture_id = 0;
-    float shadow_map_bias_at_45_deg = 0.0006f;
+    float shadow_map_bias_at_45_deg = 0.0008f;
     glm::u32vec2 shadow_map_size { 1024, 1024 };
 
     // Non-owning pointer to the current camera node.
@@ -219,5 +224,6 @@ private:
 
     void initialize_shadow_map();
     void update_shadow_map();
+    void delete_shadow_map();
 };
 }
