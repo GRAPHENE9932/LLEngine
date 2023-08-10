@@ -181,7 +181,7 @@ public:
 
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
-    [[nodiscard]] bool have_environment_cubemap();
+    [[nodiscard]] bool has_environment_cubemap();
 
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_irradiance_map(const glm::vec3& obj_position);

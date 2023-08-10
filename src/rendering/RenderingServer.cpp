@@ -306,7 +306,7 @@ const Texture& RenderingServer::get_brdf_integration_map() {
     return *brdf_integration_map;
 }
 
-bool RenderingServer::have_environment_cubemap() {
+bool RenderingServer::has_environment_cubemap() {
     return skybox != nullptr;
 }
 

@@ -51,7 +51,7 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     if (material.roughness_factor != 1.0f) {
         flags |= PBRShader::USING_ROUGHNESS_FACTOR;
     }
-    if (rs.have_environment_cubemap()) {
+    if (rs.has_environment_cubemap()) {
         flags |= PBRShader::USING_IBL;
     }
     if (!rs.get_point_lights().empty() || flags & PBRShader::USING_IBL) {
