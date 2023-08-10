@@ -32,29 +32,37 @@ public:
     TextureLoadingError(const std::string& message) : std::runtime_error(message) {}
 };
 
+class ManagedTextureID {
+public:
+    ManagedTextureID();
+    ManagedTextureID(TextureID id);
+    ManagedTextureID(const ManagedTextureID& other) = delete;
+    ManagedTextureID(ManagedTextureID&& other) noexcept;
+    ~ManagedTextureID();
+
+    ManagedTextureID& operator=(const ManagedTextureID& other) = delete;
+    ManagedTextureID& operator=(ManagedTextureID&& other) noexcept;
+    operator TextureID() const;
+
+    void set_id(TextureID id);
+    [[nodiscard]] TextureID get() const;
+
+private:
+    TextureID id = 0;
+    
+    void delete_texture();
+};
+
 class Texture {
 public:
     inline Texture(VertexArrayID texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
             texture_id(texture_id), tex_size(tex_size), cubemap(is_cubemap) {}
     Texture(const Texture& other) = delete;
-    Texture(Texture&& other) : Texture(other.texture_id, other.tex_size, other.cubemap) {
-        other.texture_id = 0;
-        other.tex_size = {0, 0};
-        other.cubemap = false;
-    }
-    ~Texture();
+    Texture(Texture&& other) noexcept = default;
+    ~Texture() = default;
 
     Texture& operator=(const Texture& other) = delete;
-    Texture& operator=(Texture&& other) {
-        texture_id = other.texture_id;
-        tex_size = other.tex_size;
-        cubemap = other.cubemap;
-        other.texture_id = 0;
-        other.tex_size = {0, 0};
-        other.cubemap = false;
-
-        return *this;
-    }
+    Texture& operator=(Texture&& other) noexcept = default;
 
     inline operator TextureID() const noexcept {
         return texture_id;
@@ -126,7 +134,7 @@ public:
     [[nodiscard]] static Texture compute_brdf_integration_map(BRDFIntegrationMapperShader& shader);
 
 protected:
-    TextureID texture_id = 0; // ID of value 0 implies that there are no texture.
+    ManagedTextureID texture_id = 0; // ID of value 0 implies that there are no texture.
     glm::u32vec2 tex_size {0, 0};
     bool cubemap = false;
 };

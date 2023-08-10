@@ -25,16 +25,45 @@ void TexLoadingParams::set_to_defaults() {
     size = 0;
 }
 
-Texture::~Texture() {
-    // This function ignores texture ID of 0.
-    glDeleteTextures(1, &texture_id);
+ManagedTextureID::ManagedTextureID() = default;
+
+ManagedTextureID::ManagedTextureID(TextureID id) : id(id) {}
+
+ManagedTextureID::ManagedTextureID(ManagedTextureID&& other) noexcept {
+    this->id = other.id;
+    other.id = 0;
+}
+
+ManagedTextureID::~ManagedTextureID() {
+    delete_texture();
+}
+
+ManagedTextureID& ManagedTextureID::operator=(ManagedTextureID&& other) noexcept {
+    set_id(other.id);
+    other.id = 0;
+
+    return *this;
+}
+
+ManagedTextureID::operator TextureID() const {
+    return get();
+}
+
+void ManagedTextureID::set_id(TextureID id) {
+    delete_texture();
+    this->id = id;
+}
+
+[[nodiscard]] TextureID ManagedTextureID::get() const {
+    return id;
+}
+
+void ManagedTextureID::delete_texture() {
+    glDeleteTextures(1, &id);
 }
 
 void Texture::set_id(TextureID new_id) {
-    // This function ignores texture ID of 0.
-    glDeleteTextures(1, &texture_id);
-
-    texture_id = new_id;
+    texture_id.set_id(new_id);
 }
 
 auto draw_to_cubemap(
