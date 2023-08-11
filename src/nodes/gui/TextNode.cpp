@@ -9,6 +9,17 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT = 
+    #include "shaders/colored_text.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/colored_text.frag"
+;
+
+TextNode::TextNode() : shader(VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT) {
+
+}
+
 [[nodiscard]] static std::vector<std::string_view> split_in_lines(
     std::string_view text, const FreeTypeFont& font, float maximum_width
 ) {
@@ -131,7 +142,8 @@ void TextNode::draw() {
     const glm::vec3 pixels_to_opengl_scale {2.0f / window_size, 1.0f};
     const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(pixels_to_opengl_scale)};
 
-    get_rendering_server().get_shader_holder().get_colored_text_shader().use_shader(mvp, get_color());
+    shader.set_mat4<"mvp">(mvp);
+    shader.set_vec3<"text_color">(get_color());
     glActiveTexture(GL_TEXTURE0);
     for (std::size_t char_i = 0; char_i < chars.size(); char_i++) {
         glBindTexture(GL_TEXTURE_2D, chars[char_i].get().texture);

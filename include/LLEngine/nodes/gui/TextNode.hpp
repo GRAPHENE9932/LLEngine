@@ -3,6 +3,7 @@
 #include "rendering/Mesh.hpp"
 #include "GUINode.hpp"
 #include "gui/FreeTypeFont.hpp"
+#include "rendering/Shader.hpp"
 
 #include <vector>
 #include <memory>
@@ -12,7 +13,7 @@
 namespace llengine {
 class TextNode : public GUINode {
 public:
-    TextNode() = default;
+    TextNode();
 
     [[nodiscard]] GUITransform get_transform() const override;
     [[nodiscard]] glm::vec2 get_absolute_size() const override;
@@ -38,6 +39,8 @@ public:
     static void register_properties();
 
 private:
+    using ShaderType = Shader<"mvp", "text_color">;
+
     glm::vec2 position_anchor {0.0f, 0.0f};
     glm::vec2 position_offset {0.0f, 0.0f};
     float z_coordinate {0.0f};
@@ -55,6 +58,8 @@ private:
     std::int32_t max_x = std::numeric_limits<std::int32_t>::min();
     std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
     std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
+
+    ShaderType shader;
 
     void add_line(
         glm::vec2 offset, std::string_view line,
