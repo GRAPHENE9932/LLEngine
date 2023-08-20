@@ -2,6 +2,7 @@
 
 #include "gui/GUITransform.hpp"
 #include "nodes/Node.hpp"
+#include "rendering/Shader.hpp"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -110,10 +111,13 @@ protected:
     virtual void internal_on_disable() override;
 
 private:
+    using ShaderType = Shader<"mvp", "uv_scale", "uv_offset", "color_factor">;
+
     std::variant<GUINode*, GUICanvas*, std::monostate> parent = std::monostate();
     std::vector<std::unique_ptr<GUINode>> children;
     std::vector<std::unique_ptr<GUINode>> children_queued_to_add;
     std::vector<GUINode*> children_queued_to_remove;
+    inline static std::unique_ptr<ShaderType> shader = nullptr;
 
     void draw_texture_part(
         const Texture& texture, glm::vec2 pos_offset_in_px, glm::vec2 tex_offset_in_px,
@@ -122,6 +126,7 @@ private:
 
     void add_children_from_queue();
     void remove_children_from_queue();
+    static void ensure_shader_is_initialized();
 
     friend class GUICanvas;
 };

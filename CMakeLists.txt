@@ -32,16 +32,9 @@ set(SOURCES
     src/rendering/Mesh.cpp
     src/rendering/MeshPrimitives.cpp
     src/rendering/Skybox.cpp
-    src/rendering/shaders/SkyboxShader.cpp
-    src/rendering/shaders/GUIRectangleShader.cpp
     src/rendering/shaders/PBRShaderManager.cpp
     src/rendering/shaders/PBRShader.cpp
-    src/rendering/shaders/IrradiancePrecomputerShader.cpp
-    src/rendering/shaders/SpecularPrefilterShader.cpp
-    src/rendering/shaders/EquirectangularMapperShader.cpp
     src/rendering/shaders/BRDFIntegrationMapperShader.cpp
-    src/rendering/shaders/ColoredTextShader.cpp
-    src/rendering/shaders/ShadowMappingShader.cpp
     src/rendering/FPSMeter.cpp
     src/rendering/GLTFLoading.cpp
     src/rendering/RenderingServer.cpp

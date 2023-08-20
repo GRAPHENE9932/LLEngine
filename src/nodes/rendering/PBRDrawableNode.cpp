@@ -5,6 +5,13 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADOW_MAPPING_SHADER_TEXT =
+    #include "shaders/shadow_mapping.vert"
+;
+constexpr std::string_view FRAGMENT_SHADOW_MAPPING_SHADER_TEXT =
+    #include "shaders/shadow_mapping.frag"
+;
+
 PBRDrawableNode::PBRDrawableNode() = default;
 
 PBRDrawableNode::PBRDrawableNode(
@@ -55,7 +62,10 @@ void PBRDrawableNode::draw_to_shadow_map() {
 
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rs.get_dir_light_view_proj_matrix() * model_matrix;
-    rs.get_shader_holder().get_shadow_mapping_shader().use_shader(mvp);
+
+    static Shader<"mvp"> shadow_mapping_shader(VERTEX_SHADOW_MAPPING_SHADER_TEXT, FRAGMENT_SHADOW_MAPPING_SHADER_TEXT);
+    shadow_mapping_shader.use_shader();
+    shadow_mapping_shader.set_mat4<"mvp">(mvp);
 
     draw_mesh(*mesh, rs);
 }

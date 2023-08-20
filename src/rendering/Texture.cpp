@@ -1,11 +1,8 @@
 #include "rendering/Texture.hpp"
-#include "rendering/shaders/BRDFIntegrationMapperShader.hpp"
-#include "rendering/shaders/EquirectangularMapperShader.hpp"
-#include "rendering/shaders/IrradiancePrecomputerShader.hpp"
-#include "rendering/shaders/SpecularPrefilterShader.hpp"
 #include "rendering/Mesh.hpp"
 #include "NodeProperty.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
+#include "rendering/Shader.hpp"
 
 #include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
@@ -144,7 +141,26 @@ auto draw_to_cubemap(
     return Texture(cubemap_id, cubemap_size, true);
 }
 
-Texture Texture::panorama_to_cubemap(EquirectangularMapperShader& shader) const {
+constexpr std::string_view EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT =
+    #include "shaders/equirectangular_mapper.vert"
+;
+constexpr std::string_view EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT =
+    #include "shaders/equirectangular_mapper.frag"
+;
+using EquirectangularMapperShader = Shader<"mvp">;
+
+static std::unique_ptr<EquirectangularMapperShader> equirectangular_mapper_shader = nullptr;
+static void ensure_equirectangular_mapper_shader_is_initialized() {
+    if (equirectangular_mapper_shader) {
+        return;
+    }
+
+    equirectangular_mapper_shader = std::make_unique<EquirectangularMapperShader>(
+        EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT, EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT
+    );
+}
+
+Texture Texture::panorama_to_cubemap() const {
     if (is_cubemap()) {
         throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
     }
@@ -152,11 +168,15 @@ Texture Texture::panorama_to_cubemap(EquirectangularMapperShader& shader) const 
     const glm::u32vec2 cubemap_size {get_size().x / 2u};
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
+    ensure_equirectangular_mapper_shader_is_initialized();
+    equirectangular_mapper_shader->use_shader();
     return draw_to_cubemap(cubemap_size, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
-        shader.use_shader(mvp, *this);
+        equirectangular_mapper_shader->set_mat4<"mvp">(mvp);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, get_id());
 
         cube_mesh->bind_vao(false, false, false);
-        
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
 
@@ -164,16 +184,39 @@ Texture Texture::panorama_to_cubemap(EquirectangularMapperShader& shader) const 
     });
 }
 
+constexpr std::string_view IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT =
+    #include "shaders/irradiance_precomputer.vert"
+;
+constexpr std::string_view IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT =
+    #include "shaders/irradiance_precomputer.frag"
+;
+using IrradiancePrecomputerShader = Shader<"mvp">;
+
+static std::unique_ptr<EquirectangularMapperShader> irradiance_precomputer_shader = nullptr;
+static void ensure_irradiance_precomputer_shader_is_initialized() {
+    if (irradiance_precomputer_shader) {
+        return;
+    }
+
+    irradiance_precomputer_shader = std::make_unique<IrradiancePrecomputerShader>(
+        IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT, IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT
+    );
+}
+
 constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {16u, 16u};
-Texture Texture::compute_irradiance_map(IrradiancePrecomputerShader& shader) const {
+Texture Texture::compute_irradiance_map() const {
     if (!is_cubemap()) {
         throw std::runtime_error("Unable to compute irradiance map because the given environment map is not cubemap.");
     }
 
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
-    
+
+    ensure_irradiance_precomputer_shader_is_initialized();
+    irradiance_precomputer_shader->use_shader();
     return draw_to_cubemap(IRRADIANCE_MAP_SIZE, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
-        shader.use_shader(mvp, *this);
+        irradiance_precomputer_shader->set_mat4<"mvp">(mvp);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, get_id());
 
         cube_mesh->bind_vao(false, false, false);
 
@@ -184,18 +227,42 @@ Texture Texture::compute_irradiance_map(IrradiancePrecomputerShader& shader) con
     });
 }
 
+constexpr std::string_view SPECULAR_PREFILTER_VERTEX_SHADER_TEXT =
+    #include "shaders/specular_prefilter.vert"
+;
+constexpr std::string_view SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT =
+    #include "shaders/specular_prefilter.frag"
+;
+using SpecularPrefilterShader = Shader<"mvp", "roughness">;
+
+static std::unique_ptr<SpecularPrefilterShader> specular_prefilter_shader = nullptr;
+static void ensure_specular_prefilter_shader_is_initialized() {
+    if (specular_prefilter_shader) {
+        return;
+    }
+
+    specular_prefilter_shader = std::make_unique<SpecularPrefilterShader>(
+        SPECULAR_PREFILTER_VERTEX_SHADER_TEXT, SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT
+    );
+}
+
 constexpr glm::u32vec2 SPECULAR_MAP_SIZE {256u, 256u};
 constexpr std::int32_t SPECULAR_MAP_MIPMAP_LEVELS = 9; // log2(256) + 1. Also change LAST_PREFILTERED_MIPMAP_LEVEL in pbr_shader.frag.
-Texture Texture::compute_prefiltered_specular_map(SpecularPrefilterShader& shader) const {
+Texture Texture::compute_prefiltered_specular_map() const {
     if (!is_cubemap()) {
         throw std::runtime_error("Unable to compute specular map because the given environment map is not cubemap.");
     }
 
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
-    
+
+    ensure_specular_prefilter_shader_is_initialized();
+    specular_prefilter_shader->use_shader();
     return draw_to_cubemap(SPECULAR_MAP_SIZE, SPECULAR_MAP_MIPMAP_LEVELS, [&] (const glm::mat4& mvp, std::int32_t level) {
         float roughness = static_cast<float>(level) / (SPECULAR_MAP_MIPMAP_LEVELS - 1);
-        shader.use_shader(mvp, roughness, *this);
+        specular_prefilter_shader->set_mat4<"mvp">(mvp);
+        specular_prefilter_shader->set_float<"roughness">(roughness);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, get_id());
 
         cube_mesh->bind_vao(false, false, false);
 
@@ -206,8 +273,27 @@ Texture Texture::compute_prefiltered_specular_map(SpecularPrefilterShader& shade
     });
 }
 
+constexpr std::string_view BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT =
+    #include "shaders/brdf_integration_mapper.vert"
+;
+constexpr std::string_view BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT =
+    #include "shaders/brdf_integration_mapper.frag"
+;
+using BRDFIntegrationMapperShader = Shader<>;
+
+static std::unique_ptr<BRDFIntegrationMapperShader> brdf_integration_mapper_shader = nullptr;
+static void ensure_brdf_integration_mapper_shader_is_initialized() {
+    if (brdf_integration_mapper_shader) {
+        return;
+    }
+
+    brdf_integration_mapper_shader = std::make_unique<BRDFIntegrationMapperShader>(
+        BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT, BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT
+    );
+}
+
 constexpr glm::u32vec2 BRDF_INTEGRATION_MAP_SIZE = SPECULAR_MAP_SIZE;
-Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shader) {
+Texture Texture::compute_brdf_integration_map() {
     const auto& quad_mesh = Mesh::get_quad(); // Alias the cube.
 
     // Create and allocate the texture.
@@ -241,7 +327,8 @@ Texture Texture::compute_brdf_integration_map(BRDFIntegrationMapperShader& shade
         texture_id, 0
     );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shader.use_shader();
+    ensure_brdf_integration_mapper_shader_is_initialized();
+    brdf_integration_mapper_shader->use_shader();
 
     quad_mesh->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, quad_mesh->get_amount_of_vertices());
@@ -330,6 +417,7 @@ template<std::size_t ArraySize>
     }
 
     TexLoadingParams params;
+    params.set_to_defaults();
     params.file_path = property.get<std::string>("path");
     params.offset = property.get_optional<std::int64_t>("offset").value_or(0);
     params.size = property.get_optional<std::int64_t>("size").value_or(0);

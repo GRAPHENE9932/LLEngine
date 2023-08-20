@@ -54,12 +54,6 @@ void CameraNode::set_field_of_view(float new_field_of_view) {
     is_cached_proj_matrix_valid = false;
 }
 
-void CameraNode::set_aspect_ratio(float new_aspect_ratio) {
-    aspect_ratio = new_aspect_ratio;
-
-    is_cached_proj_matrix_valid = false;
-}
-
 void CameraNode::on_attachment_to_tree_without_start() {
     SpatialNode::on_attachment_to_tree_without_start();
     get_rendering_server().register_camera_node(this);
@@ -75,7 +69,8 @@ void CameraNode::recompute_view_matrix() noexcept {
 }
 
 void CameraNode::recompute_proj_matrix() noexcept {
-    cached_proj_matrix = glm::perspective(field_of_view, aspect_ratio, 0.1f, 100.0f);
+    const glm::ivec2 window_size = get_rendering_server().get_window().get_window_size();
+    cached_proj_matrix = glm::perspective(field_of_view, static_cast<float>(window_size.x) / window_size.y, 0.1f, 100.0f);
 
     is_cached_proj_matrix_valid = true;
 }

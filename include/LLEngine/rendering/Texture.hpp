@@ -9,10 +9,6 @@
 #include "datatypes.hpp"
 
 namespace llengine {
-class EquirectangularMapperShader;
-class IrradiancePrecomputerShader;
-class SpecularPrefilterShader;
-class BRDFIntegrationMapperShader;
 class NodeProperty;
 
 struct TexLoadingParams {
@@ -134,10 +130,10 @@ public:
 
     [[nodiscard]] static Texture from_property(const NodeProperty& property);
 
-    [[nodiscard]] Texture panorama_to_cubemap(EquirectangularMapperShader& shader) const;
-    [[nodiscard]] Texture compute_irradiance_map(IrradiancePrecomputerShader& shader) const;
-    [[nodiscard]] Texture compute_prefiltered_specular_map(SpecularPrefilterShader& shader) const;
-    [[nodiscard]] static Texture compute_brdf_integration_map(BRDFIntegrationMapperShader& shader);
+    [[nodiscard]] Texture panorama_to_cubemap() const;
+    [[nodiscard]] Texture compute_irradiance_map() const;
+    [[nodiscard]] Texture compute_prefiltered_specular_map() const;
+    [[nodiscard]] static Texture compute_brdf_integration_map();
 
 protected:
     ManagedTextureID texture_id = 0; // ID of value 0 implies that there are no texture.

@@ -13,7 +13,7 @@
 namespace llengine {
 class TextNode : public GUINode {
 public:
-    TextNode();
+    TextNode() = default;
 
     [[nodiscard]] GUITransform get_transform() const override;
     [[nodiscard]] glm::vec2 get_absolute_size() const override;
@@ -59,11 +59,12 @@ private:
     std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
     std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
 
-    ShaderType shader;
+    inline static std::unique_ptr<ShaderType> shader = nullptr;
 
     void add_line(
         glm::vec2 offset, std::string_view line,
         std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs
     );
+    static void ensure_shader_is_initialized();
 };
 }

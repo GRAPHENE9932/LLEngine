@@ -120,14 +120,18 @@ void GUINode::draw_texture_part(
     uv_offset.y += uv_scale.y; // Invert UV's y. If (scale * y) goes from 0 to scale when y goes from 0 to 1,
     uv_scale.y = -uv_scale.y; // then (scale - scale * y) goes from scale to 0.
 
-    
-    get_rendering_server().get_shader_holder().get_gui_rectangle_shader().use_shader(
-        texture, mvp, uv_scale, uv_offset, {1.0f, 1.0f, 1.0f, 1.0f}
-    );
+    ensure_shader_is_initialized();
+    shader->use_shader();
+    shader->set_mat4<"mvp">(mvp);
+    shader->set_vec2<"uv_scale">(uv_scale);
+    shader->set_vec2<"uv_offset">(uv_offset);
+    shader->set_vec4<"color_factor">({1.0f, 1.0f, 1.0f, 1.0f});
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture.get_id());
 
     auto mesh = Mesh::get_quad();
     mesh->bind_vao(true, false, false);
-    
+
     if (mesh->is_indexed()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, mesh->get_amount_of_vertices(), mesh->get_indices_type(), 0);
@@ -295,4 +299,19 @@ void GUINode::remove_children_from_queue() {
     }
 
     children_queued_to_remove.clear();
+}
+
+constexpr std::string_view VERTEX_SHADER_TEXT =
+    #include "shaders/gui_rectangle.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/gui_rectangle.frag"
+;
+
+void GUINode::ensure_shader_is_initialized() {
+    if (shader) {
+        return;
+    }
+
+    shader = std::make_unique<ShaderType>(VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT);
 }

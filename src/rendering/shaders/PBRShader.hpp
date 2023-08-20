@@ -3,6 +3,7 @@
 #include "nodes/rendering/PointLightNode.hpp" // PointLightNode
 #include "rendering/Material.hpp"
 #include "rendering/Skybox.hpp"
+#include "rendering/Shader.hpp"
 #include "datatypes.hpp"
 
 #include <glm/vec4.hpp> // glm::vec4
@@ -81,59 +82,29 @@ public:
     ShaderID get_program_id() const noexcept;
 
     inline bool is_initialized() const noexcept {
-        return program_id != 0;
-    }
-    inline uint32_t get_point_lights_count() const noexcept {
-        return point_light_ids.size();
+        return shader.has_value();
     }
 
 private:
-    ShaderID program_id = 0;
+    using ShaderType = Shader<
+        "mvp", "model_matrix", "normal_matrix", "ambient", "camera_position",
+        "base_color_factor", "normal_map_scale", "metallic_factor", "roughness_factor",
+        "ao_factor", "uv_offset", "uv_scale",
+        "base_uv_offset", "base_uv_scale", "normal_uv_offset", "normal_uv_scale",
+        "metallic_uv_offset", "metallic_uv_scale", "roughness_uv_offset",
+        "roughness_uv_scale", "ao_uv_offset", "ao_uv_scale", "dir_light_view_proj_matrix",
+        "shadow_map_bias_at_45_deg", "dir_light_direction", "base_color_texture",
+        "normal_texture", "ao_texture", "metallic_texture", "roughness_texture",
+        "emissive_texture", "prefiltered_specular_map", "irradiance_map",
+        "brdf_integration_map", "shadow_map", "point_lights[].position",
+        "point_lights[].color"
+    >;
+    std::optional<ShaderType> shader = std::nullopt;
 
     Flags flags = NO_FLAGS;
     Channel metallic_channel = Channel::NONE;
     Channel roughness_channel = Channel::NONE;
     Channel ao_channel = Channel::NONE;
-
-    ShaderUniformID mvp_id = -1;
-    ShaderUniformID model_matrix_id = -1;
-    ShaderUniformID normal_matrix_id = -1;
-    ShaderUniformID ambient_id = -1;
-    ShaderUniformID camera_position_id = -1;
-    ShaderUniformID base_color_factor_id = -1;
-    ShaderUniformID normal_scale_id = -1;
-    ShaderUniformID metallic_factor_id = -1;
-    ShaderUniformID roughness_factor_id = -1;
-    ShaderUniformID ao_factor_id = -1;
-    ShaderUniformID uv_offset_id = -1;
-    ShaderUniformID uv_scale_id = -1;
-    ShaderUniformID base_uv_offset_id = -1;
-    ShaderUniformID base_uv_scale_id = -1;
-    ShaderUniformID normal_uv_offset_id = -1;
-    ShaderUniformID normal_uv_scale_id = -1;
-    ShaderUniformID metallic_uv_offset_id = -1;
-    ShaderUniformID metallic_uv_scale_id = -1;
-    ShaderUniformID roughness_uv_offset_id = -1;
-    ShaderUniformID roughness_uv_scale_id = -1;
-    ShaderUniformID ao_uv_offset_id = -1;
-    ShaderUniformID ao_uv_scale_id = -1;
-    ShaderUniformID dir_light_view_proj_matrix_id = -1;
-    ShaderUniformID shadow_map_bias_at_45_deg_id = -1;
-    ShaderUniformID dir_light_direction_id = -1;
-
-    ShaderUniformID base_color_texture_uniform_id = -1;
-    ShaderUniformID normal_map_texture_uniform_id = -1;
-    ShaderUniformID ao_texture_uniform_id = -1;
-    ShaderUniformID metallic_texture_uniform_id = -1;
-    ShaderUniformID roughness_texture_uniform_id = -1;
-    ShaderUniformID emissive_texture_uniform_id = -1;
-    ShaderUniformID prefiltered_specular_map_uniform_id = -1;
-    ShaderUniformID brdf_integration_map_uniform_id = -1;
-    ShaderUniformID irradiance_map_uniform_id = -1;
-    ShaderUniformID shadow_map_uniform_id = -1;
-
-    std::set<PointLightNode::Uniforms> point_light_ids;
-
-    void initialize_uniforms(const Parameters& params);
+    std::int32_t point_lights_count = 0;
 };
 }

@@ -3,9 +3,6 @@
 #include <set> // std::set
 #include <type_traits> // std::true_type
 
-#include "EquirectangularMapperShader.hpp"
-#include "ColoredTextShader.hpp"
-#include "SkyboxShader.hpp"
 #include "PBRShader.hpp"
 #include "datatypes.hpp"
 

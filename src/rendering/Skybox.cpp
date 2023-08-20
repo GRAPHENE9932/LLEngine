@@ -8,6 +8,13 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT =
+    #include "shaders/skybox.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/skybox.frag"
+;
+
 Skybox::Skybox(Skybox&& other) noexcept :
     Skybox(std::move(other.cubemap_texture)) {}
 
@@ -25,8 +32,12 @@ void Skybox::draw(RenderingServer& rs) {
     // Uniforms.
     const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());
     const glm::mat4 mvp = rs.get_proj_matrix() * view_without_translation;
-    
-    rs.get_shader_holder().get_skybox_shader().use_shader(mvp, *cubemap_texture);
+
+    ensure_shader_is_initialized();
+    shader->use_shader();
+    shader->set_mat4<"mvp">(mvp);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture->get_id());
 
     cube_mesh->bind_vao(false, false, false);
 
@@ -35,4 +46,12 @@ void Skybox::draw(RenderingServer& rs) {
     rs.report_about_drawn_triangles(cube_mesh->get_amount_of_vertices() / 3);
 
     cube_mesh->unbind_vao();
+}
+
+void Skybox::ensure_shader_is_initialized() {
+    if (shader) {
+        return;
+    }
+
+    shader = std::make_unique<ShaderType>(VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT);
 }
