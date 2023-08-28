@@ -56,7 +56,7 @@ uniform sampler2D normal_texture;
 uniform sampler2D metallic_texture;
 uniform sampler2D roughness_texture;
 uniform sampler2D ao_texture;
-uniform sampler2D shadow_map;
+uniform sampler2DShadow shadow_map;
 uniform samplerCube irradiance_map;
 uniform samplerCube prefiltered_specular_map;
 uniform sampler2D brdf_integration_map;
@@ -67,6 +67,7 @@ uniform float metallic_factor;
 uniform float roughness_factor;
 uniform float ao_factor;
 uniform vec3 ambient;
+uniform float pcf_sparsity;
 #if POINT_LIGHTS_COUNT > 0
     uniform PointLight point_lights[POINT_LIGHTS_COUNT];
 #endif
@@ -218,15 +219,26 @@ float get_ao() {
 }
 
 #ifdef USING_SHADOW_MAP
+    float sample_shadow(vec3 projection_clip_space) {
+        float real_depth = projection_clip_space.z - shadow_map_bias;
+        return texture(shadow_map, vec3(projection_clip_space.xy, real_depth));
+    }
+
     float compute_shadow_coefficient() {
         vec3 projection_clip_space = dir_light_space_frag_pos.xyz / dir_light_space_frag_pos.w;
         projection_clip_space = projection_clip_space * 0.5 + 0.5; // Convert from [-1; 1] range to [0; 1].
 
-        float closest_depth = texture(shadow_map, projection_clip_space.xy).r;
-        float real_depth = projection_clip_space.z - shadow_map_bias;
-        float shadow_coeff = closest_depth > real_depth ? 1.0 : 0.0;
+        float shadow_coeff = 0.0;
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                vec3 cur = projection_clip_space;
+                cur.x += (x - 1) * pcf_sparsity;
+                cur.y += (y - 1) * pcf_sparsity;
+                shadow_coeff += sample_shadow(cur);
+            }
+        }
 
-        return shadow_coeff;
+        return shadow_coeff * 0.111111;
     }
 #endif
 
@@ -255,7 +267,7 @@ float geometric_shadowing_schlick_ggx(float n_dot_v, float roughness) {
     float r = (roughness + 1.0);
     float k = (r * r) / 8.0;
     float denominator = n_dot_v * (1.0 - k) + k;
-	
+
     return n_dot_v / denominator;
 }
 
@@ -264,7 +276,7 @@ float geometric_shadowing_smith(vec3 n, vec3 v, vec3 l, float roughness) {
     float n_dot_l = max(dot(n, l), 0.0);
     float ggx_1  = geometric_shadowing_schlick_ggx(n_dot_l, roughness);
     float ggx_2  = geometric_shadowing_schlick_ggx(n_dot_v, roughness);
-	
+
     return ggx_1 * ggx_2;
 }
 
@@ -318,7 +330,7 @@ void main() {
     #else
         lightning_result = ambient * get_ao();
     #endif
-    
+
     #if POINT_LIGHTS_COUNT > 0
         for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
             // Calculate vectors that we will need later.
@@ -331,8 +343,8 @@ void main() {
             vec3 radiance = point_lights[i].color * attenuation;
 
             // Compute surface reflection ratio.
-            vec3 reflection_ratio = fresnel_schlick(max(dot(halfway, view_direction), 0.0), refl_ratio_at_zero_inc);   
-            // Compute results of the normal distribution function and the geometric shadowing function.        
+            vec3 reflection_ratio = fresnel_schlick(max(dot(halfway, view_direction), 0.0), refl_ratio_at_zero_inc);
+            // Compute results of the normal distribution function and the geometric shadowing function.
             float ndf = normal_distribution_ggx(get_roughness(), get_normal(), halfway);
             float gsf = geometric_shadowing_smith(get_normal(), view_direction, light_direction, get_roughness());
 

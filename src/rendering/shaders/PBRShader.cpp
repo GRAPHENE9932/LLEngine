@@ -253,6 +253,10 @@ void PBRShader::use_shader(
     if (shader->is_uniform_initialized<"shadow_map_bias_at_45_deg">()) {
         shader->set_float<"shadow_map_bias_at_45_deg">(rs.get_adjusted_shadow_map_bias_at_45_deg());
     }
+    if (shader->is_uniform_initialized<"pcf_sparsity">()) {
+        assert(rs.get_shadow_map_size().x == rs.get_shadow_map_size().y);
+        shader->set_float<"pcf_sparsity">(1.0f / rs.get_shadow_map_size().x);
+    }
     if (shader->is_uniform_initialized<"dir_light_direction">()) {
         shader->set_vec3<"dir_light_direction">(rs.get_dir_light_direction());
     }

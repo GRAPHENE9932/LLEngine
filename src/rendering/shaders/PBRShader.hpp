@@ -96,7 +96,7 @@ private:
         "shadow_map_bias_at_45_deg", "dir_light_direction", "base_color_texture",
         "normal_texture", "ao_texture", "metallic_texture", "roughness_texture",
         "emissive_texture", "prefiltered_specular_map", "irradiance_map",
-        "brdf_integration_map", "shadow_map", "point_lights[].position",
+        "brdf_integration_map", "shadow_map", "pcf_sparsity", "point_lights[].position",
         "point_lights[].color"
     >;
     std::optional<ShaderType> shader = std::nullopt;
