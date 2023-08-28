@@ -25,6 +25,9 @@ public:
 
     void set_field_of_view(float new_field_of_view);
 
+    [[nodiscard]] glm::vec3 get_direction() const;
+    [[nodiscard]] float get_far_distance() const;
+
 protected:
     void on_attachment_to_tree_without_start() override final;
 

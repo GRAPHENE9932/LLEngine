@@ -11,6 +11,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <algorithm>
+
 using namespace llengine;
 
 RenderingServer::RenderingServer(glm::ivec2 window_size) :
@@ -39,7 +41,7 @@ void RenderingServer::main_loop() {
 
         // Invoke callback.
         update_callback(delta_time);
-        
+
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         update_shadow_map();
@@ -98,6 +100,7 @@ void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
     }
 
     set_shadow_map_size(settings.shadow_map_size);
+    set_shadow_drawing_distance(settings.shadow_map_drawing_distance);
 }
 
 void RenderingServer::register_drawable(Drawable* drawable) noexcept {
@@ -182,12 +185,64 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return get_proj_matrix() * get_view_matrix();
 }
 
+[[nodiscard]] std::array<glm::vec4, 8> RenderingServer::get_camera_frustrum_corners(float max_distance) const {
+    assert(camera != nullptr);
+
+    const glm::mat4 proj_inverse = glm::inverse(get_proj_matrix());
+    const glm::mat4 view_inverse = glm::inverse(get_view_matrix());
+    const float far_corners_coeff = std::min(max_distance / camera->get_far_distance(), 1.0f);
+
+    std::array<glm::vec4, 8> result;
+    for (std::uint8_t corner_index = 0; corner_index < 8; corner_index++) {
+        glm::vec4 corner {
+            corner_index & 0x01 ? 1.0 : -1.0,
+            corner_index & 0x02 ? 1.0 : -1.0,
+            corner_index & 0x04 ? 1.0 : -1.0,
+            1.0f
+        };
+
+        corner = proj_inverse * corner;
+        if ((corner_index & 0x04)) {
+            corner.x *= far_corners_coeff;
+            corner.y *= far_corners_coeff;
+            corner.z *= far_corners_coeff;
+        }
+        corner = view_inverse * corner;
+
+        result[corner_index] = corner / corner.w;
+    }
+
+    return result;
+}
+
+[[nodiscard]] glm::vec4 compute_average_vector(const std::array<glm::vec4, 8>& vectors) {
+    glm::vec4 result {0.0f, 0.0f, 0.0f, 0.0f};
+    for (const glm::vec4 cur_vec : vectors) {
+        result += cur_vec * (1.0f / 8.0f);
+    }
+    return result;
+}
+
+constexpr float SHADOW_CAMERA_CLEARANCE = 25.0f;
+
 [[nodiscard]] glm::mat4 RenderingServer::get_dir_light_view_proj_matrix() const {
-    const glm::mat4 projection { glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 50.0f) };
+    const auto camera_frustrum_corners = get_camera_frustrum_corners(shadow_map_drawing_distance * 2.0f);
+    const glm::vec3 camera_frustrum_center = glm::vec3(compute_average_vector(camera_frustrum_corners));
+    glm::vec3 flat_frustrum_center {camera_frustrum_center.x, 0.0f, camera_frustrum_center.z};
+
     const glm::mat4 view { glm::lookAt(
-        -dir_light_direction * 30.0f,
-        {0.0f, 0.0f, 0.0f},
+        -dir_light_direction * SHADOW_CAMERA_CLEARANCE + flat_frustrum_center,
+        flat_frustrum_center,
         {0.0f, 1.0f, 0.0f}
+    ) };
+
+    const glm::mat4 projection { glm::ortho(
+        -shadow_map_drawing_distance,
+        shadow_map_drawing_distance,
+        -shadow_map_drawing_distance,
+        shadow_map_drawing_distance,
+        camera_frustrum_center.y - SHADOW_CAMERA_CLEARANCE * 2.0f,
+        camera_frustrum_center.y + SHADOW_CAMERA_CLEARANCE * 2.0f
     ) };
 
     return projection * view;
@@ -255,6 +310,10 @@ void RenderingServer::set_shadow_map_size(glm::u32vec2 new_size) {
     }
 
     return dir_light_direction;
+}
+
+void RenderingServer::set_shadow_drawing_distance(float new_distance) {
+    shadow_map_drawing_distance = new_distance;
 }
 
 std::optional<std::reference_wrapper<const Texture>>

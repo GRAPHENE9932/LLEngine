@@ -154,6 +154,7 @@ public:
     [[nodiscard]] glm::u32vec2 get_shadow_map_size() const;
     void set_shadow_map_size(glm::u32vec2 new_size);
     [[nodiscard]] glm::vec3 get_dir_light_direction() const;
+    void set_shadow_drawing_distance(float new_distance);
 
     [[nodiscard]] const std::vector<PointLightNode*>& get_point_lights() const noexcept {
         return point_lights;
@@ -208,6 +209,7 @@ private:
     ManagedTextureID shadow_map_texture_id = 0;
     float shadow_map_bias_at_45_deg = 0.0008f;
     glm::u32vec2 shadow_map_size { 1024, 1024 };
+    float shadow_map_drawing_distance = 20.0f;
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
@@ -227,5 +229,7 @@ private:
     void initialize_shadow_map();
     void update_shadow_map();
     void delete_shadow_map();
+
+    [[nodiscard]] std::array<glm::vec4, 8> get_camera_frustrum_corners(float max_distance) const;
 };
 }
