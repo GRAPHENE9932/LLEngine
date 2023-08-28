@@ -377,6 +377,8 @@ void RenderingServer::draw_non_overlay_objects() {
     }
 }
 
+constexpr std::array<float, 4> SHADOW_MAP_BORDER_COLOR {1.0f, 1.0f, 1.0f, 1.0f};
+
 void RenderingServer::initialize_shadow_map() {
     delete_shadow_map();
 
@@ -388,6 +390,7 @@ void RenderingServer::initialize_shadow_map() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, SHADOW_MAP_BORDER_COLOR.data());
     glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map_texture_id, 0);
     glDrawBuffer(GL_NONE);
