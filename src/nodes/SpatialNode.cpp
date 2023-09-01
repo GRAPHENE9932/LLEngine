@@ -45,7 +45,13 @@ void SpatialNode::queue_remove_child(SpatialNode* const ptr) {
         throw std::invalid_argument("Can't remove a non-existent child.");
     }
 
-    children_queued_to_remove.push_back(ptr);
+    if (
+        std::find(
+            children_queued_to_remove.begin(), children_queued_to_remove.end(), ptr
+        ) == children_queued_to_remove.end()
+    ) {
+        children_queued_to_remove.push_back(ptr);
+    }
 }
 
 SpatialNode* SpatialNode::get_parent() const {
@@ -110,7 +116,7 @@ void SpatialNode::internal_update() {
 
 void SpatialNode::on_attachment_to_tree_without_start() {
     Node::on_attachment_to_tree_without_start();
-    
+
     std::for_each(
         children.begin(), children.end(),
         [] (const auto& child) {
