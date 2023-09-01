@@ -55,6 +55,7 @@ set(SOURCES
     src/gui/GUITransform.cpp
     src/SceneFile.cpp
     src/SceneJSON.cpp
+    src/CustomNodeType.cpp
     src/node_registration.cpp
     src/nodes/rendering/SpectatorCameraNode.cpp
     src/nodes/rendering/PBRDrawableNode.cpp
@@ -98,6 +99,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/physics/BulletPhysicsServer.hpp
     include/LLEngine/node_cast.hpp
     include/LLEngine/SceneJSON.hpp
+    include/LLEngine/CustomNodeType.hpp
     include/LLEngine/node_registration.hpp
     include/LLEngine/Event.hpp
     include/LLEngine/SceneFile.hpp

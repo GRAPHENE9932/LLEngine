@@ -79,6 +79,9 @@ public:
     */
     explicit GLTF(std::string_view file_path);
 
-    std::unique_ptr<llengine::Node> to_node(const std::vector<NodeProperty>& properties) const override;
+    [[nodiscard]] std::unique_ptr<llengine::Node> to_node(
+        const std::vector<NodeProperty>& properties = {},
+        const CustomNodeType* node_type = nullptr
+    ) const override;
 };
 }

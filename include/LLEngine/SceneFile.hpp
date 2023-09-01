@@ -3,12 +3,17 @@
 #include "nodes/Node.hpp"
 
 namespace llengine {
+class CustomNodeType;
+
 class SceneFile {
 public:
     virtual ~SceneFile() = default;
 
     static std::unique_ptr<SceneFile> load_from_file(std::string_view file_path);
 
-    virtual std::unique_ptr<Node> to_node(const std::vector<NodeProperty>& properties = {}) const = 0;
+    [[nodiscard]] virtual std::unique_ptr<Node> to_node(
+        const std::vector<NodeProperty>& properties = {},
+        const CustomNodeType* node_type = nullptr
+    ) const = 0;
 };
 }

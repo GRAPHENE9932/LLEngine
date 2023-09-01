@@ -1,4 +1,5 @@
 #include "GLTF.hpp" // GLTF
+#include "node_cast.hpp"
 #include "node_registration.hpp"
 #include "rendering/Mesh.hpp"
 #include "physics/shapes/Shape.hpp"
@@ -31,26 +32,36 @@ bool GLTF::Node::is_rigid_body() const {
 }
 
 std::unique_ptr<SpatialNode> to_node(
-    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
+    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
+    const CustomNodeType* node_type
 );
 
 template<bool with_children = true>
 std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
-    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
+    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
+    const CustomNodeType* node_type
 ) {
     assert(gltf_node.is_drawable());
 
-    auto result = std::make_unique<PBRDrawableNode>(
-        constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
-        constr_env.meshes.at(*gltf_node.mesh_index)
-    );
+    std::unique_ptr<PBRDrawableNode> result = nullptr;
+    if (node_type == nullptr) {
+        result = std::make_unique<PBRDrawableNode>(
+            constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index),
+            constr_env.meshes.at(*gltf_node.mesh_index)
+        );
+    }
+    else {
+        result = node_cast<PBRDrawableNode>(node_type->construct_node());
+        result->material = constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index);
+        result->mesh = constr_env.meshes.at(*gltf_node.mesh_index);
+    }
 
     result->set_transform(gltf_node.transform);
     result->set_name(gltf_node.name);
 
     if constexpr (with_children) {
         for (const GLTF::Node& cur_child : gltf_node.children) {
-            result->queue_add_child(to_node(constr_env, cur_child));
+            result->queue_add_child(to_node(constr_env, cur_child, nullptr));
         }
     }
 
@@ -58,14 +69,22 @@ std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
 }
 
 std::unique_ptr<CompleteSpatialNode> construct_complete_spatial(
-    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
+    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
+    const CustomNodeType* node_type
 ) {
-    auto result = std::make_unique<CompleteSpatialNode>(gltf_node.transform);
+    std::unique_ptr<CompleteSpatialNode> result = nullptr;
+    if (node_type == nullptr) {
+        result = std::make_unique<CompleteSpatialNode>(gltf_node.transform);
+    }
+    else {
+        result = node_cast<CompleteSpatialNode>(node_type->construct_node());
+        result->set_transform(gltf_node.transform);
+    }
 
     result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->queue_add_child(to_node(constr_env, cur_child));
+        result->queue_add_child(to_node(constr_env, cur_child, nullptr));
     }
 
     return result;
@@ -121,11 +140,18 @@ std::shared_ptr<Shape>& extract_shape(
 }
 
 std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
-    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
+    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
+    const CustomNodeType* node_type
 ) {
     assert(gltf_node.is_rigid_body());
 
-    auto result = std::make_unique<BulletRigidBodyNode>();
+    std::unique_ptr<BulletRigidBodyNode> result = nullptr;
+    if (node_type == nullptr) {
+        result = std::make_unique<BulletRigidBodyNode>();
+    }
+    else {
+        result = node_cast<BulletRigidBodyNode>(node_type->construct_node());
+    }
     result->set_mass(get_optional<float>(gltf_node.extras.value(), "mass").value_or(0.0f));
     result->set_transform(gltf_node.transform);
     result->set_shape(extract_shape(constr_env, gltf_node));
@@ -133,7 +159,7 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     if (gltf_node.is_drawable()) {
         // If our GLTF::Node is rigid body and drawable at the same time,
         // then add the drawable component as a child.
-        auto drawable {construct_pbr_drawable<false>(constr_env, gltf_node)};
+        auto drawable {construct_pbr_drawable<false>(constr_env, gltf_node, nullptr)};
         drawable->set_transform(Transform());
         drawable->set_name(drawable->get_name() + "_drawable");
 
@@ -143,23 +169,24 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     result->set_name(gltf_node.name);
 
     for (const GLTF::Node& cur_child : gltf_node.children) {
-        result->queue_add_child(to_node(constr_env, cur_child));
+        result->queue_add_child(to_node(constr_env, cur_child, nullptr));
     }
 
     return result;
 }
 
 std::unique_ptr<SpatialNode> to_node(
-    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
+    ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
+    const CustomNodeType* node_type
 ) {
     if (gltf_node.is_rigid_body()) {
-        return construct_bullet_rigid_body(constr_env, gltf_node);
+        return construct_bullet_rigid_body(constr_env, gltf_node, node_type);
     }
     else if (gltf_node.is_drawable()) {
-        return construct_pbr_drawable(constr_env, gltf_node);
+        return construct_pbr_drawable(constr_env, gltf_node, node_type);
     }
     else {
-        return construct_complete_spatial(constr_env, gltf_node);
+        return construct_complete_spatial(constr_env, gltf_node, node_type);
     }
 }
 
@@ -174,7 +201,7 @@ std::shared_ptr<Mesh> construct_mesh(const GLTF::MeshParameters& mesh_params) {
     }
 
     result->set_vertices(mesh_params.vertices);
-    
+
     if (mesh_params.uvs.has_value()) {
         result->set_uvs(*mesh_params.uvs);
     }
@@ -232,7 +259,7 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
 
     result->metallic_texture = construct_texture_info(mat_params.metallic_texture, textures);
     result->metallic_factor = mat_params.metallic_factor;
-    
+
     result->roughness_texture = construct_texture_info(mat_params.roughness_texture, textures);
     result->roughness_factor = mat_params.roughness_factor;
 
@@ -249,7 +276,10 @@ std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_
     return result;
 }
 
-std::unique_ptr<::Node> GLTF::to_node(const std::vector<NodeProperty>& properties) const {
+[[nodiscard]] std::unique_ptr<::Node> GLTF::to_node(
+    const std::vector<NodeProperty>& properties,
+    const CustomNodeType* node_type
+) const {
     // Construct meshes.
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(this->meshes.size());
@@ -282,22 +312,33 @@ std::unique_ptr<::Node> GLTF::to_node(const std::vector<NodeProperty>& propertie
 
     // Convert glTF to node.
     if (this->nodes.size() == 1) {
-        result = ::to_node(constr_env, this->nodes[0]);
+        result = ::to_node(constr_env, this->nodes[0], node_type);
     }
     else if (this->nodes.size() > 1) {
         // We have multiple root nodes in this glTF, but
         // we must return only one root node.
         // So, create the spatial node with default
         // transform and make it root.
-        result = std::make_unique<CompleteSpatialNode>(Transform());
+        if (node_type == nullptr) {
+            result = std::make_unique<CompleteSpatialNode>(Transform());
+        }
+        else {
+            result = node_type->construct_node();
+        }
+
         for (const auto& cur_gltf_node : this->nodes) {
-            result->queue_add_child(::to_node(constr_env, cur_gltf_node));
+            result->queue_add_child(::to_node(constr_env, cur_gltf_node, nullptr));
         }
     }
     else {
         // If there are 0 nodes, then just create a complete spatial node
         // with identity transform.
-        result = std::make_unique<CompleteSpatialNode>(Transform());
+        if (node_type == nullptr) {
+            result = std::make_unique<CompleteSpatialNode>(Transform());
+        }
+        else {
+            result = node_type->construct_node();
+        }
     }
 
     set_properties_to_node(*result, properties);

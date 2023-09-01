@@ -17,77 +17,6 @@ enum NodeRegistrationState : std::uint8_t {
 std::map<std::string, CustomNodeType> custom_nodes_map;
 NodeRegistrationState node_registration_state = REGISTRATION_NOT_BEGUN;
 
-[[nodiscard]] std::unique_ptr<Node> CustomNodeType::construct_node() const {
-    return holder->construct();
-}
-
-void CustomNodeType::add_setter(std::string_view name, PropertySetter&& setter) {
-    property_setters.insert(std::make_pair(name, std::move(setter)));
-}
-
-bool CustomNodeType::call_setter(Node& node, const NodeProperty& property) {
-    auto iter = property_setters.find(std::string(property.get_name()));
-    if (iter != property_setters.end()) {
-        iter->second.call(node, property);
-        return true;
-    }
-
-    if (auto parent = get_parent()) {
-        return parent->call_setter(node, property);
-    }
-
-    return false;
-}
-
-[[nodiscard]] bool CustomNodeType::has_setter_for(std::string_view name) const {
-    if (property_setters.contains(std::string(name))) {
-        return true;
-    }
-
-    if (auto parent = get_parent()) {
-        return parent->has_setter_for(name);
-    }
-
-    return false;
-}
-
-[[nodiscard]] bool CustomNodeType::has_own_setter_for(std::string_view name) const {
-    return property_setters.contains(std::string(name));
-}
-
-[[nodiscard]] bool CustomNodeType::is_parent_of(const CustomNodeType& other) const {
-    if (std::holds_alternative<CustomNodeType*>(other.parent)) {
-        if (std::get<CustomNodeType*>(other.parent) == nullptr) {
-            return false;
-        }
-        
-        return *this == *std::get<CustomNodeType*>(other.parent);
-    }
-    else {
-        return this->get_type_index() == std::get<std::type_index>(other.parent);
-    }
-}
-
-[[nodiscard]] std::type_index CustomNodeType::get_type_index() const {
-    return holder->get_type_info();
-}
-
-void CustomNodeType::assign_parent(CustomNodeType* parent) {
-    this->parent = parent;
-}
-
-[[nodiscard]] CustomNodeType* CustomNodeType::get_parent() const {
-    return std::get<CustomNodeType*>(parent);
-}
-
-[[nodiscard]] bool CustomNodeType::operator==(const CustomNodeType& other) const {
-    return holder->get_type_info() == other.holder->get_type_info();
-}
-
-[[nodiscard]] bool CustomNodeType::operator!=(const CustomNodeType &other) const {
-    return !(*this == other);
-}
-
 void llengine::begin_nodes_registration() {
     if (node_registration_state == REGISTRATION_BEGUN) {
         throw std::runtime_error("Can not begin nodes registration because it was already begun.");
@@ -146,18 +75,33 @@ void internal::add_node_setter(std::string_view node_type_name, std::string_view
     iter->second.add_setter(property_name, std::move(setter));
 }
 
-[[nodiscard]] std::unique_ptr<Node> llengine::construct_node(std::string_view node_type_name) {
-    return custom_nodes_map.at(std::string(node_type_name)).construct_node();
+const CustomNodeType& internal::find_custom_node_type_by_type_index(std::type_index type_index) {
+    const auto iter = std::find_if(
+        custom_nodes_map.begin(), custom_nodes_map.end(),
+        [&type_index] (const auto& pair) {
+            return pair.second.get_type_index() == type_index;
+        }
+    );
+
+    if (iter == custom_nodes_map.end()) {
+        throw std::runtime_error("Tried to find a non-existent custom node type.");
+    }
+
+    return iter->second;
 }
 
 [[nodiscard]] std::unique_ptr<Node> llengine::construct_node(std::string_view node_type_name, const std::vector<NodeProperty>& properties) {
     CustomNodeType& type = custom_nodes_map.at(std::string(node_type_name));
-    std::unique_ptr<Node> result = type.construct_node();
+    return construct_node(type, properties);
+}
+
+[[nodiscard]] std::unique_ptr<Node> llengine::construct_node(const CustomNodeType& node_type, const std::vector<NodeProperty>& properties) {
+    std::unique_ptr<Node> result = node_type.construct_node();
     for (const auto& property : properties) {
-        if (!type.call_setter(*result, property)) {
+        if (!node_type.call_setter(*result, property)) {
             logger::warning(fmt::format(
-                "Tried to set inexistent/unregistered property \"{}\" to a node of type \"{}\"",
-                property.get_name(), node_type_name
+                "Tried to set inexistent/unregistered property \"{}\" to a node.",
+                property.get_name()
             ));
         }
     }

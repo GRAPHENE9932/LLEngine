@@ -188,7 +188,7 @@ SceneJSON::SceneJSON(std::string_view json_path) {
     root_node_data = initialize_root_node_data(root_json.at("nodes"));
 }
 
-std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
+std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data, const CustomNodeType* node_type) {
     std::unique_ptr<Node> result = nullptr;
 
     if (data.type == "scene_file") {
@@ -203,7 +203,7 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
         }
         std::string scene_file_path = prop_iter->get<std::string>();
 
-        result = SceneFile::load_from_file(scene_file_path)->to_node();
+        result = SceneFile::load_from_file(scene_file_path)->to_node({}, node_type);
 
         auto node_name = find_node_type_name(*result);
         if (node_name.has_value()) {
@@ -217,18 +217,26 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data) {
         }
     }
     else {
-        result = construct_node(data.type, data.properties);
+        if (node_type == nullptr) {
+            result = construct_node(data.type, data.properties);
+        }
+        else {
+            result = construct_node(*node_type, data.properties);
+        }
     }
-    
+
     for (const auto& child_data : data.children) {
-        auto child_ptr = to_node(child_data);
+        auto child_ptr = to_node(child_data, nullptr);
         result->queue_add_child(std::move(child_ptr));
     }
     return std::move(result);
 }
 
-std::unique_ptr<Node> SceneJSON::to_node(const std::vector<NodeProperty>& properties) const {
-    std::unique_ptr<Node> result = ::to_node(root_node_data);
+[[nodiscard]] std::unique_ptr<Node> SceneJSON::to_node(
+    const std::vector<NodeProperty>& properties,
+    const CustomNodeType* node_type
+) const {
+    std::unique_ptr<Node> result = ::to_node(root_node_data, node_type);
     set_properties_to_node(*result, properties);
     return result;
 }

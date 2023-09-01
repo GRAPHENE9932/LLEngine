@@ -17,7 +17,10 @@ public:
 
     SceneJSON(std::string_view json_path);
 
-    std::unique_ptr<Node> to_node(const std::vector<NodeProperty>& properties = {}) const override;
+    std::unique_ptr<Node> to_node(
+        const std::vector<NodeProperty>& properties = {},
+        const CustomNodeType* node_type = nullptr
+    ) const override;
 
 private:
     NodeData root_node_data;
