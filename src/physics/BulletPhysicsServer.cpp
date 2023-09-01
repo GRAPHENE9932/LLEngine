@@ -27,7 +27,41 @@ void BulletPhysicsServer::do_step(float delta_time) {
         cur_rigid_body->before_simulation_step();
     }
 
+    bool must_check_for_collisions = false;
+    for (const BulletRigidBodyNode* body : rigid_bodies) {
+        if (body->is_contact_checking_enabled()) {
+            must_check_for_collisions = true;
+            break;
+        }
+    }
+
+    if (must_check_for_collisions) {
+        check_for_contacts();
+    }
+
     dynamics_world->stepSimulation(delta_time);
+}
+
+void BulletPhysicsServer::check_for_contacts() const {
+    int manifolds_count = dynamics_world->getDispatcher()->getNumManifolds();
+    for (int i = 0; i < manifolds_count; i++) {
+        btPersistentManifold* manifold = dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
+        const btCollisionObject* body_0 = static_cast<const btCollisionObject*>(manifold->getBody0());
+        const btCollisionObject* body_1 = static_cast<const btCollisionObject*>(manifold->getBody1());
+
+        BulletRigidBodyNode* node_0 = find_body_node_from_bt_object(body_0);
+        BulletRigidBodyNode* node_1 = find_body_node_from_bt_object(body_1);
+        if (!(node_0 && node_1)) {
+            continue;
+        }
+
+        if (node_0->is_contact_checking_enabled()) {
+            node_0->on_contact(*node_1);
+        }
+        if (node_1->is_contact_checking_enabled()) {
+            node_1->on_contact(*node_0);
+        }
+    }
 }
 
 void BulletPhysicsServer::register_rigid_body(BulletRigidBodyNode* rigid_body_node) {
@@ -68,4 +102,21 @@ void BulletPhysicsServer::set_gravity(const glm::vec3& gravity) {
 
     btVector3 bt_point = bt_from.lerp(bt_to, result.m_closestHitFraction);
     return bullet_vec3_to_glm<float>(bt_point);
+}
+
+[[nodiscard]] llengine::BulletRigidBodyNode*
+BulletPhysicsServer::find_body_node_from_bt_object(const btCollisionObject* bt_object) const {
+    const auto iter = std::find_if(
+        rigid_bodies.begin(),
+        rigid_bodies.end(),
+        [&bt_object] (llengine::BulletRigidBodyNode* node) -> bool {
+            return static_cast<btCollisionObject*>(node->get_bt_rigid_body()) == bt_object;
+        }
+    );
+
+    if (iter == rigid_bodies.end()) {
+        return nullptr;
+    }
+
+    return *iter;
 }

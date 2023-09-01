@@ -12,6 +12,7 @@ class btCollisionDispatcher;
 class btDiscreteDynamicsWorld;
 class btDefaultCollisionConfiguration;
 class btSequentialImpulseConstraintSolver;
+class btCollisionObject;
 
 namespace llengine {
 class BulletRigidBodyNode;
@@ -57,5 +58,8 @@ private:
     std::unique_ptr<btDiscreteDynamicsWorld> dynamics_world;
 
     std::vector<BulletRigidBodyNode*> rigid_bodies;
+
+    [[nodiscard]] BulletRigidBodyNode* find_body_node_from_bt_object(const btCollisionObject* bt_object) const;
+    void check_for_contacts() const;
 };
 }

@@ -38,7 +38,7 @@ BulletRigidBodyNode::~BulletRigidBodyNode() noexcept {
 void BulletRigidBodyNode::before_simulation_step() {
     if (get_parent()) {
         const auto current_parent_transform {get_parent()->get_global_transform()};
-        
+
         if (current_parent_transform != previous_parent_transform) {
             // Bullet rigid bodies do not obey the node system with relative transforms we have.
             // The consequence is unchanged global position when parent's transform had changed.
@@ -49,6 +49,11 @@ void BulletRigidBodyNode::before_simulation_step() {
             previous_parent_transform = current_parent_transform;
         }
     }
+
+    for (const auto& args : queued_impulse_application_calls) {
+        apply_impulse(args.first, args.second);
+    }
+    queued_impulse_application_calls.clear();
 }
 
 void BulletRigidBodyNode::set_translation(const glm::vec3& new_trans) {
@@ -359,6 +364,17 @@ float BulletRigidBodyNode::get_mass() const noexcept {
     }
 }
 
+void BulletRigidBodyNode::queue_apply_impulse(const glm::vec3& impulse_vector, const glm::vec3& point) {
+    queued_impulse_application_calls.emplace_back(impulse_vector, point);
+}
+
+void BulletRigidBodyNode::apply_impulse(const glm::vec3& impulse_vector, const glm::vec3& point) {
+    get_bt_rigid_body()->applyImpulse(
+        glm_vec3_to_bullet(impulse_vector),
+        glm_vec3_to_bullet(point)
+    );
+}
+
 void BulletRigidBodyNode::create_bullet_body(const Shape& new_shape, const Transform& transform, float new_mass) {
     btTransform bt_transform(
         glm_quat_to_bullet(transform.rotation),
@@ -380,6 +396,14 @@ void BulletRigidBodyNode::create_bullet_body(const Shape& new_shape, const Trans
         local_inertia
     );
     bt_rigid_body = std::make_unique<btRigidBody>(rb_info);
+}
+
+[[nodiscard]] bool BulletRigidBodyNode::is_contact_checking_enabled() const {
+    return check_collisions;
+}
+
+void BulletRigidBodyNode::set_collision_checking_enabled(bool enable) {
+    check_collisions = enable;
 }
 
 void BulletRigidBodyNode::copy_to(Node& node) const {

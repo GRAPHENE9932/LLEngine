@@ -6,6 +6,7 @@
 #include <glm/vec3.hpp>
 
 #include <memory>
+#include <vector>
 
 class btRigidBody;
 class btCollisionShape;
@@ -72,8 +73,13 @@ public:
     void set_mass(float new_mass);
     [[nodiscard]] float get_mass() const noexcept;
 
+    void queue_apply_impulse(const glm::vec3& impulse_vector, const glm::vec3& point = {0.0f, 0.0f, 0.0f});
+
     void set_shape(const Shape& shape);
     void create_bullet_body(const Shape& new_shape, const Transform& transform, float new_mass);
+
+    [[nodiscard]] bool is_contact_checking_enabled() const;
+    void set_collision_checking_enabled(bool enable);
 
     virtual void copy_to(Node& node) const override;
     virtual std::unique_ptr<Node> copy() const override;
@@ -91,5 +97,15 @@ private:
     float cached_set_mass = 0.0f;
     glm::quat cached_set_rotation = glm::quat({0.0f, 0.0f, 0.0f});
     glm::vec3 cached_set_translation = {0.0f, 0.0f, 0.0f};
+
+    bool check_collisions = false;
+
+    std::vector<std::pair<glm::vec3, glm::vec3>> queued_impulse_application_calls;
+
+    virtual void on_contact(BulletRigidBodyNode& collided_body) {}
+
+    void apply_impulse(const glm::vec3& impulse_vector, const glm::vec3& point);
+
+    friend class BulletPhysicsServer;
 };
 }
