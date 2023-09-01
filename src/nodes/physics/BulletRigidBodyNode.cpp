@@ -396,7 +396,6 @@ void BulletRigidBodyNode::copy_to(Node& node) const {
 std::unique_ptr<Node> BulletRigidBodyNode::copy() const {
     std::unique_ptr<Node> result { std::make_unique<BulletRigidBodyNode>() };
     copy_to(*result);
-    auto t = static_cast<BulletRigidBodyNode*>(result.get())->get_transform();
     return result;
 }
 
