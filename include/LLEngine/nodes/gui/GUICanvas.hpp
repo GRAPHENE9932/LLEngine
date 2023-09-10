@@ -25,13 +25,13 @@ public:
     void queue_add_gui_node(std::unique_ptr<GUINode>&& gui_node);
     /**
      * @brief Removes a root GUI node from canvas.
-     * 
+     *
      * @throws std::out_of_range if the specified index is out of range.
      */
     void queue_remove_gui_node(std::size_t index);
     /**
      * @brief Removes a root GUI node from canvas.
-     * 
+     *
      * @throws std::invalid_argument if the specified node is not a child of this canvas.
      */
     void queue_remove_gui_node(GUINode* gui_node);
@@ -67,8 +67,8 @@ protected:
 private:
     bool screen_overlayed = true;
     std::optional<glm::vec2> canvas_size;
-    std::vector<std::unique_ptr<GUINode>> gui_nodes;
     std::vector<GUINode*> all_sorted_gui_nodes;
+    std::vector<std::unique_ptr<GUINode>> gui_nodes;
     std::vector<std::unique_ptr<GUINode>> gui_nodes_queued_to_add;
     std::vector<GUINode*> gui_nodes_queued_to_remove;
 

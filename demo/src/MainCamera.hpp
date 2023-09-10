@@ -8,8 +8,8 @@ public:
     void update() final override;
 
 private:
-    std::unique_ptr<llengine::SpatialNode> barrel = nullptr;
+    std::unique_ptr<llengine::SpatialNode> bullet = nullptr;
     bool clicked_before = false;
 
-    void spawn_barrel() const;
+    void spawn_barrel();
 };

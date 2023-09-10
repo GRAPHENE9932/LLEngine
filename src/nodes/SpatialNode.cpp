@@ -162,23 +162,17 @@ void SpatialNode::add_children_from_queue() {
 }
 
 void SpatialNode::remove_children_from_queue() {
-    if (children_queued_to_remove.empty()) {
-        return;
-    }
+    for (auto child_ptr : children_queued_to_remove) {
+        const auto iter = std::find_if(
+            children.begin(), children.end(), [&child_ptr] (const auto& unique_ptr) {
+                return unique_ptr.get() == child_ptr;
+            }
+        );
 
-    std::size_t handled_children = 0;
-    while (handled_children < children_queued_to_remove.size()) {
-        std::size_t index_in_queue = 0;
-        for (std::size_t index_in_children = 0; index_in_children < children.size();) {
-            if (children[index_in_children].get() == children_queued_to_remove[index_in_queue]) {
-                children.erase(children.begin() + index_in_children);
-                index_in_queue++;
-                handled_children++;
-            }
-            else {
-                index_in_children++;
-            }
+        if (iter == children.end()) {
+            continue;
         }
+        children.erase(iter);
     }
 
     children_queued_to_remove.clear();
