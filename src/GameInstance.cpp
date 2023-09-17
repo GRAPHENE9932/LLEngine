@@ -12,7 +12,7 @@ using namespace llengine;
 GameInstance::GameInstance(const GameSettings& settings) {
     logger::enable_console_logging();
 
-    rendering_server = std::make_unique<RenderingServer>(settings.window_resolution);
+    rendering_server = std::make_unique<RenderingServer>(settings.window_resolution, settings.window_title);
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
     root_node = std::make_unique<RootNode>(*rendering_server, *bullet_physics_server);
@@ -34,7 +34,7 @@ GameInstance::GameInstance(const GameSettings& settings) {
     });
 }
 
-GameInstance::~GameInstance() {    
+GameInstance::~GameInstance() {
 
 };
 

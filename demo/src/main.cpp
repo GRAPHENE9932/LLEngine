@@ -15,6 +15,7 @@ void register_nodes() {
 
 int main() {
     llengine::GameSettings settings;
+    settings.window_title = "LLEngine demo";
     settings.json_scene_path = "res/maps/demo_map.json";
     settings.skybox_path = "res/textures/sky.hdr";
     settings.window_resolution = {1600, 1000};

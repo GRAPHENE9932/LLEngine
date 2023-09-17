@@ -17,8 +17,8 @@
 
 using namespace llengine;
 
-RenderingServer::RenderingServer(glm::ivec2 window_size) :
-    window(GLFWWindow(window_size, "LLShooter", 3, 3)) {
+RenderingServer::RenderingServer(glm::ivec2 window_size, std::string_view window_title) :
+    window(GLFWWindow(window_size, window_title, 3, 3)) {
     main_framebuffer = std::make_unique<MainFramebuffer>(window_size);
     current_default_framebuffer = main_framebuffer.get();
 }

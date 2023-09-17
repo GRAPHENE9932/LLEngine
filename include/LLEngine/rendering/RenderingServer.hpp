@@ -33,7 +33,7 @@ struct SpotLight;
  */
 class RenderingServer {
 public:
-    explicit RenderingServer(glm::ivec2 window_size);
+    explicit RenderingServer(glm::ivec2 window_size, std::string_view window_title = "LLEngine");
     RenderingServer(const RenderingServer& other) = delete;
     RenderingServer(RenderingServer&& other) = delete;
     ~RenderingServer();
