@@ -23,6 +23,7 @@ class RenderingNode;
 class CameraNode;
 class Drawable;
 class GUICanvas;
+class MainFramebuffer;
 struct PointLightNode;
 struct SpotLight;
 
@@ -35,7 +36,7 @@ public:
     explicit RenderingServer(glm::ivec2 window_size);
     RenderingServer(const RenderingServer& other) = delete;
     RenderingServer(RenderingServer&& other) = delete;
-    ~RenderingServer() = default;
+    ~RenderingServer();
 
     RenderingServer& operator=(const RenderingServer& other) = delete;
     RenderingServer& operator=(RenderingServer&& other) = delete;
@@ -192,6 +193,8 @@ public:
 
     [[nodiscard]] const Texture& get_brdf_integration_map();
 
+    [[nodiscard]] static FramebufferID get_current_default_framebuffer_id();
+
 private:
     Window window;
     std::function<void(float)> update_callback;
@@ -203,6 +206,9 @@ private:
     std::chrono::high_resolution_clock::time_point prev_frame_time;
     float delta_time = 1.0f;
     glm::vec3 dir_light_direction {-0.577350f, -0.577350f, -0.577350f};
+
+    std::unique_ptr<MainFramebuffer> main_framebuffer;
+    inline static MainFramebuffer* current_default_framebuffer = nullptr;
 
     bool shadow_mapping_enabled = true;
     ManagedFramebufferID shadow_map_framebuffer;

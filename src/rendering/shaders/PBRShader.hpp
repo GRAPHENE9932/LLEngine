@@ -38,7 +38,9 @@ public:
         USING_AO_TEXTURE = 0x20000,
         USING_AO_FACTOR = 0x40000,
         USING_IBL = 0x80000,
-        USING_SHADOW_MAP = 0x100000
+        USING_SHADOW_MAP = 0x100000,
+        USING_EMISSIVE_TEXTURE = 0x200000,
+        USING_EMISSIVE_FACTOR = 0x400000
     };
 
     friend inline constexpr Flags operator|(Flags left, Flags right) noexcept {
@@ -89,7 +91,7 @@ private:
     using ShaderType = Shader<
         "mvp", "model_matrix", "normal_matrix", "ambient", "camera_position",
         "base_color_factor", "normal_map_scale", "metallic_factor", "roughness_factor",
-        "ao_factor", "uv_offset", "uv_scale",
+        "ao_factor", "emissive_factor", "uv_offset", "uv_scale",
         "base_uv_offset", "base_uv_scale", "normal_uv_offset", "normal_uv_scale",
         "metallic_uv_offset", "metallic_uv_scale", "roughness_uv_offset",
         "roughness_uv_scale", "ao_uv_offset", "ao_uv_scale", "dir_light_view_proj_matrix",

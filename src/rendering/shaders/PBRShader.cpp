@@ -51,6 +51,12 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     if (material.roughness_factor != 1.0f) {
         flags |= PBRShader::USING_ROUGHNESS_FACTOR;
     }
+    if (material.emissive_texture.has_value()) {
+        flags |= PBRShader::USING_EMISSIVE_TEXTURE;
+    }
+    if (material.emissive_factor != glm::vec3(0.0f, 0.0f, 0.0f)) {
+        flags |= PBRShader::USING_EMISSIVE_FACTOR;
+    }
     if (rs.has_environment_cubemap()) {
         flags |= PBRShader::USING_IBL;
     }
@@ -165,6 +171,12 @@ PBRShader::~PBRShader() {
     if (flags & PBRShader::USING_SHADOW_MAP) {
         defines.emplace_back("USING_SHADOW_MAP");
     }
+    if (flags & PBRShader::USING_EMISSIVE_TEXTURE) {
+        defines.emplace_back("USING_EMISSIVE_TEXTURE");
+    }
+    if (flags & PBRShader::USING_EMISSIVE_FACTOR) {
+        defines.emplace_back("USING_EMISSIVE_FACTOR");
+    }
 
     return defines;
 }
@@ -207,6 +219,7 @@ void PBRShader::use_shader(
     }
     shader->set_float<"metallic_factor">(material.metallic_factor);
     shader->set_float<"roughness_factor">(material.roughness_factor);
+    shader->set_vec3<"emissive_factor">(material.emissive_factor);
     shader->set_float<"ao_factor">(material.ambient_occlusion_factor);
     shader->set_mat4<"dir_light_view_proj_matrix">(rs.get_dir_light_view_proj_matrix());
     if (shader->is_uniform_initialized<"uv_offset">() || shader->is_uniform_initialized<"uv_scale">()) {

@@ -54,9 +54,6 @@ static void initialize_opengl() {
     // Enable filtering of cubemap seams.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    // Set blend function.
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     // Enable backface culling.
     glEnable(GL_CULL_FACE);
 }

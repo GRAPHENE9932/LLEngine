@@ -43,7 +43,11 @@ set(SOURCES
     src/rendering/TextureFromKTX.cpp
     src/rendering/TextureFromRGBE.cpp
     src/rendering/ManagedFramebufferID.cpp
+    src/rendering/ManagedRenderbufferID.cpp
+    src/rendering/MainFramebuffer.cpp
     src/rendering/Shader.cpp
+    src/rendering/BloomRenderer.cpp
+    src/rendering/BloomFramebuffer.cpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/shader_loader.cpp
     src/structs/shapes/SphereShape.cpp

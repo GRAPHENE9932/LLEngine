@@ -56,12 +56,14 @@ uniform sampler2D normal_texture;
 uniform sampler2D metallic_texture;
 uniform sampler2D roughness_texture;
 uniform sampler2D ao_texture;
+uniform sampler2D emissive_texture;
 uniform sampler2DShadow shadow_map;
 uniform samplerCube irradiance_map;
 uniform samplerCube prefiltered_specular_map;
 uniform sampler2D brdf_integration_map;
 uniform vec3 camera_position;
 uniform vec4 base_color_factor;
+uniform vec3 emissive_factor;
 uniform float normal_map_scale;
 uniform float metallic_factor;
 uniform float roughness_factor;
@@ -218,6 +220,22 @@ float get_ao() {
     #endif
 }
 
+vec3 get_emissive() {
+    #ifdef USING_EMISSIVE_TEXTURE
+        #ifdef USING_EMISSIVE_FACTOR
+            return texture(emissive_texture, get_base_uv()).rgb * emissive_factor;
+        #else
+            return texture(emissive_texture, get_base_uv()).rgb;
+        #endif
+    #else
+        #ifdef USING_EMISSIVE_FACTOR
+            return emissive_factor;
+        #else
+            return vec3(0.0, 0.0, 0.0);
+        #endif
+    #endif
+}
+
 #ifdef USING_SHADOW_MAP
     float sample_shadow(vec3 projection_clip_space) {
         float real_depth = projection_clip_space.z - shadow_map_bias;
@@ -358,6 +376,6 @@ void main() {
             lightning_result += (refraction_ratio * vec3(get_base_color()) / PI + specular) * radiance * n_dot_l;
         }
     #endif
-    color_out = vec4(lightning_result, 1.0);
+    color_out = vec4(lightning_result + get_emissive() * 10.0, 1.0);
 }
 )""

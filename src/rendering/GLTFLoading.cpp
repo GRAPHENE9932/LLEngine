@@ -72,7 +72,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
 
     if (!gltf_json.contains("textures"))
         return;
-    
+
     for (const json& cur_json : gltf_json.at("textures")) {
         TexLoadingParams result;
 
@@ -101,12 +101,12 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
             // TODO: Placeholder image.
             throw std::runtime_error("glTF texture doesn't have the source.");
         }
-        
+
         const json& image_json = gltf_json.at("images").at(source);
         if (image_json.contains("uri")) {
             if (image_json["uri"].get<std::string>().starts_with("data:"))
                 throw std::runtime_error("base64 data is not supported here.");
-            
+
             result.file_path = append_paths(
                 TEXTURES_LOCATION,
                 image_json["uri"].get<std::string>()
@@ -118,7 +118,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
 
             if (buf_view_json.contains("byteStride"))
                 throw std::runtime_error("byteStride property must not be defined for images.");
-            
+
             result.offset = bin_buffer_offset +
                     get_optional<std::streamsize>(buf_view_json, "byteOffset", 0);
             result.size = buf_view_json.at("byteLength");
@@ -184,7 +184,7 @@ handle_normal_texture_info(const json& tex_info_json) {
 void construct_material_params(GLTF& gltf, const json& gltf_json) {
     if (!gltf_json.contains("materials"))
         return;
-    
+
     gltf.materials.reserve(gltf_json["materials"].size());
     for (const json& cur_json : gltf_json["materials"]) {
         BasicMaterial<uint32_t> result {};
@@ -231,6 +231,15 @@ void construct_material_params(GLTF& gltf, const json& gltf_json) {
             result.normal_map = handle_normal_texture_info(cur_json["normalTexture"]);
         else
             result.normal_map = std::nullopt;
+
+        if (cur_json.contains("emissiveTexture")) {
+            result.emissive_texture = handle_texture_info(cur_json["emissiveTexture"]);
+        }
+        else {
+            result.emissive_texture = std::nullopt;
+        }
+
+        result.emissive_factor = get_optional<glm::vec3>(cur_json, "emissiveFactor", {0.0f, 0.0f, 0.0f});
 
         gltf.materials.push_back(result);
     }
@@ -317,7 +326,7 @@ std::vector<T> read_from_fine_buffer_view(
     std::string_view uri = buf_json.contains("uri") ?
             buf_json["uri"].get<std::string_view>() :
             args.gltf_path;
-    
+
     // TODO: Support base64 data.
     if (uri.starts_with("data:"))
         throw std::runtime_error("base64 data is not supported here.");
@@ -360,7 +369,7 @@ std::vector<VAL_T> read_from_sparse_buffer_view(
 ) {
     const json& indices_json = sparse_json.at("indices");
     const json& values_json = sparse_json.at("values");
-    
+
     assert(
         (indices_json.at("componentType").get<GLenum>() == GL_UNSIGNED_BYTE &&
         std::is_same<IDX_T, uint8_t>()) ||
@@ -385,7 +394,7 @@ std::vector<VAL_T> read_from_sparse_buffer_view(
     result.reserve(indices.size());
     for (const IDX_T cur_index : indices)
         result.push_back(values.at(cur_index));
-    
+
     return result;
 }
 
@@ -439,7 +448,7 @@ std::optional<std::vector<T>> load_primitive_attribute(const CommonBufferArgs& a
         const std::string_view attribute_name) {
     if (!attributes_json.contains(attribute_name))
         return std::nullopt;
-    
+
     const uint32_t accessor_index = attributes_json[attribute_name].get<uint32_t>();
     const json& accessor_json = args.gltf_json.at("accessors").at(accessor_index);
 
@@ -454,25 +463,25 @@ void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view g
         return;
 
     // Create the stream pool
-    // (used to not open ifstreams in every read_from_*_buffer_view function). 
+    // (used to not open ifstreams in every read_from_*_buffer_view function).
     // We could use std::unordered_map instead, but hash computation of
     // entire std::string is slow and we don't have much streams usually.
     std::map<std::string_view, std::ifstream> stream_pool;
     const CommonBufferArgs args {
         gltf_json, gltf_path, bin_chunk_offset, stream_pool
     };
-    
+
     gltf.meshes.reserve(gltf_json["meshes"].size());
     for (const json& mesh_json : gltf_json["meshes"]) {
         GLTF::MeshParameters result;
-        
+
         // Get the primitive.
         // TODO: Support multiple primitives.
         if (mesh_json.at("primitives").size() != 1) {
             throw std::runtime_error("Unsupported amount of primitives in one mesh. "
                     "Only 1 per mesh supported.");
         }
-        
+
         const json& prim_json = mesh_json.at("primitives").at(0);
 
         // Check some primitive values.
@@ -491,9 +500,9 @@ void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view g
         // Check attributes.
         if (!prim_json.contains("attributes"))
             throw std::runtime_error("The primitive does not contain attributes.");
-        
+
         const json& attributes_json = prim_json["attributes"];
-        
+
         // Load positions.
         auto vertices_optional = load_primitive_attribute<glm::vec3>(
             args, attributes_json, "POSITION"
@@ -535,7 +544,7 @@ void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view g
         }
 
         gltf.meshes.push_back(result);
-    }    
+    }
 }
 
 GLTF::Node::Node(
@@ -584,7 +593,7 @@ GLTF::Node::Node(
 void construct_node_params(GLTF& gltf, const json& gltf_json) {
     if (!gltf_json.contains("nodes"))
         return;
-    
+
     // Use the construct_node_and_children_params functions on all
     // root nodes (the function above will recursively process all
     // children too). However, not all nodes are roots. We don't
@@ -605,7 +614,7 @@ void construct_node_params(GLTF& gltf, const json& gltf_json) {
     for (uint32_t i = 0; i < gltf_json["nodes"].size(); i++) {
         if (non_root_nodes.contains(i))
             continue;
-        
+
         gltf.nodes.emplace_back(gltf, gltf_json, gltf_json.at("nodes").at(i));
     }
 }
@@ -655,7 +664,7 @@ GLTF::GLTF(std::string_view file_path) {
                 std::find(SUPPORTED_EXTENSIONS.begin(), SUPPORTED_EXTENSIONS.end(), cur_extension.get<std::string_view>()) !=
                 SUPPORTED_EXTENSIONS.end()
             };
-            
+
             if (!is_extension_supported)
                 throw std::runtime_error("Unsupported extension(s) are required by this glTF file.");
         }

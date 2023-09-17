@@ -1,4 +1,5 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
+#include "rendering/Mesh.hpp"
 #include "rendering/Skybox.hpp"
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
 #include "logger.hpp"
@@ -6,6 +7,7 @@
 #include "nodes/rendering/Drawable.hpp"
 #include "nodes/gui/GUICanvas.hpp"
 #include "utils/math.hpp"
+#include "MainFramebuffer.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -17,6 +19,12 @@ using namespace llengine;
 
 RenderingServer::RenderingServer(glm::ivec2 window_size) :
     window(GLFWWindow(window_size, "LLShooter", 3, 3)) {
+    main_framebuffer = std::make_unique<MainFramebuffer>(window_size);
+    current_default_framebuffer = main_framebuffer.get();
+}
+
+RenderingServer::~RenderingServer() {
+
 }
 
 void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
@@ -42,6 +50,7 @@ void RenderingServer::main_loop() {
         // Invoke callback.
         update_callback(delta_time);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, main_framebuffer->get_framebuffer_id());
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         update_shadow_map();
@@ -57,10 +66,13 @@ void RenderingServer::main_loop() {
         // Draw overlay objects.
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (GUICanvas* canvas : gui_canvases) {
             canvas->draw();
         }
         glDisable(GL_BLEND);
+
+        main_framebuffer->render_to_window();
 
         window.swap_buffers();
         glfwPollEvents();
@@ -101,6 +113,7 @@ void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
 
     set_shadow_map_size(settings.shadow_map_size);
     set_shadow_drawing_distance(settings.shadow_map_drawing_distance);
+    main_framebuffer->apply_postprocessing_settings(settings);
 }
 
 void RenderingServer::register_drawable(Drawable* drawable) noexcept {
@@ -365,6 +378,11 @@ const Texture& RenderingServer::get_brdf_integration_map() {
     return *brdf_integration_map;
 }
 
+[[nodiscard]] FramebufferID RenderingServer::get_current_default_framebuffer_id() {
+    assert(current_default_framebuffer != nullptr);
+    return current_default_framebuffer->get_framebuffer_id();
+}
+
 bool RenderingServer::has_environment_cubemap() {
     return skybox != nullptr;
 }
@@ -417,7 +435,7 @@ void RenderingServer::update_shadow_map() {
         }
     }
     glEnable(GL_CULL_FACE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, get_current_default_framebuffer_id());
     const auto window_size = get_window().get_window_size();
     glViewport(0, 0, window_size.x, window_size.y);
 }

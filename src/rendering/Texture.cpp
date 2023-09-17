@@ -2,6 +2,7 @@
 #include "rendering/Mesh.hpp"
 #include "NodeProperty.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
+#include "rendering/RenderingServer.hpp"
 #include "rendering/Shader.hpp"
 
 #include <glm/gtx/transform.hpp>
@@ -130,7 +131,7 @@ auto draw_to_cubemap(
         }
         cur_cubemap_size /= 2;
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
 
     // Return viewport to the original state.
     glViewport(
@@ -335,7 +336,7 @@ Texture Texture::compute_brdf_integration_map() {
     quad_mesh->unbind_vao();
 
     // Clean up.
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
 
     // Return viewport to the original state.
     glViewport(
