@@ -44,7 +44,7 @@
 			"id": 7,
 			"parent_id": 4,
 			"type": "text_node",
-			"text": "Press ESCAPE or ALT+F4 to quit.",
+			"text": "Press Q or ALT+F4 to quit.",
 			"font": {
 				"type": "font",
 				"path": "res/fonts/Ubuntu-Regular.ttf",
