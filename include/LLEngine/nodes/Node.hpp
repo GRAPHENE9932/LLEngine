@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Key.hpp"
 #include "NodeProperty.hpp"
+#include "rendering/Window.hpp"
 
 #include <string_view>
 #include <map>
@@ -13,7 +15,9 @@ class BulletPhysicsServer;
 class Node {
 public:
     Node() = default;
-    virtual ~Node() = default;
+    virtual ~Node() {
+        enable_on_keyboard_key(false);
+    }
     Node(const Node& other) = delete;
     Node(Node&& other) = delete;
     Node& operator=(const Node& other) = delete;
@@ -33,6 +37,8 @@ public:
     inline void set_name_property(const NodeProperty& property) {
         name = property.get<std::string>();
     }
+
+    void enable_on_keyboard_key(bool enable);
 
     void enable();
     void disable();
@@ -57,6 +63,8 @@ protected:
     virtual void start() {};
     virtual void update() {};
     virtual void internal_update() {};
+    virtual void on_keyboard_key_press(Key key) {};
+    virtual void on_keyboard_key_release(Key key) {};
     void on_parent_enable_disable(bool enabled);
     virtual void internal_on_enable() {};
     virtual void internal_on_disable() {};
@@ -67,9 +75,14 @@ private:
     bool parent_enabled = true;
     bool was_enabled_before = true;
 
+    bool on_key_press_release_listening = false;
+
+    void key_event_callback(Key key, Window::KeyEventType event_type);
+
     mutable RenderingServer* cached_rendering_server = nullptr;
     mutable BulletPhysicsServer* cached_bullet_physics_server = nullptr;
 
     friend class GameInstance;
+    friend Window;
 };
 }

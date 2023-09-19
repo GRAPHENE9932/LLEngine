@@ -1,11 +1,14 @@
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
+#include "nodes/Node.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h> // Various GLFW functions and constants.
 #include <fmt/format.h>
 
 #include <map>
+#include <array>
 #include <algorithm>
+#include <functional>
 
 using namespace llengine;
 
@@ -142,132 +145,161 @@ void GLFWWindow::set_cursor_position(const glm::dvec2& new_position) {
     glfwSetCursorPos(glfw_window, new_position.x, new_position.y);
 }
 
-static int get_glfw_key_code(Key key) {
-    switch (key) {
-    case Key::SPACE: return GLFW_KEY_SPACE;
-    case Key::APOSTROPHE: return GLFW_KEY_APOSTROPHE;
-    case Key::COMMA: return GLFW_KEY_COMMA;
-    case Key::MINUS: return GLFW_KEY_MINUS;
-    case Key::DOT: return GLFW_KEY_PERIOD;
-    case Key::SLASH: return GLFW_KEY_SLASH;
-    case Key::ZERO: return GLFW_KEY_0;
-    case Key::ONE: return GLFW_KEY_1;
-    case Key::TWO: return GLFW_KEY_2;
-    case Key::THREE: return GLFW_KEY_3;
-    case Key::FOUR: return GLFW_KEY_4;
-    case Key::FIVE: return GLFW_KEY_5;
-    case Key::SIX: return GLFW_KEY_6;
-    case Key::SEVEN: return GLFW_KEY_7;
-    case Key::EIGHT: return GLFW_KEY_8;
-    case Key::NINE: return GLFW_KEY_9;
-    case Key::SEMICOLON: return GLFW_KEY_SEMICOLON;
-    case Key::EQUAL_SIGN: return GLFW_KEY_EQUAL;
-    case Key::A: return GLFW_KEY_A;
-    case Key::B: return GLFW_KEY_B;
-    case Key::C: return GLFW_KEY_C;
-    case Key::D: return GLFW_KEY_D;
-    case Key::E: return GLFW_KEY_E;
-    case Key::F: return GLFW_KEY_F;
-    case Key::G: return GLFW_KEY_G;
-    case Key::H: return GLFW_KEY_H;
-    case Key::I: return GLFW_KEY_I;
-    case Key::J: return GLFW_KEY_J;
-    case Key::K: return GLFW_KEY_K;
-    case Key::L: return GLFW_KEY_L;
-    case Key::M: return GLFW_KEY_M;
-    case Key::N: return GLFW_KEY_N;
-    case Key::O: return GLFW_KEY_O;
-    case Key::P: return GLFW_KEY_P;
-    case Key::Q: return GLFW_KEY_Q;
-    case Key::R: return GLFW_KEY_R;
-    case Key::S: return GLFW_KEY_S;
-    case Key::T: return GLFW_KEY_T;
-    case Key::U: return GLFW_KEY_U;
-    case Key::V: return GLFW_KEY_V;
-    case Key::W: return GLFW_KEY_W;
-    case Key::X: return GLFW_KEY_X;
-    case Key::Y: return GLFW_KEY_Y;
-    case Key::Z: return GLFW_KEY_Z;
-    case Key::LEFT_BRACKET: return GLFW_KEY_LEFT_BRACKET;
-    case Key::BACKSLASH: return GLFW_KEY_APOSTROPHE;
-    case Key::RIGHT_BRACKET: return GLFW_KEY_RIGHT_BRACKET;
-    case Key::GRAVE_ACCENT: return GLFW_KEY_GRAVE_ACCENT;
-    case Key::ESCAPE: return GLFW_KEY_ESCAPE;
-    case Key::ENTER: return GLFW_KEY_ENTER;
-    case Key::TAB: return GLFW_KEY_TAB;
-    case Key::BACKSPACE: return GLFW_KEY_BACKSPACE;
-    case Key::INSERT: return GLFW_KEY_INSERT;
-    case Key::DELETE: return GLFW_KEY_DELETE;
-    case Key::RIGHT: return GLFW_KEY_RIGHT;
-    case Key::LEFT: return GLFW_KEY_LEFT;
-    case Key::DOWN: return GLFW_KEY_DOWN;
-    case Key::UP: return GLFW_KEY_UP;
-    case Key::PAGE_UP: return GLFW_KEY_PAGE_UP;
-    case Key::PAGE_DOWN: return GLFW_KEY_PAGE_DOWN;
-    case Key::HOME: return GLFW_KEY_HOME;
-    case Key::END: return GLFW_KEY_END;
-    case Key::CAPS_LOCK: return GLFW_KEY_CAPS_LOCK;
-    case Key::SCROLL_LOCK: return GLFW_KEY_SCROLL_LOCK;
-    case Key::NUM_LOCK: return GLFW_KEY_NUM_LOCK;
-    case Key::PRINT_SCREEN: return GLFW_KEY_PRINT_SCREEN;
-    case Key::PAUSE: return GLFW_KEY_PAUSE;
-    case Key::F1: return GLFW_KEY_F1;
-    case Key::F2: return GLFW_KEY_F2;
-    case Key::F3: return GLFW_KEY_F3;
-    case Key::F4: return GLFW_KEY_F4;
-    case Key::F5: return GLFW_KEY_F5;
-    case Key::F6: return GLFW_KEY_F6;
-    case Key::F7: return GLFW_KEY_F7;
-    case Key::F8: return GLFW_KEY_F8;
-    case Key::F9: return GLFW_KEY_F9;
-    case Key::F10: return GLFW_KEY_F10;
-    case Key::F11: return GLFW_KEY_F11;
-    case Key::F12: return GLFW_KEY_F12;
-    case Key::F13: return GLFW_KEY_F13;
-    case Key::F14: return GLFW_KEY_F14;
-    case Key::F15: return GLFW_KEY_F15;
-    case Key::F16: return GLFW_KEY_F16;
-    case Key::F17: return GLFW_KEY_F17;
-    case Key::F18: return GLFW_KEY_F18;
-    case Key::F19: return GLFW_KEY_F19;
-    case Key::F20: return GLFW_KEY_F20;
-    case Key::F21: return GLFW_KEY_F21;
-    case Key::F22: return GLFW_KEY_F22;
-    case Key::F23: return GLFW_KEY_F23;
-    case Key::F24: return GLFW_KEY_F24;
-    case Key::F25: return GLFW_KEY_F25;
-    case Key::NUMPAD_ZERO: return GLFW_KEY_KP_0;
-    case Key::NUMPAD_ONE: return GLFW_KEY_KP_1;
-    case Key::NUMPAD_TWO: return GLFW_KEY_KP_2;
-    case Key::NUMPAD_THREE: return GLFW_KEY_KP_3;
-    case Key::NUMPAD_FOUR: return GLFW_KEY_KP_4;
-    case Key::NUMPAD_FIVE: return GLFW_KEY_KP_5;
-    case Key::NUMPAD_SIX: return GLFW_KEY_KP_6;
-    case Key::NUMPAD_SEVEN: return GLFW_KEY_KP_7;
-    case Key::NUMPAD_EIGHT: return GLFW_KEY_KP_8;
-    case Key::NUMPAD_NINE: return GLFW_KEY_KP_9;
-    case Key::NUMPAD_DOT: return GLFW_KEY_KP_DECIMAL;
-    case Key::NUMPAD_DIVIDE: return GLFW_KEY_KP_DIVIDE;
-    case Key::NUMPAD_MULTIPLY: return GLFW_KEY_KP_MULTIPLY;
-    case Key::NUMPAD_SUBTRACT: return GLFW_KEY_KP_SUBTRACT;
-    case Key::NUMPAD_ADD: return GLFW_KEY_KP_ADD;
-    case Key::NUMPAD_ENTER: return GLFW_KEY_KP_ENTER;
-    case Key::NUMPAD_EQUAL: return GLFW_KEY_KP_EQUAL;
-    case Key::LEFT_SHIFT: return GLFW_KEY_LEFT_SHIFT;
-    case Key::LEFT_CONTROL: return GLFW_KEY_LEFT_CONTROL;
-    case Key::LEFT_ALT: return GLFW_KEY_LEFT_ALT;
-    case Key::LEFT_SUPER: return GLFW_KEY_LEFT_SUPER;
-    case Key::RIGHT_SHIFT: return GLFW_KEY_RIGHT;
-    case Key::RIGHT_CONTROL: return GLFW_KEY_RIGHT_SHIFT;
-    case Key::RIGHT_ALT: return GLFW_KEY_RIGHT_ALT;
-    case Key::RIGHT_SUPER: return GLFW_KEY_RIGHT_SUPER;
-    case Key::MENU: return GLFW_KEY_MENU;
-    default: return GLFW_KEY_UNKNOWN;
+constexpr std::array<std::pair<Key, int>, 118> GLFW_KEY_CODE_TABLE {{
+    {Key::SPACE, GLFW_KEY_SPACE},
+    {Key::APOSTROPHE, GLFW_KEY_APOSTROPHE},
+    {Key::COMMA, GLFW_KEY_COMMA},
+    {Key::MINUS, GLFW_KEY_MINUS},
+    {Key::DOT, GLFW_KEY_PERIOD},
+    {Key::SLASH, GLFW_KEY_SLASH},
+    {Key::ZERO, GLFW_KEY_0},
+    {Key::ONE, GLFW_KEY_1},
+    {Key::TWO, GLFW_KEY_2},
+    {Key::THREE, GLFW_KEY_3},
+    {Key::FOUR, GLFW_KEY_4},
+    {Key::FIVE, GLFW_KEY_5},
+    {Key::SIX, GLFW_KEY_6},
+    {Key::SEVEN, GLFW_KEY_7},
+    {Key::EIGHT, GLFW_KEY_8},
+    {Key::NINE, GLFW_KEY_9},
+    {Key::SEMICOLON, GLFW_KEY_SEMICOLON},
+    {Key::EQUAL_SIGN, GLFW_KEY_EQUAL},
+    {Key::A, GLFW_KEY_A},
+    {Key::B, GLFW_KEY_B},
+    {Key::C, GLFW_KEY_C},
+    {Key::D, GLFW_KEY_D},
+    {Key::E, GLFW_KEY_E},
+    {Key::F, GLFW_KEY_F},
+    {Key::G, GLFW_KEY_G},
+    {Key::H, GLFW_KEY_H},
+    {Key::I, GLFW_KEY_I},
+    {Key::J, GLFW_KEY_J},
+    {Key::K, GLFW_KEY_K},
+    {Key::L, GLFW_KEY_L},
+    {Key::M, GLFW_KEY_M},
+    {Key::N, GLFW_KEY_N},
+    {Key::O, GLFW_KEY_O},
+    {Key::P, GLFW_KEY_P},
+    {Key::Q, GLFW_KEY_Q},
+    {Key::R, GLFW_KEY_R},
+    {Key::S, GLFW_KEY_S},
+    {Key::T, GLFW_KEY_T},
+    {Key::U, GLFW_KEY_U},
+    {Key::V, GLFW_KEY_V},
+    {Key::W, GLFW_KEY_W},
+    {Key::X, GLFW_KEY_X},
+    {Key::Y, GLFW_KEY_Y},
+    {Key::Z, GLFW_KEY_Z},
+    {Key::LEFT_BRACKET, GLFW_KEY_LEFT_BRACKET},
+    {Key::BACKSLASH, GLFW_KEY_APOSTROPHE},
+    {Key::RIGHT_BRACKET, GLFW_KEY_RIGHT_BRACKET},
+    {Key::GRAVE_ACCENT, GLFW_KEY_GRAVE_ACCENT},
+    {Key::ESCAPE, GLFW_KEY_ESCAPE},
+    {Key::ENTER, GLFW_KEY_ENTER},
+    {Key::TAB, GLFW_KEY_TAB},
+    {Key::BACKSPACE, GLFW_KEY_BACKSPACE},
+    {Key::INSERT, GLFW_KEY_INSERT},
+    {Key::DELETE, GLFW_KEY_DELETE},
+    {Key::RIGHT, GLFW_KEY_RIGHT},
+    {Key::LEFT, GLFW_KEY_LEFT},
+    {Key::DOWN, GLFW_KEY_DOWN},
+    {Key::UP, GLFW_KEY_UP},
+    {Key::PAGE_UP, GLFW_KEY_PAGE_UP},
+    {Key::PAGE_DOWN, GLFW_KEY_PAGE_DOWN},
+    {Key::HOME, GLFW_KEY_HOME},
+    {Key::END, GLFW_KEY_END},
+    {Key::CAPS_LOCK, GLFW_KEY_CAPS_LOCK},
+    {Key::SCROLL_LOCK, GLFW_KEY_SCROLL_LOCK},
+    {Key::NUM_LOCK, GLFW_KEY_NUM_LOCK},
+    {Key::PRINT_SCREEN, GLFW_KEY_PRINT_SCREEN},
+    {Key::PAUSE, GLFW_KEY_PAUSE},
+    {Key::F1, GLFW_KEY_F1},
+    {Key::F2, GLFW_KEY_F2},
+    {Key::F3, GLFW_KEY_F3},
+    {Key::F4, GLFW_KEY_F4},
+    {Key::F5, GLFW_KEY_F5},
+    {Key::F6, GLFW_KEY_F6},
+    {Key::F7, GLFW_KEY_F7},
+    {Key::F8, GLFW_KEY_F8},
+    {Key::F9, GLFW_KEY_F9},
+    {Key::F10, GLFW_KEY_F10},
+    {Key::F11, GLFW_KEY_F11},
+    {Key::F12, GLFW_KEY_F12},
+    {Key::F13, GLFW_KEY_F13},
+    {Key::F14, GLFW_KEY_F14},
+    {Key::F15, GLFW_KEY_F15},
+    {Key::F16, GLFW_KEY_F16},
+    {Key::F17, GLFW_KEY_F17},
+    {Key::F18, GLFW_KEY_F18},
+    {Key::F19, GLFW_KEY_F19},
+    {Key::F20, GLFW_KEY_F20},
+    {Key::F21, GLFW_KEY_F21},
+    {Key::F22, GLFW_KEY_F22},
+    {Key::F23, GLFW_KEY_F23},
+    {Key::F24, GLFW_KEY_F24},
+    {Key::F25, GLFW_KEY_F25},
+    {Key::NUMPAD_ZERO, GLFW_KEY_KP_0},
+    {Key::NUMPAD_ONE, GLFW_KEY_KP_1},
+    {Key::NUMPAD_TWO, GLFW_KEY_KP_2},
+    {Key::NUMPAD_THREE, GLFW_KEY_KP_3},
+    {Key::NUMPAD_FOUR, GLFW_KEY_KP_4},
+    {Key::NUMPAD_FIVE, GLFW_KEY_KP_5},
+    {Key::NUMPAD_SIX, GLFW_KEY_KP_6},
+    {Key::NUMPAD_SEVEN, GLFW_KEY_KP_7},
+    {Key::NUMPAD_EIGHT, GLFW_KEY_KP_8},
+    {Key::NUMPAD_NINE, GLFW_KEY_KP_9},
+    {Key::NUMPAD_DOT, GLFW_KEY_KP_DECIMAL},
+    {Key::NUMPAD_DIVIDE, GLFW_KEY_KP_DIVIDE},
+    {Key::NUMPAD_MULTIPLY, GLFW_KEY_KP_MULTIPLY},
+    {Key::NUMPAD_SUBTRACT, GLFW_KEY_KP_SUBTRACT},
+    {Key::NUMPAD_ADD, GLFW_KEY_KP_ADD},
+    {Key::NUMPAD_ENTER, GLFW_KEY_KP_ENTER},
+    {Key::NUMPAD_EQUAL, GLFW_KEY_KP_EQUAL},
+    {Key::LEFT_SHIFT, GLFW_KEY_LEFT_SHIFT},
+    {Key::LEFT_CONTROL, GLFW_KEY_LEFT_CONTROL},
+    {Key::LEFT_ALT, GLFW_KEY_LEFT_ALT},
+    {Key::LEFT_SUPER, GLFW_KEY_LEFT_SUPER},
+    {Key::RIGHT_SHIFT, GLFW_KEY_RIGHT},
+    {Key::RIGHT_CONTROL, GLFW_KEY_RIGHT_SHIFT},
+    {Key::RIGHT_ALT, GLFW_KEY_RIGHT_ALT},
+    {Key::RIGHT_SUPER, GLFW_KEY_RIGHT_SUPER},
+    {Key::MENU, GLFW_KEY_MENU}
+}};
+
+static int glfw_key_code_from_key(Key key) {
+    const auto iter = std::find_if(
+        GLFW_KEY_CODE_TABLE.begin(),
+        GLFW_KEY_CODE_TABLE.end(),
+        [&key] (const auto& pair) {
+            return pair.first == key;
+        }
+    );
+
+    if (iter == GLFW_KEY_CODE_TABLE.end()) {
+        throw std::runtime_error("Invalid Key specified.");
     }
+
+    return iter->second;
+}
+
+static Key key_from_glfw_key_code(int key_code) {
+    const auto iter = std::find_if(
+        GLFW_KEY_CODE_TABLE.begin(),
+        GLFW_KEY_CODE_TABLE.end(),
+        [&key_code] (const auto& pair) {
+            return pair.second == key_code;
+        }
+    );
+
+    if (iter == GLFW_KEY_CODE_TABLE.end()) {
+        throw std::runtime_error("Unknown glfw key code.");
+    }
+
+    return iter->first;
 }
 
 bool GLFWWindow::is_key_pressed(Key key) const {
-    return glfwGetKey(glfw_window, get_glfw_key_code(key)) == GLFW_PRESS;
+    return glfwGetKey(glfw_window, glfw_key_code_from_key(key)) == GLFW_PRESS;
 }
 
 [[nodiscard]] bool GLFWWindow::is_mouse_button_pressed(std::uint8_t button) const {
@@ -276,4 +308,49 @@ bool GLFWWindow::is_key_pressed(Key key) const {
         pressed_mouse_buttons.end(),
         button
     ) != pressed_mouse_buttons.end();
+}
+
+void GLFWWindow::subscribe_to_keyboard_key_event(Node& node) {
+    if (keyboard_key_event_subscribers.size() == 0) {
+        glfwSetKeyCallback(glfw_window, keyboard_key_callback);
+    }
+
+    keyboard_key_event_subscribers.push_back(node);
+}
+
+void GLFWWindow::unsubscribe_from_keyboard_key_event(Node& node) {
+    const auto iter = std::find_if(
+        keyboard_key_event_subscribers.begin(),
+        keyboard_key_event_subscribers.end(),
+        [&node] (std::reference_wrapper<Node> ref) {
+            return std::addressof(ref.get()) == std::addressof(node);
+        }
+    );
+
+    if (iter == keyboard_key_event_subscribers.end()) {
+        throw std::runtime_error("Failed to unsubscribe from keyboard key event, as specified node was not found.");
+    }
+
+    keyboard_key_event_subscribers.erase(iter);
+
+    if (keyboard_key_event_subscribers.empty()) {
+        glfwSetKeyCallback(glfw_window, nullptr);
+    }
+}
+
+void GLFWWindow::call_keyboard_key_event_subscribers(Key key, KeyEventType event_type) {
+    for (Node& subscriber : keyboard_key_event_subscribers) {
+        subscriber.key_event_callback(key, event_type);
+    }
+}
+
+void GLFWWindow::keyboard_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    GLFWWindow* wrapper = window_to_wrapper_map[window];
+
+    if (action == GLFW_PRESS) {
+        wrapper->call_keyboard_key_event_subscribers(key_from_glfw_key_code(key), KeyEventType::PRESS_EVENT);
+    }
+    else if (action == GLFW_RELEASE) {
+        wrapper->call_keyboard_key_event_subscribers(key_from_glfw_key_code(key), KeyEventType::RELEASE_EVENT);
+    }
 }

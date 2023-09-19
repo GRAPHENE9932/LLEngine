@@ -2,10 +2,21 @@
 #include "nodes/RootNode.hpp"
 #include "node_registration.hpp"
 #include "logger.hpp"
+#include "rendering/RenderingServer.hpp"
 
 #include <fmt/format.h>
 
 using namespace llengine;
+
+void Node::enable_on_keyboard_key(bool enable) {
+    if (!on_key_press_release_listening && enable) {
+        get_rendering_server().get_window().subscribe_to_keyboard_key_event(*this);
+    }
+    else if (on_key_press_release_listening && !enable) {
+        get_rendering_server().get_window().unsubscribe_from_keyboard_key_event(*this);
+    }
+    on_key_press_release_listening = enable;
+}
 
 void Node::enable() {
     enabled = true;
@@ -135,4 +146,16 @@ void Node::on_parent_enable_disable(bool enabled) {
     }
 
     was_enabled_before = is_enabled();
+}
+
+void Node::key_event_callback(Key key, Window::KeyEventType event_type) {
+    if (event_type == Window::PRESS_EVENT) {
+        on_keyboard_key_press(key);
+    }
+    else if (event_type == Window::RELEASE_EVENT) {
+        on_keyboard_key_release(key);
+    }
+    else {
+        throw std::runtime_error("Unknown keyboard event type.");
+    }
 }

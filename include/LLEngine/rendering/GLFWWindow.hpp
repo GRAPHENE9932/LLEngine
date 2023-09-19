@@ -10,8 +10,14 @@
 class GLFWwindow;
 
 namespace llengine {
+class Node;
+
 class GLFWWindow {
 public:
+    enum KeyEventType : std::uint8_t {
+        PRESS_EVENT, RELEASE_EVENT
+    };
+
     GLFWWindow(glm::ivec2 extents, std::string_view title,
                int gl_version_major, int gl_version_minor);
     GLFWWindow(const GLFWWindow& other) = delete;
@@ -37,7 +43,15 @@ private:
 
     GLFWwindow* glfw_window;
     std::vector<std::uint8_t> pressed_mouse_buttons;
+    std::vector<std::reference_wrapper<Node>> keyboard_key_event_subscribers;
 
+    void subscribe_to_keyboard_key_event(Node& node);
+    void unsubscribe_from_keyboard_key_event(Node& node);
+    void call_keyboard_key_event_subscribers(Key key, KeyEventType event_type);
+
+    static void keyboard_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+
+    friend class Node;
 };
 }
