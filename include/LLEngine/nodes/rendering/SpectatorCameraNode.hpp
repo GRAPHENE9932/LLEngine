@@ -19,7 +19,15 @@ public:
 
     void internal_update() override;
 
+    void unlock_mouse();
+    void lock_mouse();
+    [[nodiscard]] bool is_mouse_locked() const {
+        return mouse_locked;
+    }
+
 private:
+    bool mouse_locked = true;
+
     void update_rotation();
     void update_position();
 };

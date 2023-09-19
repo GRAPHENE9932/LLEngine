@@ -17,6 +17,14 @@ void SpectatorCameraNode::internal_update() {
     update_position();
 }
 
+void SpectatorCameraNode::unlock_mouse() {
+    mouse_locked = false;
+}
+
+void SpectatorCameraNode::lock_mouse() {
+    mouse_locked = true;
+}
+
 /// Angle axis to quaternion conversion, but only around the
 /// X axis (1.0, 0.0, 0.0).
 /// More performant than angle axis with arbitrary axis.
@@ -72,7 +80,7 @@ void move_angle_in_bounds(float& angle) {
 
 void clamp_x_angle(float& x_angle) {
     move_angle_in_bounds(x_angle);
-    
+
     if (x_angle > glm::radians(90.0f))
         x_angle = glm::radians(90.0f);
     else if (x_angle < glm::radians(-90.0f))
@@ -80,11 +88,15 @@ void clamp_x_angle(float& x_angle) {
 }
 
 void SpectatorCameraNode::update_rotation() {
+    if (!mouse_locked) {
+        return;
+    }
+
     auto& window {get_rendering_server().get_window()};
 
     // Get the current cursor position.
     glm::dvec2 cursor_pos = window.get_cursor_position();
-    
+
     // Set cursor to the center.
     const glm::dvec2 center = static_cast<glm::dvec2>(
         window.get_window_size()
