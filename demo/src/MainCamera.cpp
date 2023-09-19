@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 
 void MainCamera::start() {
+    enable_on_keyboard_key(true);
     bullet = llengine::node_cast<llengine::SpatialNode>(
         llengine::SceneFile::load_from_file("res/meshes/bullet.glb")->to_node({}, &llengine::find_custom_node_type<BulletNode>())
     );
@@ -25,9 +26,19 @@ void MainCamera::update() {
     if (!get_rendering_server().is_mouse_button_pressed(0)) {
         clicked_before = false;
     }
+}
 
-    if (get_rendering_server().get_window().is_key_pressed(llengine::Key::ESCAPE)) {
+void MainCamera::on_keyboard_key_press(llengine::Key key) {
+    if (key == llengine::Key::Q) {
         get_rendering_server().stop();
+    }
+    else if (key == llengine::Key::ESCAPE) {
+        if (is_mouse_locked()) {
+            unlock_mouse();
+        }
+        else {
+            lock_mouse();
+        }
     }
 }
 
