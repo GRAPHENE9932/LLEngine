@@ -19,12 +19,14 @@ void MainCamera::start() {
 }
 
 void MainCamera::update() {
-    if (get_rendering_server().is_mouse_button_pressed(0) && !clicked_before) {
+    auto& rs = get_rendering_server();
+
+    if (rs.is_mouse_button_pressed(0) && !clicked_before) {
         spawn_barrel();
         clicked_before = true;
     }
 
-    if (!get_rendering_server().is_mouse_button_pressed(0)) {
+    if (!rs.is_mouse_button_pressed(0)) {
         clicked_before = false;
     }
 }
