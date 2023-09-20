@@ -34,6 +34,7 @@ void MainFramebuffer::render_to_window() {
         bloom_renderer->render_to_bloom_texture(get_color_texture_id(), 0.005f);
     }
 
+    glDisable(GL_DEPTH_TEST);
     static Shader<"main_image", "bloom_image"> postprocessing_shader(
         #include "shaders/postprocessing.vert"
         ,
@@ -48,6 +49,7 @@ void MainFramebuffer::render_to_window() {
     Mesh::get_quad()->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
     Mesh::get_quad()->unbind_vao(true, false, false);
+    glEnable(GL_DEPTH_TEST);
 }
 
 [[nodiscard]] FramebufferID MainFramebuffer::get_framebuffer_id() const {
