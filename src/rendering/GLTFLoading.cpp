@@ -63,7 +63,7 @@ bool check_asset_version(std::string_view version) {
 
 inline std::string append_paths(std::string_view path_1,
                                 std::string_view path_2) {
-    return std::filesystem::path(path_1) / std::filesystem::path(path_2);
+    return (std::filesystem::path(path_1) / std::filesystem::path(path_2)).string();
 }
 
 void construct_texture_params(GLTF& gltf, const json& gltf_json,
