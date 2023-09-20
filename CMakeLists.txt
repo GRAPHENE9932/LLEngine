@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(LLEngine)
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(src)
