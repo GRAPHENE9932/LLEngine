@@ -45,7 +45,7 @@ void Skybox::draw(RenderingServer& rs) {
     glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
     rs.report_about_drawn_triangles(cube_mesh->get_amount_of_vertices() / 3);
 
-    cube_mesh->unbind_vao();
+    cube_mesh->unbind_vao(false, false, false);
 }
 
 void Skybox::ensure_shader_is_initialized() {

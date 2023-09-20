@@ -142,7 +142,7 @@ void GUINode::draw_texture_part(
     }
     get_rendering_server().report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
 
-    mesh->unbind_vao();
+    mesh->unbind_vao(true, false, false);
 }
 
 void GUINode::draw_rectangle(const GUITexture& texture) {

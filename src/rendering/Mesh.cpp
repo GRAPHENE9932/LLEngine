@@ -42,13 +42,14 @@ void Mesh::bind_vao(bool enable_uv, bool enable_normals, bool enable_tangents) c
     if (tangents_id != 0 && enable_tangents) glEnableVertexAttribArray(3);
 }
 
-void Mesh::unbind_vao() const {
+void Mesh::unbind_vao(bool unbind_uv, bool unbind_normals, bool unbind_tangents) const {
+    return;
     if (vao_id != 0) {
         glBindVertexArray(0);
         if (vertices_id != 0) glDisableVertexAttribArray(0);
-        if (uvs_id != 0) glDisableVertexAttribArray(1);
-        if (normals_id != 0) glDisableVertexAttribArray(2);
-        if (tangents_id != 0) glDisableVertexAttribArray(3);
+        if (uvs_id != 0 && unbind_uv) glDisableVertexAttribArray(1);
+        if (normals_id != 0 && unbind_normals) glDisableVertexAttribArray(2);
+        if (tangents_id != 0 && unbind_tangents) glDisableVertexAttribArray(3);
     }
 }
 
@@ -131,7 +132,7 @@ void Mesh::index_data() {
     }
 
     auto& indices = std::get<std::vector<T>>(this->indices);
-    
+
     // Copy input data.
     auto in_vertices = vertices;
     auto in_uvs = uvs;

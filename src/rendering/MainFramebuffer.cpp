@@ -47,7 +47,7 @@ void MainFramebuffer::render_to_window() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     Mesh::get_quad()->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
-    Mesh::get_quad()->unbind_vao();
+    Mesh::get_quad()->unbind_vao(true, false, false);
 }
 
 [[nodiscard]] FramebufferID MainFramebuffer::get_framebuffer_id() const {

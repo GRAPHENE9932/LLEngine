@@ -147,7 +147,7 @@ void TextNode::draw() {
         glBindTexture(GL_TEXTURE_2D, chars[char_i].get().texture);
         mesh->bind_vao(true, false, false);
         glDrawArrays(GL_TRIANGLES, char_i * 6, 6);
-        mesh->unbind_vao();
+        mesh->unbind_vao(true, false, false);
     }
 }
 

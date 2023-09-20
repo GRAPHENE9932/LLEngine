@@ -181,7 +181,7 @@ Texture Texture::panorama_to_cubemap() const {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
 
-        cube_mesh->unbind_vao();
+        cube_mesh->unbind_vao(false, false, false);
     });
 }
 
@@ -224,7 +224,7 @@ Texture Texture::compute_irradiance_map() const {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
 
-        cube_mesh->unbind_vao();
+        cube_mesh->unbind_vao(false, false, false);
     });
 }
 
@@ -270,7 +270,7 @@ Texture Texture::compute_prefiltered_specular_map() const {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_mesh->get_indices_id());
         glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
 
-        cube_mesh->unbind_vao();
+        cube_mesh->unbind_vao(false, false, false);
     });
 }
 
@@ -333,7 +333,7 @@ Texture Texture::compute_brdf_integration_map() {
 
     quad_mesh->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, quad_mesh->get_amount_of_vertices());
-    quad_mesh->unbind_vao();
+    quad_mesh->unbind_vao(true, false, false);
 
     // Clean up.
     glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());

@@ -36,22 +36,22 @@ public:
     /**
      * @brief Binds this Mesh's VAO. If this Mesh does not have a VAO,
      * one will be created.
-     * 
+     *
      * Vertex attribute array index 0 corresponds to vertex positions,
      * 1 to UVs,
      * 2 to normals,
      * 3 to tangents.
      */
     void bind_vao(bool enable_uv = true, bool enable_normals = true, bool enable_tangents = true) const;
-    void unbind_vao() const;
-    
+    void unbind_vao(bool unbind_uv, bool unbind_normals, bool unbind_tangents) const;
+
     template<typename T>
     void set_indices(const std::vector<T>& new_indices);
     void set_vertices(const std::vector<glm::vec3>& new_vertices);
     void set_uvs(const std::vector<glm::vec2>& new_uvs);
     void set_normals(const std::vector<glm::vec3>& new_normals);
     void set_tangents(const std::vector<glm::vec4>& new_tangents);
-    
+
     void index_data();
 
     [[nodiscard]] bool is_indexed() const {
@@ -68,7 +68,7 @@ public:
 
     /**
      * @brief Get the indexed 2x2x2 cube mesh that can be used as skybox mesh.
-     * 
+     *
      * This Mesh DOES NOT contain UVs, normals or tangents. Triangles are
      * faced inwards, so with enabled backface culling the cube will be
      * visible only from inside.

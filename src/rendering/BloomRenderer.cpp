@@ -59,7 +59,7 @@ void BloomRenderer::render_downsamples(TextureID source_texture_id) {
 
         Mesh::get_quad()->bind_vao(true, false, false);
         glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
-        Mesh::get_quad()->unbind_vao();
+        Mesh::get_quad()->unbind_vao(true, false, false);
 
         shader.set_vec2<"orig_tex_resolution">(cur_image.size);
         glBindTexture(GL_TEXTURE_2D, cur_image.texture_id);
@@ -95,7 +95,7 @@ void BloomRenderer::render_upsamples(float filter_radius) {
 
         Mesh::get_quad()->bind_vao(true, false, false);
         glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
-        Mesh::get_quad()->unbind_vao();
+        Mesh::get_quad()->unbind_vao(true, false, false);
     }
 
     glDisable(GL_BLEND);

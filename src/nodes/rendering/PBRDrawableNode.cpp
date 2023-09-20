@@ -32,7 +32,7 @@ static void draw_mesh(const Mesh& mesh, RenderingServer& rs) {
     }
     rs.report_about_drawn_triangles(mesh.get_amount_of_vertices() / 3);
 
-    mesh.unbind_vao();
+    mesh.unbind_vao(true, true, true);
 }
 
 void PBRDrawableNode::draw() {
