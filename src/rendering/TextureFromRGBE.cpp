@@ -164,16 +164,9 @@ parse_header_variable(std::string_view line_with_variable) {
         return std::nullopt;
     }
 
-    return {{
-        std::string_view(
-            line_with_variable.begin(),
-            equal_sign_index
-        ),
-        std::string_view(
-            line_with_variable.begin() + equal_sign_index + 1,
-            line_with_variable.end()
-        )
-    }};
+    std::string_view key = std::string_view(line_with_variable.begin(), line_with_variable.begin() + equal_sign_index);
+    std::string_view value = std::string_view(line_with_variable.begin() + equal_sign_index + 1, line_with_variable.end());
+    return {{key, value}};
 }
 
 Texture Texture::from_rgbe(const TexLoadingParams& params) {
