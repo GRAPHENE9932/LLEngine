@@ -19,6 +19,7 @@
 #include <vector>
 #include <concepts>
 #include <functional>
+#include <string>
 
 namespace llengine {
 namespace internal {
