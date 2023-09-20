@@ -30,6 +30,7 @@ public:
     void swap_buffers();
     [[nodiscard]] bool window_should_close() const;
     void disable_cursor();
+    void enable_cursor();
     [[nodiscard]] glm::dvec2 get_cursor_position() const;
     [[nodiscard]] glm::ivec2 get_window_size() const;
     void set_cursor_position(const glm::dvec2 & new_position);

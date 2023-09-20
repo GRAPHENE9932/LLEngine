@@ -15,6 +15,7 @@ void MainCamera::start() {
     bullet = llengine::node_cast<llengine::SpatialNode>(
         llengine::SceneFile::load_from_file("res/meshes/bullet.glb")->to_node({}, &llengine::find_custom_node_type<BulletNode>())
     );
+    get_rendering_server().get_window().disable_cursor();
 }
 
 void MainCamera::update() {

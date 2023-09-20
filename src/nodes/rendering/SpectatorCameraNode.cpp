@@ -20,10 +20,12 @@ void SpectatorCameraNode::internal_update() {
 }
 
 void SpectatorCameraNode::unlock_mouse() {
+    get_rendering_server().get_window().enable_cursor();
     mouse_locked = false;
 }
 
 void SpectatorCameraNode::lock_mouse() {
+    get_rendering_server().get_window().disable_cursor();
     mouse_locked = true;
 }
 
