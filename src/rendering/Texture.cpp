@@ -386,7 +386,7 @@ template<std::size_t ArraySize>
 
     // If the texture is just a part of some other file (for instance, glTF),
     // determine the file type using file identifiers at start of the texture.
-    std::ifstream stream(params.file_path);
+    std::ifstream stream(params.file_path, std::ios::binary | std::ios::in);
     stream.exceptions(std::ifstream::failbit);
     stream.seekg(params.offset);
 
