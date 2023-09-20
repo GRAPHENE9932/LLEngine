@@ -27,7 +27,6 @@ if (LLENGINE_BUILD_DEMO)
 endif()
 
 set(SOURCES
-    src/rendering/VkFormatInfo.cpp
     src/rendering/GLFWWindow.cpp
     src/rendering/Mesh.cpp
     src/rendering/MeshPrimitives.cpp
