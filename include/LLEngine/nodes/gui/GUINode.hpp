@@ -16,7 +16,7 @@
 namespace llengine {
 class Texture;
 class GUICanvas;
-class GUITexture;
+struct GUITexture;
 class RenderingServer;
 
 class GUINode : public Node {
@@ -42,7 +42,7 @@ public:
     [[nodiscard]] virtual glm::vec2 get_absolute_size() const = 0;
     /**
      * @brief Returns the global GUINode position in pixels in screen space.
-     * 
+     *
      * Top left corner has XY coordinates (0, 0).
      * The Z coordinate is left unchanged relatively to the transform.
      */
@@ -69,7 +69,7 @@ public:
 
     /**
      * @brief Get the parent GUI node if exists.
-     * 
+     *
      * @returns Non-owning pointer to the parent,
      * or nullptr if this GUI node is root or
      * doesn't have a parent GUI node for another reason.
@@ -79,7 +79,7 @@ public:
      * @brief Get the parent size.
      *
      * May throw if the current GUI node doesn't have neither canvas or parent.
-     * 
+     *
      * @returns Size of the parent or size of the canvas, if
      * this node doesn't have a parent.
      */
@@ -87,7 +87,7 @@ public:
 
     /**
      * @brief Get the GUI canvas if assigned.
-     * 
+     *
      * May throw if the current GUI node and it's parent doesn't
      * have a canvas assigned.
      */
