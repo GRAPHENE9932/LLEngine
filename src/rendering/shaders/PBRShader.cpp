@@ -299,13 +299,19 @@ void PBRShader::use_shader(
         shader->bind_2d_texture<"emissive_texture">(material.emissive_texture.value().texture->get_id(), texture_unit++);
     }
     if (shader->is_uniform_initialized<"prefiltered_specular_map">()) {
-        shader->bind_cubemap_texture<"prefiltered_specular_map">(rs.get_prefiltered_specular_map(camera_position).value().get().get_id(), texture_unit++);
+        auto prefiltered_specular_map_id = rs.get_prefiltered_specular_map(camera_position).value().get().get_id();
+        shader->use_shader();
+        shader->bind_cubemap_texture<"prefiltered_specular_map">(prefiltered_specular_map_id, texture_unit++);
     }
     if (shader->is_uniform_initialized<"irradiance_map">()) {
-        shader->bind_cubemap_texture<"irradiance_map">(rs.get_irradiance_map(camera_position).value().get().get_id(), texture_unit++);
+        auto irradiance_map_id = rs.get_irradiance_map(camera_position).value().get().get_id();
+        shader->use_shader();
+        shader->bind_cubemap_texture<"irradiance_map">(irradiance_map_id, texture_unit++);
     }
     if (shader->is_uniform_initialized<"brdf_integration_map">()) {
-        shader->bind_2d_texture<"brdf_integration_map">(rs.get_brdf_integration_map().get_id(), texture_unit++);
+        auto brdf_integration_map_id = rs.get_brdf_integration_map().get_id();
+        shader->use_shader();
+        shader->bind_2d_texture<"brdf_integration_map">(brdf_integration_map_id, texture_unit++);
     }
     if (shader->is_uniform_initialized<"shadow_map">()) {
         shader->bind_2d_texture<"shadow_map">(rs.get_shadow_map_texture_id(), texture_unit++);
