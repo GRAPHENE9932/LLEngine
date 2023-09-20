@@ -51,9 +51,6 @@ static void initialize_opengl() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    // Enable gamma correction.
-    glEnable(GL_FRAMEBUFFER_SRGB);
-
     // Enable filtering of cubemap seams.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 

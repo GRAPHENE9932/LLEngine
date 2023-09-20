@@ -12,5 +12,7 @@ out vec3 color_out;
 void main() {
     color_out = texture(main_image, frag_uv).rgb + texture(bloom_image, frag_uv).rgb * 0.1;
     color_out = 1.0 - exp(-color_out * exposure);
+
+    color_out = pow(color_out, vec3(1.0 / 2.2));
 }
 )""
