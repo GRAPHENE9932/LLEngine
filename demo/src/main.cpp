@@ -1,6 +1,7 @@
 #include "FPSTextNode.hpp"
 #include "MainCamera.hpp"
 #include "BulletNode.hpp"
+#include "ExposureTextNode.hpp"
 
 #include <LLEngine/GameInstance.hpp>
 #include <LLEngine/node_registration.hpp>
@@ -10,6 +11,7 @@ void register_nodes() {
     llengine::register_node_type<FPSTextNode, llengine::TextNode>("fps_text_node");
     llengine::register_node_type<MainCamera, llengine::SpectatorCameraNode>("main_camera");
     llengine::register_node_type<BulletNode, llengine::BulletRigidBodyNode>("bullet_node");
+    llengine::register_node_type<ExposureTextNode, llengine::TextNode>("exposure_text_node");
     llengine::end_nodes_registration();
 }
 

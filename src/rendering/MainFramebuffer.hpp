@@ -15,12 +15,14 @@ public:
     MainFramebuffer(glm::u32vec2 size);
     ~MainFramebuffer();
 
-    void render_to_window();
+    void render_to_window(float delta_time);
 
     [[nodiscard]] FramebufferID get_framebuffer_id() const;
     [[nodiscard]] TextureID get_color_texture_id() const;
 
     void apply_postprocessing_settings(const QualitySettings& quality_settings);
+
+    [[nodiscard]] float get_exposure() const;
 
 private:
     glm::u32vec2 window_size;
@@ -32,7 +34,11 @@ private:
     bool bloom_enabled = true;
     std::unique_ptr<BloomRenderer> bloom_renderer;
 
+    float exposure = 0.0f;
+
     void initialize_color_attachment(glm::u32vec2 size);
     void initialize_depth_attachment(glm::u32vec2 size);
+
+    void compute_automatic_exposure(float delta_time);
 };
 }

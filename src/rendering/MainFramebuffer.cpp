@@ -4,6 +4,9 @@
 #include "rendering/Mesh.hpp"
 
 #include <GL/glew.h>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <cmath>
 
 namespace llengine {
 MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), window_size(size) {
@@ -26,7 +29,9 @@ MainFramebuffer::~MainFramebuffer() {
 
 }
 
-void MainFramebuffer::render_to_window() {
+void MainFramebuffer::render_to_window(float delta_time) {
+    compute_automatic_exposure(delta_time);
+
     if (bloom_enabled) {
         if (!bloom_renderer) {
             bloom_renderer = std::make_unique<BloomRenderer>(window_size);
@@ -35,13 +40,14 @@ void MainFramebuffer::render_to_window() {
     }
 
     glDisable(GL_DEPTH_TEST);
-    static Shader<"main_image", "bloom_image"> postprocessing_shader(
+    static Shader<"main_image", "bloom_image", "exposure"> postprocessing_shader(
         #include "shaders/postprocessing.vert"
         ,
         #include "shaders/postprocessing.frag"
     );
     postprocessing_shader.use_shader();
     postprocessing_shader.bind_2d_texture<"main_image">(get_color_texture_id(), 0);
+    postprocessing_shader.set_float<"exposure">(exposure);
     if (bloom_enabled) {
         postprocessing_shader.bind_2d_texture<"bloom_image">(bloom_renderer->get_bloom_texture_id(), 1);
     }
@@ -62,6 +68,10 @@ void MainFramebuffer::render_to_window() {
 
 void MainFramebuffer::apply_postprocessing_settings(const QualitySettings& quality_settings) {
     bloom_enabled = quality_settings.enable_bloom;
+}
+
+[[nodiscard]] float MainFramebuffer::get_exposure() const {
+    return exposure;
 }
 
 void MainFramebuffer::initialize_color_attachment(glm::u32vec2 size) {
@@ -85,5 +95,37 @@ void MainFramebuffer::initialize_depth_attachment(glm::u32vec2 size) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.x, size.y);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_attachment);
+}
+
+static std::uint32_t calculate_amount_of_mipmap_levels(glm::u32vec2 texture_size) {
+    return std::floor(std::log2(static_cast<float>(std::max(texture_size.x, texture_size.y)))) + 1;
+}
+
+static glm::vec3 compute_average_texture_color(TextureID texture_id, glm::u32vec2 texture_size) {
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glm::vec3 result;
+    glGetTexImage(
+        GL_TEXTURE_2D,
+        calculate_amount_of_mipmap_levels(texture_size) - 1,
+        GL_RGB,
+        GL_FLOAT,
+        glm::value_ptr(result)
+    );
+
+    return result;
+}
+
+constexpr float EXPOSURE_KEY_VALUE = 0.18f;
+constexpr float DECAY_RATE = 0.75f;
+
+void MainFramebuffer::compute_automatic_exposure(float delta_time) {
+    const glm::vec3 average_color = compute_average_texture_color(get_color_texture_id(), window_size);
+    float average_luminance = 0.2126f * average_color.r + 0.7152f * average_color.g + 0.0722f * average_color.b;
+
+    float target_exposure = EXPOSURE_KEY_VALUE / average_luminance;
+
+    exposure = exposure + (target_exposure - exposure) * (1.0f - std::exp(-delta_time * DECAY_RATE));
 }
 }

@@ -3,6 +3,7 @@ add_executable(llengine_demo
     src/FPSTextNode.cpp
     src/MainCamera.cpp
     src/BulletNode.cpp
+    src/ExposureTextNode.cpp
 )
 
 target_link_libraries(llengine_demo llengine)

@@ -72,7 +72,7 @@ void RenderingServer::main_loop() {
         }
         glDisable(GL_BLEND);
 
-        main_framebuffer->render_to_window();
+        main_framebuffer->render_to_window(delta_time);
 
         window.swap_buffers();
         glfwPollEvents();
@@ -327,6 +327,10 @@ void RenderingServer::set_shadow_map_size(glm::u32vec2 new_size) {
 
 void RenderingServer::set_shadow_drawing_distance(float new_distance) {
     shadow_map_drawing_distance = new_distance;
+}
+
+[[nodiscard]] float RenderingServer::get_exposure() const {
+    return main_framebuffer->get_exposure();
 }
 
 std::optional<std::reference_wrapper<const Texture>>

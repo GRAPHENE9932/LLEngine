@@ -157,6 +157,8 @@ public:
     [[nodiscard]] glm::vec3 get_dir_light_direction() const;
     void set_shadow_drawing_distance(float new_distance);
 
+    [[nodiscard]] float get_exposure() const;
+
     [[nodiscard]] const std::vector<PointLightNode*>& get_point_lights() const noexcept {
         return point_lights;
     }

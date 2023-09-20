@@ -55,6 +55,22 @@
 				"position_anchor": [0.5, 0.1],
 				"origin": ["center", "center"]
 			}
+		},
+		{
+			"id": 8,
+			"parent_id": 4,
+			"type": "exposure_text_node",
+			"font": {
+				"type": "font",
+				"path": "res/fonts/Ubuntu-Regular.ttf",
+				"size": 32
+			},
+			"transform": {
+				"type": "gui_transform",
+				"position_anchor": [0.0, 0.0],
+				"origin": ["left", "top"],
+				"position_offset": [0.0, 32.0]
+			}
 		}
 	]
 }
