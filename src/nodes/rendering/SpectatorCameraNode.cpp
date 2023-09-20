@@ -5,6 +5,8 @@
 #include <glm/ext/vector_double2.hpp> // glm::dvec2
 #include <glm/ext/quaternion_exponential.hpp> // glm::pow
 
+#include <numbers>
+
 using namespace llengine;
 
 constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
@@ -72,10 +74,10 @@ glm::quat angle_axis_y(float angle) {
 /// Moves arbitrary angle in range [-PI; PI] without
 /// changing the angle.
 void move_angle_in_bounds(float& angle) {
-    if (angle > M_PIf)
-        angle -= 2.0f * M_PIf;
-    else if (angle < -M_PIf)
-        angle += 2.0f * M_PIf;
+    if (angle > std::numbers::pi_v<float>)
+        angle -= 2.0f * std::numbers::pi_v<float>;
+    else if (angle < -std::numbers::pi_v<float>)
+        angle += 2.0f * std::numbers::pi_v<float>;
 }
 
 void clamp_x_angle(float& x_angle) {
