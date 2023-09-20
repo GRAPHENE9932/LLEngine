@@ -3,6 +3,7 @@
 #include "nodes/Node.hpp"
 
 #include <memory>
+#include <stdexcept>
 #include <typeindex>
 #include <functional>
 #include <string_view>
