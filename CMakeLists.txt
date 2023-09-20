@@ -136,6 +136,7 @@ set(PUBLIC_HEADERS
 
 find_package(Threads)
 add_library(llengine SHARED ${SOURCES})
+set_target_properties(llengine PROPERTIES PUBLIC_HEADER PUBLIC_HEADERS)
 
 # Enable warnings.
 if (MSVC)
