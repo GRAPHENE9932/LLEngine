@@ -401,7 +401,7 @@ std::vector<VAL_T> read_from_sparse_buffer_view(
 template<typename T>
 std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& accessor_json) {
     // Check type and componentType.
-    if (accessor_json.at("type") != get_accessor_type<T>())
+    if (accessor_json.at("type").get<std::string_view>() != get_accessor_type<T>())
         throw std::runtime_error("Unexpected accessor type.");
     if (accessor_json.at("componentType") != get_component_type<T>())
         throw std::runtime_error("Unexpected accessor componentType.");
