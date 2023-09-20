@@ -156,11 +156,6 @@ target_link_libraries(llengine glfw)
 find_package(GLEW REQUIRED)
 target_link_libraries(llengine GLEW::GLEW)
 
-# OpenGL.
-set(OpenGL_GL_PREFERENCE GLVND)
-find_package(OpenGL REQUIRED)
-target_link_libraries(llengine OpenGL)
-
 # Bullet.
 find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIR})
