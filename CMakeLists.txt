@@ -82,6 +82,7 @@ set(SOURCES
     src/SceneJSON.cpp
     src/node_registration.cpp
     src/builtin_node_registration.cpp
+    src/random.cpp
 )
 
 set(PUBLIC_HEADERS
@@ -133,6 +134,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/nodes/gui/ButtonNode.hpp
     include/LLEngine/nodes/Node.hpp
     include/LLEngine/FPSMeter.hpp
+    include/LLEngine/random.hpp
 )
 
 find_package(Threads)
