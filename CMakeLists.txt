@@ -67,6 +67,7 @@ set(SOURCES
     src/nodes/rendering/PointLightNode.cpp
     src/nodes/rendering/CameraNode.cpp
     src/nodes/rendering/SpotLight.cpp
+    src/nodes/rendering/ExplosionParticlesNode.cpp
     src/nodes/physics/BulletRigidBodyNode.cpp
     src/nodes/SpatialNode.cpp
     src/nodes/gui/GUINode.cpp
@@ -124,6 +125,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/nodes/rendering/DrawableCompleteSpatialNode.hpp
     include/LLEngine/nodes/rendering/SpectatorCameraNode.hpp
     include/LLEngine/nodes/rendering/SpotLight.hpp
+    include/LLEngine/nodes/rendering/ExplosionParticlesNode.hpp
     include/LLEngine/nodes/physics/BulletRigidBodyNode.hpp
     include/LLEngine/nodes/SpatialNode.hpp
     include/LLEngine/nodes/CompleteSpatialNode.hpp
