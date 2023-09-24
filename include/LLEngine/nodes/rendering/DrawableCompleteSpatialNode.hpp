@@ -20,6 +20,6 @@ public:
     }
 
 protected:
-    void on_attachment_to_tree_without_start() override final;
+    void on_attachment_to_tree_without_start() override;
 };
 }
