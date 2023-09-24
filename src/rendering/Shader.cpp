@@ -13,6 +13,10 @@ void set_int(ShaderID shader_id, ShaderUniformID uniform_id, std::int32_t value)
     glUniform1i(uniform_id, value);
 }
 
+void set_uint(ShaderID shader_id, ShaderUniformID uniform_id, std::uint32_t value) {
+    glUniform1ui(uniform_id, value);
+}
+
 void set_float(ShaderID shader_id, ShaderUniformID uniform_id, float value) {
     glUniform1f(uniform_id, value);
 }

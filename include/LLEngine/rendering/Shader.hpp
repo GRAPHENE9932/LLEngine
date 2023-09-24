@@ -25,6 +25,7 @@ namespace llengine {
 namespace internal {
 void use_shader(ShaderID shader_id);
 void set_int(ShaderID shader_id, ShaderUniformID uniform_id, std::int32_t value);
+void set_uint(ShaderID shader_id, ShaderUniformID uniform_id, std::uint32_t value);
 void set_float(ShaderID shader_id, ShaderUniformID uniform_id, float value);
 void set_vec2(ShaderID shader_id, ShaderUniformID uniform_id, glm::vec2 value);
 void set_vec3(ShaderID shader_id, ShaderUniformID uniform_id, const glm::vec3& value);
@@ -92,6 +93,16 @@ public:
     template<ConstUniformName Name>
     void set_int(std::size_t index, std::int32_t value) const {
         internal::set_int(shader_id, get_uniform_id<Name>(index), value);
+    }
+
+    template<ConstUniformName Name>
+    void set_uint(std::uint32_t value) const {
+        internal::set_uint(shader_id, get_uniform_id<Name>(), value);
+    }
+
+    template<ConstUniformName Name>
+    void set_uint(std::size_t index, std::uint32_t value) const {
+        internal::set_uint(shader_id, get_uniform_id<Name>(index), value);
     }
 
     template<ConstUniformName Name>
