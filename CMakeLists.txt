@@ -184,6 +184,3 @@ target_link_libraries(llengine KTX::ktx)
 # FreeType.
 find_package(Freetype REQUIRED)
 target_link_libraries(llengine Freetype::Freetype)
-
-# Copy shaders to the binary directory.
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/res")
