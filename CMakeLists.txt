@@ -10,6 +10,9 @@ include_directories(include/LLEngine)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 if (NOT DEFINED LLENGINE_BUILD_TESTS)
     set(LLENGINE_BUILD_TESTS 1)
 endif()
@@ -184,6 +187,3 @@ target_link_libraries(llengine KTX::ktx)
 # FreeType.
 find_package(Freetype REQUIRED)
 target_link_libraries(llengine Freetype::Freetype)
-
-# Copy shaders to the binary directory.
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/res")

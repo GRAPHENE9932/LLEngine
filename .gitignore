@@ -12,6 +12,7 @@ build/
 .vscode/
 *.kateproject
 .idea/
+.vs/
 
 # Compile commands.
 compile_commands.json

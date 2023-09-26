@@ -9,4 +9,4 @@ add_executable(llengine_demo
 target_link_libraries(llengine_demo llengine)
 
 # Copy resources.
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/res" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/res" DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
