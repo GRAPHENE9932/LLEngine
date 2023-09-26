@@ -84,7 +84,31 @@ public:
     [[nodiscard]] static std::shared_ptr<const Mesh> get_quad();
 
 private:
-    BufferID indices_id = 0, vertices_id = 0, uvs_id = 0,
+    class HandledBufferID {
+    public:
+        HandledBufferID();
+        HandledBufferID(BufferID buffer_id);
+        HandledBufferID(const HandledBufferID& other) = delete;
+        HandledBufferID(HandledBufferID&& other);
+        ~HandledBufferID();
+
+        operator BufferID() const {
+            return get();
+        }
+
+        [[nodiscard]] BufferID get() const {
+            return buffer_id;
+        }
+
+        HandledBufferID& operator=(const HandledBufferID& other) = delete;
+        HandledBufferID& operator=(HandledBufferID&& other);
+        HandledBufferID& operator=(BufferID buffer_id);
+
+    private:
+        BufferID buffer_id;
+    };
+
+    HandledBufferID indices_id = 0, vertices_id = 0, uvs_id = 0,
            normals_id = 0, tangents_id = 0;
     mutable VertexArrayID vao_id = 0;
 

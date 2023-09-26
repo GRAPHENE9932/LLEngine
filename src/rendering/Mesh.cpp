@@ -54,46 +54,88 @@ void Mesh::unbind_vao(bool unbind_uv, bool unbind_normals, bool unbind_tangents)
 }
 
 template<typename T, GLenum TARGET>
-void handle_buffer(std::vector<T>& buffer, GLuint& buffer_id) {
-    if (!buffer_id)
-        glGenBuffers(1, &buffer_id);
+BufferID handle_buffer(std::vector<T>& buffer) {
+    BufferID buffer_id;
+
+    glGenBuffers(1, &buffer_id);
 
     glBindBuffer(TARGET, buffer_id);
     glBufferData(TARGET, buffer.size() * sizeof(T),
                  buffer.data(), GL_STATIC_DRAW);
+
+    return buffer_id;
 }
 
 template<typename T>
 void Mesh::set_indices(const std::vector<T>& new_indices) {
     indices = new_indices;
-    handle_buffer<T, GL_ELEMENT_ARRAY_BUFFER>(
-        std::get<std::vector<T>>(indices),
-        indices_id
+    indices_id = handle_buffer<T, GL_ELEMENT_ARRAY_BUFFER>(
+        std::get<std::vector<T>>(indices)
     );
 }
 
 void Mesh::set_vertices(const std::vector<glm::vec3>& new_vertices) {
     vertices = new_vertices;
-    handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(vertices, vertices_id);
+    vertices_id = handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(vertices);
     reset_vao_if_needed();
 }
 
 void Mesh::set_uvs(const std::vector<glm::vec2>& new_uvs) {
     uvs = new_uvs;
-    handle_buffer<glm::vec2, GL_ARRAY_BUFFER>(uvs, uvs_id);
+    uvs_id = handle_buffer<glm::vec2, GL_ARRAY_BUFFER>(uvs);
     reset_vao_if_needed();
 }
 
 void Mesh::set_normals(const std::vector<glm::vec3>& new_normals) {
     normals = new_normals;
-    handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(normals, normals_id);
+    normals_id = handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(normals);
     reset_vao_if_needed();
 }
 
 void Mesh::set_tangents(const std::vector<glm::vec4>& new_tangents) {
     tangents = new_tangents;
-    handle_buffer<glm::vec4, GL_ARRAY_BUFFER>(tangents, tangents_id);
+    tangents_id = handle_buffer<glm::vec4, GL_ARRAY_BUFFER>(tangents);
     reset_vao_if_needed();
+}
+
+Mesh::HandledBufferID::HandledBufferID() : buffer_id(0) {
+
+}
+
+Mesh::HandledBufferID::HandledBufferID(BufferID buffer_id) : buffer_id(buffer_id) {
+
+}
+
+Mesh::HandledBufferID::HandledBufferID(Mesh::HandledBufferID&& other) {
+    this->buffer_id = other.get();
+    other.buffer_id = 0;
+}
+
+Mesh::HandledBufferID::~HandledBufferID() {
+    if (buffer_id != 0) {
+        glDeleteBuffers(1, &buffer_id);
+    }
+}
+
+Mesh::HandledBufferID& Mesh::HandledBufferID::operator=(Mesh::HandledBufferID&& other) {
+    if (buffer_id != 0) {
+        glDeleteBuffers(1, &buffer_id);
+    }
+
+    this->buffer_id = other.buffer_id;
+    other.buffer_id = 0;
+
+    return *this;
+}
+
+Mesh::HandledBufferID& Mesh::HandledBufferID::operator=(BufferID buffer_id) {
+    if (this->buffer_id != 0) {
+        glDeleteBuffers(1, &buffer_id);
+    }
+
+    this->buffer_id = buffer_id;
+
+    return *this;
 }
 
 struct CompleteVertex {
@@ -195,25 +237,16 @@ Mesh::Mesh(Mesh&& other) noexcept :
     normals(std::move(other.normals)),
     tangents(std::move(other.tangents)),
     vao_id(other.vao_id),
-    indices_id(other.indices_id),
-    vertices_id(other.vertices_id),
-    uvs_id(other.uvs_id),
-    normals_id(other.normals_id),
-    tangents_id(other.tangents_id) {}
+    indices_id(std::move(other.indices_id)),
+    vertices_id(std::move(other.vertices_id)),
+    uvs_id(std::move(other.uvs_id)),
+    normals_id(std::move(other.normals_id)),
+    tangents_id(std::move(other.tangents_id)) {}
 
 Mesh::~Mesh() {
-    if (indices_id)
-        glDeleteBuffers(1, &indices_id);
-    if (vertices_id)
-        glDeleteBuffers(1, &vertices_id);
-    if (uvs_id)
-        glDeleteBuffers(1, &uvs_id);
-    if (normals_id)
-        glDeleteBuffers(1, &normals_id);
-    if (tangents_id)
-        glDeleteBuffers(1, &tangents_id);
-    if (vao_id)
+    if (vao_id) {
         glDeleteVertexArrays(1, &vao_id);
+    }
 }
 
 Mesh& Mesh::operator=(const Mesh& other) {
@@ -235,11 +268,11 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
     normals = std::move(other.normals);
     tangents = std::move(other.tangents);
 
-    indices_id = other.indices_id;
-    vertices_id = other.vertices_id;
-    uvs_id = other.uvs_id;
-    normals_id = other.normals_id;
-    tangents_id = other.tangents_id;
+    indices_id = std::move(other.indices_id);
+    vertices_id = std::move(other.vertices_id);
+    uvs_id = std::move(other.uvs_id);
+    normals_id = std::move(other.normals_id);
+    tangents_id = std::move(other.tangents_id);
 
     return *this;
 }
