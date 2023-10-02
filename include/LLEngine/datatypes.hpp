@@ -11,4 +11,5 @@ using VertexArrayID = std::uint32_t;
 using TextureID = std::uint32_t;
 using FramebufferID = std::uint32_t;
 using RenderbufferID = std::uint32_t;
+using GraphicsAPISize = std::int32_t;
 }

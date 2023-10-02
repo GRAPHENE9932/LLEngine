@@ -20,7 +20,7 @@ struct TexLoadingParams {
     std::streamsize offset;
     std::streamsize size; // Zero implies that loader must load to the end.
 
-    void set_to_defaults();
+    TexLoadingParams();
 };
 
 class TextureLoadingError : std::runtime_error {
@@ -82,7 +82,6 @@ public:
     [[nodiscard]] static Texture from_rgbe(const TexLoadingParams& params);
     [[nodiscard]] static inline Texture from_rgbe(const std::string& rgbe_texture_path) {
         TexLoadingParams params;
-        params.set_to_defaults();
         params.file_path = rgbe_texture_path;
         return Texture::from_rgbe(params);
     }
@@ -90,7 +89,6 @@ public:
     [[nodiscard]] static Texture from_ktx(const TexLoadingParams& params);
     [[nodiscard]] static inline Texture from_ktx2(const std::string& ktx_texture_path) {
         TexLoadingParams params;
-        params.set_to_defaults();
         params.file_path = ktx_texture_path;
         return Texture::from_ktx(params);
     }
@@ -123,7 +121,6 @@ public:
      */
     [[nodiscard]] static inline Texture from_file(const std::string& texture_path) {
         TexLoadingParams params;
-        params.set_to_defaults();
         params.file_path = texture_path;
         return Texture::from_file(params);
     }

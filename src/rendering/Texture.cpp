@@ -14,7 +14,7 @@
 
 using namespace llengine;
 
-void TexLoadingParams::set_to_defaults() {
+TexLoadingParams::TexLoadingParams() {
     magnification_filter = GL_LINEAR;
     minification_filter = GL_LINEAR;
     wrap_s = GL_CLAMP_TO_EDGE;
@@ -99,7 +99,7 @@ auto draw_to_cubemap(
     for (std::int32_t level = 0; level < mipmap_levels; level++) {
         for (std::size_t i = 0; i < 6; i++) {
             glTexImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, level, GL_RGB16F,
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GraphicsAPIEnum>(i), level, GL_RGB16F,
                 cur_cubemap_size.x, cur_cubemap_size.y, 0, GL_RGB,
                 GL_FLOAT, nullptr
             );
@@ -122,7 +122,7 @@ auto draw_to_cubemap(
         glViewport(0, 0, cur_cubemap_size.x, cur_cubemap_size.y);
         for (std::size_t i = 0; i < 6; i++) {
             glFramebufferTexture2D(
-                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GraphicsAPIEnum>(i),
                 cubemap_id, level
             );
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -418,7 +418,6 @@ template<std::size_t ArraySize>
     }
 
     TexLoadingParams params;
-    params.set_to_defaults();
     params.file_path = property.get<std::string>("path");
     params.offset = property.get_optional<std::int64_t>("offset").value_or(0);
     params.size = property.get_optional<std::int64_t>("size").value_or(0);

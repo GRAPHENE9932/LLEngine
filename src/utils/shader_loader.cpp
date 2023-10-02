@@ -41,7 +41,7 @@ ShaderID llengine::load_shaders(
     std::string_view fragment_shader_code,
     const std::vector<std::string>& defines
 ) {
-    using std::string_literals::operator""s;
+    using namespace std::string_literals;
 
     ManagedProgramID program_id = glCreateProgram();
 
@@ -79,7 +79,7 @@ ManagedShaderID llengine::load_vertex_shader(
     std::string_view vertex_shader_code,
     const std::vector<std::string>& defines
 ) {
-    using std::string_literals::operator""s;
+    using namespace std::string_literals;
 
     std::string modified_shader_code(vertex_shader_code);
 
@@ -130,7 +130,7 @@ ManagedShaderID llengine::load_fragment_shader(
     std::string_view fragment_shader_code,
     const std::vector<std::string>& defines
 ) {
-    using std::string_literals::operator""s;
+    using namespace std::string_literals;
 
     std::string modified_shader_code(fragment_shader_code);
 

@@ -27,7 +27,7 @@ public:
     [[nodiscard]] BufferID get_normals_id() const { return normals_id; }
     [[nodiscard]] BufferID get_tangents_id() const { return tangents_id; }
 
-    [[nodiscard]] size_t get_amount_of_vertices() const;
+    [[nodiscard]] GraphicsAPISize get_amount_of_vertices() const;
     [[nodiscard]] GraphicsAPIEnum get_indices_type() const;
 
     [[nodiscard]] inline bool is_initialized() const noexcept {
@@ -89,7 +89,7 @@ private:
         HandledBufferID();
         HandledBufferID(BufferID buffer_id);
         HandledBufferID(const HandledBufferID& other) = delete;
-        HandledBufferID(HandledBufferID&& other);
+        HandledBufferID(HandledBufferID&& other) noexcept;
         ~HandledBufferID();
 
         operator BufferID() const {
@@ -101,7 +101,7 @@ private:
         }
 
         HandledBufferID& operator=(const HandledBufferID& other) = delete;
-        HandledBufferID& operator=(HandledBufferID&& other);
+        HandledBufferID& operator=(HandledBufferID&& other) noexcept;
         HandledBufferID& operator=(BufferID buffer_id);
 
     private:

@@ -98,7 +98,11 @@ void MainFramebuffer::initialize_depth_attachment(glm::u32vec2 size) {
 }
 
 static std::uint32_t calculate_amount_of_mipmap_levels(glm::u32vec2 texture_size) {
-    return std::floor(std::log2(static_cast<float>(std::max(texture_size.x, texture_size.y)))) + 1;
+    return static_cast<std::uint32_t>(
+        std::floor(
+            std::log2(static_cast<float>(std::max(texture_size.x, texture_size.y)))
+        ) + 1
+    );
 }
 
 static glm::vec3 compute_average_texture_color(TextureID texture_id, glm::u32vec2 texture_size) {

@@ -7,7 +7,7 @@
 #include <vector>
 #include <string_view> // std::string_view
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace llengine {
 class Node;

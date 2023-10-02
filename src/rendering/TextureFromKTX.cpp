@@ -32,43 +32,6 @@ private:
     ktxTexture* ptr = nullptr;
 };
 
-class FILEWrapper {
-public:
-    FILEWrapper() : ptr(nullptr) {}
-    FILEWrapper(std::FILE* ptr) : ptr(ptr) {}
-    FILEWrapper(const std::string& file_name, const std::string& mode) {
-        init(file_name, mode);
-    }
-    FILEWrapper(const FILEWrapper& other) = delete;
-    FILEWrapper(FILEWrapper&& other) noexcept : FILEWrapper(other.get()) {
-        other.ptr = nullptr;
-    }
-    FILEWrapper& operator=(const FILEWrapper& other) = delete;
-    ~FILEWrapper() {
-        if (ptr) {
-            fclose(ptr);
-        }
-    }
-
-    void init(const std::string& file_name, const std::string& mode) {
-        ptr = std::fopen(file_name.c_str(), mode.c_str());
-    }
-
-    [[nodiscard]] inline std::FILE* get() const noexcept {
-        return ptr;
-    }
-
-    [[nodiscard]] inline operator bool() const noexcept {
-        return ptr;
-    }
-    [[nodiscard]] inline bool operator!() const noexcept {
-        return !ptr;
-    }
-
-private:
-    std::FILE* ptr;
-};
-
 std::string ktx_error_to_string(KTX_error_code error) {
     switch (error) {
     case KTX_SUCCESS:

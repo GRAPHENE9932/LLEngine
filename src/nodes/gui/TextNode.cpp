@@ -143,7 +143,7 @@ void TextNode::draw() {
     shader->set_mat4<"mvp">(mvp);
     shader->set_vec3<"text_color">(get_color());
     glActiveTexture(GL_TEXTURE0);
-    for (std::size_t char_i = 0; char_i < chars.size(); char_i++) {
+    for (std::int32_t char_i = 0; char_i < chars.size(); char_i++) {
         glBindTexture(GL_TEXTURE_2D, chars[char_i].get().texture);
         mesh->bind_vao(true, false, false);
         glDrawArrays(GL_TRIANGLES, char_i * 6, 6);
@@ -172,10 +172,10 @@ void TextNode::add_line(
         const float top_y = static_cast<float>(font_char.position.y) + offset.y;
         const float bottom_y = static_cast<float>(font_char.position.y) - static_cast<float>(font_char.texture.get_size().y) + offset.y;
 
-        if (right_x > max_x) max_x = right_x;
-        if (left_x < min_x) min_x = left_x;
-        if (top_y > max_y) max_y = top_y;
-        if (bottom_y < min_y) min_y = bottom_y;
+        if (right_x > max_x) max_x = static_cast<std::int32_t>(right_x);
+        if (left_x < min_x) min_x = static_cast<std::int32_t>(left_x);
+        if (top_y > max_y) max_y = static_cast<std::int32_t>(top_y);
+        if (bottom_y < min_y) min_y = static_cast<std::int32_t>(bottom_y);
 
         vertices.emplace_back(left_x, top_y, 0.0f);
         vertices.emplace_back(left_x, bottom_y, 0.0f);

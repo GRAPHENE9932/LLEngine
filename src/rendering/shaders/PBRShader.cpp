@@ -115,7 +115,7 @@ PBRShader::~PBRShader() {
 }
 
 [[nodiscard]] static std::vector<std::string> compute_defines_from_params(const PBRShader::Parameters& params) {
-    using std::string_literals::operator""s;
+    using namespace std::string_literals;
 
     std::vector<std::string> defines {
         "POINT_LIGHTS_COUNT " + std::to_string(params.point_lights_count)
@@ -186,7 +186,7 @@ void PBRShader::initialize(const Parameters& params) {
     metallic_channel = params.metallic_channel;
     roughness_channel = params.roughness_channel;
     ao_channel = params.ao_channel;
-    point_lights_count = params.point_lights_count;
+    point_lights_count = static_cast<std::int32_t>(params.point_lights_count);
 
     shader = std::make_optional<ShaderType>(
         VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT,

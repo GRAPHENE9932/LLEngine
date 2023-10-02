@@ -10,14 +10,14 @@
 
 using namespace llengine;
 
-size_t Mesh::get_amount_of_vertices() const {
+GraphicsAPISize Mesh::get_amount_of_vertices() const {
     if (is_indexed()) {
-        return std::visit([] (const auto& vector) -> std::size_t {
-            return vector.size();
+        return std::visit([] (const auto& vector) -> GraphicsAPISize {
+            return static_cast<GraphicsAPISize>(vector.size());
         }, indices);
     }
     else {
-        return vertices.size();
+        return static_cast<GraphicsAPISize>(vertices.size());
     }
 }
 
@@ -106,7 +106,7 @@ Mesh::HandledBufferID::HandledBufferID(BufferID buffer_id) : buffer_id(buffer_id
 
 }
 
-Mesh::HandledBufferID::HandledBufferID(Mesh::HandledBufferID&& other) {
+Mesh::HandledBufferID::HandledBufferID(Mesh::HandledBufferID&& other) noexcept {
     this->buffer_id = other.get();
     other.buffer_id = 0;
 }
@@ -117,7 +117,7 @@ Mesh::HandledBufferID::~HandledBufferID() {
     }
 }
 
-Mesh::HandledBufferID& Mesh::HandledBufferID::operator=(Mesh::HandledBufferID&& other) {
+Mesh::HandledBufferID& Mesh::HandledBufferID::operator=(Mesh::HandledBufferID&& other) noexcept {
     if (buffer_id != 0) {
         glDeleteBuffers(1, &buffer_id);
     }
@@ -204,7 +204,7 @@ void Mesh::index_data() {
             uvs.push_back(complete.uv);
             normals.push_back(complete.normal);
 
-            uint32_t new_index = vertices.size() - 1;
+            std::uint32_t new_index = static_cast<std::uint32_t>(vertices.size()) - 1;
             vertex_to_index.insert(std::make_pair(complete, new_index));
             indices.push_back(new_index);
         }

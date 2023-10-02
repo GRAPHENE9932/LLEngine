@@ -24,7 +24,7 @@ void rgbe_to_rgb(
     static_assert(std::is_same<typename std::remove_reference<decltype(*rgb_data_begin)>::type, float>());
     assert((rgbe_data_end - rgbe_data_begin) % 4 == 0);
 
-    const auto size {(rgbe_data_end - rgbe_data_begin) / 4};
+    const std::size_t size = (rgbe_data_end - rgbe_data_begin) / 4;
     for (std::size_t i = 0; i < size; i++) {
         float exponent = std::ldexp(1.0f, *(rgbe_data_begin + size * 3 + i) - 128);
         *rgb_data_begin++ = *(rgbe_data_begin + size * 0 + i) / 255.0f * exponent;
