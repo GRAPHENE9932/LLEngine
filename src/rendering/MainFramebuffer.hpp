@@ -24,6 +24,8 @@ public:
 
     [[nodiscard]] float get_exposure() const;
 
+    void assign_window_size(glm::u32vec2 size);
+
 private:
     glm::u32vec2 window_size;
 
@@ -40,5 +42,7 @@ private:
     void initialize_depth_attachment(glm::u32vec2 size);
 
     void compute_automatic_exposure(float delta_time);
+
+    void initialize_framebuffer(glm::u32vec2 size);
 };
 }

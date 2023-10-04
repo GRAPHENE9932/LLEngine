@@ -10,19 +10,7 @@
 
 namespace llengine {
 MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), window_size(size) {
-    framebuffer.delete_framebuffer();
-    glGenFramebuffers(1, &framebuffer.get_ref());
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    initialize_color_attachment(size);
-    initialize_depth_attachment(size);
-
-    GraphicsAPIEnum attachment = GL_COLOR_ATTACHMENT0;
-    glDrawBuffers(1, &attachment);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        throw std::runtime_error("Failed to initialize main framebuffer.");
-    }
+    initialize_framebuffer(size);
 }
 
 MainFramebuffer::~MainFramebuffer() {
@@ -72,6 +60,18 @@ void MainFramebuffer::apply_postprocessing_settings(const QualitySettings& quali
 
 [[nodiscard]] float MainFramebuffer::get_exposure() const {
     return exposure;
+}
+
+void MainFramebuffer::assign_window_size(glm::u32vec2 size) {
+    if (bloom_enabled && bloom_renderer) {
+        bloom_renderer->assign_window_size(size);
+    }
+    if (this->window_size == size) {
+        return;
+    }
+
+    this->window_size = size;
+    initialize_framebuffer(size);
 }
 
 void MainFramebuffer::initialize_color_attachment(glm::u32vec2 size) {
@@ -131,5 +131,21 @@ void MainFramebuffer::compute_automatic_exposure(float delta_time) {
     float target_exposure = EXPOSURE_KEY_VALUE / average_luminance;
 
     exposure = exposure + (target_exposure - exposure) * (1.0f - std::exp(-delta_time * DECAY_RATE));
+}
+
+void MainFramebuffer::initialize_framebuffer(glm::u32vec2 size) {
+    framebuffer.delete_framebuffer();
+    glGenFramebuffers(1, &framebuffer.get_ref());
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    initialize_color_attachment(size);
+    initialize_depth_attachment(size);
+
+    GraphicsAPIEnum attachment = GL_COLOR_ATTACHMENT0;
+    glDrawBuffers(1, &attachment);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        throw std::runtime_error("Failed to initialize main framebuffer.");
+    }
 }
 }

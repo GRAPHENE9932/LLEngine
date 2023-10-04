@@ -11,6 +11,9 @@ public:
     ManagedFramebufferID(ManagedFramebufferID&& other) noexcept;
     ~ManagedFramebufferID();
 
+    ManagedFramebufferID& operator=(const ManagedFramebufferID& other) = delete;
+    ManagedFramebufferID& operator=(ManagedFramebufferID&& other) noexcept;
+
     operator FramebufferID() const {
         return get();
     }

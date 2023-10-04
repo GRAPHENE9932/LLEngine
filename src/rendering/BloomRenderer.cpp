@@ -21,6 +21,15 @@ BloomRenderer::~BloomRenderer() {
 
 }
 
+void BloomRenderer::assign_window_size(glm::u32vec2 window_size) {
+    if (this->window_size == window_size) {
+        return;
+    }
+
+    this->window_size = window_size;
+    framebuffer = std::move(BloomFramebuffer(window_size, IMAGE_STAGES));
+}
+
 void BloomRenderer::render_to_bloom_texture(TextureID source_texture_id, float bloom_radius) {
     framebuffer.bind();
 

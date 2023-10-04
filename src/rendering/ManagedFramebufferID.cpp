@@ -16,6 +16,15 @@ ManagedFramebufferID::~ManagedFramebufferID() {
     delete_framebuffer();
 }
 
+ManagedFramebufferID& ManagedFramebufferID::operator=(ManagedFramebufferID&& other) noexcept {
+    delete_framebuffer();
+
+    set_id(other.id);
+    other.id = 0;
+
+    return *this;
+}
+
 void ManagedFramebufferID::set_id(FramebufferID id) {
     this->id = id;
 }

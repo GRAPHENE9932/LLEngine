@@ -50,6 +50,7 @@ void RenderingServer::main_loop() {
         // Invoke callback.
         update_callback(delta_time);
 
+        main_framebuffer->assign_window_size(get_window().get_window_size());
         glBindFramebuffer(GL_FRAMEBUFFER, main_framebuffer->get_framebuffer_id());
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
