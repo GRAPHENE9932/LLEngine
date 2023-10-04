@@ -9,7 +9,7 @@
 #include <cmath>
 
 namespace llengine {
-MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), window_size(size) {
+MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), framebuffer_size(size) {
     initialize_framebuffer(size);
 }
 
@@ -22,7 +22,7 @@ void MainFramebuffer::render_to_window(float delta_time) {
 
     if (bloom_enabled) {
         if (!bloom_renderer) {
-            bloom_renderer = std::make_unique<BloomRenderer>(window_size);
+            bloom_renderer = std::make_unique<BloomRenderer>(framebuffer_size);
         }
         bloom_renderer->render_to_bloom_texture(get_color_texture_id(), 0.005f);
     }
@@ -62,15 +62,15 @@ void MainFramebuffer::apply_postprocessing_settings(const QualitySettings& quali
     return exposure;
 }
 
-void MainFramebuffer::assign_window_size(glm::u32vec2 size) {
+void MainFramebuffer::assign_framebuffer_size(glm::u32vec2 size) {
     if (bloom_enabled && bloom_renderer) {
-        bloom_renderer->assign_window_size(size);
+        bloom_renderer->assign_framebuffer_size(size);
     }
-    if (this->window_size == size) {
+    if (this->framebuffer_size == size) {
         return;
     }
 
-    this->window_size = size;
+    this->framebuffer_size = size;
     initialize_framebuffer(size);
 }
 
@@ -125,7 +125,7 @@ constexpr float EXPOSURE_KEY_VALUE = 0.18f;
 constexpr float DECAY_RATE = 0.75f;
 
 void MainFramebuffer::compute_automatic_exposure(float delta_time) {
-    const glm::vec3 average_color = compute_average_texture_color(get_color_texture_id(), window_size);
+    const glm::vec3 average_color = compute_average_texture_color(get_color_texture_id(), framebuffer_size);
     float average_luminance = 0.2126f * average_color.r + 0.7152f * average_color.g + 0.0722f * average_color.b;
 
     float target_exposure = EXPOSURE_KEY_VALUE / average_luminance;

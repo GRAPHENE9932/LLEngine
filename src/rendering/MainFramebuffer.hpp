@@ -24,10 +24,10 @@ public:
 
     [[nodiscard]] float get_exposure() const;
 
-    void assign_window_size(glm::u32vec2 size);
+    void assign_framebuffer_size(glm::u32vec2 size);
 
 private:
-    glm::u32vec2 window_size;
+    glm::u32vec2 framebuffer_size;
 
     ManagedFramebufferID framebuffer;
     ManagedTextureID color_attachment;

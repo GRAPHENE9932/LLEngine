@@ -77,8 +77,8 @@ void CameraNode::recompute_view_matrix() noexcept {
 }
 
 void CameraNode::recompute_proj_matrix() noexcept {
-    const glm::ivec2 window_size = get_rendering_server().get_window().get_window_size();
-    cached_proj_matrix = glm::perspective(field_of_view, static_cast<float>(window_size.x) / window_size.y, 0.1f, 100.0f);
+    const glm::ivec2 framebuffer_size = get_rendering_server().get_window().get_framebuffer_size();
+    cached_proj_matrix = glm::perspective(field_of_view, static_cast<float>(framebuffer_size.x) / framebuffer_size.y, 0.1f, 100.0f);
 
     is_cached_proj_matrix_valid = true;
 }

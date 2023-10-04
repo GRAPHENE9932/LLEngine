@@ -33,6 +33,7 @@ public:
     void enable_cursor();
     [[nodiscard]] glm::dvec2 get_cursor_position() const;
     [[nodiscard]] glm::ivec2 get_window_size() const;
+    [[nodiscard]] glm::ivec2 get_framebuffer_size() const;
     void set_cursor_position(const glm::dvec2 & new_position);
     [[nodiscard]] bool is_key_pressed(Key key) const;
     [[nodiscard]] bool is_mouse_button_pressed(std::uint8_t button) const;

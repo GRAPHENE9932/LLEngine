@@ -7,13 +7,13 @@
 #include <array>
 
 namespace llengine {
-BloomFramebuffer::BloomFramebuffer(glm::u32vec2 window_size, std::uint32_t image_stages) {
+BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t image_stages) {
     assert(image_stages > 0);
 
     glGenFramebuffers(1, &framebuffer_id.get_ref());
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 
-    glm::u32vec2 cur_image_size = window_size;
+    glm::u32vec2 cur_image_size = framebuffer_size;
     for (std::uint32_t i = 0; i < image_stages; i++) {
         Image result;
 
@@ -65,7 +65,7 @@ void BloomFramebuffer::bind() const {
     return images[stage];
 }
 
-[[nodiscard]] glm::u32vec2 BloomFramebuffer::get_window_size() const {
+[[nodiscard]] glm::u32vec2 BloomFramebuffer::get_framebuffer_size() const {
     return images[0].size;
 }
 }

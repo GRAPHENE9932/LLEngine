@@ -11,9 +11,9 @@ using UpsampleShaderType = Shader<"filter_radius">;
 
 constexpr std::uint32_t IMAGE_STAGES = 5;
 
-BloomRenderer::BloomRenderer(glm::u32vec2 window_size) :
-framebuffer(window_size, IMAGE_STAGES),
-window_size(window_size) {
+BloomRenderer::BloomRenderer(glm::u32vec2 framebuffer_size) :
+framebuffer(framebuffer_size, IMAGE_STAGES),
+framebuffer_size(framebuffer_size) {
 
 }
 
@@ -21,13 +21,13 @@ BloomRenderer::~BloomRenderer() {
 
 }
 
-void BloomRenderer::assign_window_size(glm::u32vec2 window_size) {
-    if (this->window_size == window_size) {
+void BloomRenderer::assign_framebuffer_size(glm::u32vec2 framebuffer_size) {
+    if (this->framebuffer_size == framebuffer_size) {
         return;
     }
 
-    this->window_size = window_size;
-    framebuffer = std::move(BloomFramebuffer(window_size, IMAGE_STAGES));
+    this->framebuffer_size = framebuffer_size;
+    framebuffer = std::move(BloomFramebuffer(framebuffer_size, IMAGE_STAGES));
 }
 
 void BloomRenderer::render_to_bloom_texture(TextureID source_texture_id, float bloom_radius) {
@@ -37,7 +37,7 @@ void BloomRenderer::render_to_bloom_texture(TextureID source_texture_id, float b
     render_upsamples(bloom_radius);
 
     glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
-    glViewport(0, 0, window_size.x, window_size.y);
+    glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
 }
 
 [[nodiscard]] TextureID BloomRenderer::get_bloom_texture_id() const {
@@ -52,7 +52,7 @@ void BloomRenderer::render_downsamples(TextureID source_texture_id) {
     );
 
     shader.use_shader();
-    shader.set_vec2<"orig_tex_resolution">(framebuffer.get_window_size());
+    shader.set_vec2<"orig_tex_resolution">(framebuffer.get_framebuffer_size());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, source_texture_id);

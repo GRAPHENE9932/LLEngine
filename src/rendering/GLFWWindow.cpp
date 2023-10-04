@@ -142,6 +142,12 @@ glm::ivec2 GLFWWindow::get_window_size() const {
     return result;
 }
 
+[[nodiscard]] glm::ivec2 GLFWWindow::get_framebuffer_size() const {
+    glm::ivec2 result;
+    glfwGetFramebufferSize(glfw_window, &result.x, &result.y);
+    return result;
+}
+
 void GLFWWindow::set_cursor_position(const glm::dvec2& new_position) {
     glfwSetCursorPos(glfw_window, new_position.x, new_position.y);
 }

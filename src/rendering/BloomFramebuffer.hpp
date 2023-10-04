@@ -15,14 +15,14 @@ struct Image {
 };
 
 public:
-    BloomFramebuffer(glm::u32vec2 window_size, std::uint32_t image_stages);
+    BloomFramebuffer(glm::u32vec2 frambuffer_size, std::uint32_t image_stages);
     ~BloomFramebuffer();
 
     BloomFramebuffer& operator=(BloomFramebuffer&& other) noexcept = default;
 
     void bind() const;
     [[nodiscard]] const Image& get_image(std::size_t stage) const;
-    [[nodiscard]] glm::u32vec2 get_window_size() const;
+    [[nodiscard]] glm::u32vec2 get_framebuffer_size() const;
 
 private:
     ManagedFramebufferID framebuffer_id;

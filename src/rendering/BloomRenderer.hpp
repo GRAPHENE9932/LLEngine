@@ -8,16 +8,16 @@
 namespace llengine {
 class BloomRenderer {
 public:
-    BloomRenderer(glm::u32vec2 window_size);
+    BloomRenderer(glm::u32vec2 framebuffer_size);
     ~BloomRenderer();
 
-    void assign_window_size(glm::u32vec2 window_size);
+    void assign_framebuffer_size(glm::u32vec2 framebuffer_size);
     void render_to_bloom_texture(TextureID source_texture_id, float bloom_radius);
     [[nodiscard]] TextureID get_bloom_texture_id() const;
 
 private:
     BloomFramebuffer framebuffer;
-    glm::u32vec2 window_size;
+    glm::u32vec2 framebuffer_size;
 
     void render_downsamples(TextureID source_texture_id);
     void render_upsamples(float filter_radius);

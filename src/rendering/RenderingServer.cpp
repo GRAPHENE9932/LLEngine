@@ -50,7 +50,7 @@ void RenderingServer::main_loop() {
         // Invoke callback.
         update_callback(delta_time);
 
-        main_framebuffer->assign_window_size(get_window().get_window_size());
+        main_framebuffer->assign_framebuffer_size(get_window().get_framebuffer_size());
         glBindFramebuffer(GL_FRAMEBUFFER, main_framebuffer->get_framebuffer_id());
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -441,8 +441,8 @@ void RenderingServer::update_shadow_map() {
     }
     glEnable(GL_CULL_FACE);
     glBindFramebuffer(GL_FRAMEBUFFER, get_current_default_framebuffer_id());
-    const auto window_size = get_window().get_window_size();
-    glViewport(0, 0, window_size.x, window_size.y);
+    const auto framebuffer_size = get_window().get_framebuffer_size();
+    glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
 }
 
 void RenderingServer::delete_shadow_map() {
