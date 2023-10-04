@@ -136,13 +136,13 @@ glm::dvec2 GLFWWindow::get_cursor_position() const {
     return result;
 }
 
-glm::ivec2 GLFWWindow::get_window_size() const {
+glm::u32vec2 GLFWWindow::get_window_size() const {
     glm::ivec2 result;
     glfwGetWindowSize(glfw_window, &result.x, &result.y);
     return result;
 }
 
-[[nodiscard]] glm::ivec2 GLFWWindow::get_framebuffer_size() const {
+[[nodiscard]] glm::u32vec2 GLFWWindow::get_framebuffer_size() const {
     glm::ivec2 result;
     glfwGetFramebufferSize(glfw_window, &result.x, &result.y);
     return result;
