@@ -38,6 +38,7 @@ private:
     bool is_cached_proj_matrix_valid = false;
     glm::mat4 cached_view_matrix;
     glm::mat4 cached_proj_matrix;
+    glm::u32vec2 cached_framebuffer_size {0, 0};
 
     void recompute_view_matrix() noexcept;
     void recompute_proj_matrix() noexcept;

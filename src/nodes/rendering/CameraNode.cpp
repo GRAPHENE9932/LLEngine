@@ -23,6 +23,10 @@ glm::mat4 CameraNode::get_view_matrix() noexcept {
 }
 
 glm::mat4 CameraNode::get_proj_matrix() noexcept {
+    if (get_rendering_server().get_window().get_framebuffer_size() != cached_framebuffer_size) {
+        is_cached_proj_matrix_valid = false;
+    }
+
     if (!is_cached_proj_matrix_valid) {
         recompute_proj_matrix();
     }
