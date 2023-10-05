@@ -46,6 +46,7 @@ void RenderingServer::main_loop() {
         delta_time = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
 
         unblock_mouse_press();
+        cached_camera_frustum_corners_are_valid = false;
 
         // Invoke callback.
         update_callback(delta_time);
