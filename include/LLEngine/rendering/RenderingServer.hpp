@@ -238,6 +238,9 @@ private:
     void update_shadow_map();
     void delete_shadow_map();
 
-    [[nodiscard]] std::array<glm::vec4, 8> get_camera_frustrum_corners(float max_distance) const;
+    mutable std::array<glm::vec4, 8> cached_camera_frustum_corners;
+    mutable bool cached_camera_frustum_corners_are_valid = false;
+
+    [[nodiscard]] const std::array<glm::vec4, 8>& get_camera_frustrum_corners(float max_distance) const;
 };
 }

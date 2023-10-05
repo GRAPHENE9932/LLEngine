@@ -199,14 +199,17 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return get_proj_matrix() * get_view_matrix();
 }
 
-[[nodiscard]] std::array<glm::vec4, 8> RenderingServer::get_camera_frustrum_corners(float max_distance) const {
+[[nodiscard]] const std::array<glm::vec4, 8>& RenderingServer::get_camera_frustrum_corners(float max_distance) const {
+    if (cached_camera_frustum_corners_are_valid) {
+        return cached_camera_frustum_corners;
+    }
+
     assert(camera != nullptr);
 
     const glm::mat4 proj_inverse = glm::inverse(get_proj_matrix());
     const glm::mat4 view_inverse = glm::inverse(get_view_matrix());
     const float far_corners_coeff = std::min(max_distance / camera->get_far_distance(), 1.0f);
 
-    std::array<glm::vec4, 8> result;
     for (std::uint8_t corner_index = 0; corner_index < 8; corner_index++) {
         glm::vec4 corner {
             corner_index & 0x01 ? 1.0 : -1.0,
@@ -223,10 +226,11 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
         }
         corner = view_inverse * corner;
 
-        result[corner_index] = corner / corner.w;
+        cached_camera_frustum_corners[corner_index] = corner / corner.w;
     }
 
-    return result;
+    cached_camera_frustum_corners_are_valid = true;
+    return cached_camera_frustum_corners;
 }
 
 [[nodiscard]] glm::vec4 compute_average_vector(const std::array<glm::vec4, 8>& vectors) {
