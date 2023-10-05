@@ -52,7 +52,7 @@ void RenderingServer::main_loop() {
 
         main_framebuffer->assign_framebuffer_size(get_window().get_framebuffer_size());
         glBindFramebuffer(GL_FRAMEBUFFER, main_framebuffer->get_framebuffer_id());
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         update_shadow_map();
         draw_non_overlay_objects();
