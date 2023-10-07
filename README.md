@@ -11,3 +11,7 @@
 - Radiance RGBE (.hdr) texture loading.
 - PBR shading.
 - FreeType font loading and text rendering.
+- Particles with instancing.
+- Bloom postprocessing effect.
+- HDR.
+- Automatic exposure.
