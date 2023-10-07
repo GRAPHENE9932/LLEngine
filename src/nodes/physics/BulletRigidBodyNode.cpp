@@ -54,6 +54,10 @@ void BulletRigidBodyNode::before_simulation_step() {
         apply_impulse(args.first, args.second);
     }
     queued_impulse_application_calls.clear();
+
+    if (!is_static()) {
+        invalidate_transform_cache();
+    }
 }
 
 void BulletRigidBodyNode::set_translation(const glm::vec3& new_trans) {
@@ -77,6 +81,8 @@ void BulletRigidBodyNode::set_translation(const glm::vec3& new_trans) {
     cur_transform.setOrigin(glm_vec3_to_bullet(new_global_position));
     get_bt_rigid_body()->setWorldTransform(cur_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(cur_transform);
+
+    invalidate_transform_cache();
 }
 
 void BulletRigidBodyNode::translate(const glm::vec3& translation) {
@@ -90,6 +96,8 @@ void BulletRigidBodyNode::translate(const glm::vec3& translation) {
     cur_transform.setOrigin(cur_transform.getOrigin() + glm_vec3_to_bullet(translation));
     get_bt_rigid_body()->setWorldTransform(cur_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(cur_transform);
+
+    invalidate_transform_cache();
 }
 
 void BulletRigidBodyNode::set_scale(const glm::vec3& new_scale) {
@@ -110,6 +118,8 @@ void BulletRigidBodyNode::set_scale(const glm::vec3& new_scale) {
     this->set_shape(shape_copy);
 
     scale = new_scale;
+
+    invalidate_transform_cache();
 }
 
 void BulletRigidBodyNode::set_rotation(const glm::quat& new_rotation) {
@@ -133,6 +143,8 @@ void BulletRigidBodyNode::set_rotation(const glm::quat& new_rotation) {
     cur_transform.setRotation(glm_quat_to_bullet(new_global_rotation));
     get_bt_rigid_body()->setWorldTransform(cur_transform);
     get_bt_rigid_body()->getMotionState()->setWorldTransform(cur_transform);
+
+    invalidate_transform_cache();
 }
 
 void BulletRigidBodyNode::set_transform(const Transform &new_transform) {
@@ -167,6 +179,8 @@ void BulletRigidBodyNode::set_transform(const Transform &new_transform) {
     get_bt_rigid_body()->getMotionState()->setWorldTransform(new_bt_transform);
 
     set_scale(new_transform.scale);
+
+    invalidate_transform_cache();
 }
 
 void BulletRigidBodyNode::set_global_scale(const glm::vec3& new_scale) {
@@ -324,7 +338,11 @@ glm::mat4 BulletRigidBodyNode::get_local_matrix() const noexcept {
 }
 
 glm::mat4 BulletRigidBodyNode::get_global_matrix() const noexcept {
-    return get_global_transform().calculate_matrix();
+    if (!cached_global_matrix.has_value()) {
+        cached_global_matrix = get_global_transform().calculate_matrix();
+    }
+
+    return *cached_global_matrix;
 }
 
 void BulletRigidBodyNode::set_shape(const std::shared_ptr<Shape>& shape) {
@@ -426,4 +444,8 @@ std::unique_ptr<Node> BulletRigidBodyNode::copy() const {
 void BulletRigidBodyNode::on_attachment_to_tree_without_start() {
     SpatialNode::on_attachment_to_tree_without_start();
     get_bullet_physics_server().register_rigid_body(this);
+}
+
+void BulletRigidBodyNode::invalidate_transform_cache() const {
+    cached_global_matrix = std::nullopt;
 }

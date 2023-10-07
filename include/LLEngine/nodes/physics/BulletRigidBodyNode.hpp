@@ -73,6 +73,10 @@ public:
     void set_mass(float new_mass);
     [[nodiscard]] float get_mass() const noexcept;
 
+    [[nodiscard]] bool is_static() const {
+        return get_mass() == 0.0f;
+    }
+
     void queue_apply_impulse(const glm::vec3& impulse_vector, const glm::vec3& point = {0.0f, 0.0f, 0.0f});
 
     void set_shape(const Shape& shape);
@@ -98,6 +102,8 @@ private:
     glm::quat cached_set_rotation = glm::quat({0.0f, 0.0f, 0.0f});
     glm::vec3 cached_set_translation = {0.0f, 0.0f, 0.0f};
 
+    mutable std::optional<glm::mat4> cached_global_matrix = std::nullopt;
+
     bool check_collisions = false;
 
     std::vector<std::pair<glm::vec3, glm::vec3>> queued_impulse_application_calls;
@@ -105,6 +111,8 @@ private:
     virtual void on_contact(BulletRigidBodyNode& collided_body) {}
 
     void apply_impulse(const glm::vec3& impulse_vector, const glm::vec3& point);
+
+    void invalidate_transform_cache() const;
 
     friend class BulletPhysicsServer;
 };
