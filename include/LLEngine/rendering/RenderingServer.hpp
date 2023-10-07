@@ -241,6 +241,6 @@ private:
     mutable std::array<glm::vec4, 8> cached_camera_frustum_corners;
     mutable bool cached_camera_frustum_corners_are_valid = false;
 
-    [[nodiscard]] const std::array<glm::vec4, 8>& get_camera_frustrum_corners(float max_distance) const;
+    [[nodiscard]] const std::array<glm::vec4, 8>& get_camera_frustum_corners(float max_distance) const;
 };
 }

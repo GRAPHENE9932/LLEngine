@@ -200,7 +200,7 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
     return get_proj_matrix() * get_view_matrix();
 }
 
-[[nodiscard]] const std::array<glm::vec4, 8>& RenderingServer::get_camera_frustrum_corners(float max_distance) const {
+[[nodiscard]] const std::array<glm::vec4, 8>& RenderingServer::get_camera_frustum_corners(float max_distance) const {
     if (cached_camera_frustum_corners_are_valid) {
         return cached_camera_frustum_corners;
     }
@@ -245,13 +245,13 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
 constexpr float SHADOW_CAMERA_CLEARANCE = 25.0f;
 
 [[nodiscard]] glm::mat4 RenderingServer::get_dir_light_view_proj_matrix() const {
-    const auto camera_frustrum_corners = get_camera_frustrum_corners(shadow_map_drawing_distance * 2.0f);
-    const glm::vec3 camera_frustrum_center = glm::vec3(compute_average_vector(camera_frustrum_corners));
-    glm::vec3 flat_frustrum_center {camera_frustrum_center.x, 0.0f, camera_frustrum_center.z};
+    const auto camera_frustum_corners = get_camera_frustum_corners(shadow_map_drawing_distance * 2.0f);
+    const glm::vec3 camera_frustum_center = glm::vec3(compute_average_vector(camera_frustum_corners));
+    glm::vec3 flat_frustum_center {camera_frustum_center.x, 0.0f, camera_frustum_center.z};
 
     const glm::mat4 view { glm::lookAt(
-        -dir_light_direction * SHADOW_CAMERA_CLEARANCE + flat_frustrum_center,
-        flat_frustrum_center,
+        -dir_light_direction * SHADOW_CAMERA_CLEARANCE + flat_frustum_center,
+        flat_frustum_center,
         {0.0f, 1.0f, 0.0f}
     ) };
 
@@ -260,8 +260,8 @@ constexpr float SHADOW_CAMERA_CLEARANCE = 25.0f;
         shadow_map_drawing_distance,
         -shadow_map_drawing_distance,
         shadow_map_drawing_distance,
-        camera_frustrum_center.y - SHADOW_CAMERA_CLEARANCE * 2.0f,
-        camera_frustrum_center.y + SHADOW_CAMERA_CLEARANCE * 2.0f
+        camera_frustum_center.y - SHADOW_CAMERA_CLEARANCE * 2.0f,
+        camera_frustum_center.y + SHADOW_CAMERA_CLEARANCE * 2.0f
     ) };
 
     return projection * view;
