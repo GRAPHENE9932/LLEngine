@@ -104,12 +104,6 @@ public:
     void unregister_point_light(PointLightNode* point_light) noexcept;
 
     /**
-     * @brief Should be called after every draw call to count triangles
-     * that has been drawn.
-     */
-    void report_about_drawn_triangles(uint64_t triangles_amount) noexcept;
-
-    /**
      * @brief Returns view matrix from the current camera.
      *
      * If camera is missing, returns identity matrix.

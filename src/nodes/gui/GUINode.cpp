@@ -140,7 +140,6 @@ void GUINode::draw_texture_part(
         glBindBuffer(GL_ARRAY_BUFFER, mesh->get_vertices_id());
         glDrawArrays(GL_TRIANGLES, 0, mesh->get_amount_of_vertices());
     }
-    get_rendering_server().report_about_drawn_triangles(mesh->get_amount_of_vertices() / 3);
 
     mesh->unbind_vao(true, false, false);
 }

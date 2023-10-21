@@ -30,7 +30,6 @@ static void draw_mesh(const Mesh& mesh, RenderingServer& rs) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.get_vertices_id());
         glDrawArrays(GL_TRIANGLES, 0, mesh.get_amount_of_vertices());
     }
-    rs.report_about_drawn_triangles(mesh.get_amount_of_vertices() / 3);
 
     mesh.unbind_vao(true, true, true);
 }

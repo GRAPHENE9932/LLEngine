@@ -165,10 +165,6 @@ void RenderingServer::unregister_point_light(PointLightNode* point_light) noexce
     }
 }
 
-void RenderingServer::report_about_drawn_triangles(uint64_t triangles_amount) noexcept {
-    // Does nothing now.
-}
-
 glm::mat4 RenderingServer::get_view_matrix() const noexcept {
     if (camera) {
         return camera->get_view_matrix();
