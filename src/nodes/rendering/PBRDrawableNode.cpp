@@ -1,5 +1,6 @@
 #include "rendering/RenderingServer.hpp"
 #include "nodes/rendering/PBRDrawableNode.hpp" // PBRDrawableNode
+#include "nodes/rendering/CameraNode.hpp"
 
 #include <GL/glew.h>
 
@@ -48,9 +49,9 @@ void PBRDrawableNode::draw() {
 
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
-    const glm::mat4 mvp = rs.get_view_proj_matrix() * model_matrix;
+    const glm::mat4 mvp = rs.get_current_camera_node().get_view_proj_matrix() * model_matrix;
     rs.get_shader_holder().get_pbr_shader_manager().use_shader(
-        rs, *material, mvp, model_matrix, rs.get_camera_position()
+        rs, *material, mvp, model_matrix, rs.get_current_camera_node().get_global_position()
     );
 
     draw_mesh(*mesh, rs);

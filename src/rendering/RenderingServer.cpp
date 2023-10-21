@@ -165,35 +165,20 @@ void RenderingServer::unregister_point_light(PointLightNode* point_light) noexce
     }
 }
 
-glm::mat4 RenderingServer::get_view_matrix() const noexcept {
-    if (camera) {
-        return camera->get_view_matrix();
+[[nodiscard]] CameraNode& RenderingServer::get_current_camera_node() {
+    if (camera == nullptr) {
+        throw std::runtime_error("There is no current camera node.");
     }
-    else {
-        return {};
-    }
+
+    return *camera;
 }
 
-glm::vec3 RenderingServer::get_camera_position() const noexcept {
-    if (camera) {
-        return camera->get_global_position();
+[[nodiscard]] const CameraNode& RenderingServer::get_current_camera_node() const {
+    if (camera == nullptr) {
+        throw std::runtime_error("There is no current camera node.");
     }
-    else {
-        return {0.0f, 0.0f, 0.0f};
-    }
-}
 
-glm::mat4 RenderingServer::get_proj_matrix() const noexcept {
-    if (camera) {
-        return camera->get_proj_matrix();
-    }
-    else {
-        return {};
-    }
-}
-
-glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
-    return get_proj_matrix() * get_view_matrix();
+    return *camera;
 }
 
 [[nodiscard]] const std::array<glm::vec4, 8>& RenderingServer::get_camera_frustum_corners(float max_distance) const {
@@ -203,8 +188,8 @@ glm::mat4 RenderingServer::get_view_proj_matrix() const noexcept {
 
     assert(camera != nullptr);
 
-    const glm::mat4 proj_inverse = glm::inverse(get_proj_matrix());
-    const glm::mat4 view_inverse = glm::inverse(get_view_matrix());
+    const glm::mat4 proj_inverse = glm::inverse(get_current_camera_node().get_proj_matrix());
+    const glm::mat4 view_inverse = glm::inverse(get_current_camera_node().get_view_matrix());
     const float far_corners_coeff = std::min(max_distance / camera->get_far_distance(), 1.0f);
 
     for (std::uint8_t corner_index = 0; corner_index < 8; corner_index++) {

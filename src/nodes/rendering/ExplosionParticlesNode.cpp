@@ -1,4 +1,5 @@
 #include "nodes/rendering/ExplosionParticlesNode.hpp"
+#include "nodes/rendering/CameraNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "rendering/Shader.hpp"
 #include "random.hpp"
@@ -122,7 +123,7 @@ void ExplosionParticlesNode::draw() {
         return;
     }
 
-    const glm::mat4 mvp = get_rendering_server().get_view_proj_matrix() * get_global_matrix();
+    const glm::mat4 mvp = get_rendering_server().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
 
     ensure_shader_is_initialized();
     shader->use_shader();

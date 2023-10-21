@@ -103,35 +103,20 @@ public:
      */
     void unregister_point_light(PointLightNode* point_light) noexcept;
 
-    /**
-     * @brief Returns view matrix from the current camera.
-     *
-     * If camera is missing, returns identity matrix.
-     */
-    [[nodiscard]] glm::mat4 get_view_matrix() const noexcept;
-
-    /**
-     * @brief Returns position of the current camera.
-     *
-     * If camera is missing, returns (0.0, 0.0, 0.0).
-     */
-    [[nodiscard]] glm::vec3 get_camera_position() const noexcept;
-
-    /**
-     * @brief Returns projection matrix from the current camera.
-     *
-     * If camera is missing, returns identity matrix.
-     */
-    [[nodiscard]] glm::mat4 get_proj_matrix() const noexcept;
-
-    /**
-     * @brief Get the projection matrix multiplied by view matrix.
-     *
-     * Both these matrices can be retrieved from
-     * get_view_matrix() and get_proj_matrix().
-     */
-    [[nodiscard]] glm::mat4 get_view_proj_matrix() const noexcept;
     [[nodiscard]] glm::mat4 get_dir_light_view_proj_matrix() const;
+
+    /**
+     * @brief Returns reference to the current camera node.
+     * 
+     * Throws if there is no current_camera.
+     */
+    [[nodiscard]] CameraNode& get_current_camera_node();
+    /**
+     * @brief Returns const reference to the current camera node.
+     * 
+     * Throws if there is no current_camera.
+     */
+    [[nodiscard]] const CameraNode& get_current_camera_node() const;
 
     void enable_shadow_mapping();
     void disable_shadow_mapping();

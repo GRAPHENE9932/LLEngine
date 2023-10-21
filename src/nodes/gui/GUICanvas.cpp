@@ -2,6 +2,7 @@
 #include "node_registration.hpp"
 #include "nodes/SpatialNode.hpp"
 #include "rendering/RenderingServer.hpp"
+#include "nodes/rendering/CameraNode.hpp"
 #include "node_cast.hpp"
 #include "logger.hpp"
 
@@ -112,7 +113,7 @@ void GUICanvas::unregister_gui_node(GUINode* gui_node) {
         return glm::mat4(1.0f);
     }
     else {
-        return get_rendering_server().get_view_proj_matrix() * get_global_matrix();
+        return get_rendering_server().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
     }
 }
 

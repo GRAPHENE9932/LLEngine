@@ -5,6 +5,7 @@
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/RenderingServer.hpp" // RenderingServer
 #include "rendering/Mesh.hpp"
+#include "nodes/rendering/CameraNode.hpp"
 
 using namespace llengine;
 
@@ -30,8 +31,8 @@ void Skybox::draw(RenderingServer& rs) {
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
     // Uniforms.
-    const glm::mat4 view_without_translation = glm::mat3(rs.get_view_matrix());
-    const glm::mat4 mvp = rs.get_proj_matrix() * view_without_translation;
+    const glm::mat4 view_without_translation = glm::mat3(rs.get_current_camera_node().get_view_matrix());
+    const glm::mat4 mvp = rs.get_current_camera_node().get_proj_matrix() * view_without_translation;
 
     ensure_shader_is_initialized();
     shader->use_shader();

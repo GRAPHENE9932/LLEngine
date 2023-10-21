@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <array>
+#include <limits>
 
 #include <GL/glew.h>
 
@@ -73,11 +74,14 @@ void Mesh::set_indices(const std::vector<T>& new_indices) {
         std::get<std::vector<T>>(indices)
     );
 }
+template void Mesh::set_indices(const std::vector<uint16_t> &new_indices);
+template void Mesh::set_indices(const std::vector<uint32_t> &new_indices);
 
 void Mesh::set_vertices(const std::vector<glm::vec3>& new_vertices) {
     vertices = new_vertices;
     vertices_id = handle_buffer<glm::vec3, GL_ARRAY_BUFFER>(vertices);
     reset_vao_if_needed();
+    compute_min_and_max_vertex_values();
 }
 
 void Mesh::set_uvs(const std::vector<glm::vec2>& new_uvs) {
@@ -301,5 +305,26 @@ void Mesh::initialize_vao() const {
     bind_vertex_attrib_pointer(tangents_id, 3, 4);
 }
 
-template void Mesh::set_indices(const std::vector<uint16_t> &new_indices);
-template void Mesh::set_indices(const std::vector<uint32_t> &new_indices);
+void Mesh::compute_min_and_max_vertex_values() {
+    min_vertex_value = {
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max()
+    };
+    max_vertex_value = {
+        std::numeric_limits<float>::min(),
+        std::numeric_limits<float>::min(),
+        std::numeric_limits<float>::min()
+    };
+
+    for (const glm::vec3& cur_vertex : vertices) {
+        for (std::size_t i = 0; i < 3; i++) {
+            if (cur_vertex[i] > max_vertex_value[i]) {
+                max_vertex_value[i] = cur_vertex[i];
+            }
+            if (cur_vertex[i] < min_vertex_value[i]) {
+                min_vertex_value[i] = cur_vertex[i];
+            }
+        }
+    }
+}

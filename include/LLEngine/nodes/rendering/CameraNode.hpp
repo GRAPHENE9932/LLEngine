@@ -16,8 +16,9 @@ class CameraNode : public CompleteSpatialNode {
 public:
     CameraNode();
 
-    glm::mat4 get_view_matrix() noexcept;
-    glm::mat4 get_proj_matrix() noexcept;
+    [[nodiscard]] const glm::mat4& get_view_matrix() const;
+    [[nodiscard]] const glm::mat4& get_proj_matrix() const;
+    [[nodiscard]] const glm::mat4& get_view_proj_matrix() const;
 
     void set_translation(const glm::vec3& new_trans) override;
     void translate(const glm::vec3& translation) override;
@@ -34,13 +35,15 @@ protected:
 private:
     float field_of_view = glm::radians(90.0f);
 
-    bool is_cached_view_matrix_valid = false;
-    bool is_cached_proj_matrix_valid = false;
-    glm::mat4 cached_view_matrix;
-    glm::mat4 cached_proj_matrix;
+    mutable bool is_cached_view_matrix_valid = false;
+    mutable bool is_cached_proj_matrix_valid = false;
+    mutable bool is_cached_view_proj_matrix_valid = false;
+    mutable glm::mat4 cached_view_matrix;
+    mutable glm::mat4 cached_proj_matrix;
+    mutable glm::mat4 cached_view_proj_matrix;
     glm::u32vec2 cached_framebuffer_size {0, 0};
 
-    void recompute_view_matrix() noexcept;
-    void recompute_proj_matrix() noexcept;
+    void recompute_view_matrix() const noexcept;
+    void recompute_proj_matrix() const noexcept;
 };
 }
