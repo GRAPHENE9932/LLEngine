@@ -34,7 +34,7 @@ out vec4 color_out;
     in mat3 tbn;
 #endif
 #ifdef USING_SHADOW_MAP
-    in vec4 dir_light_space_frag_pos;
+    in vec4 shadow_map_space_frag_pos;
     in float shadow_map_bias;
 #endif
 
@@ -243,7 +243,7 @@ vec3 get_emissive() {
     }
 
     float compute_shadow_coefficient() {
-        vec3 projection_clip_space = dir_light_space_frag_pos.xyz / dir_light_space_frag_pos.w;
+        vec3 projection_clip_space = shadow_map_space_frag_pos.xyz / shadow_map_space_frag_pos.w;
         projection_clip_space = projection_clip_space * 0.5 + 0.5; // Convert from [-1; 1] range to [0; 1].
 
         float shadow_coeff = 0.0;

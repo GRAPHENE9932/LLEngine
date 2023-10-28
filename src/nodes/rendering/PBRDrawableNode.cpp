@@ -61,7 +61,7 @@ void PBRDrawableNode::draw_to_shadow_map() {
     RenderingServer& rs = get_rendering_server();
 
     const glm::mat4 model_matrix = get_global_matrix();
-    const glm::mat4 mvp = rs.get_dir_light_view_proj_matrix() * model_matrix;
+    const glm::mat4 mvp = rs.get_shadow_map().get_view_proj_matrix() * model_matrix;
 
     static Shader<"mvp"> shadow_mapping_shader(VERTEX_SHADOW_MAPPING_SHADER_TEXT, FRAGMENT_SHADOW_MAPPING_SHADER_TEXT);
     shadow_mapping_shader.use_shader();

@@ -51,6 +51,7 @@ set(SOURCES
     src/rendering/Shader.cpp
     src/rendering/BloomRenderer.cpp
     src/rendering/BloomFramebuffer.cpp
+    src/rendering/ShadowMap.cpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/shader_loader.cpp
     src/structs/shapes/SphereShape.cpp
@@ -99,6 +100,7 @@ set(PUBLIC_HEADERS
     include/LLEngine/rendering/Window.hpp
     include/LLEngine/rendering/ManagedFramebufferID.hpp
     include/LLEngine/rendering/Shader.hpp
+    include/LLEngine/rendering/ShadowMap.hpp
     include/LLEngine/Transform.hpp
     include/LLEngine/GameInstance.hpp
     include/LLEngine/physics/shapes/BoxShape.hpp

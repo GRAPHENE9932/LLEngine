@@ -107,14 +107,16 @@ void RenderingServer::unblock_mouse_press() {
 
 void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
     if (settings.shadow_mapping_enabled) {
-        enable_shadow_mapping();
+        shadow_map = ShadowMap(settings.shadow_map_size);
+        shadow_map->set_drawing_distance(settings.shadow_map_drawing_distance);
+        if (camera != nullptr) {
+            shadow_map->link_to_camera(get_current_camera_node());
+        }
     }
     else {
-        disable_shadow_mapping();
+        shadow_map = std::nullopt;
     }
 
-    set_shadow_map_size(settings.shadow_map_size);
-    set_shadow_drawing_distance(settings.shadow_map_drawing_distance);
     main_framebuffer->apply_postprocessing_settings(settings);
 }
 
@@ -130,6 +132,10 @@ void RenderingServer::register_gui_canvas(GUICanvas* gui_node) noexcept {
 
 void RenderingServer::register_camera_node(CameraNode* camera_node) noexcept {
     camera = camera_node;
+
+    if (shadow_map.has_value()) {
+        shadow_map->link_to_camera(*camera_node);
+    }
 }
 
 void RenderingServer::register_point_light(PointLightNode* point_light) noexcept {
@@ -215,105 +221,16 @@ void RenderingServer::unregister_point_light(PointLightNode* point_light) noexce
     return cached_camera_frustum_corners;
 }
 
-[[nodiscard]] glm::vec4 compute_average_vector(const std::array<glm::vec4, 8>& vectors) {
-    glm::vec4 result {0.0f, 0.0f, 0.0f, 0.0f};
-    for (const glm::vec4 cur_vec : vectors) {
-        result += cur_vec * (1.0f / 8.0f);
-    }
-    return result;
-}
-
-constexpr float SHADOW_CAMERA_CLEARANCE = 25.0f;
-
-[[nodiscard]] glm::mat4 RenderingServer::get_dir_light_view_proj_matrix() const {
-    const auto camera_frustum_corners = get_camera_frustum_corners(shadow_map_drawing_distance * 2.0f);
-    const glm::vec3 camera_frustum_center = glm::vec3(compute_average_vector(camera_frustum_corners));
-    glm::vec3 flat_frustum_center {camera_frustum_center.x, 0.0f, camera_frustum_center.z};
-
-    const glm::mat4 view { glm::lookAt(
-        -dir_light_direction * SHADOW_CAMERA_CLEARANCE + flat_frustum_center,
-        flat_frustum_center,
-        {0.0f, 1.0f, 0.0f}
-    ) };
-
-    const glm::mat4 projection { glm::ortho(
-        -shadow_map_drawing_distance,
-        shadow_map_drawing_distance,
-        -shadow_map_drawing_distance,
-        shadow_map_drawing_distance,
-        camera_frustum_center.y - SHADOW_CAMERA_CLEARANCE * 2.0f,
-        camera_frustum_center.y + SHADOW_CAMERA_CLEARANCE * 2.0f
-    ) };
-
-    return projection * view;
-}
-
-void RenderingServer::enable_shadow_mapping() {
-    shadow_mapping_enabled = true;
-}
-
-void RenderingServer::disable_shadow_mapping() {
-    shadow_mapping_enabled = false;
-    delete_shadow_map();
-}
-
 [[nodiscard]] bool RenderingServer::is_shadow_mapping_enabled() const {
-    return shadow_mapping_enabled;
+    return shadow_map.has_value();
 }
 
-[[nodiscard]] GLuint RenderingServer::get_shadow_map_texture_id() const {
-    if (!is_shadow_mapping_enabled()) {
-        throw std::runtime_error("Can't get shadow map texture ID, because shadows are disabled.");
+[[nodiscard]] ShadowMap& RenderingServer::get_shadow_map() {
+    if (!shadow_map.has_value()) {
+        throw std::runtime_error("Can not get shadow map as shadow mapping is disabled.");
     }
 
-    if (shadow_map_texture_id == 0) {
-        throw std::runtime_error("Can't get shadow map texture ID, bacause shadows map texture is uninitialized.");
-    }
-
-    return shadow_map_texture_id;
-}
-
-[[nodiscard]] float RenderingServer::get_shadow_map_bias() const {
-    if (!is_shadow_mapping_enabled()) {
-        throw std::runtime_error("Can't get shadow map bias, because shadows are disabled.");
-    }
-
-    return shadow_map_bias_at_45_deg;
-}
-
-[[nodiscard]] float RenderingServer::get_adjusted_shadow_map_bias_at_45_deg() const {
-    float size_ratio = 1024.0f / shadow_map_size.x;
-    float result = shadow_map_bias_at_45_deg * size_ratio;
-    return result;
-}
-
-[[nodiscard]] glm::u32vec2 RenderingServer::get_shadow_map_size() const {
-    return shadow_map_size;
-}
-
-void RenderingServer::set_shadow_map_size(glm::u32vec2 new_size) {
-    if (new_size.x != new_size.y || !llengine::math_utils::is_power_of_two(new_size.x)) {
-        throw std::runtime_error(
-            "Invalid shadow map size specified. "
-            "Shadow map must be square, bigger or equal to 4x4 and "
-            "all extends must equal to a power of 2."
-        );
-    }
-
-    shadow_map_size = new_size;
-    initialize_shadow_map();
-}
-
-[[nodiscard]] glm::vec3 RenderingServer::get_dir_light_direction() const {
-    if (!is_shadow_mapping_enabled()) {
-        throw std::runtime_error("Can't get directional light direction, because shadows are disabled.");
-    }
-
-    return dir_light_direction;
-}
-
-void RenderingServer::set_shadow_drawing_distance(float new_distance) {
-    shadow_map_drawing_distance = new_distance;
+    return *shadow_map;
 }
 
 [[nodiscard]] float RenderingServer::get_exposure() const {
@@ -386,52 +303,16 @@ void RenderingServer::draw_non_overlay_objects() {
     }
 }
 
-constexpr std::array<float, 4> SHADOW_MAP_BORDER_COLOR {1.0f, 1.0f, 1.0f, 1.0f};
-
-void RenderingServer::initialize_shadow_map() {
-    delete_shadow_map();
-
-    glGenFramebuffers(1, &shadow_map_framebuffer.get_ref());
-    glGenTextures(1, &shadow_map_texture_id.get_ref());
-    glBindTexture(GL_TEXTURE_2D, shadow_map_texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_map_size.x, shadow_map_size.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, SHADOW_MAP_BORDER_COLOR.data());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadow_map_texture_id, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-}
-
 void RenderingServer::update_shadow_map() {
     if (!is_shadow_mapping_enabled()) {
         return;
     }
 
-    if (shadow_map_framebuffer == 0) {
-        initialize_shadow_map();
-    }
-
-    glViewport(0, 0, shadow_map_size.x, shadow_map_size.y);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadow_map_framebuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_CULL_FACE);
+    shadow_map->prepare_for_drawing();
     for (const auto& cur_drawable : get_drawables()) {
         if (cur_drawable->is_enabled()) {
             cur_drawable->draw_to_shadow_map();
         }
     }
-    glEnable(GL_CULL_FACE);
-    glBindFramebuffer(GL_FRAMEBUFFER, get_current_default_framebuffer_id());
-    const auto framebuffer_size = get_window().get_framebuffer_size();
-    glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
-}
-
-void RenderingServer::delete_shadow_map() {
-    shadow_map_texture_id.delete_texture();
-    shadow_map_framebuffer.delete_framebuffer();
+    shadow_map->finish_drawing(get_current_default_framebuffer_id(), get_window().get_framebuffer_size());
 }

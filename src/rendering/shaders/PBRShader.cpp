@@ -221,7 +221,7 @@ void PBRShader::use_shader(
     shader->set_float<"roughness_factor">(material.roughness_factor);
     shader->set_vec3<"emissive_factor">(material.emissive_factor);
     shader->set_float<"ao_factor">(material.ambient_occlusion_factor);
-    shader->set_mat4<"dir_light_view_proj_matrix">(rs.get_dir_light_view_proj_matrix());
+    shader->set_mat4<"shadow_view_proj_matrix">(rs.get_shadow_map().get_view_proj_matrix());
     if (shader->is_uniform_initialized<"uv_offset">() || shader->is_uniform_initialized<"uv_scale">()) {
         const std::pair<glm::vec2, glm::vec2> general_offset_scale =
                 material.get_general_uv_offset_and_scale();
@@ -264,14 +264,14 @@ void PBRShader::use_shader(
         shader->set_vec2<"ao_uv_scale">(material.ambient_occlusion_texture->uv_scale);
     }
     if (shader->is_uniform_initialized<"shadow_map_bias_at_45_deg">()) {
-        shader->set_float<"shadow_map_bias_at_45_deg">(rs.get_adjusted_shadow_map_bias_at_45_deg());
+        shader->set_float<"shadow_map_bias_at_45_deg">(rs.get_shadow_map().get_adjusted_bias_at_45_deg());
     }
     if (shader->is_uniform_initialized<"pcf_sparsity">()) {
-        assert(rs.get_shadow_map_size().x == rs.get_shadow_map_size().y);
-        shader->set_float<"pcf_sparsity">(1.0f / rs.get_shadow_map_size().x);
+        assert(rs.get_shadow_map().get_size().x == rs.get_shadow_map().get_size().y);
+        shader->set_float<"pcf_sparsity">(1.0f / rs.get_shadow_map().get_size().x);
     }
-    if (shader->is_uniform_initialized<"dir_light_direction">()) {
-        shader->set_vec3<"dir_light_direction">(rs.get_dir_light_direction());
+    if (shader->is_uniform_initialized<"shadow_light_direction">()) {
+        shader->set_vec3<"shadow_light_direction">(rs.get_shadow_map().get_light_direction());
     }
     const auto& point_lights = rs.get_point_lights();
     for (std::size_t i = 0; i < point_lights.size(); i++) {
@@ -314,7 +314,7 @@ void PBRShader::use_shader(
         shader->bind_2d_texture<"brdf_integration_map">(brdf_integration_map_id, texture_unit++);
     }
     if (shader->is_uniform_initialized<"shadow_map">()) {
-        shader->bind_2d_texture<"shadow_map">(rs.get_shadow_map_texture_id(), texture_unit++);
+        shader->bind_2d_texture<"shadow_map">(rs.get_shadow_map().get_texture_id(), texture_unit++);
     }
 }
 
