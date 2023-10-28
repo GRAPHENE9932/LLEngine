@@ -46,7 +46,6 @@ void RenderingServer::main_loop() {
         delta_time = std::chrono::duration_cast<std::chrono::duration<float>>(duration).count();
 
         unblock_mouse_press();
-        cached_camera_frustum_corners_are_valid = false;
 
         // Invoke callback.
         update_callback(delta_time);
@@ -185,40 +184,6 @@ void RenderingServer::unregister_point_light(PointLightNode* point_light) noexce
     }
 
     return *camera;
-}
-
-[[nodiscard]] const std::array<glm::vec4, 8>& RenderingServer::get_camera_frustum_corners(float max_distance) const {
-    if (cached_camera_frustum_corners_are_valid) {
-        return cached_camera_frustum_corners;
-    }
-
-    assert(camera != nullptr);
-
-    const glm::mat4 proj_inverse = glm::inverse(get_current_camera_node().get_proj_matrix());
-    const glm::mat4 view_inverse = glm::inverse(get_current_camera_node().get_view_matrix());
-    const float far_corners_coeff = std::min(max_distance / camera->get_far_distance(), 1.0f);
-
-    for (std::uint8_t corner_index = 0; corner_index < 8; corner_index++) {
-        glm::vec4 corner {
-            corner_index & 0x01 ? 1.0 : -1.0,
-            corner_index & 0x02 ? 1.0 : -1.0,
-            corner_index & 0x04 ? 1.0 : -1.0,
-            1.0f
-        };
-
-        corner = proj_inverse * corner;
-        if ((corner_index & 0x04)) {
-            corner.x *= far_corners_coeff;
-            corner.y *= far_corners_coeff;
-            corner.z *= far_corners_coeff;
-        }
-        corner = view_inverse * corner;
-
-        cached_camera_frustum_corners[corner_index] = corner / corner.w;
-    }
-
-    cached_camera_frustum_corners_are_valid = true;
-    return cached_camera_frustum_corners;
 }
 
 [[nodiscard]] bool RenderingServer::is_shadow_mapping_enabled() const {
