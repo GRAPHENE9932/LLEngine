@@ -16,6 +16,10 @@ public:
     ~GameInstance();
     void start();
 
+    [[nodiscard]] RootNode& get_root_node() {
+        return *root_node;
+    }
+
 private:
     std::unique_ptr<RenderingServer> rendering_server;
     std::unique_ptr<BulletPhysicsServer> bullet_physics_server;
