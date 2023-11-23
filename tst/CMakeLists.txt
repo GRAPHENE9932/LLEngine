@@ -3,6 +3,8 @@ include(GoogleTest)
 add_executable(llengine_tst
     main.cpp
     gltf_loading.cpp
+    frustum_construction.cpp
+    plane_transformation.cpp
 )
 
 find_package(GTest)
