@@ -15,3 +15,4 @@
 - Bloom postprocessing effect.
 - HDR.
 - Automatic exposure.
+- Frustum culling.
