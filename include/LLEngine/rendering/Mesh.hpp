@@ -9,6 +9,7 @@
 #include <glm/vec4.hpp> // glm::vec4
 
 #include "datatypes.hpp"
+#include "math/AABB.hpp"
 
 namespace llengine {
 class Mesh {
@@ -33,6 +34,17 @@ public:
     [[nodiscard]] inline bool is_initialized() const noexcept {
         return vertices_id != 0;
     }
+
+    [[nodiscard]] inline glm::vec3 get_max_vertex_values() const {
+        return max_vertex_value;
+    }
+    [[nodiscard]] inline glm::vec3 get_min_vertex_values() const {
+        return min_vertex_value;
+    }
+    [[nodiscard]] inline AABB get_aabb() const {
+        return { get_max_vertex_values(), get_min_vertex_values() };
+    }
+
     /**
      * @brief Binds this Mesh's VAO. If this Mesh does not have a VAO,
      * one will be created.
@@ -118,8 +130,12 @@ private:
     std::vector<glm::vec3> normals;
     std::vector<glm::vec4> tangents;
 
+    glm::vec3 min_vertex_value;
+    glm::vec3 max_vertex_value;
+
     template<typename T> void index_data();
     void reset_vao_if_needed() const;
     void initialize_vao() const;
+    void compute_min_and_max_vertex_values();
 };
 }

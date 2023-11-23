@@ -304,3 +304,27 @@ void Mesh::initialize_vao() const {
     bind_vertex_attrib_pointer(normals_id,  2, 3);
     bind_vertex_attrib_pointer(tangents_id, 3, 4);
 }
+
+void Mesh::compute_min_and_max_vertex_values() {
+    min_vertex_value = {
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max()
+    };
+    max_vertex_value = {
+        std::numeric_limits<float>::lowest(),
+        std::numeric_limits<float>::lowest(),
+        std::numeric_limits<float>::lowest()
+    };
+
+    for (const glm::vec3& cur_vertex : vertices) {
+        for (std::size_t i = 0; i < 3; i++) {
+            if (cur_vertex[i] > max_vertex_value[i]) {
+                max_vertex_value[i] = cur_vertex[i];
+            }
+            if (cur_vertex[i] < min_vertex_value[i]) {
+                min_vertex_value[i] = cur_vertex[i];
+            }
+        }
+    }
+}
