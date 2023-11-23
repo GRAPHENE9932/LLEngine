@@ -78,6 +78,30 @@ GLuint PBRDrawableNode::get_program_id() const {
     return rs.get_shader_holder().get_pbr_shader_manager().get_program_id(rs, *material);
 }
 
+void PBRDrawableNode::set_mesh(const std::shared_ptr<const Mesh>& mesh) {
+    this->mesh = mesh;
+}
+
+void PBRDrawableNode::set_material(const std::shared_ptr<Material>& material) {
+    this->material = material;
+}
+
+const Mesh& PBRDrawableNode::get_mesh() const {
+    if (mesh == nullptr) {
+        throw std::runtime_error("Failed to get mesh from PBRDrawableNode as it is null.");
+    }
+
+    return *mesh;
+}
+
+const Material& PBRDrawableNode::get_material() const {
+    if (material == nullptr) {
+        throw std::runtime_error("Failed to get material from PBRDrawableNode as it is null.");
+    }
+
+    return *material;
+}
+
 [[nodiscard]] AABB model_space_to_world_space_aabb(const AABB& model_space_aabb, const glm::mat4& model_matrix) {
     AABB result {
         {
