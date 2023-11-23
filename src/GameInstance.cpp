@@ -17,12 +17,16 @@ GameInstance::GameInstance(const GameSettings& settings) {
 
     root_node = std::make_unique<RootNode>(*rendering_server, *bullet_physics_server);
 
-    SceneJSON scene(settings.json_scene_path);
-    root_node->queue_add_child(std::move(scene.to_node()));
+    if (!settings.json_scene_path.empty()) {
+        SceneJSON scene(settings.json_scene_path);
+        root_node->queue_add_child(std::move(scene.to_node()));
+    }
 
-    auto sky_panorama = Texture::from_file(settings.skybox_path);
-    auto sky_cubemap = sky_panorama.panorama_to_cubemap();
-    rendering_server->set_cubemap(std::make_shared<Texture>(std::move(sky_cubemap)));
+    if (!settings.skybox_path.empty()) {
+        auto sky_panorama = Texture::from_file(settings.skybox_path);
+        auto sky_cubemap = sky_panorama.panorama_to_cubemap();
+        rendering_server->set_cubemap(std::make_shared<Texture>(std::move(sky_cubemap)));
+    }
 
     rendering_server->apply_quality_settings(settings.quality_settings);
 
