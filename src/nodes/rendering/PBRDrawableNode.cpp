@@ -1,8 +1,11 @@
 #include "rendering/RenderingServer.hpp"
 #include "nodes/rendering/PBRDrawableNode.hpp" // PBRDrawableNode
 #include "nodes/rendering/CameraNode.hpp"
+#include "math/AABB.hpp"
 
 #include <GL/glew.h>
+
+#include <limits>
 
 using namespace llengine;
 
@@ -73,6 +76,45 @@ void PBRDrawableNode::draw_to_shadow_map() {
 GLuint PBRDrawableNode::get_program_id() const {
     RenderingServer& rs = get_rendering_server();
     return rs.get_shader_holder().get_pbr_shader_manager().get_program_id(rs, *material);
+}
+
+[[nodiscard]] AABB model_space_to_world_space_aabb(const AABB& model_space_aabb, const glm::mat4& model_matrix) {
+    AABB result {
+        {
+            std::numeric_limits<float>::lowest(),
+            std::numeric_limits<float>::lowest(),
+            std::numeric_limits<float>::lowest()
+        },
+        {
+            std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max()
+        }
+    };
+
+    for (std::uint8_t i = 0; i < 8; i++) {
+        glm::vec3 world_space_vertex = model_matrix * glm::vec4(model_space_aabb.get_vertex(i), 1.0f);
+        
+        for (std::size_t j = 0; j < 3; j++) {
+            if (result.point_max[j] < world_space_vertex[j]) {
+                result.point_max[j] = world_space_vertex[j];
+            }
+            if (result.point_min[j] > world_space_vertex[j]) {
+                result.point_min[j] = world_space_vertex[j];
+            }
+        }
+    }
+
+    return result;
+}
+
+[[nodiscard]] bool PBRDrawableNode::is_outside_the_frustum(const Frustum& frustum) const {
+    if (mesh == nullptr) {
+        return false;
+    }
+
+    AABB aabb = model_space_to_world_space_aabb(mesh->get_aabb(), get_global_matrix());
+    return !frustum.is_aabb_on_frustum(aabb);
 }
 
 void PBRDrawableNode::copy_to(Node& node) const {

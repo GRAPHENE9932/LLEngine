@@ -261,8 +261,10 @@ bool RenderingServer::has_environment_cubemap() {
 }
 
 void RenderingServer::draw_non_overlay_objects() {
+    const Frustum frustum = get_current_camera_node().get_frustum();
+
     for (const auto& cur_drawable : get_drawables()) {
-        if (cur_drawable->is_enabled()) {
+        if (cur_drawable->is_enabled() && !cur_drawable->is_outside_the_frustum(frustum)) {
             cur_drawable->draw();
         }
     }

@@ -24,6 +24,8 @@ public:
     void draw_to_shadow_map() override;
     ShaderID get_program_id() const override;
 
+    [[nodiscard]] virtual bool is_outside_the_frustum(const Frustum& frustum) const final override;
+
     void copy_to(Node& node) const override;
     std::unique_ptr<Node> copy() const override;
 };
