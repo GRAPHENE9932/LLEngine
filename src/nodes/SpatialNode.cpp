@@ -150,9 +150,9 @@ void SpatialNode::add_children_from_queue() {
 
     const bool attached_to_tree = is_attached_to_tree();
 
-    for (auto& child_in_queue : children_queued_to_add) {
-        child_in_queue->parent = this;
-        children.emplace_back(std::move(child_in_queue));
+    for (std::size_t i = 0; i < children_queued_to_add.size(); i++) {
+        children_queued_to_add[i]->parent = this;
+        children.emplace_back(std::move(children_queued_to_add[i]));
         if (attached_to_tree) {
             children.back()->on_attachment_to_tree();
         }
