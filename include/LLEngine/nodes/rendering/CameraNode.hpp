@@ -74,6 +74,9 @@ private:
     void recompute_view_matrix() const noexcept;
     void recompute_proj_matrix() const noexcept;
 
+    void invalidate_view_matrix_cache() const noexcept;
+    void invalidate_proj_matrix_cache() const noexcept;
+
     [[nodiscard]] float get_aspect_ratio() const;
 };
 }
