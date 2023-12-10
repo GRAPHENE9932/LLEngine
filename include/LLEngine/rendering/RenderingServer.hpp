@@ -55,6 +55,8 @@ public:
     void block_mouse_press();
 
     void apply_quality_settings(const QualitySettings& settings);
+    void enable_face_culling();
+    void disable_face_culling();
 
     /**
      * @brief Must be called by every Drawable upon its creation.
@@ -175,6 +177,7 @@ private:
     inline static MainFramebuffer* current_default_framebuffer = nullptr;
 
     std::optional<ShadowMap> shadow_map;
+    bool face_culling_enabled = true;
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;

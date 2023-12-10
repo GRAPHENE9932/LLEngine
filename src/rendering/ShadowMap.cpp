@@ -125,8 +125,12 @@ void ShadowMap::prepare_for_drawing() {
     glDisable(GL_CULL_FACE);
 }
 
-void ShadowMap::finish_drawing(FramebufferID default_framebuffer, glm::u32vec2 default_framebuffer_size) {
-    glEnable(GL_CULL_FACE);
+void ShadowMap::finish_drawing(
+    bool enable_face_culling, FramebufferID default_framebuffer, glm::u32vec2 default_framebuffer_size
+) {
+    if (enable_face_culling) {
+        glEnable(GL_CULL_FACE);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, default_framebuffer);
     const auto framebuffer_size = default_framebuffer_size;
     glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);

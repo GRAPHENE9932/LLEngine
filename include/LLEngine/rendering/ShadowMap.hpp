@@ -63,7 +63,7 @@ private:
 
     [[nodiscard]] glm::mat4 compute_view_proj_matrix() const;
     void prepare_for_drawing();
-    void finish_drawing(FramebufferID default_framebuffer, glm::u32vec2 default_framebuffer_size);
+    void finish_drawing(bool enable_face_culling, FramebufferID default_framebuffer, glm::u32vec2 default_framebuffer_size);
 
     friend class RenderingServer;
 };

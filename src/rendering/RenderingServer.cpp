@@ -119,6 +119,16 @@ void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
     main_framebuffer->apply_postprocessing_settings(settings);
 }
 
+void RenderingServer::enable_face_culling() {
+    face_culling_enabled = true;
+    glCullFace(GL_TRUE);
+}
+
+void RenderingServer::disable_face_culling() {
+    face_culling_enabled = false;
+    glCullFace(GL_FALSE);
+}
+
 void RenderingServer::register_drawable(Drawable* drawable) noexcept {
     if (drawable) {
         drawables.push_back(drawable);
@@ -281,5 +291,7 @@ void RenderingServer::update_shadow_map() {
             cur_drawable->draw_to_shadow_map();
         }
     }
-    shadow_map->finish_drawing(get_current_default_framebuffer_id(), get_window().get_framebuffer_size());
+    shadow_map->finish_drawing(
+        face_culling_enabled, get_current_default_framebuffer_id(), get_window().get_framebuffer_size()
+    );
 }
