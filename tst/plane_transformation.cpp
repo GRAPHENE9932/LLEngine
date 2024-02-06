@@ -1,6 +1,9 @@
 #include "math/Plane.hpp"
 #include "testing_tools.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtx/quaternion.hpp>
 #include <gtest/gtest.h>
 
 TEST(PlaneTransformation, IdentityTransform) {
@@ -18,7 +21,7 @@ TEST(PlaneTransformation, IdentityTransform) {
 TEST(PlaneTransformation, CombinedTranslationAndRotation) {
     llengine::Plane plane { { 0.7071067812f, 0.7071067812f, 0.0f }, 2.0f};
 
-    glm::mat4 translation = glm::translate(glm::vec3(1.5f, 2.0f, -3.5f));
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(1.5f, 2.0f, -3.5f));
     glm::mat4 rotation = glm::toMat4(glm::quat(glm::vec3(glm::radians(30.0f), glm::radians(45.0f), glm::radians(-60.0f))));
     glm::mat4 combined = translation * rotation;
 
