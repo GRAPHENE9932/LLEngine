@@ -1,7 +1,7 @@
 #include "NodeProperty.hpp"
 
 #include <fmt/format.h>
-#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <algorithm>
 
