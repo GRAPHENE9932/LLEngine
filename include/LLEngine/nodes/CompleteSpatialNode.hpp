@@ -4,7 +4,7 @@
 #include "Transform.hpp"
 
 #include <glm/vec3.hpp> // glm::vec3
-#include <glm/gtx/quaternion.hpp> // glm::quat
+#include <glm/gtc/quaternion.hpp>
 
 #include <vector> // std::vector
 #include <memory> // std::unique_ptr
