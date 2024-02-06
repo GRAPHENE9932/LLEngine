@@ -3,7 +3,7 @@
 #include <glm/geometric.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/gtx/transform.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace llengine {
 struct Plane {
