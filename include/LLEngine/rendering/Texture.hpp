@@ -2,7 +2,6 @@
 
 #include <ios> // std::streamsize
 #include <string> // std::string
-#include <memory>
 
 #include <glm/vec2.hpp> // glm::u32vec2
 
@@ -52,10 +51,21 @@ private:
 
 class Texture {
 public:
-    Texture(TextureID texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
-            texture_id(texture_id), tex_size(tex_size), cubemap(is_cubemap) {}
-    Texture(ManagedTextureID&& texture_id, const glm::u32vec2 tex_size, bool is_cubemap) noexcept :
-            texture_id(std::move(texture_id)), tex_size(tex_size), cubemap(is_cubemap) {}
+    enum class Type : std::uint8_t {
+        TEX_2D, TEX_1D, TEX_CUBEMAP
+    };
+    enum class Format : std::uint8_t {
+        R8, RG8, RGB8, RGBA8,
+        R11G11B10F,
+        R16F, RG16F, RGB16F, RGBA16F,
+        R32F, RG32F, RGB32F, RGBA32F
+    };
+    
+    Texture() = default;
+    Texture(TextureID texture_id, const glm::u32vec2 tex_size, Type type) noexcept :
+            texture_id(texture_id), tex_size(tex_size), type(type) {}
+    Texture(ManagedTextureID&& texture_id, const glm::u32vec2 tex_size, Type type) noexcept :
+            texture_id(std::move(texture_id)), tex_size(tex_size), type(type) {}
     Texture(const Texture& other) = delete;
     Texture(Texture&& other) noexcept = default;
     ~Texture() = default;
@@ -75,10 +85,21 @@ public:
     [[nodiscard]] glm::u32vec2 get_size() const {
         return tex_size;
     }
-    [[nodiscard]] bool is_cubemap() const {
-        return cubemap;
+    [[nodiscard]] Type get_type() const {
+        return type;
     }
 
+    /**
+     * @brief Creates a Texture from raw image data.
+     * 
+     * @tparam T Input component type. Must be either char or float.
+     * @param resolution Texture resolution. If the type parameter is TEX_1D, then the
+     * resolution's y component is ignored.
+     */
+    template<typename T>
+    [[nodiscard]] static Texture from_pixel_data(
+        T* pixel_data, glm::u32vec2 resolution, Type type, Format format
+    );
     [[nodiscard]] static Texture from_rgbe(const TexLoadingParams& params);
     [[nodiscard]] static inline Texture from_rgbe(const std::string& rgbe_texture_path) {
         TexLoadingParams params;
@@ -128,13 +149,13 @@ public:
     [[nodiscard]] static Texture from_property(const NodeProperty& property);
 
     [[nodiscard]] Texture panorama_to_cubemap() const;
-    [[nodiscard]] Texture compute_irradiance_map() const;
-    [[nodiscard]] Texture compute_prefiltered_specular_map() const;
-    [[nodiscard]] static Texture compute_brdf_integration_map();
+    [[nodiscard]] Texture compute_irradiance_map() const; // TODO: Move this to another class.
+    [[nodiscard]] Texture compute_prefiltered_specular_map() const; // TODO: Move this to another class.
+    [[nodiscard]] static Texture compute_brdf_integration_map(); // TODO: Move this to another class.
 
 protected:
     ManagedTextureID texture_id = 0; // ID of value 0 implies that there are no texture.
     glm::u32vec2 tex_size {0, 0};
-    bool cubemap = false;
+    Type type {Type::TEX_2D};
 };
 }

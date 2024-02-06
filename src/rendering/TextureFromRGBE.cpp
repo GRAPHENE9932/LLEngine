@@ -232,12 +232,10 @@ Texture Texture::from_rgbe(const TexLoadingParams& params) {
 
     GLuint texture_id;
     glm::u32vec2 tex_size;
-    bool is_cubemap;
     std::vector<float> rgb_data {get_rgb_data(x_resolution, y_resolution, stream)};
     texture_id = initialize_opengl_texture(x_resolution, y_resolution, params, rgb_data);
     tex_size = {x_resolution, y_resolution};
-    is_cubemap = false;
 
-    return Texture(texture_id, tex_size, is_cubemap);
+    return Texture(texture_id, tex_size, Type::TEX_2D);
 }
 }

@@ -119,7 +119,7 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
         chars.emplace(
             c,
             FontChar {
-                Texture(std::move(texture_id), tex_size, false),
+                Texture(std::move(texture_id), tex_size, Texture::Type::TEX_2D),
                 glm::u32vec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                 static_cast<std::uint32_t>(face->glyph->advance.x)
             }

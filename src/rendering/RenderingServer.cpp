@@ -28,7 +28,7 @@ RenderingServer::~RenderingServer() {
 }
 
 void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
-    if (!cubemap->is_cubemap()) {
+    if (cubemap->get_type() != Texture::Type::TEX_CUBEMAP) {
         throw std::invalid_argument("Specified cubemap texture for skybox is not actually a cubemap.");
     }
 

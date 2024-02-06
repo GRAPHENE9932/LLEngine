@@ -1,16 +1,18 @@
 #include "rendering/Texture.hpp"
+#include "datatypes.hpp"
 #include "rendering/Mesh.hpp"
 #include "NodeProperty.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "rendering/Shader.hpp"
 
-#include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <GL/glew.h>
 
 #include <array>
 #include <fstream>
+#include <type_traits>
+#include <utility>
 
 using namespace llengine;
 
@@ -69,6 +71,144 @@ void ManagedTextureID::delete_texture() {
 void Texture::set_id(TextureID new_id) {
     texture_id.set_id(new_id);
 }
+
+template<typename T>
+static void throw_if_invalid_format(Texture::Format format) {
+    switch (format) {
+    case Texture::Format::R8:
+    case Texture::Format::RG8:
+    case Texture::Format::RGB8:
+    case Texture::Format::RGBA8:
+        if (!std::is_same_v<T, char>) {
+            throw std::runtime_error("Invalid input datatype for the specified format.");
+        }
+        break;
+    case Texture::Format::R11G11B10F:
+    case Texture::Format::R16F:
+    case Texture::Format::RG16F:
+    case Texture::Format::RGB16F:
+    case Texture::Format::RGBA16F:
+    case Texture::Format::R32F:
+    case Texture::Format::RG32F:
+    case Texture::Format::RGB32F:
+    case Texture::Format::RGBA32F:
+        if (!std::is_same_v<T, float>) {
+            throw std::runtime_error("Invalid input datatype for the specified format.");
+        }
+        break;
+    default:
+        throw std::runtime_error("Invalid Texture::Format specified.");
+    }
+}
+
+static std::pair<GLenum, GLenum> opengl_format_and_internal_format(Texture::Format format) {
+    switch (format) {
+    case Texture::Format::R8:
+        return {GL_RED, GL_R8};
+    case Texture::Format::RG8:
+        return {GL_RG, GL_RG8};
+    case Texture::Format::RGB8:
+        return {GL_RGB, GL_RGB8};
+    case Texture::Format::RGBA8:
+        return {GL_RGBA, GL_RGBA8};
+    case Texture::Format::R11G11B10F:
+        return {GL_RGB, GL_R11F_G11F_B10F};
+    case Texture::Format::R16F:
+        return {GL_RED, GL_R16F};
+    case Texture::Format::RG16F:
+        return {GL_RG, GL_RG16F};
+    case Texture::Format::RGB16F:
+        return {GL_RGB, GL_RGB16F};
+    case Texture::Format::RGBA16F:
+        return {GL_RGBA, GL_RGBA16F};
+    case Texture::Format::R32F:
+        return {GL_RED, GL_R32F};
+    case Texture::Format::RG32F:
+        return {GL_RG, GL_RG32F};
+    case Texture::Format::RGB32F:
+        return {GL_RGB, GL_RGB32F};
+    case Texture::Format::RGBA32F:
+        return {GL_RGBA, GL_RGBA32F};
+    default:
+        throw std::runtime_error("Invalid Texture::Format specified.");
+    }
+}
+
+static GLenum opengl_target(Texture::Type type) {
+    switch (type) {
+    case Texture::Type::TEX_1D:
+        return GL_TEXTURE_1D;
+    case Texture::Type::TEX_2D:
+        return GL_TEXTURE_2D;
+    case Texture::Type::TEX_CUBEMAP:
+        return GL_TEXTURE_CUBE_MAP;
+    default:
+        throw std::runtime_error("Invalid Texture::Type specified.");
+    }
+}
+
+template<typename T>
+static GLenum opengl_type() {
+    if constexpr (std::is_same_v<T, float>) {
+        return GL_FLOAT;
+    }
+    else if constexpr (std::is_same_v<T, char>) {
+        return GL_BYTE;
+    }
+    else {
+        static_assert(false, "Invalid type specified.");
+    }
+}
+
+template<typename T>
+[[nodiscard]] Texture Texture::from_pixel_data(
+    T* pixel_data, glm::u32vec2 resolution, Type type, Format format
+) {
+    GLenum target = opengl_target(type);
+    throw_if_invalid_format<T>(format);
+    auto [gl_format, gl_internal_format] = opengl_format_and_internal_format(format);
+
+    GLuint texture_id {};
+    glGenTextures(1, &texture_id);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(target, texture_id);
+    
+    switch (type) {
+    case Type::TEX_1D:
+        glTexImage1D(
+            target, 0, gl_internal_format, resolution.x, 0,
+            gl_format, std::is_same_v<T, float> ? GL_FLOAT : GL_BYTE, pixel_data
+        );
+        break;
+    case Type::TEX_2D:
+        glTexImage2D(
+            target, 0, gl_internal_format, resolution.x, resolution.y, 0,
+            gl_format, std::is_same_v<T, float> ? GL_FLOAT : GL_BYTE, pixel_data
+        );
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        break;
+    case Type::TEX_CUBEMAP:
+        for (std::size_t i = 0; i < 6; i++) {
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GraphicsAPIEnum>(i), 0, gl_internal_format,
+                resolution.x, resolution.y, 0, gl_format, std::is_same_v<T, float> ? GL_FLOAT : GL_BYTE, pixel_data
+            );
+            glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        }
+        break;
+    default:
+        throw std::runtime_error("Invalid Texture::Type specified.");
+    }
+    glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    return Texture(texture_id, resolution, type);
+}
+
+template Texture Texture::from_pixel_data<float>(float* pixel_data, glm::u32vec2 resolution, Type type, Format format);
+template Texture Texture::from_pixel_data<char>(char* pixel_data, glm::u32vec2 resolution, Type type, Format format);
 
 auto draw_to_cubemap(
     glm::i32vec2 cubemap_size, std::int32_t mipmap_levels, std::invocable<const glm::mat4&, std::int32_t> auto&& drawing_function
@@ -139,7 +279,7 @@ auto draw_to_cubemap(
         original_viewport_params[2], original_viewport_params[3]
     );
 
-    return Texture(cubemap_id, cubemap_size, true);
+    return Texture(cubemap_id, cubemap_size, Texture::Type::TEX_CUBEMAP);
 }
 
 constexpr std::string_view EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT =
@@ -162,8 +302,8 @@ static void ensure_equirectangular_mapper_shader_is_initialized() {
 }
 
 Texture Texture::panorama_to_cubemap() const {
-    if (is_cubemap()) {
-        throw std::runtime_error("Unable to make cubemap from panorama because panorama is cubemap.");
+    if (type != Type::TEX_2D) {
+        throw std::runtime_error("Unable to make cubemap from panorama because panorama has invalid texture type.");
     }
 
     const glm::u32vec2 cubemap_size {get_size().x / 2u};
@@ -206,7 +346,7 @@ static void ensure_irradiance_precomputer_shader_is_initialized() {
 
 constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {16u, 16u};
 Texture Texture::compute_irradiance_map() const {
-    if (!is_cubemap()) {
+    if (type != Type::TEX_CUBEMAP) {
         throw std::runtime_error("Unable to compute irradiance map because the given environment map is not cubemap.");
     }
 
@@ -250,7 +390,7 @@ static void ensure_specular_prefilter_shader_is_initialized() {
 constexpr glm::u32vec2 SPECULAR_MAP_SIZE {256u, 256u};
 constexpr std::int32_t SPECULAR_MAP_MIPMAP_LEVELS = 9; // log2(256) + 1. Also change LAST_PREFILTERED_MIPMAP_LEVEL in pbr_shader.frag.
 Texture Texture::compute_prefiltered_specular_map() const {
-    if (!is_cubemap()) {
+    if (type != Type::TEX_CUBEMAP) {
         throw std::runtime_error("Unable to compute specular map because the given environment map is not cubemap.");
     }
 
@@ -344,7 +484,7 @@ Texture Texture::compute_brdf_integration_map() {
         original_viewport_params[2], original_viewport_params[3]
     );
 
-    return Texture(texture_id, BRDF_INTEGRATION_MAP_SIZE, false);
+    return Texture(texture_id, BRDF_INTEGRATION_MAP_SIZE, Type::TEX_2D);
 }
 
 constexpr std::array<std::uint8_t, 12> KTX1_IDENTIFIER {

@@ -155,7 +155,7 @@ Texture Texture::from_ktx(const TexLoadingParams& params) {
     Texture texture {
         texture_id,
         glm::u32vec2(ktx_texture.get()->baseWidth, ktx_texture.get()->baseHeight),
-        ktx_texture.get()->isCubemap
+        ktx_texture.get()->isCubemap ? Type::TEX_CUBEMAP : Type::TEX_2D
     };
     glBindTexture(tex_target, texture_id);
     glTexParameteri(tex_target, GL_TEXTURE_MAG_FILTER, params.magnification_filter);
