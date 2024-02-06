@@ -6,6 +6,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 
 namespace llengine {
 class FreeTypeFont {
