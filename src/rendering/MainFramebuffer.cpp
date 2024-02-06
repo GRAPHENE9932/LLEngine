@@ -1,7 +1,9 @@
 #include "MainFramebuffer.hpp"
 #include "BloomRenderer.hpp"
+#include "datatypes.hpp"
 #include "rendering/Shader.hpp"
 #include "rendering/Mesh.hpp"
+#include "rendering/Texture.hpp"
 
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,7 +11,7 @@
 #include <cmath>
 
 namespace llengine {
-MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), framebuffer_size(size) {
+MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), framebuffer_size(size), color_attachment(initialize_color_attachment(size)) {
     initialize_framebuffer(size);
 }
 
@@ -24,7 +26,7 @@ void MainFramebuffer::render_to_window(float delta_time) {
         if (!bloom_renderer) {
             bloom_renderer = std::make_unique<BloomRenderer>(framebuffer_size);
         }
-        bloom_renderer->render_to_bloom_texture(get_color_texture_id(), 0.005f);
+        bloom_renderer->render_to_bloom_texture(get_color_texture(), 0.0075f);
     }
 
     glDisable(GL_DEPTH_TEST);
@@ -34,7 +36,7 @@ void MainFramebuffer::render_to_window(float delta_time) {
         #include "shaders/postprocessing.frag"
     );
     postprocessing_shader.use_shader();
-    postprocessing_shader.bind_2d_texture<"main_image">(get_color_texture_id(), 0);
+    postprocessing_shader.bind_2d_texture<"main_image">(get_color_texture().get_id(), 0);
     postprocessing_shader.set_float<"exposure">(exposure);
     if (bloom_enabled) {
         postprocessing_shader.bind_2d_texture<"bloom_image">(bloom_renderer->get_bloom_texture_id(), 1);
@@ -50,8 +52,8 @@ void MainFramebuffer::render_to_window(float delta_time) {
     return framebuffer.get();
 }
 
-[[nodiscard]] TextureID MainFramebuffer::get_color_texture_id() const {
-    return color_attachment.get();
+[[nodiscard]] const Texture& MainFramebuffer::get_color_texture() const {
+    return color_attachment;
 }
 
 void MainFramebuffer::apply_postprocessing_settings(const QualitySettings& quality_settings) {
@@ -74,18 +76,20 @@ void MainFramebuffer::assign_framebuffer_size(glm::u32vec2 size) {
     initialize_framebuffer(size);
 }
 
-void MainFramebuffer::initialize_color_attachment(glm::u32vec2 size) {
-    color_attachment.delete_texture();
-    glGenTextures(1, &color_attachment.get_ref());
-    glBindTexture(GL_TEXTURE_2D, color_attachment);
+Texture MainFramebuffer::initialize_color_attachment(glm::u32vec2 size) {
+    ManagedTextureID tex_id;
+    glGenTextures(1, &tex_id.get_ref());
+    glBindTexture(GL_TEXTURE_2D, tex_id);
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, size.x, size.y, 0,
         GL_RGB, GL_FLOAT, nullptr
     );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, color_attachment, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex_id, 0);
+
+    return Texture(std::move(tex_id), size, Texture::Type::TEX_2D);
 }
 
 void MainFramebuffer::initialize_depth_attachment(glm::u32vec2 size) {
@@ -125,7 +129,7 @@ constexpr float EXPOSURE_KEY_VALUE = 0.18f;
 constexpr float DECAY_RATE = 0.75f;
 
 void MainFramebuffer::compute_automatic_exposure(float delta_time) {
-    const glm::vec3 average_color = compute_average_texture_color(get_color_texture_id(), framebuffer_size);
+    const glm::vec3 average_color = compute_average_texture_color(get_color_texture().get_id(), framebuffer_size);
     float average_luminance = 0.2126f * average_color.r + 0.7152f * average_color.g + 0.0722f * average_color.b;
 
     float target_exposure = EXPOSURE_KEY_VALUE / average_luminance;
@@ -138,7 +142,7 @@ void MainFramebuffer::initialize_framebuffer(glm::u32vec2 size) {
     glGenFramebuffers(1, &framebuffer.get_ref());
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    initialize_color_attachment(size);
+    color_attachment = initialize_color_attachment(size);
     initialize_depth_attachment(size);
 
     GraphicsAPIEnum attachment = GL_COLOR_ATTACHMENT0;

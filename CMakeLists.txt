@@ -38,6 +38,7 @@ set(SOURCES
     src/rendering/shaders/PBRShaderManager.cpp
     src/rendering/shaders/PBRShader.cpp
     src/rendering/shaders/BRDFIntegrationMapperShader.cpp
+    src/rendering/shaders/GaussianBlurShader.cpp
     src/rendering/FPSMeter.cpp
     src/rendering/GLTFLoading.cpp
     src/rendering/RenderingServer.cpp

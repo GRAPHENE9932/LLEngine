@@ -1,5 +1,6 @@
 #include "BloomFramebuffer.hpp"
 #include "rendering/RenderingServer.hpp"
+#include "rendering/Texture.hpp"
 
 #include <GL/glew.h>
 #include <fmt/format.h>
@@ -7,21 +8,19 @@
 #include <array>
 
 namespace llengine {
-BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t image_stages) {
-    assert(image_stages > 0);
+static void initialize_images_cascade(
+    std::vector<Texture>& empty_cascade,
+    glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider,
+    std::uint32_t image_stages
+) {
+    assert(empty_cascade.empty());
 
-    glGenFramebuffers(1, &framebuffer_id.get_ref());
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
-
-    glm::u32vec2 cur_image_size = framebuffer_size;
+    glm::u32vec2 cur_image_size = framebuffer_size / first_size_divider;
     for (std::uint32_t i = 0; i < image_stages; i++) {
-        Image result;
+        TextureID texture_id;
 
-        cur_image_size /= 2;
-        result.size = cur_image_size;
-
-        glGenTextures(1, &result.texture_id.get_ref());
-        glBindTexture(GL_TEXTURE_2D, result.texture_id);
+        glGenTextures(1, &texture_id);
+        glBindTexture(GL_TEXTURE_2D, texture_id);
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, cur_image_size.x,
             cur_image_size.y, 0, GL_RGB, GL_FLOAT, nullptr
@@ -31,12 +30,44 @@ BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        images.emplace_back(std::move(result));
+        empty_cascade.emplace_back(texture_id, cur_image_size, Texture::Type::TEX_2D);
+
+        cur_image_size /= 2;
     }
+}
+
+static Texture initialize_ping_pong_image(glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider) {
+    ManagedTextureID texture_id;
+
+    glm::u32vec2 image_size = framebuffer_size / first_size_divider;
+    glGenTextures(1, &texture_id.get_ref());
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, image_size.x,
+        image_size.y, 0, GL_RGB, GL_FLOAT, nullptr
+    );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    return Texture(std::move(texture_id), image_size, Texture::Type::TEX_2D);
+}
+
+BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider, std::uint32_t image_stages) {
+    assert(image_stages > 0);
+
+    glGenFramebuffers(1, &framebuffer_id.get_ref());
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
+
+    initialize_images_cascade(images_cascade_1, framebuffer_size, first_size_divider, image_stages);
+    initialize_images_cascade(images_cascade_2, framebuffer_size, first_size_divider, image_stages);
+    ping_pong_images[0] = initialize_ping_pong_image(framebuffer_size, first_size_divider);
+    ping_pong_images[1] = initialize_ping_pong_image(framebuffer_size, first_size_divider);
 
     glFramebufferTexture2D(
         GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        images[0].texture_id, 0
+        images_cascade_1[0].get_id(), 0
     );
 
     std::uint32_t attachment = GL_COLOR_ATTACHMENT0;
@@ -60,12 +91,23 @@ void BloomFramebuffer::bind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_id);
 }
 
-[[nodiscard]] const BloomFramebuffer::Image& BloomFramebuffer::get_image(std::size_t stage) const {
-    assert(stage < images.size());
-    return images[stage];
+[[nodiscard]] const Texture& BloomFramebuffer::get_image(std::uint32_t cascade, std::size_t stage) const {
+    if (cascade == 0) {
+        return images_cascade_1.at(stage);
+    }
+    else if (cascade == 1) {
+        return images_cascade_2.at(stage);
+    }
+    else {
+        throw std::runtime_error("Invalid image cascade specified.");
+    }
+}
+
+[[nodiscard]] const Texture& BloomFramebuffer::get_ping_pong_image(std::uint8_t index) const {
+    return ping_pong_images.at(index);
 }
 
 [[nodiscard]] glm::u32vec2 BloomFramebuffer::get_framebuffer_size() const {
-    return images[0].size;
+    return images_cascade_1.at(0).get_size();
 }
 }

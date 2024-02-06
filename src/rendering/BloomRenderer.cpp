@@ -9,10 +9,11 @@ namespace llengine {
 using DownsampleShaderType = Shader<"orig_tex_resolution">;
 using UpsampleShaderType = Shader<"filter_radius">;
 
-constexpr std::uint32_t IMAGE_STAGES = 5;
+constexpr std::uint32_t IMAGE_STAGES = 4;
+constexpr std::uint32_t FIRST_SIZE_DIVIDER = 4;
 
 BloomRenderer::BloomRenderer(glm::u32vec2 framebuffer_size) :
-framebuffer(framebuffer_size, IMAGE_STAGES),
+framebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, IMAGE_STAGES),
 framebuffer_size(framebuffer_size) {
 
 }
@@ -27,86 +28,112 @@ void BloomRenderer::assign_framebuffer_size(glm::u32vec2 framebuffer_size) {
     }
 
     this->framebuffer_size = framebuffer_size;
-    framebuffer = std::move(BloomFramebuffer(framebuffer_size, IMAGE_STAGES));
+    framebuffer = std::move(BloomFramebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, IMAGE_STAGES));
 }
 
-void BloomRenderer::render_to_bloom_texture(TextureID source_texture_id, float bloom_radius) {
+void BloomRenderer::render_to_bloom_texture(const Texture& source_texture, float bloom_radius) {
     framebuffer.bind();
 
-    render_downsamples(source_texture_id);
-    render_upsamples(bloom_radius);
+    do_horizontal_blur(source_texture, bloom_radius);
+    do_vertical_blur(bloom_radius);
+    combine();
 
     glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
     glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
 }
 
 [[nodiscard]] TextureID BloomRenderer::get_bloom_texture_id() const {
-    return framebuffer.get_image(0).texture_id;
+    return framebuffer.get_ping_pong_image(ping_pong_index);
 }
 
-void BloomRenderer::render_downsamples(TextureID source_texture_id) {
-    static DownsampleShaderType shader(
-        #include "shaders/bloom_upsample_downsample.vert"
-        ,
-        #include "shaders/bloom_downsample.frag"
-    );
-
-    shader.use_shader();
-    shader.set_vec2<"orig_tex_resolution">(framebuffer.get_framebuffer_size());
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, source_texture_id);
-
+void BloomRenderer::do_horizontal_blur(const Texture& source_texture, float bloom_radius) {
     for (std::uint32_t i = 0; i < IMAGE_STAGES; i++) {
-        const auto& cur_image = framebuffer.get_image(i);
+        blur_shader.use_horizontal_shader(source_texture, bloom_radius * std::pow(2u, i), FIRST_SIZE_DIVIDER, 2 + i);
 
-        glViewport(0, 0, cur_image.size.x, cur_image.size.y);
+        const auto& cur_image = framebuffer.get_image(0, i);
+
+        glViewport(0, 0, cur_image.get_size().x, cur_image.get_size().y);
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-            cur_image.texture_id, 0
+            cur_image.get_id(), 0
         );
 
         Mesh::get_quad()->bind_vao(true, false, false);
         glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
         Mesh::get_quad()->unbind_vao(true, false, false);
-
-        shader.set_vec2<"orig_tex_resolution">(cur_image.size);
-        glBindTexture(GL_TEXTURE_2D, cur_image.texture_id);
     }
 }
 
-void BloomRenderer::render_upsamples(float filter_radius) {
-    static UpsampleShaderType shader(
-        #include "shaders/bloom_upsample_downsample.vert"
-        ,
-        #include "shaders/bloom_upsample.frag"
-    );
+void BloomRenderer::do_vertical_blur(float bloom_radius) {
+    for (std::uint32_t i = 0; i < IMAGE_STAGES; i++) {
+        blur_shader.use_vertical_shader(framebuffer.get_image(0, i), bloom_radius * std::pow(2u, i) * (static_cast<float>(framebuffer_size.x) / framebuffer_size.y));
+        
+        const auto& cur_image = framebuffer.get_image(1, i);
 
-    shader.use_shader();
-    shader.set_float<"filter_radius">(filter_radius);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBlendEquation(GL_FUNC_ADD);
-
-    for (std::uint32_t i = IMAGE_STAGES - 1; i > 0; i--) {
-        const auto& cur_image = framebuffer.get_image(i);
-        const auto& next_image = framebuffer.get_image(i - 1);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cur_image.texture_id);
-
-        glViewport(0, 0, next_image.size.x, next_image.size.y);
+        glViewport(0, 0, cur_image.get_size().x, cur_image.get_size().y);
         glFramebufferTexture2D(
-            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_2D, next_image.texture_id, 0
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+            cur_image.get_id(), 0
         );
 
         Mesh::get_quad()->bind_vao(true, false, false);
         glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
         Mesh::get_quad()->unbind_vao(true, false, false);
     }
+}
 
-    glDisable(GL_BLEND);
+static void combine_textures(
+    const Texture& target, const Texture& source_1, const Texture& source_2,
+    const Shader<"source_1", "source_2">& shader
+) {
+    shader.bind_2d_texture<"source_1">(source_1.get_id(), 0);
+    shader.bind_2d_texture<"source_2">(source_2.get_id(), 1);
+
+    glViewport(0, 0, target.get_size().x, target.get_size().y);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+        target.get_id(), 0
+    );
+
+    Mesh::get_quad()->bind_vao(true, false, false);
+    glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
+    Mesh::get_quad()->unbind_vao(true, false, false);
+}
+
+void BloomRenderer::combine() {
+    static Shader<"source_1", "source_2"> shader(
+        #include "shaders/bloom_combine.vert"
+        ,
+        #include "shaders/bloom_combine.frag"
+    );
+    
+    shader.use_shader();
+
+    if (IMAGE_STAGES >= 2) {
+        combine_textures(
+            framebuffer.get_ping_pong_image(0),
+            framebuffer.get_image(1, 0),
+            framebuffer.get_image(1, 1),
+            shader
+        );
+    }
+    if (IMAGE_STAGES >= 3) {
+        combine_textures(
+            framebuffer.get_ping_pong_image(1),
+            framebuffer.get_ping_pong_image(0),
+            framebuffer.get_image(1, 2),
+            shader
+        );
+    }
+    for (std::uint32_t stage = 3; stage < IMAGE_STAGES; stage++) {
+        combine_textures(
+            framebuffer.get_ping_pong_image((stage + 1) % 2),
+            framebuffer.get_ping_pong_image(stage % 2),
+            framebuffer.get_image(1, stage),
+            shader
+        );
+    }
+
+    ping_pong_index = (IMAGE_STAGES - 1) % 2;
 }
 }

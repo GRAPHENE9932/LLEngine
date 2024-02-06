@@ -7,6 +7,8 @@
 
 #include <glm/vec2.hpp>
 
+#include <memory>
+
 namespace llengine {
 class BloomRenderer;
 
@@ -18,7 +20,7 @@ public:
     void render_to_window(float delta_time);
 
     [[nodiscard]] FramebufferID get_framebuffer_id() const;
-    [[nodiscard]] TextureID get_color_texture_id() const;
+    [[nodiscard]] const Texture& get_color_texture() const;
 
     void apply_postprocessing_settings(const QualitySettings& quality_settings);
 
@@ -30,7 +32,7 @@ private:
     glm::u32vec2 framebuffer_size;
 
     ManagedFramebufferID framebuffer;
-    ManagedTextureID color_attachment;
+    Texture color_attachment;
     ManagedRenderbufferID depth_attachment;
 
     bool bloom_enabled = true;
@@ -38,7 +40,7 @@ private:
 
     float exposure = 0.0f;
 
-    void initialize_color_attachment(glm::u32vec2 size);
+    Texture initialize_color_attachment(glm::u32vec2 size);
     void initialize_depth_attachment(glm::u32vec2 size);
 
     void compute_automatic_exposure(float delta_time);

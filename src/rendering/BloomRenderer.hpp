@@ -2,6 +2,7 @@
 
 #include "datatypes.hpp"
 #include "BloomFramebuffer.hpp"
+#include "rendering/shaders/GaussianBlurShader.hpp"
 
 #include <glm/vec2.hpp>
 
@@ -12,14 +13,17 @@ public:
     ~BloomRenderer();
 
     void assign_framebuffer_size(glm::u32vec2 framebuffer_size);
-    void render_to_bloom_texture(TextureID source_texture_id, float bloom_radius);
+    void render_to_bloom_texture(const Texture& source_texture, float bloom_radius);
     [[nodiscard]] TextureID get_bloom_texture_id() const;
 
 private:
     BloomFramebuffer framebuffer;
     glm::u32vec2 framebuffer_size;
+    GaussianBlurShader blur_shader;
+    std::uint8_t ping_pong_index = 0;
 
-    void render_downsamples(TextureID source_texture_id);
-    void render_upsamples(float filter_radius);
+    void do_horizontal_blur(const Texture& source_texture, float bloom_radius);
+    void do_vertical_blur(float bloom_radius);
+    void combine();
 };
 }

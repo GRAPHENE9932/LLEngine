@@ -5,27 +5,26 @@
 
 #include <glm/vec2.hpp>
 
+#include <array>
 #include <vector>
 
 namespace llengine {
 class BloomFramebuffer {
-struct Image {
-    glm::u32vec2 size;
-    ManagedTextureID texture_id;
-};
-
 public:
-    BloomFramebuffer(glm::u32vec2 frambuffer_size, std::uint32_t image_stages);
+    BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider, std::uint32_t image_stages);
     ~BloomFramebuffer();
 
     BloomFramebuffer& operator=(BloomFramebuffer&& other) noexcept = default;
 
     void bind() const;
-    [[nodiscard]] const Image& get_image(std::size_t stage) const;
+    [[nodiscard]] const Texture& get_image(std::uint32_t cascade, std::size_t stage) const;
+    [[nodiscard]] const Texture& get_ping_pong_image(std::uint8_t index) const;
     [[nodiscard]] glm::u32vec2 get_framebuffer_size() const;
 
 private:
     ManagedFramebufferID framebuffer_id;
-    std::vector<Image> images;
+    std::vector<Texture> images_cascade_1;
+    std::vector<Texture> images_cascade_2;
+    std::array<Texture, 2> ping_pong_images;
 };
 }
