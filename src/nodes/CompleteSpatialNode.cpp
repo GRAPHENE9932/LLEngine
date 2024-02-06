@@ -1,7 +1,5 @@
 #include <algorithm> // std::find_if
 
-#include <glm/gtx/transform.hpp> // glm::translate, glm::scale
-
 #include "nodes/CompleteSpatialNode.hpp"
 
 using namespace llengine;
