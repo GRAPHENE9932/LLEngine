@@ -78,9 +78,8 @@ void logger::log(Severity severity, const std::string &message) noexcept {
 
     std::string log_string {
         fmt::format(
-            "{:%Y-%m-%d %H:%M:%S}.{:06} {} {}\n",
+            "{:%Y-%m-%d %H:%M:%S} {} {}\n",
             time,
-            time.time_since_epoch().count() % 1000000, // Microseconds.
             severity_to_string(severity),
             message
         )
