@@ -15,6 +15,7 @@ public:
         Texture texture;
         glm::u32vec2 position;
         std::uint32_t advance;
+        float texture_scale;
     };
 
     FreeTypeFont(const std::string& file_path, std::uint32_t font_size);
@@ -24,13 +25,14 @@ public:
     }
 
     [[nodiscard]] inline std::uint32_t get_font_size() const {
-        return font_size;
+        return scaled_size;
     }
 
     static std::shared_ptr<FreeTypeFont> from_property(const NodeProperty& property);
 
 private:
     std::map<char, FontChar> chars;
-    std::uint32_t font_size;
+    std::uint32_t scaled_size;
+    std::uint32_t unscaled_size;
 };
 }

@@ -167,9 +167,9 @@ void TextNode::add_line(
         chars.push_back(std::ref(font_char));
 
         const float left_x = baseline_x + font_char.position.x + offset.x;
-        const float right_x = left_x + font_char.texture.get_size().x + offset.x;
+        const float right_x = left_x + font_char.texture.get_size().x * font_char.texture_scale + offset.x;
         const float top_y = static_cast<float>(font_char.position.y) + offset.y;
-        const float bottom_y = static_cast<float>(font_char.position.y) - static_cast<float>(font_char.texture.get_size().y) + offset.y;
+        const float bottom_y = static_cast<float>(font_char.position.y) - static_cast<float>(font_char.texture.get_size().y * font_char.texture_scale) + offset.y;
 
         if (right_x > max_x) max_x = static_cast<std::int32_t>(right_x);
         if (left_x < min_x) min_x = static_cast<std::int32_t>(left_x);

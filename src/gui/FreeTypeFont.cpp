@@ -127,13 +127,33 @@ static Texture texture_from_freetype_bitmap(const FT_Bitmap& bitmap) {
     );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     return Texture(std::move(texture_id), tex_size, Texture::Type::TEX_2D);
 }
 
-FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size) : font_size(font_size) {
+static std::uint32_t select_unscaled_size(ManagedFTFace& face, std::uint32_t scaled_size) {
+    if (face->face_flags & FT_FACE_FLAG_SCALABLE) {
+        return scaled_size;
+    }
+
+    if (face->available_sizes == nullptr) {
+        throw std::runtime_error("The typeface is not scalable and doesn't have bitmap strikes simultaneously.");
+    }
+
+    std::uint32_t size_candidate = face->available_sizes[0].height;
+    for (std::uint32_t i = 1; i < face->num_fixed_sizes; i++) {
+        std::uint32_t cur_size = face->available_sizes[i].height;
+        if (cur_size < size_candidate && cur_size >= scaled_size) {
+            size_candidate = cur_size;
+        }
+    }
+
+    return size_candidate;
+}
+
+FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size) : scaled_size(font_size) {
     if (!is_ft_lib_initialized) {
         initialize_freetype();
     }
@@ -146,13 +166,18 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
             file_path, error
         ));
     }
-    error = FT_Set_Pixel_Sizes(face, 0, font_size);
+
+    unscaled_size = select_unscaled_size(face, scaled_size);
+
+    error = FT_Set_Pixel_Sizes(face, 0, unscaled_size);
     if (error != 0) {
         throw std::runtime_error(fmt::format(
             "Failed to set FreeType font size. File path: \"{}\", error code: {}, font size: {}.",
             file_path, error, font_size
         ));
     }
+
+    float texture_scale = static_cast<float>(scaled_size) / unscaled_size;
 
     // Load all the characters.
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -169,8 +194,9 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
             c,
             FontChar {
                 texture_from_freetype_bitmap(face->glyph->bitmap),
-                glm::u32vec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-                static_cast<std::uint32_t>(face->glyph->advance.x)
+                glm::u32vec2(face->glyph->bitmap_left * texture_scale, face->glyph->bitmap_top * texture_scale),
+                static_cast<std::uint32_t>(face->glyph->advance.x * texture_scale),
+                texture_scale
             }
         );
     }
