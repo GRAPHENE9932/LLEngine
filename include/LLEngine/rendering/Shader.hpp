@@ -32,6 +32,7 @@ void set_vec3(ShaderID shader_id, ShaderUniformID uniform_id, const glm::vec3& v
 void set_vec4(ShaderID shader_id, ShaderUniformID uniform_id, const glm::vec4& value);
 void set_mat3(ShaderID shader_id, ShaderUniformID uniform_id, const glm::mat3& value);
 void set_mat4(ShaderID shader_id, ShaderUniformID uniform_id, const glm::mat4& value);
+void bind_1d_texture(ShaderUniformID uniform_id, GraphicsAPIEnum unit, TextureID texture_id);
 void bind_2d_texture(ShaderUniformID uniform_id, GraphicsAPIEnum unit, TextureID texture_id);
 void bind_cubemap_texture(ShaderUniformID uniform_id, GraphicsAPIEnum unit, TextureID texture_id);
 
@@ -163,6 +164,11 @@ public:
     template<ConstUniformName Name>
     void set_mat4(std::size_t index, const glm::mat4& value) const {
         internal::set_mat4(shader_id, get_uniform_id<Name>(index), value);
+    }
+
+    template<ConstUniformName Name>
+    void bind_1d_texture(TextureID texture_id, GraphicsAPIEnum texture_unit) const {
+        internal::bind_1d_texture(get_uniform_id<Name>(), texture_unit, texture_id);
     }
 
     template<ConstUniformName Name>

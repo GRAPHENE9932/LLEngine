@@ -47,6 +47,10 @@ static void bind_texture(ShaderUniformID uniform_id, GraphicsAPIEnum unit, Textu
     glBindTexture(target, texture_id);
 }
 
+void bind_1d_texture(ShaderUniformID uniform_id, GraphicsAPIEnum unit, TextureID texture_id) {
+    bind_texture(uniform_id, unit, texture_id, GL_TEXTURE_1D);
+}
+
 void bind_2d_texture(ShaderUniformID uniform_id, GraphicsAPIEnum unit, TextureID texture_id) {
     bind_texture(uniform_id, unit, texture_id, GL_TEXTURE_2D);
 }
