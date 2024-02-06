@@ -273,7 +273,7 @@ constexpr GLenum get_component_type() {
     else if constexpr (is_glm_vec<T>())
         return get_component_type<typename T::value_type>();
     else
-        static_assert("Unknown component type.");
+        static_assert(false, "Unknown component type.");
 }
 
 template<typename T>
@@ -289,7 +289,7 @@ constexpr std::string_view get_accessor_type() {
         else if constexpr (T::length() == 4)
             return "VEC4";
         else
-            static_assert("Invalid vector length");
+            static_assert(false, "Invalid vector length");
     }
     else if constexpr (is_glm_mat<T>()) {
         if constexpr (T::length() == 2)
@@ -299,10 +299,10 @@ constexpr std::string_view get_accessor_type() {
         else if constexpr (T::length() == 4)
             return "MAT4";
         else
-            static_assert("Invalid matrix length");
+            static_assert(false, "Invalid matrix length");
     }
     else {
-        static_assert("The provided type is neither scalar, vector or matrix.");
+        static_assert(false, "The provided type is neither scalar, vector or matrix.");
     }
 }
 
