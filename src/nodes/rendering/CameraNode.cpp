@@ -1,5 +1,4 @@
 #include <glm/fwd.hpp>
-#include <glm/gtx/transform.hpp>
 #include <type_traits>
 
 #include "nodes/SpatialNode.hpp"
