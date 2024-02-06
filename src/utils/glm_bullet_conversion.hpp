@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <bullet/LinearMath/btVector3.h>
 #include <bullet/LinearMath/btQuaternion.h>
 

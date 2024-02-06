@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <glm/vec3.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <string>
 #include <concepts>
