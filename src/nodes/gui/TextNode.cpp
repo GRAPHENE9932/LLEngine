@@ -3,7 +3,6 @@
 #include "rendering/RenderingServer.hpp"
 #include "utils/math.hpp"
 
-#include <glm/gtx/transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <GL/glew.h>
 
