@@ -67,6 +67,72 @@ private:
     FT_Face face;
 };
 
+static bool read_bit(unsigned char* memory, std::size_t index) {
+    std::size_t byte_offset = index / 8;
+    std::size_t bit_offset = index % 8;
+    unsigned char byte = memory[byte_offset];
+    return static_cast<bool>((0b10000000 >> bit_offset) & byte);
+}
+
+static void read_mono_bitmap(const FT_Bitmap& bitmap, unsigned char* output) {
+    assert(bitmap.pixel_mode == FT_Pixel_Mode::FT_PIXEL_MODE_MONO);
+
+    std::size_t offset = 0;
+    for (std::size_t row = 0; row < bitmap.rows; row++) {
+        for (std::size_t col = 0; col < bitmap.width; col++) {
+            output[row * bitmap.width + col] = read_bit(bitmap.buffer + offset, col) ? 255 : 0;
+        }
+
+        offset += bitmap.pitch;
+    }
+}
+
+static void read_gray_bitmap(const FT_Bitmap& bitmap, unsigned char* output) {
+    assert(bitmap.pixel_mode == FT_Pixel_Mode::FT_PIXEL_MODE_GRAY);
+
+    std::size_t bitmap_offset = 0;
+    std::size_t output_offset = 0;
+    for (std::size_t row = 0; row < bitmap.rows; row++) {
+        std::memcpy(output + output_offset, bitmap.buffer + bitmap_offset, bitmap.width);
+        bitmap_offset += bitmap.pitch;
+        output_offset += bitmap.width;
+    }
+}
+
+static Texture texture_from_freetype_bitmap(const FT_Bitmap& bitmap) {
+    const std::size_t buffer_size = bitmap.width * bitmap.rows;
+    std::vector<unsigned char> buffer(buffer_size);
+    
+    if (bitmap.pixel_mode == FT_Pixel_Mode::FT_PIXEL_MODE_MONO) {
+        read_mono_bitmap(bitmap, buffer.data());
+    }
+    else if (bitmap.pixel_mode == FT_Pixel_Mode::FT_PIXEL_MODE_GRAY) {
+        read_gray_bitmap(bitmap, buffer.data());
+    }
+    else {
+        throw std::runtime_error("Unsupported FreeType bitmap pixel mode.");
+    }
+
+    const glm::u32vec2 tex_size {
+        bitmap.width,
+        bitmap.rows
+    };
+
+    ManagedTextureID texture_id;
+    glGenTextures(1, &texture_id.get_ref());
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RED, tex_size.x, tex_size.y, 0,
+        GL_RED, GL_UNSIGNED_BYTE, buffer.data()
+    );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    return Texture(std::move(texture_id), tex_size, Texture::Type::TEX_2D);
+}
+
 FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size) : font_size(font_size) {
     if (!is_ft_lib_initialized) {
         initialize_freetype();
@@ -98,28 +164,11 @@ FreeTypeFont::FreeTypeFont(const std::string& file_path, std::uint32_t font_size
                 c, file_path, error
             ));
         }
-
-        const glm::u32vec2 tex_size {
-            face->glyph->bitmap.width,
-            face->glyph->bitmap.rows
-        };
-
-        ManagedTextureID texture_id;
-        glGenTextures(1, &texture_id.get_ref());
-        glBindTexture(GL_TEXTURE_2D, texture_id);
-        glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RED, tex_size.x, tex_size.y, 0,
-            GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer
-        );
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+        
         chars.emplace(
             c,
             FontChar {
-                Texture(std::move(texture_id), tex_size, Texture::Type::TEX_2D),
+                texture_from_freetype_bitmap(face->glyph->bitmap),
                 glm::u32vec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                 static_cast<std::uint32_t>(face->glyph->advance.x)
             }
