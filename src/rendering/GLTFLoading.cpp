@@ -4,7 +4,6 @@
 #include <unordered_set>
 
 #include <glm/vec3.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
 #include <GL/glew.h>
