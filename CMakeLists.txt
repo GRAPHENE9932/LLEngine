@@ -39,7 +39,6 @@ set(SOURCES
     src/rendering/shaders/PBRShader.cpp
     src/rendering/shaders/BRDFIntegrationMapperShader.cpp
     src/rendering/shaders/GaussianBlurShader.cpp
-    src/rendering/FPSMeter.cpp
     src/rendering/GLTFLoading.cpp
     src/rendering/RenderingServer.cpp
     src/rendering/GLTFToNode.cpp
@@ -141,7 +140,6 @@ set(PUBLIC_HEADERS
     include/LLEngine/nodes/gui/TextNode.hpp
     include/LLEngine/nodes/gui/ButtonNode.hpp
     include/LLEngine/nodes/Node.hpp
-    include/LLEngine/FPSMeter.hpp
     include/LLEngine/random.hpp
 )
 
