@@ -1,11 +1,9 @@
 #pragma once
 
-#define GLM_ENABLE_EXPERIMENTAL
-
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace llengine {
 struct Transform {
@@ -14,9 +12,13 @@ struct Transform {
     glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
     [[nodiscard]] glm::mat4 calculate_matrix() const {
-        return glm::translate(translation) *
-            glm::toMat4(rotation) *
-            glm::scale(scale);
+        return glm::scale(
+            glm::translate(
+                glm::mat4(1.0f),
+                translation
+            ) * glm::mat4_cast(rotation),
+            scale
+        );
     }
 
     /**

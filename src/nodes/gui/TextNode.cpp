@@ -135,7 +135,7 @@ void TextNode::draw() {
     const glm::vec3 absolute_position_opengl {math_utils::scr_space_pos_to_gl_space(absolute_position_in_pixels, window_size)};
 
     const glm::vec3 pixels_to_opengl_scale {2.0f / window_size, 1.0f};
-    const glm::mat4 mvp {glm::translate(absolute_position_opengl) * glm::scale(pixels_to_opengl_scale)};
+    const glm::mat4 mvp {glm::scale(glm::translate(glm::mat4(1.0f), absolute_position_opengl), pixels_to_opengl_scale)};
 
     ensure_shader_is_initialized();
     shader->use_shader();

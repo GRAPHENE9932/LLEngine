@@ -110,9 +110,13 @@ void GUINode::draw_texture_part(
     // not from 0.0 to 1.0. So, to pivot it to the corner, add half of the size.
     position_in_px += pos_offset_in_px + quad_size_in_px / 2.0f;
 
-    const glm::mat4 model_matrix = glm::translate(
-        math_utils::scr_space_pos_to_gl_space(glm::vec3(position_in_px, get_transform().z_coordinate), viewport_size)
-    ) * glm::scale(glm::vec3(quad_size_in_px / viewport_size, 1.0f));
+    const glm::mat4 model_matrix = glm::scale(
+        glm::translate(
+            glm::mat4(1.0f),
+            math_utils::scr_space_pos_to_gl_space(glm::vec3(position_in_px, get_transform().z_coordinate), viewport_size)
+        ),
+        glm::vec3(quad_size_in_px / viewport_size, 1.0f)
+    );
     const glm::mat4 mvp = model_matrix * canvas.get_mvp_matrix();
 
     glm::vec2 uv_scale = tex_part_size_in_px / static_cast<glm::vec2>(texture.get_size());
