@@ -62,10 +62,6 @@ public:
     };
     
     Texture() = default;
-    Texture(TextureID texture_id, const glm::u32vec2 tex_size, Type type) noexcept :
-            texture_id(texture_id), tex_size(tex_size), type(type) {}
-    Texture(ManagedTextureID&& texture_id, const glm::u32vec2 tex_size, Type type) noexcept :
-            texture_id(std::move(texture_id)), tex_size(tex_size), type(type) {}
     Texture(const Texture& other) = delete;
     Texture(Texture&& other) noexcept = default;
     ~Texture() = default;
@@ -89,6 +85,8 @@ public:
         return type;
     }
 
+    [[nodiscard]] static Texture from_texture_id(TextureID texture_id, glm::u32vec2 tex_size, Type type);
+    [[nodiscard]] static Texture from_texture_id(ManagedTextureID&& texture_id, glm::u32vec2 tex_size, Type type);
     /**
      * @brief Creates a Texture from raw image data.
      * 
@@ -157,5 +155,11 @@ protected:
     ManagedTextureID texture_id = 0; // ID of value 0 implies that there are no texture.
     glm::u32vec2 tex_size {0, 0};
     Type type {Type::TEX_2D};
+
+private:
+    Texture(TextureID texture_id, glm::u32vec2 tex_size, Type type) noexcept :
+            texture_id(texture_id), tex_size(tex_size), type(type) {}
+    Texture(ManagedTextureID&& texture_id, const glm::u32vec2 tex_size, Type type) noexcept :
+            texture_id(std::move(texture_id)), tex_size(tex_size), type(type) {}
 };
 }

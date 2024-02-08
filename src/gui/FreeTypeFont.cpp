@@ -130,7 +130,7 @@ static Texture texture_from_freetype_bitmap(const FT_Bitmap& bitmap) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    return Texture(std::move(texture_id), tex_size, Texture::Type::TEX_2D);
+    return Texture::from_texture_id(std::move(texture_id), tex_size, Texture::Type::TEX_2D);
 }
 
 static std::uint32_t select_unscaled_size(ManagedFTFace& face, std::uint32_t scaled_size) {

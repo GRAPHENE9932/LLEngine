@@ -30,7 +30,7 @@ static void initialize_images_cascade(
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        empty_cascade.emplace_back(texture_id, cur_image_size, Texture::Type::TEX_2D);
+        empty_cascade.emplace_back(std::move(Texture::from_texture_id(texture_id, cur_image_size, Texture::Type::TEX_2D)));
 
         cur_image_size /= 2;
     }
@@ -51,7 +51,7 @@ static Texture initialize_ping_pong_image(glm::u32vec2 framebuffer_size, std::ui
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    return Texture(std::move(texture_id), image_size, Texture::Type::TEX_2D);
+    return Texture::from_texture_id(std::move(texture_id), image_size, Texture::Type::TEX_2D);
 }
 
 BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider, std::uint32_t image_stages) {

@@ -89,7 +89,7 @@ Texture MainFramebuffer::initialize_color_attachment(glm::u32vec2 size) {
 
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex_id, 0);
 
-    return Texture(std::move(tex_id), size, Texture::Type::TEX_2D);
+    return Texture::from_texture_id(std::move(tex_id), size, Texture::Type::TEX_2D);
 }
 
 void MainFramebuffer::initialize_depth_attachment(glm::u32vec2 size) {

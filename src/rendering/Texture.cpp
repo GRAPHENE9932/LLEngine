@@ -160,6 +160,14 @@ static GLenum opengl_type() {
     }
 }
 
+[[nodiscard]] Texture Texture::from_texture_id(TextureID texture_id, glm::u32vec2 tex_size, Type type) {
+    return Texture(texture_id, tex_size, type);
+}
+
+[[nodiscard]] Texture Texture::from_texture_id(ManagedTextureID&& texture_id, glm::u32vec2 tex_size, Type type) {
+    return Texture(std::move(texture_id), tex_size, type);
+}
+
 template<typename T>
 [[nodiscard]] Texture Texture::from_pixel_data(
     T* pixel_data, glm::u32vec2 resolution, Type type, Format format
@@ -279,7 +287,7 @@ auto draw_to_cubemap(
         original_viewport_params[2], original_viewport_params[3]
     );
 
-    return Texture(cubemap_id, cubemap_size, Texture::Type::TEX_CUBEMAP);
+    return Texture::from_texture_id(cubemap_id, cubemap_size, Texture::Type::TEX_CUBEMAP);
 }
 
 constexpr std::string_view EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT =
