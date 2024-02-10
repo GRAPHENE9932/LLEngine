@@ -11,7 +11,19 @@ namespace llengine {
 using DownsampleShaderType = Shader<"orig_tex_resolution">;
 using UpsampleShaderType = Shader<"filter_radius">;
 
+template<std::integral T>
+T constexpr log2(T n) {
+    T result = 0;
+    while (n >= 2) {
+        result++;
+        n /= 2;
+    }
+
+    return result;
+}
+
 constexpr std::uint32_t FIRST_SIZE_DIVIDER = 4;
+constexpr std::uint32_t FIRST_SOURCE_MIP_MAP = log2(FIRST_SIZE_DIVIDER);
 constexpr std::uint32_t MIN_LAST_IMAGE_SIZE_X = 32;
 
 static std::uint32_t calculate_best_amount_of_image_stages(glm::u32vec2 framebuffer_size) {
@@ -65,7 +77,7 @@ void BloomRenderer::render_to_bloom_texture(const Texture& source_texture, float
 
 void BloomRenderer::do_horizontal_blur(const Texture& source_texture, float blur_radius) {
     for (std::uint32_t i = 0; i < image_stages; i++) {
-        blur_shader.use_horizontal_shader(source_texture, blur_radius * std::pow(2u, i), FIRST_SIZE_DIVIDER, 2 + i);
+        blur_shader.use_horizontal_shader(source_texture, blur_radius * std::pow(2u, i), FIRST_SIZE_DIVIDER, FIRST_SOURCE_MIP_MAP + i);
 
         const auto& cur_image = framebuffer.get_image(0, i);
 
