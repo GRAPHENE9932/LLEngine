@@ -20,10 +20,12 @@ private:
     BloomFramebuffer framebuffer;
     glm::u32vec2 framebuffer_size;
     GaussianBlurShader blur_shader;
-    std::uint8_t ping_pong_index = 0;
+    TextureID result_texture_id = 0;
 
-    void do_horizontal_blur(const Texture& source_texture, float bloom_radius);
-    void do_vertical_blur(float bloom_radius);
+    std::uint32_t image_stages = 4;
+
+    void do_horizontal_blur(const Texture& source_texture, float blur_radius);
+    void do_vertical_blur(float blur_radius);
     void combine();
 };
 }

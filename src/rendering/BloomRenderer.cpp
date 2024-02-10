@@ -3,18 +3,33 @@
 #include "rendering/Mesh.hpp"
 #include "rendering/RenderingServer.hpp"
 
-#include "GL/glew.h"
+#include <GL/glew.h>
+
+#include <cmath>
 
 namespace llengine {
 using DownsampleShaderType = Shader<"orig_tex_resolution">;
 using UpsampleShaderType = Shader<"filter_radius">;
 
-constexpr std::uint32_t IMAGE_STAGES = 4;
 constexpr std::uint32_t FIRST_SIZE_DIVIDER = 4;
+constexpr std::uint32_t MIN_LAST_IMAGE_SIZE_X = 32;
+
+static std::uint32_t calculate_best_amount_of_image_stages(glm::u32vec2 framebuffer_size) {
+    framebuffer_size.x /= FIRST_SIZE_DIVIDER;
+    if (framebuffer_size.x / 2 <= MIN_LAST_IMAGE_SIZE_X) {
+        return 1;
+    }
+
+    return std::log2(framebuffer_size.x / MIN_LAST_IMAGE_SIZE_X) + 1;
+}
+
+static float compute_blur_radius(float bloom_radius, std::uint32_t image_stages) {
+    return bloom_radius * std::pow(2.0f, 5.0f - image_stages);
+}
 
 BloomRenderer::BloomRenderer(glm::u32vec2 framebuffer_size) :
-framebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, IMAGE_STAGES),
-framebuffer_size(framebuffer_size) {
+framebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, calculate_best_amount_of_image_stages(framebuffer_size)),
+framebuffer_size(framebuffer_size), image_stages(calculate_best_amount_of_image_stages(framebuffer_size)) {
 
 }
 
@@ -28,14 +43,16 @@ void BloomRenderer::assign_framebuffer_size(glm::u32vec2 framebuffer_size) {
     }
 
     this->framebuffer_size = framebuffer_size;
-    framebuffer = std::move(BloomFramebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, IMAGE_STAGES));
+    this->image_stages = calculate_best_amount_of_image_stages(framebuffer_size);
+    framebuffer = std::move(BloomFramebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, image_stages));
 }
 
 void BloomRenderer::render_to_bloom_texture(const Texture& source_texture, float bloom_radius) {
     framebuffer.bind();
 
-    do_horizontal_blur(source_texture, bloom_radius);
-    do_vertical_blur(bloom_radius);
+    float blur_radius = compute_blur_radius(bloom_radius, image_stages);
+    do_horizontal_blur(source_texture, blur_radius);
+    do_vertical_blur(blur_radius);
     combine();
 
     glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
@@ -43,12 +60,12 @@ void BloomRenderer::render_to_bloom_texture(const Texture& source_texture, float
 }
 
 [[nodiscard]] TextureID BloomRenderer::get_bloom_texture_id() const {
-    return framebuffer.get_ping_pong_image(ping_pong_index);
+    return result_texture_id;
 }
 
-void BloomRenderer::do_horizontal_blur(const Texture& source_texture, float bloom_radius) {
-    for (std::uint32_t i = 0; i < IMAGE_STAGES; i++) {
-        blur_shader.use_horizontal_shader(source_texture, bloom_radius * std::pow(2u, i), FIRST_SIZE_DIVIDER, 2 + i);
+void BloomRenderer::do_horizontal_blur(const Texture& source_texture, float blur_radius) {
+    for (std::uint32_t i = 0; i < image_stages; i++) {
+        blur_shader.use_horizontal_shader(source_texture, blur_radius * std::pow(2u, i), FIRST_SIZE_DIVIDER, 2 + i);
 
         const auto& cur_image = framebuffer.get_image(0, i);
 
@@ -64,9 +81,9 @@ void BloomRenderer::do_horizontal_blur(const Texture& source_texture, float bloo
     }
 }
 
-void BloomRenderer::do_vertical_blur(float bloom_radius) {
-    for (std::uint32_t i = 0; i < IMAGE_STAGES; i++) {
-        blur_shader.use_vertical_shader(framebuffer.get_image(0, i), bloom_radius * std::pow(2u, i) * (static_cast<float>(framebuffer_size.x) / framebuffer_size.y));
+void BloomRenderer::do_vertical_blur(float blur_radius) {
+    for (std::uint32_t i = 0; i < image_stages; i++) {
+        blur_shader.use_vertical_shader(framebuffer.get_image(0, i), blur_radius * std::pow(2u, i) * (static_cast<float>(framebuffer_size.x) / framebuffer_size.y));
         
         const auto& cur_image = framebuffer.get_image(1, i);
 
@@ -109,7 +126,12 @@ void BloomRenderer::combine() {
     
     shader.use_shader();
 
-    if (IMAGE_STAGES >= 2) {
+    if (image_stages == 1) {
+        result_texture_id = framebuffer.get_image(1, 0);
+        return;
+    }
+
+    if (image_stages >= 2) {
         combine_textures(
             framebuffer.get_ping_pong_image(0),
             framebuffer.get_image(1, 0),
@@ -117,7 +139,7 @@ void BloomRenderer::combine() {
             shader
         );
     }
-    if (IMAGE_STAGES >= 3) {
+    if (image_stages >= 3) {
         combine_textures(
             framebuffer.get_ping_pong_image(1),
             framebuffer.get_ping_pong_image(0),
@@ -125,7 +147,7 @@ void BloomRenderer::combine() {
             shader
         );
     }
-    for (std::uint32_t stage = 3; stage < IMAGE_STAGES; stage++) {
+    for (std::uint32_t stage = 3; stage < image_stages; stage++) {
         combine_textures(
             framebuffer.get_ping_pong_image((stage + 1) % 2),
             framebuffer.get_ping_pong_image(stage % 2),
@@ -134,6 +156,6 @@ void BloomRenderer::combine() {
         );
     }
 
-    ping_pong_index = (IMAGE_STAGES - 1) % 2;
+    result_texture_id = framebuffer.get_ping_pong_image(image_stages % 2).get_id();
 }
 }
