@@ -73,7 +73,7 @@ void logger::set_minimum_file_log_severity(Severity severity) noexcept {
     minimum_file_log_severity = severity;
 }
 
-void logger::log(Severity severity, const std::string &message) noexcept {
+void logger::internal::log(Severity severity, std::string_view message) noexcept {
     const auto time = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now());
 
     std::string log_string {
