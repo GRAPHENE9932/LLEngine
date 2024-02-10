@@ -5,7 +5,7 @@
 #include <fmt/format.h>
 
 void ResolutionTextNode::update() {
-    const auto size = get_rendering_server().get_window().get_window_size();
+    const auto size = get_rendering_server().get_window().get_framebuffer_size();
 
     set_text(fmt::format(
         "Resolution: {}x{}",
