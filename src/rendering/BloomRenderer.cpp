@@ -24,7 +24,7 @@ T constexpr log2(T n) {
 
 constexpr std::uint32_t FIRST_SIZE_DIVIDER = 4;
 constexpr std::uint32_t FIRST_SOURCE_MIP_MAP = log2(FIRST_SIZE_DIVIDER);
-constexpr std::uint32_t MIN_LAST_IMAGE_SIZE_X = 32;
+constexpr std::uint32_t MIN_LAST_IMAGE_SIZE_X = 64;
 
 static std::uint32_t calculate_best_amount_of_image_stages(glm::u32vec2 framebuffer_size) {
     framebuffer_size.x /= FIRST_SIZE_DIVIDER;
@@ -59,11 +59,11 @@ void BloomRenderer::assign_framebuffer_size(glm::u32vec2 framebuffer_size) {
     framebuffer = std::move(BloomFramebuffer(framebuffer_size, FIRST_SIZE_DIVIDER, image_stages));
 }
 
-void BloomRenderer::render_to_bloom_texture(const Texture& source_texture, float bloom_radius) {
+void BloomRenderer::render_to_bloom_texture(const std::vector<Texture>& source_texture_lods, float bloom_radius) {
     framebuffer.bind();
 
     float blur_radius = compute_blur_radius(bloom_radius, image_stages);
-    do_horizontal_blur(source_texture, blur_radius);
+    do_horizontal_blur(source_texture_lods, blur_radius);
     do_vertical_blur(blur_radius);
     combine();
 
@@ -75,9 +75,9 @@ void BloomRenderer::render_to_bloom_texture(const Texture& source_texture, float
     return result_texture_id;
 }
 
-void BloomRenderer::do_horizontal_blur(const Texture& source_texture, float blur_radius) {
+void BloomRenderer::do_horizontal_blur(const std::vector<Texture>& source_texture_lods, float blur_radius) {
     for (std::uint32_t i = 0; i < image_stages; i++) {
-        blur_shader.use_horizontal_shader(source_texture, blur_radius * std::pow(2u, i), FIRST_SIZE_DIVIDER, FIRST_SOURCE_MIP_MAP + i);
+        blur_shader.use_horizontal_shader(source_texture_lods.at(FIRST_SOURCE_MIP_MAP + i), blur_radius * std::pow(2u, i));
 
         const auto& cur_image = framebuffer.get_image(0, i);
 

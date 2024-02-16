@@ -13,7 +13,7 @@ public:
     ~BloomRenderer();
 
     void assign_framebuffer_size(glm::u32vec2 framebuffer_size);
-    void render_to_bloom_texture(const Texture& source_texture, float bloom_radius);
+    void render_to_bloom_texture(const std::vector<Texture>& source_texture_lods, float bloom_radius);
     [[nodiscard]] TextureID get_bloom_texture_id() const;
 
 private:
@@ -24,7 +24,7 @@ private:
 
     std::uint32_t image_stages = 4;
 
-    void do_horizontal_blur(const Texture& source_texture, float blur_radius);
+    void do_horizontal_blur(const std::vector<Texture>& source_texture_lods, float blur_radius);
     void do_vertical_blur(float blur_radius);
     void combine();
 };

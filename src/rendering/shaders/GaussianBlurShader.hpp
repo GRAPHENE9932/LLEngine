@@ -8,11 +8,11 @@ class GaussianBlurShader {
 public:
     GaussianBlurShader();
 
-    void use_horizontal_shader(const Texture& source, float radius, float step_coefficient, float source_mipmap_level) const;
+    void use_horizontal_shader(const Texture& source, float radius, float step_coefficient = 1.0f) const;
     void use_vertical_shader(const Texture& source, float radius, float step_coefficient = 1.0f) const;
 
 private:
-    Shader<"source_texture", "gauss_weights", "radius", "hor_step", "coefficient", "samples_to_take", "source_mipmap"> hor_blur_shader;
+    Shader<"source_texture", "gauss_weights", "radius", "hor_step", "coefficient", "samples_to_take"> hor_blur_shader;
     Shader<"source_texture", "gauss_weights", "radius", "vert_step", "coefficient"> vert_blur_shader;
     Texture gauss_weights;
 };

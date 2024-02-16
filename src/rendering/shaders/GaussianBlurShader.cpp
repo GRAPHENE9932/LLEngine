@@ -30,7 +30,7 @@ GaussianBlurShader::GaussianBlurShader() :
         GAUSS_BLUR_KERNEL.data(), glm::u32vec2(128, 1), Texture::Type::TEX_1D, Texture::Format::R11G11B10F
     )) {}
 
-void GaussianBlurShader::use_horizontal_shader(const Texture& source, float radius, float step_coefficient, float source_mipmap_level) const {
+void GaussianBlurShader::use_horizontal_shader(const Texture& source, float radius, float step_coefficient) const {
     if (source.get_type() != Texture::Type::TEX_2D) {
         throw std::runtime_error("It is impossible to use a non-2D texture as a source for a blur shader");
     }
@@ -46,7 +46,6 @@ void GaussianBlurShader::use_horizontal_shader(const Texture& source, float radi
     hor_blur_shader.bind_2d_texture<"source_texture">(source.get_id(), 1);
     hor_blur_shader.set_float<"coefficient">(coefficient);
     hor_blur_shader.set_int<"samples_to_take">(samples_to_take);
-    hor_blur_shader.set_float<"source_mipmap">(source_mipmap_level);
 }
 
 void GaussianBlurShader::use_vertical_shader(const Texture& source, float radius, float step_coefficient) const {
