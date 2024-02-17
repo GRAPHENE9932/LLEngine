@@ -97,6 +97,16 @@ public:
     }
 
     template<ConstUniformName Name>
+    void set_bool(bool value) const {
+        internal::set_int(shader_id, get_uniform_id<Name>(), value);
+    }
+
+    template<ConstUniformName Name>
+    void set_bool(bool index, std::int32_t value) const {
+        internal::set_int(shader_id, get_uniform_id<Name>(index), value);
+    }
+
+    template<ConstUniformName Name>
     void set_uint(std::uint32_t value) const {
         internal::set_uint(shader_id, get_uniform_id<Name>(), value);
     }
