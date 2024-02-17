@@ -6,6 +6,8 @@
 
 #include <glm/vec2.hpp>
 
+#include <span>
+
 namespace llengine {
 class BloomRenderer {
 public:
@@ -24,8 +26,12 @@ private:
 
     std::uint32_t image_stages = 4;
 
-    void do_horizontal_blur(const std::vector<Texture>& source_texture_lods, float blur_radius);
-    void do_vertical_blur(float blur_radius);
+    void do_blur(
+        std::span<const Texture> source_texture_lods,
+        std::span<const Texture> target_texture_lods,
+        float blur_radius,
+        bool is_vertical
+    );
     void combine();
 };
 }

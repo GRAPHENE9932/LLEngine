@@ -18,6 +18,7 @@ public:
 
     void bind() const;
     [[nodiscard]] const Texture& get_image(std::uint32_t cascade, std::size_t stage) const;
+    [[nodiscard]] const std::vector<Texture>& get_image_cascade(std::uint32_t cascade) const;
     [[nodiscard]] const Texture& get_ping_pong_image(std::uint8_t index) const;
     [[nodiscard]] glm::u32vec2 get_framebuffer_size() const;
 

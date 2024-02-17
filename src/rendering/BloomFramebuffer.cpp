@@ -103,6 +103,18 @@ void BloomFramebuffer::bind() const {
     }
 }
 
+[[nodiscard]] const std::vector<Texture>& BloomFramebuffer::get_image_cascade(std::uint32_t cascade) const {
+    if (cascade == 0) {
+        return images_cascade_1;
+    }
+    else if (cascade == 1) {
+        return images_cascade_2;
+    }
+    else {
+        throw std::runtime_error("Invalid image cascade specified.");
+    }
+}
+
 [[nodiscard]] const Texture& BloomFramebuffer::get_ping_pong_image(std::uint8_t index) const {
     return ping_pong_images.at(index);
 }

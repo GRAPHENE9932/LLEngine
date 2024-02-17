@@ -6,17 +6,11 @@
 #include <array>
 
 namespace llengine {
-constexpr std::string_view VERTICAL_BLUR_VERT_SHADER_TEXT =
-    #include "shaders/vertical_gaussian_blur.vert"
+constexpr std::string_view VERT_SHADER_TEXT =
+    #include "shaders/gaussian_blur.vert"
 ;
-constexpr std::string_view VERTICAL_BLUR_FRAG_SHADER_TEXT =
-    #include "shaders/vertical_gaussian_blur.frag"
-;
-constexpr std::string_view HORIZONTAL_BLUR_VERT_SHADER_TEXT =
-    #include "shaders/horizontal_gaussian_blur.vert"
-;
-constexpr std::string_view HORIZONTAL_BLUR_FRAG_SHADER_TEXT =
-    #include "shaders/horizontal_gaussian_blur.frag"
+constexpr std::string_view FRAG_SHADER_TEXT =
+    #include "shaders/gaussian_blur.frag"
 ;
 
 std::array<float, 128 * 3> GAUSS_BLUR_KERNEL = {
@@ -24,43 +18,21 @@ std::array<float, 128 * 3> GAUSS_BLUR_KERNEL = {
 };
 
 GaussianBlurShader::GaussianBlurShader() :
-    hor_blur_shader(HORIZONTAL_BLUR_VERT_SHADER_TEXT, HORIZONTAL_BLUR_FRAG_SHADER_TEXT),
-    vert_blur_shader(VERTICAL_BLUR_VERT_SHADER_TEXT, VERTICAL_BLUR_FRAG_SHADER_TEXT),
+    shader(VERT_SHADER_TEXT, FRAG_SHADER_TEXT),
     gauss_weights(Texture::from_pixel_data<float>(
         GAUSS_BLUR_KERNEL.data(), glm::u32vec2(128, 1), Texture::Type::TEX_1D, Texture::Format::R11G11B10F
     )) {}
 
-void GaussianBlurShader::use_horizontal_shader(const Texture& source, float radius, float step_coefficient) const {
+void GaussianBlurShader::use_shader(const Texture& source, float radius, bool vertical) const {
     if (source.get_type() != Texture::Type::TEX_2D) {
         throw std::runtime_error("It is impossible to use a non-2D texture as a source for a blur shader");
     }
 
-    float hor_step = 1.0f / source.get_size().x * step_coefficient;
-    std::int32_t samples_to_take = radius / hor_step;
-    float coefficient = 1.0f / samples_to_take;
-
-    hor_blur_shader.use_shader();
-    hor_blur_shader.set_float<"radius">(radius);
-    hor_blur_shader.set_float<"hor_step">(hor_step);
-    hor_blur_shader.bind_1d_texture<"gauss_weights">(gauss_weights.get_id(), 0);
-    hor_blur_shader.bind_2d_texture<"source_texture">(source.get_id(), 1);
-    hor_blur_shader.set_float<"coefficient">(coefficient);
-    hor_blur_shader.set_int<"samples_to_take">(samples_to_take);
-}
-
-void GaussianBlurShader::use_vertical_shader(const Texture& source, float radius, float step_coefficient) const {
-    if (source.get_type() != Texture::Type::TEX_2D) {
-        throw std::runtime_error("It is impossible to use a non-2D texture as a source for a blur shader");
-    }
-
-    float vert_step = 1.0f / source.get_size().y * step_coefficient;
-    float coefficient = 1.0f / std::floor(radius / vert_step);
-
-    vert_blur_shader.use_shader();
-    vert_blur_shader.set_float<"radius">(radius);
-    vert_blur_shader.set_float<"vert_step">(vert_step);
-    vert_blur_shader.bind_1d_texture<"gauss_weights">(gauss_weights.get_id(), 0);
-    vert_blur_shader.bind_2d_texture<"source_texture">(source.get_id(), 1);
-    vert_blur_shader.set_float<"coefficient">(coefficient);
+    shader.use_shader();
+    shader.set_float<"radius">(radius);
+    shader.set_float<"pixel_width">(1.0f / (vertical ? source.get_size().y : source.get_size().x));
+    shader.set_bool<"is_vertical">(vertical);
+    shader.bind_1d_texture<"gauss_weights">(gauss_weights.get_id(), 0);
+    shader.bind_2d_texture<"source_texture">(source.get_id(), 1);
 }
 }

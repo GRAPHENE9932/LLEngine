@@ -27,7 +27,7 @@ void MainFramebuffer::render_to_window(float delta_time) {
         if (!bloom_renderer) {
             bloom_renderer = std::make_unique<BloomRenderer>(framebuffer_size);
         }
-        bloom_renderer->render_to_bloom_texture(color_attachment_lods, 0.0075f);
+        bloom_renderer->render_to_bloom_texture(color_attachment_lods, 0.00375f);
     }
 
     glDisable(GL_DEPTH_TEST);

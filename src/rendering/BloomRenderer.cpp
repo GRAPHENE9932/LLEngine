@@ -2,6 +2,7 @@
 #include "rendering/Shader.hpp"
 #include "rendering/Mesh.hpp"
 #include "rendering/RenderingServer.hpp"
+#include "rendering/Texture.hpp"
 
 #include <GL/glew.h>
 
@@ -63,8 +64,20 @@ void BloomRenderer::render_to_bloom_texture(const std::vector<Texture>& source_t
     framebuffer.bind();
 
     float blur_radius = compute_blur_radius(bloom_radius, image_stages);
-    do_horizontal_blur(source_texture_lods, blur_radius);
-    do_vertical_blur(blur_radius);
+    do_blur(
+        std::span(source_texture_lods.begin() + FIRST_SOURCE_MIP_MAP, source_texture_lods.end()),
+        framebuffer.get_image_cascade(0),
+        blur_radius,
+        false
+    );
+
+    do_blur(
+        framebuffer.get_image_cascade(0),
+        framebuffer.get_image_cascade(1),
+        blur_radius,
+        true
+    );
+
     combine();
 
     glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
@@ -75,29 +88,24 @@ void BloomRenderer::render_to_bloom_texture(const std::vector<Texture>& source_t
     return result_texture_id;
 }
 
-void BloomRenderer::do_horizontal_blur(const std::vector<Texture>& source_texture_lods, float blur_radius) {
+void BloomRenderer::do_blur(
+    std::span<const Texture> source_texture_lods,
+    std::span<const Texture> target_texture_lods,
+    float blur_radius,
+    bool is_vertical
+) {
+    assert(source_texture_lods.size() >= image_stages);
+    assert(target_texture_lods.size() >= image_stages);
+
     for (std::uint32_t i = 0; i < image_stages; i++) {
-        blur_shader.use_horizontal_shader(source_texture_lods.at(FIRST_SOURCE_MIP_MAP + i), blur_radius * std::pow(2u, i));
+        float real_radius = blur_radius * std::pow(2u, i);
+        if (is_vertical) {
+            real_radius *= static_cast<float>(framebuffer_size.x) / framebuffer_size.y;
+        }
 
-        const auto& cur_image = framebuffer.get_image(0, i);
+        blur_shader.use_shader(source_texture_lods[i], real_radius, is_vertical);
 
-        glViewport(0, 0, cur_image.get_size().x, cur_image.get_size().y);
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-            cur_image.get_id(), 0
-        );
-
-        Mesh::get_quad()->bind_vao(true, false, false);
-        glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
-        Mesh::get_quad()->unbind_vao(true, false, false);
-    }
-}
-
-void BloomRenderer::do_vertical_blur(float blur_radius) {
-    for (std::uint32_t i = 0; i < image_stages; i++) {
-        blur_shader.use_vertical_shader(framebuffer.get_image(0, i), blur_radius * std::pow(2u, i) * (static_cast<float>(framebuffer_size.x) / framebuffer_size.y));
-        
-        const auto& cur_image = framebuffer.get_image(1, i);
+        const auto& cur_image = target_texture_lods[i];
 
         glViewport(0, 0, cur_image.get_size().x, cur_image.get_size().y);
         glFramebufferTexture2D(
