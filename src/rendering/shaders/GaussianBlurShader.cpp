@@ -23,7 +23,7 @@ GaussianBlurShader::GaussianBlurShader() :
         GAUSS_BLUR_KERNEL.data(), glm::u32vec2(128, 1), Texture::Type::TEX_1D, Texture::Format::R11G11B10F
     )) {}
 
-void GaussianBlurShader::use_shader(const Texture& source, float radius, bool vertical) const {
+void GaussianBlurShader::use_shader(const Texture& source, const Texture* texture_to_add, float radius, bool vertical) const {
     if (source.get_type() != Texture::Type::TEX_2D) {
         throw std::runtime_error("It is impossible to use a non-2D texture as a source for a blur shader");
     }
@@ -34,5 +34,9 @@ void GaussianBlurShader::use_shader(const Texture& source, float radius, bool ve
     shader.set_bool<"is_vertical">(vertical);
     shader.bind_1d_texture<"gauss_weights">(gauss_weights.get_id(), 0);
     shader.bind_2d_texture<"source_texture">(source.get_id(), 1);
+    shader.set_bool<"combine">(texture_to_add != nullptr);
+    if (texture_to_add) {
+        shader.bind_2d_texture<"texture_to_combine">(texture_to_add->get_id(), 2);
+    }
 }
 }

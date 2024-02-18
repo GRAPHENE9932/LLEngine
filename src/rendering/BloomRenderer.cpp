@@ -68,6 +68,7 @@ void BloomRenderer::render_to_bloom_texture(const std::vector<Texture>& source_t
         std::span(source_texture_lods.begin() + FIRST_SOURCE_MIP_MAP, source_texture_lods.end()),
         framebuffer.get_image_cascade(0),
         blur_radius,
+        false,
         false
     );
 
@@ -75,35 +76,40 @@ void BloomRenderer::render_to_bloom_texture(const std::vector<Texture>& source_t
         framebuffer.get_image_cascade(0),
         framebuffer.get_image_cascade(1),
         blur_radius,
+        true,
         true
     );
-
-    combine();
 
     glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
     glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
 }
 
 [[nodiscard]] TextureID BloomRenderer::get_bloom_texture_id() const {
-    return result_texture_id;
+    return framebuffer.get_image(1, 0).get_id();
 }
 
 void BloomRenderer::do_blur(
     std::span<const Texture> source_texture_lods,
     std::span<const Texture> target_texture_lods,
     float blur_radius,
-    bool is_vertical
+    bool is_vertical,
+    bool combine_with_previous_target
 ) {
     assert(source_texture_lods.size() >= image_stages);
     assert(target_texture_lods.size() >= image_stages);
 
-    for (std::uint32_t i = 0; i < image_stages; i++) {
+    for (std::int32_t i = image_stages - 1; i >= 0; i--) {
         float real_radius = blur_radius * std::pow(2u, i);
         if (is_vertical) {
             real_radius *= static_cast<float>(framebuffer_size.x) / framebuffer_size.y;
         }
 
-        blur_shader.use_shader(source_texture_lods[i], real_radius, is_vertical);
+        const Texture* texture_to_add = nullptr;
+        if (combine_with_previous_target && i < image_stages - 1) {
+            texture_to_add = &target_texture_lods[i + 1];
+        }
+
+        blur_shader.use_shader(source_texture_lods[i], texture_to_add, real_radius, is_vertical);
 
         const auto& cur_image = target_texture_lods[i];
 
@@ -135,47 +141,5 @@ static void combine_textures(
     Mesh::get_quad()->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
     Mesh::get_quad()->unbind_vao(true, false, false);
-}
-
-void BloomRenderer::combine() {
-    static Shader<"source_1", "source_2"> shader(
-        #include "shaders/bloom_combine.vert"
-        ,
-        #include "shaders/bloom_combine.frag"
-    );
-    
-    shader.use_shader();
-
-    if (image_stages == 1) {
-        result_texture_id = framebuffer.get_image(1, 0);
-        return;
-    }
-
-    if (image_stages >= 2) {
-        combine_textures(
-            framebuffer.get_ping_pong_image(0),
-            framebuffer.get_image(1, 0),
-            framebuffer.get_image(1, 1),
-            shader
-        );
-    }
-    if (image_stages >= 3) {
-        combine_textures(
-            framebuffer.get_ping_pong_image(1),
-            framebuffer.get_ping_pong_image(0),
-            framebuffer.get_image(1, 2),
-            shader
-        );
-    }
-    for (std::uint32_t stage = 3; stage < image_stages; stage++) {
-        combine_textures(
-            framebuffer.get_ping_pong_image((stage + 1) % 2),
-            framebuffer.get_ping_pong_image(stage % 2),
-            framebuffer.get_image(1, stage),
-            shader
-        );
-    }
-
-    result_texture_id = framebuffer.get_ping_pong_image(image_stages % 2).get_id();
 }
 }

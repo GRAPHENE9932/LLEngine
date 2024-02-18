@@ -11,6 +11,9 @@ uniform float pixel_width; // 1.0 / resolution
 uniform float radius;
 uniform bool is_vertical;
 
+uniform bool combine;
+uniform sampler2D texture_to_combine;
+
 void main() {
     vec3 result = vec3(0.0);
     float off = pixel_width * 0.5;
@@ -31,5 +34,8 @@ void main() {
     }
 
     color_out = vec4(result / samples_to_take * 0.5, 1.0);
+    if (combine) {
+        color_out.rgb += texture(texture_to_combine, frag_uv).rgb;
+    }
 }
 )""

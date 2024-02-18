@@ -36,24 +36,6 @@ static void initialize_images_cascade(
     }
 }
 
-static Texture initialize_ping_pong_image(glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider) {
-    ManagedTextureID texture_id;
-
-    glm::u32vec2 image_size = framebuffer_size / first_size_divider;
-    glGenTextures(1, &texture_id.get_ref());
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, image_size.x,
-        image_size.y, 0, GL_RGB, GL_FLOAT, nullptr
-    );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    return Texture::from_texture_id(std::move(texture_id), image_size, Texture::Type::TEX_2D);
-}
-
 BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t first_size_divider, std::uint32_t image_stages) {
     assert(image_stages > 0);
 
@@ -62,8 +44,6 @@ BloomFramebuffer::BloomFramebuffer(glm::u32vec2 framebuffer_size, std::uint32_t 
 
     initialize_images_cascade(images_cascade_1, framebuffer_size, first_size_divider, image_stages);
     initialize_images_cascade(images_cascade_2, framebuffer_size, first_size_divider, image_stages);
-    ping_pong_images[0] = initialize_ping_pong_image(framebuffer_size, first_size_divider);
-    ping_pong_images[1] = initialize_ping_pong_image(framebuffer_size, first_size_divider);
 
     glFramebufferTexture2D(
         GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
@@ -113,10 +93,6 @@ void BloomFramebuffer::bind() const {
     else {
         throw std::runtime_error("Invalid image cascade specified.");
     }
-}
-
-[[nodiscard]] const Texture& BloomFramebuffer::get_ping_pong_image(std::uint8_t index) const {
-    return ping_pong_images.at(index);
 }
 
 [[nodiscard]] glm::u32vec2 BloomFramebuffer::get_framebuffer_size() const {

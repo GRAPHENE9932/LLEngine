@@ -30,8 +30,8 @@ private:
         std::span<const Texture> source_texture_lods,
         std::span<const Texture> target_texture_lods,
         float blur_radius,
-        bool is_vertical
+        bool is_vertical,
+        bool combine_with_previous_target
     );
-    void combine();
 };
 }
