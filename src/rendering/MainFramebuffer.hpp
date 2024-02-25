@@ -2,6 +2,7 @@
 
 #include "ManagedRenderbufferID.hpp"
 #include "QualitySettings.hpp"
+#include "rendering/ExposureController.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
 #include "rendering/Texture.hpp"
 
@@ -39,12 +40,10 @@ private:
     bool bloom_enabled = true;
     std::unique_ptr<BloomRenderer> bloom_renderer;
 
-    float exposure = 0.0f;
+    ExposureController exposure_controller;
 
     void generate_lods_for_color_attachment();
     void initialize_depth_attachment(glm::u32vec2 size);
-
-    void compute_automatic_exposure(float delta_time);
 
     void initialize_framebuffer_lods(glm::u32vec2 size);
 };

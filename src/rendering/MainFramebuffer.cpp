@@ -1,6 +1,7 @@
 #include "MainFramebuffer.hpp"
 #include "BloomRenderer.hpp"
 #include "datatypes.hpp"
+#include "rendering/ExposureController.hpp"
 #include "rendering/Shader.hpp"
 #include "rendering/Mesh.hpp"
 #include "rendering/Texture.hpp"
@@ -11,7 +12,7 @@
 #include <cmath>
 
 namespace llengine {
-MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), framebuffer_size(size) {
+MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), framebuffer_size(size), exposure_controller(size) {
     initialize_framebuffer_lods(size);
 }
 
@@ -21,7 +22,7 @@ MainFramebuffer::~MainFramebuffer() {
 
 void MainFramebuffer::render_to_window(float delta_time) {
     generate_lods_for_color_attachment();
-    compute_automatic_exposure(delta_time);
+    exposure_controller.recompute_exposure(color_attachment_lods.at(0), delta_time);
 
     if (bloom_enabled) {
         if (!bloom_renderer) {
@@ -38,7 +39,7 @@ void MainFramebuffer::render_to_window(float delta_time) {
     );
     postprocessing_shader.use_shader();
     postprocessing_shader.bind_2d_texture<"main_image">(get_color_texture().get_id(), 0);
-    postprocessing_shader.set_float<"exposure">(exposure);
+    postprocessing_shader.set_float<"exposure">(get_exposure());
     if (bloom_enabled) {
         postprocessing_shader.bind_2d_texture<"bloom_image">(bloom_renderer->get_bloom_texture_id(), 1);
     }
@@ -62,7 +63,7 @@ void MainFramebuffer::apply_postprocessing_settings(const QualitySettings& quali
 }
 
 [[nodiscard]] float MainFramebuffer::get_exposure() const {
-    return exposure;
+    return exposure_controller.get_exposure();
 }
 
 void MainFramebuffer::assign_framebuffer_size(glm::u32vec2 size) {
@@ -75,6 +76,7 @@ void MainFramebuffer::assign_framebuffer_size(glm::u32vec2 size) {
 
     this->framebuffer_size = size;
     initialize_framebuffer_lods(size);
+    exposure_controller = ExposureController(size);
 }
 
 static std::size_t calculate_amount_of_lods(glm::u32vec2 size) {
@@ -143,18 +145,6 @@ void MainFramebuffer::generate_lods_for_color_attachment() {
         Mesh::get_quad()->unbind_vao(true, false, false);
     }
     glEnable(GL_DEPTH_TEST);
-}
-
-constexpr float EXPOSURE_KEY_VALUE = 0.18f;
-constexpr float DECAY_RATE = 0.75f;
-
-void MainFramebuffer::compute_automatic_exposure(float delta_time) {
-    const glm::vec3 average_color = compute_average_color(color_attachment_lods);
-    float average_luminance = 0.2126f * average_color.r + 0.7152f * average_color.g + 0.0722f * average_color.b;
-
-    float target_exposure = EXPOSURE_KEY_VALUE / average_luminance;
-
-    exposure = exposure + (target_exposure - exposure) * (1.0f - std::exp(-delta_time * DECAY_RATE));
 }
 
 void MainFramebuffer::initialize_framebuffer_lods(glm::u32vec2 size) {

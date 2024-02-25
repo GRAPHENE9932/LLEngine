@@ -52,6 +52,7 @@ set(SOURCES
     src/rendering/BloomRenderer.cpp
     src/rendering/BloomFramebuffer.cpp
     src/rendering/ShadowMap.cpp
+    src/rendering/ExposureController.cpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/shader_loader.cpp
     src/structs/shapes/SphereShape.cpp
