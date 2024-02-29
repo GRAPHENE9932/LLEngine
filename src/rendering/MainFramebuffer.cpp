@@ -12,7 +12,25 @@
 #include <cmath>
 
 namespace llengine {
-MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr), framebuffer_size(size), exposure_controller(size) {
+static std::size_t calculate_amount_of_lods(glm::u32vec2 size) {
+    return static_cast<std::size_t>(
+        std::floor(
+            std::log2(std::max(size.x, size.y))
+        ) + 1
+    );
+}
+
+static std::uint32_t calculate_lod_for_exposure_controller(glm::u32vec2 main_fb_size) {
+    return std::min(4ul, calculate_amount_of_lods(main_fb_size) - 1ul);
+}
+
+static glm::u32vec2 calculate_size_for_exposure_controller(glm::u32vec2 main_fb_size) {
+    return main_fb_size / static_cast<std::uint32_t>(std::pow(2, calculate_lod_for_exposure_controller(main_fb_size)));
+}
+
+MainFramebuffer::MainFramebuffer(glm::u32vec2 size) : bloom_renderer(nullptr),
+    framebuffer_size(size),
+    exposure_controller(calculate_size_for_exposure_controller(size)) {
     initialize_framebuffer_lods(size);
 }
 
@@ -22,7 +40,10 @@ MainFramebuffer::~MainFramebuffer() {
 
 void MainFramebuffer::render_to_window(float delta_time) {
     generate_lods_for_color_attachment();
-    exposure_controller.recompute_exposure(color_attachment_lods.at(0), delta_time);
+    exposure_controller.recompute_exposure(
+        color_attachment_lods.at(calculate_lod_for_exposure_controller(framebuffer_size)),
+        delta_time
+    );
 
     if (bloom_enabled) {
         if (!bloom_renderer) {
@@ -76,15 +97,7 @@ void MainFramebuffer::assign_framebuffer_size(glm::u32vec2 size) {
 
     this->framebuffer_size = size;
     initialize_framebuffer_lods(size);
-    exposure_controller = ExposureController(size);
-}
-
-static std::size_t calculate_amount_of_lods(glm::u32vec2 size) {
-    return static_cast<std::size_t>(
-        std::floor(
-            std::log2(std::max(size.x, size.y))
-        ) + 1
-    );
+    exposure_controller = ExposureController(calculate_size_for_exposure_controller(size));
 }
 
 static Texture initialize_color_attachment_lod(glm::u32vec2 size) {
