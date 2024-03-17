@@ -58,6 +58,9 @@ void GaussianBlurShader::use_shader(const Texture& source, const Texture* textur
     if (source.get_type() != Texture::Type::TEX_2D) {
         throw std::runtime_error("It is impossible to use a non-2D texture as a source for a blur shader");
     }
+    if (texture_to_add && texture_to_add->get_type() != Texture::Type::TEX_2D) {
+        throw std::runtime_error("It is impossible to use a non-2D texture as a texture to add for a blur shader");
+    }
 
     shader.use_shader();
     shader.set_float<"radius">(radius);
