@@ -66,8 +66,6 @@ void GaussianBlurShader::use_shader(const Texture& source, const Texture* textur
     shader.bind_1d_texture<"gauss_weights">(gauss_weights.get_id(), 0);
     shader.bind_2d_texture<"source_texture">(source.get_id(), 1);
     shader.set_bool<"combine">(texture_to_add != nullptr);
-    if (texture_to_add) {
-        shader.bind_2d_texture<"texture_to_combine">(texture_to_add->get_id(), 2);
-    }
+    shader.bind_2d_texture<"texture_to_combine">(texture_to_add ? texture_to_add->get_id() : 0, 2);
 }
 }
