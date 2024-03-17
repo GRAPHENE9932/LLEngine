@@ -1,5 +1,6 @@
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
 #include "nodes/Node.hpp"
+#include "OpenGLDebug.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h> // Various GLFW functions and constants.
@@ -56,6 +57,10 @@ static void initialize_opengl() {
 
     // Enable backface culling.
     glEnable(GL_CULL_FACE);
+
+#ifndef NDEBUG
+    enable_opengl_debug_logs();
+#endif
 }
 
 void terminate_glfw() {

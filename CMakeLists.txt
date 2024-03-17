@@ -91,6 +91,10 @@ set(SOURCES
     src/random.cpp
 )
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list(APPEND SOURCES src/rendering/OpenGLDebug.cpp)
+endif()
+
 set(PUBLIC_HEADERS
     include/LLEngine/rendering/RenderingServer.hpp
     include/LLEngine/rendering/Skybox.hpp
