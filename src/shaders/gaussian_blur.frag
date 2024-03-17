@@ -20,14 +20,15 @@ void main() {
     int samples_to_take = int(radius / pixel_width);
     for (int i = 0; i < samples_to_take; i++) {
         float off_in_gauss_texture = off / radius;
+        float gauss_weight = texture(gauss_weights, off_in_gauss_texture).r;
 
         if (is_vertical) {
-            result += texture(source_texture, vec2(frag_uv.x, frag_uv.y + off)).rgb * texture(gauss_weights, off_in_gauss_texture).r;
-            result += texture(source_texture, vec2(frag_uv.x, frag_uv.y - off)).rgb * texture(gauss_weights, off_in_gauss_texture).r;
+            result += texture(source_texture, vec2(frag_uv.x, frag_uv.y + off)).rgb * gauss_weight;
+            result += texture(source_texture, vec2(frag_uv.x, frag_uv.y - off)).rgb * gauss_weight;
         }
         else {
-            result += texture(source_texture, vec2(frag_uv.x + off, frag_uv.y)).rgb * texture(gauss_weights, off_in_gauss_texture).r;
-            result += texture(source_texture, vec2(frag_uv.x - off, frag_uv.y)).rgb * texture(gauss_weights, off_in_gauss_texture).r;
+            result += texture(source_texture, vec2(frag_uv.x + off, frag_uv.y)).rgb * gauss_weight;
+            result += texture(source_texture, vec2(frag_uv.x - off, frag_uv.y)).rgb * gauss_weight;
         }
         
         off += pixel_width * 2.0;
