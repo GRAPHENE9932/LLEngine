@@ -77,6 +77,10 @@ static std::string_view get_source_by_enum(GLenum source) {
     }
 }
 
+static bool is_useless(GLuint id) {
+    return id == 131218; // Nvidia: "Program/shader state performance warning: Vertex shader in program {} is being recompiled based on GL state."
+}
+
 void opengl_debug_message_callback(
     GLenum source,
     GLenum type,
@@ -86,7 +90,7 @@ void opengl_debug_message_callback(
     const GLchar* message,
     const void* user_param
 ) {
-    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION || is_useless(id)) {
         return;
     }
     
