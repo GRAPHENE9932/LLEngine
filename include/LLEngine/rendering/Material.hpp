@@ -70,15 +70,17 @@ struct BasicMaterial {
         for (size_t i = 0; i < textures_array.size(); i++) {
             const TextureInfo* current = textures_array[i];
 
-            if (current) {
-                if (previous &&
-                    (previous->uv_offset != current->uv_offset ||
-                    previous->uv_scale != current->uv_scale)) {
-                    return false;
-                }
-
-                previous = current;
+            if (!current) {
+                continue;
             }
+
+            if (previous &&
+                (previous->uv_offset != current->uv_offset ||
+                previous->uv_scale != current->uv_scale)) {
+                return false;
+            }
+
+            previous = current;
         }
 
         return true;
