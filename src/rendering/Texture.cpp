@@ -475,10 +475,11 @@ Texture Texture::compute_brdf_integration_map() {
         GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
         texture_id, 0
     );
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     ensure_brdf_integration_mapper_shader_is_initialized();
     brdf_integration_mapper_shader->use_shader();
 
+    glClear(GL_COLOR_BUFFER_BIT);
     quad_mesh->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, quad_mesh->get_amount_of_vertices());
     quad_mesh->unbind_vao(true, false, false);
