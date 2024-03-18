@@ -115,5 +115,6 @@ void enable_opengl_debug_logs() {
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(opengl_debug_message_callback, nullptr);
+    logger::info("OpenGL debug logs enabled.");
 }
 }
