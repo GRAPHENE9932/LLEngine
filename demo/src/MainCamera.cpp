@@ -3,6 +3,7 @@
 #include "node_cast.hpp"
 #include "node_registration.hpp"
 #include "nodes/physics/BulletRigidBodyNode.hpp"
+#include "nodes/rendering/PBRDrawableNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "physics/BulletPhysicsServer.hpp"
 #include "BulletNode.hpp"
@@ -15,6 +16,17 @@ void MainCamera::start() {
     bullet = llengine::node_cast<llengine::SpatialNode>(
         llengine::SceneFile::load_from_file("res/meshes/bullet.glb")->to_node({}, &llengine::find_custom_node_type<BulletNode>())
     );
+
+    std::unique_ptr<llengine::PBRDrawableNode> glowing_cube = std::make_unique<llengine::PBRDrawableNode>();
+    glowing_cube->set_mesh(llengine::Mesh::get_cube());
+    llengine::Material glowing_cube_material;
+    glowing_cube_material.base_color_factor = {1.0f, 1.0f, 1.0f, 1.0f};
+    glowing_cube_material.emissive_factor = {5.0f, 5.0f, 5.0f};
+    glowing_cube->set_material(std::make_shared<llengine::Material>(std::move(glowing_cube_material)));
+    glowing_cube->set_transform(llengine::Transform());
+    glowing_cube->set_name("Glowing cube");
+    get_parent()->queue_add_child(std::move(llengine::node_cast<llengine::SpatialNode>(std::move(glowing_cube))));
+
     get_rendering_server().get_window().disable_cursor();
 }
 
