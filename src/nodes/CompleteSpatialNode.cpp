@@ -1,5 +1,3 @@
-#include <algorithm> // std::find_if
-
 #include "nodes/CompleteSpatialNode.hpp"
 
 using namespace llengine;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "QualitySettings.hpp"
 #include "nodes/rendering/CameraNode.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
 #include "rendering/Texture.hpp"

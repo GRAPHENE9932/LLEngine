@@ -1,12 +1,10 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
-#include "rendering/Mesh.hpp"
 #include "rendering/Skybox.hpp"
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
 #include "logger.hpp"
 #include "nodes/rendering/CameraNode.hpp"
 #include "nodes/rendering/Drawable.hpp"
 #include "nodes/gui/GUICanvas.hpp"
-#include "utils/math.hpp"
 #include "MainFramebuffer.hpp"
 
 #include <GL/glew.h>

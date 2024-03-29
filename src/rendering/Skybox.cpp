@@ -1,5 +1,3 @@
-#include <array> // std::array
-
 #include <GL/glew.h>
 
 #include "rendering/Skybox.hpp" // Skybox

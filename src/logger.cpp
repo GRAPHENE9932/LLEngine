@@ -4,7 +4,6 @@
 #include <fmt/chrono.h>
 #include <fmt/ostream.h>
 
-#include <array>
 #include <mutex>
 #include <chrono>
 #include <atomic>

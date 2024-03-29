@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "rendering/RenderingServer.hpp"
 #include "PBRShaderManager.hpp"
 #include "rendering/Skybox.hpp"

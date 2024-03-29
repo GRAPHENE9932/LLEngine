@@ -3,7 +3,6 @@
 #include <memory> // std::shared_ptr
 
 #include "DrawableCompleteSpatialNode.hpp" // DrawableNode
-#include "nodes/CompleteSpatialNode.hpp"
 #include "rendering/Mesh.hpp"
 #include "rendering/Material.hpp" // Material
 #include "datatypes.hpp"

@@ -6,9 +6,7 @@
 #include <glm/vec3.hpp> // glm::vec3
 #include <glm/gtc/quaternion.hpp>
 
-#include <vector> // std::vector
 #include <memory> // std::unique_ptr
-#include <string> // std::string
 
 namespace llengine {
 class CompleteSpatialNode : public SpatialNode {

@@ -3,7 +3,6 @@
 #include "GameSettings.hpp"
 
 #include <memory>
-#include <string_view>
 
 namespace llengine {
 class RenderingServer;

@@ -1,5 +1,4 @@
 #include "SceneFile.hpp"
-#include "logger.hpp"
 #include "node_cast.hpp"
 #include "node_registration.hpp"
 #include "nodes/physics/BulletRigidBodyNode.hpp"

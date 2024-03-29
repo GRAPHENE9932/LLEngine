@@ -2,6 +2,8 @@
 
 #include "nodes/Node.hpp"
 
+#include <memory>
+
 namespace llengine {
 class CustomNodeType;
 

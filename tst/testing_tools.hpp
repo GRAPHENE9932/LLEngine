@@ -5,10 +5,8 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <string>
-#include <concepts>
 #include <span>
 #include <fstream>
-#include <algorithm>
 
 inline std::string create_temporary_file(const std::span<const unsigned char>& data, const std::string& file_name) {
     std::string path = testing::TempDir() + file_name;

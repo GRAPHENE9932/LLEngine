@@ -1,8 +1,5 @@
 #include <unordered_map>
 #include <utility>
-#include <fstream>
-#include <sstream>
-#include <array>
 #include <limits>
 
 #include <GL/glew.h>

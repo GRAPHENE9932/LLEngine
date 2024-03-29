@@ -5,7 +5,6 @@
 
 #include <glm/vec2.hpp>
 
-#include <array>
 #include <vector>
 
 namespace llengine {

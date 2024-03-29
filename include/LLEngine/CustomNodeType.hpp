@@ -7,6 +7,7 @@
 #include <typeindex>
 #include <functional>
 #include <string_view>
+#include <map>
 
 namespace llengine {
 namespace internal {

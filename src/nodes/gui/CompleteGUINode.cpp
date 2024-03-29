@@ -1,5 +1,4 @@
 #include "nodes/gui/CompleteGUINode.hpp"
-#include "rendering/RenderingServer.hpp"
 
 using namespace llengine;
 

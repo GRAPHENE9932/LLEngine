@@ -5,10 +5,8 @@
 
 #include <functional>
 #include <typeindex>
-#include <typeinfo>
 #include <memory>
 #include <vector>
-#include <map>
 
 namespace llengine {
 namespace internal {

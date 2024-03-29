@@ -1,5 +1,4 @@
 #include <glm/fwd.hpp>
-#include <type_traits>
 
 #include "nodes/SpatialNode.hpp"
 #include "nodes/rendering/CameraNode.hpp" // CameraNode

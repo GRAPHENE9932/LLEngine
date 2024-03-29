@@ -6,8 +6,6 @@
 #include <GL/glew.h>
 #include <fmt/format.h>
 
-#include <array>
-
 namespace llengine {
 static Texture initialize_texture(glm::u32vec2 size) {
     TextureID texture_id;

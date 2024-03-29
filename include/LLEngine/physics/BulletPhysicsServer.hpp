@@ -3,7 +3,6 @@
 #include <glm/vec3.hpp>
 
 #include <memory>
-#include <chrono>
 #include <vector>
 #include <optional>
 

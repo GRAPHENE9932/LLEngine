@@ -1,5 +1,4 @@
 #include "BloomRenderer.hpp"
-#include "rendering/ManagedFramebufferID.hpp"
 #include "rendering/Shader.hpp"
 #include "rendering/Mesh.hpp"
 #include "rendering/RenderingServer.hpp"

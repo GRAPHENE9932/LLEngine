@@ -9,7 +9,6 @@
 #include <glm/vec4.hpp> // glm::vec4
 #include <glm/mat4x4.hpp> // glm::mat4
 
-#include <set> // std::set
 #include <cstdint> // uint8_t, uint32_t
 #include <optional> // std::optional
 

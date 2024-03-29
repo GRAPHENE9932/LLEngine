@@ -7,9 +7,6 @@
 
 #include <GL/glew.h>
 
-#include <random>
-#include <numbers>
-
 namespace llengine {
 using ExplosionParticlesShader = Shader<
     "center_mvp", "particle_scale_inverse", "spreading_distance",

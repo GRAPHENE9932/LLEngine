@@ -2,7 +2,6 @@
 
 #include "SceneFile.hpp"
 #include "NodeProperty.hpp"
-#include "nodes/RootNode.hpp"
 
 #include <vector>
 

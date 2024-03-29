@@ -7,7 +7,6 @@
 #include <variant> // std::variant, std::monostate
 #include <optional> // std::optional
 #include <string_view> // std::string_view
-#include <unordered_map> // std::unordered_map
 
 #include <nlohmann/json.hpp> // nlohmann::json
 

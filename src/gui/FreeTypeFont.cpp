@@ -6,7 +6,6 @@
 #include FT_FREETYPE_H
 #include <GL/glew.h>
 
-#include <optional>
 #include <stdexcept>
 
 using namespace llengine;

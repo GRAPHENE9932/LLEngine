@@ -1,7 +1,6 @@
 #include "BulletNode.hpp"
 #include "node_cast.hpp"
 #include "nodes/rendering/ExplosionParticlesNode.hpp"
-#include "node_registration.hpp"
 
 #include <fmt/format.h>
 #include <logger.hpp>

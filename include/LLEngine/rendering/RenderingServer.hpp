@@ -1,6 +1,5 @@
 #pragma once
 
-#include <set> // std::set
 #include <memory> // std::shared_ptr
 #include <chrono> // std::chrono::high_resolution_clock
 #include <cstdint> // uint64_t
@@ -15,7 +14,6 @@
 #include "rendering/Window.hpp" // Window
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/Texture.hpp"
-#include "rendering/ManagedFramebufferID.hpp"
 
 namespace llengine {
 class Texture;
