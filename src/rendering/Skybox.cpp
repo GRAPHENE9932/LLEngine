@@ -16,6 +16,8 @@ constexpr std::string_view FRAGMENT_SHADER_TEXT =
     #include "shaders/skybox.frag"
 ;
 
+LazyShader<Skybox::ShaderType> Skybox::shader = {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};
+
 Skybox::Skybox(Skybox&& other) noexcept :
     Skybox(std::move(other.cubemap_texture)) {}
 
@@ -34,7 +36,6 @@ void Skybox::draw(RenderingServer& rs) {
     const glm::mat4 view_without_translation = glm::mat3(rs.get_current_camera_node().get_view_matrix());
     const glm::mat4 mvp = rs.get_current_camera_node().get_proj_matrix() * view_without_translation;
 
-    ensure_shader_is_initialized();
     shader->use_shader();
     shader->set_mat4<"mvp">(mvp);
     glActiveTexture(GL_TEXTURE0);
@@ -46,12 +47,4 @@ void Skybox::draw(RenderingServer& rs) {
     glDrawElements(GL_TRIANGLES, cube_mesh->get_amount_of_vertices(), cube_mesh->get_indices_type(), nullptr);
 
     cube_mesh->unbind_vao(false, false, false);
-}
-
-void Skybox::ensure_shader_is_initialized() {
-    if (shader) {
-        return;
-    }
-
-    shader = std::make_unique<ShaderType>(VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT);
 }

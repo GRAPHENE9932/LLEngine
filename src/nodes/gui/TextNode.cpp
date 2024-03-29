@@ -15,6 +15,8 @@ constexpr std::string_view FRAGMENT_SHADER_TEXT =
     #include "shaders/colored_text.frag"
 ;
 
+LazyShader<TextNode::ShaderType> TextNode::shader = {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};
+
 [[nodiscard]] static std::vector<std::string_view> split_in_lines(
     std::string_view text, const FreeTypeFont& font, float maximum_width
 ) {
@@ -137,7 +139,6 @@ void TextNode::draw() {
     const glm::vec3 pixels_to_opengl_scale {2.0f / window_size, 1.0f};
     const glm::mat4 mvp {glm::scale(glm::translate(glm::mat4(1.0f), absolute_position_opengl), pixels_to_opengl_scale)};
 
-    ensure_shader_is_initialized();
     shader->use_shader();
     shader->set_mat4<"mvp">(mvp);
     shader->set_vec3<"text_color">(get_color());
@@ -192,12 +193,4 @@ void TextNode::add_line(
 
         baseline_x += font_char.advance / 64.0f;
     }
-}
-
-void TextNode::ensure_shader_is_initialized() {
-    if (shader) {
-        return;
-    }
-
-    shader = std::make_unique<ShaderType>(VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT);
 }

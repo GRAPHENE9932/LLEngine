@@ -1,5 +1,6 @@
 #include "rendering/Texture.hpp"
 #include "datatypes.hpp"
+#include "rendering/LazyShader.hpp"
 #include "rendering/Mesh.hpp"
 #include "NodeProperty.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
@@ -296,18 +297,7 @@ constexpr std::string_view EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT =
 constexpr std::string_view EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT =
     #include "shaders/equirectangular_mapper.frag"
 ;
-using EquirectangularMapperShader = Shader<"mvp">;
-
-static std::unique_ptr<EquirectangularMapperShader> equirectangular_mapper_shader = nullptr;
-static void ensure_equirectangular_mapper_shader_is_initialized() {
-    if (equirectangular_mapper_shader) {
-        return;
-    }
-
-    equirectangular_mapper_shader = std::make_unique<EquirectangularMapperShader>(
-        EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT, EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT
-    );
-}
+static LazyShader<Shader<"mvp">> equirectangular_mapper_shader {EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT, EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT};
 
 Texture Texture::panorama_to_cubemap() const {
     if (type != Type::TEX_2D) {
@@ -317,7 +307,6 @@ Texture Texture::panorama_to_cubemap() const {
     const glm::u32vec2 cubemap_size {get_size().x / 2u};
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
-    ensure_equirectangular_mapper_shader_is_initialized();
     equirectangular_mapper_shader->use_shader();
     return draw_to_cubemap(cubemap_size, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
         equirectangular_mapper_shader->set_mat4<"mvp">(mvp);
@@ -339,18 +328,7 @@ constexpr std::string_view IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT =
 constexpr std::string_view IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT =
     #include "shaders/irradiance_precomputer.frag"
 ;
-using IrradiancePrecomputerShader = Shader<"mvp">;
-
-static std::unique_ptr<EquirectangularMapperShader> irradiance_precomputer_shader = nullptr;
-static void ensure_irradiance_precomputer_shader_is_initialized() {
-    if (irradiance_precomputer_shader) {
-        return;
-    }
-
-    irradiance_precomputer_shader = std::make_unique<IrradiancePrecomputerShader>(
-        IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT, IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT
-    );
-}
+static LazyShader<Shader<"mvp">> irradiance_precomputer_shader {IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT, IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT};
 
 constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {16u, 16u};
 Texture Texture::compute_irradiance_map() const {
@@ -360,7 +338,6 @@ Texture Texture::compute_irradiance_map() const {
 
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
-    ensure_irradiance_precomputer_shader_is_initialized();
     irradiance_precomputer_shader->use_shader();
     return draw_to_cubemap(IRRADIANCE_MAP_SIZE, 1, [&] (const glm::mat4& mvp, std::int32_t level) {
         irradiance_precomputer_shader->set_mat4<"mvp">(mvp);
@@ -382,18 +359,7 @@ constexpr std::string_view SPECULAR_PREFILTER_VERTEX_SHADER_TEXT =
 constexpr std::string_view SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT =
     #include "shaders/specular_prefilter.frag"
 ;
-using SpecularPrefilterShader = Shader<"mvp", "roughness">;
-
-static std::unique_ptr<SpecularPrefilterShader> specular_prefilter_shader = nullptr;
-static void ensure_specular_prefilter_shader_is_initialized() {
-    if (specular_prefilter_shader) {
-        return;
-    }
-
-    specular_prefilter_shader = std::make_unique<SpecularPrefilterShader>(
-        SPECULAR_PREFILTER_VERTEX_SHADER_TEXT, SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT
-    );
-}
+static LazyShader<Shader<"mvp", "roughness">> specular_prefilter_shader {SPECULAR_PREFILTER_VERTEX_SHADER_TEXT, SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT};
 
 constexpr glm::u32vec2 SPECULAR_MAP_SIZE {256u, 256u};
 constexpr std::int32_t SPECULAR_MAP_MIPMAP_LEVELS = 9; // log2(256) + 1. Also change LAST_PREFILTERED_MIPMAP_LEVEL in pbr_shader.frag.
@@ -404,7 +370,6 @@ Texture Texture::compute_prefiltered_specular_map() const {
 
     const auto& cube_mesh = Mesh::get_skybox_cube(); // Alias the cube.
 
-    ensure_specular_prefilter_shader_is_initialized();
     specular_prefilter_shader->use_shader();
     return draw_to_cubemap(SPECULAR_MAP_SIZE, SPECULAR_MAP_MIPMAP_LEVELS, [&] (const glm::mat4& mvp, std::int32_t level) {
         float roughness = static_cast<float>(level) / (SPECULAR_MAP_MIPMAP_LEVELS - 1);
@@ -428,18 +393,7 @@ constexpr std::string_view BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT =
 constexpr std::string_view BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT =
     #include "shaders/brdf_integration_mapper.frag"
 ;
-using BRDFIntegrationMapperShader = Shader<>;
-
-static std::unique_ptr<BRDFIntegrationMapperShader> brdf_integration_mapper_shader = nullptr;
-static void ensure_brdf_integration_mapper_shader_is_initialized() {
-    if (brdf_integration_mapper_shader) {
-        return;
-    }
-
-    brdf_integration_mapper_shader = std::make_unique<BRDFIntegrationMapperShader>(
-        BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT, BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT
-    );
-}
+static LazyShader<Shader<>> brdf_integration_mapper_shader {BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT, BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT};
 
 constexpr glm::u32vec2 BRDF_INTEGRATION_MAP_SIZE = SPECULAR_MAP_SIZE;
 Texture Texture::compute_brdf_integration_map() {
@@ -476,7 +430,6 @@ Texture Texture::compute_brdf_integration_map() {
         texture_id, 0
     );
 
-    ensure_brdf_integration_mapper_shader_is_initialized();
     brdf_integration_mapper_shader->use_shader();
 
     glClear(GL_COLOR_BUFFER_BIT);

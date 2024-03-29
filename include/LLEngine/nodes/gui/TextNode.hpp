@@ -4,6 +4,7 @@
 #include "GUINode.hpp"
 #include "gui/FreeTypeFont.hpp"
 #include "rendering/Shader.hpp"
+#include "rendering/LazyShader.hpp"
 
 #include <vector>
 #include <memory>
@@ -59,12 +60,11 @@ private:
     std::int32_t min_y = std::numeric_limits<std::int32_t>::max();
     std::int32_t max_y = std::numeric_limits<std::int32_t>::min();
 
-    inline static std::unique_ptr<ShaderType> shader = nullptr;
+    static LazyShader<ShaderType> shader;
 
     void add_line(
         glm::vec2 offset, std::string_view line,
         std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs
     );
-    static void ensure_shader_is_initialized();
 };
 }

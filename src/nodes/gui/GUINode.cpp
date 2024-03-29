@@ -15,6 +15,15 @@
 
 using namespace llengine;
 
+constexpr std::string_view VERTEX_SHADER_TEXT =
+    #include "shaders/gui_rectangle.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/gui_rectangle.frag"
+;
+
+LazyShader<GUINode::ShaderType> GUINode::shader {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};
+
 GUINode::~GUINode() {
     if (GUICanvas* canvas = get_canvas_optional()) {
         canvas->unregister_gui_node(this);
@@ -124,7 +133,6 @@ void GUINode::draw_texture_part(
     uv_offset.y += uv_scale.y; // Invert UV's y. If (scale * y) goes from 0 to scale when y goes from 0 to 1,
     uv_scale.y = -uv_scale.y; // then (scale - scale * y) goes from scale to 0.
 
-    ensure_shader_is_initialized();
     shader->use_shader();
     shader->set_mat4<"mvp">(mvp);
     shader->set_vec2<"uv_scale">(uv_scale);
@@ -302,19 +310,4 @@ void GUINode::remove_children_from_queue() {
     }
 
     children_queued_to_remove.clear();
-}
-
-constexpr std::string_view VERTEX_SHADER_TEXT =
-    #include "shaders/gui_rectangle.vert"
-;
-constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/gui_rectangle.frag"
-;
-
-void GUINode::ensure_shader_is_initialized() {
-    if (shader) {
-        return;
-    }
-
-    shader = std::make_unique<ShaderType>(VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rendering/Shader.hpp"
+#include "rendering/LazyShader.hpp"
 
 #include <memory> // std::shared_ptr
 
@@ -26,8 +27,6 @@ private:
     using ShaderType = Shader<"mvp">;
 
     std::shared_ptr<Texture> cubemap_texture;
-    inline static std::unique_ptr<ShaderType> shader = nullptr;
-
-    static void ensure_shader_is_initialized();
+    static LazyShader<ShaderType> shader;
 };
 }

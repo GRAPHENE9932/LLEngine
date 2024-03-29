@@ -2,6 +2,7 @@
 #include "nodes/rendering/CameraNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "rendering/Shader.hpp"
+#include "rendering/LazyShader.hpp"
 #include "random.hpp"
 
 #include <GL/glew.h>
@@ -10,6 +11,20 @@
 #include <numbers>
 
 namespace llengine {
+using ExplosionParticlesShader = Shader<
+    "center_mvp", "particle_scale_inverse", "spreading_distance",
+    "scale_decline_power", "phase", "particles_count", "particle_color"
+>;
+
+constexpr std::string_view VERTEX_SHADER_TEXT =
+    #include "shaders/explosion_particles.vert"
+;
+constexpr std::string_view FRAGMENT_SHADER_TEXT =
+    #include "shaders/explosion_particles.frag"
+;
+
+static LazyShader<ExplosionParticlesShader> shader = {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};
+
 void ExplosionParticlesNode::set_mesh(const std::shared_ptr<const Mesh>& mesh) {
     particle_mesh = mesh;
     if (is_attached_to_tree()) {
@@ -102,22 +117,6 @@ void ExplosionParticlesNode::set_particles_count_property(const NodeProperty& pr
     return particles_count;
 }
 
-using ExplosionParticlesShader = Shader<
-    "center_mvp", "particle_scale_inverse", "spreading_distance",
-    "scale_decline_power", "phase", "particles_count", "particle_color"
->;
-static std::unique_ptr<ExplosionParticlesShader> shader = nullptr;
-
-static void ensure_shader_is_initialized() {
-    if (shader == nullptr) {
-        shader = std::make_unique<ExplosionParticlesShader>(
-            #include "shaders/explosion_particles.vert"
-            ,
-            #include "shaders/explosion_particles.frag"
-        );
-    }
-}
-
 void ExplosionParticlesNode::draw() {
     if (particle_mesh == nullptr) {
         return;
@@ -125,7 +124,6 @@ void ExplosionParticlesNode::draw() {
 
     const glm::mat4 mvp = get_rendering_server().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
 
-    ensure_shader_is_initialized();
     shader->use_shader();
     shader->set_mat4<"center_mvp">(mvp);
     shader->set_vec3<"particle_scale_inverse">(1.0f / get_scale());
@@ -174,11 +172,7 @@ void ExplosionParticlesNode::copy_to(Node& node) const {
 }
 
 [[nodiscard]] ShaderID ExplosionParticlesNode::get_program_id() const {
-    if (shader == nullptr) {
-        return 0;
-    }
-
-    return shader->get_program_id();
+    return shader.is_initialized() ? shader->get_program_id() : 0;
 }
 
 void ExplosionParticlesNode::on_attachment_to_tree_without_start() {
