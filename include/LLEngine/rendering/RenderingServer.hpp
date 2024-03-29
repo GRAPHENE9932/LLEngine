@@ -15,7 +15,6 @@
 #include "rendering/Window.hpp" // Window
 #include "rendering/Skybox.hpp" // Skybox
 #include "rendering/Texture.hpp"
-#include "rendering/shaders/ShaderHolder.hpp"
 #include "rendering/ManagedFramebufferID.hpp"
 
 namespace llengine {
@@ -144,10 +143,6 @@ public:
         return window;
     }
 
-    [[nodiscard]] ShaderHolder& get_shader_holder() {
-        return shader_holder;
-    }
-
     [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
     get_environment_cubemap(const glm::vec3& obj_position);
     [[nodiscard]] bool has_environment_cubemap();
@@ -188,8 +183,6 @@ private:
     std::vector<Drawable*> drawables;
     std::vector<GUICanvas*> gui_canvases;
     std::vector<PointLightNode*> point_lights;
-
-    ShaderHolder shader_holder;
 
     void unblock_mouse_press();
     void draw_non_overlay_objects();

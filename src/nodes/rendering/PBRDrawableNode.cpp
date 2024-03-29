@@ -2,6 +2,7 @@
 #include "nodes/rendering/PBRDrawableNode.hpp" // PBRDrawableNode
 #include "nodes/rendering/CameraNode.hpp"
 #include "math/AABB.hpp"
+#include "rendering/shaders/PBRShaderManager.hpp"
 
 #include <GL/glew.h>
 
@@ -15,6 +16,8 @@ constexpr std::string_view VERTEX_SHADOW_MAPPING_SHADER_TEXT =
 constexpr std::string_view FRAGMENT_SHADOW_MAPPING_SHADER_TEXT =
     #include "shaders/shadow_mapping.frag"
 ;
+
+static PBRShaderManager pbr_shader_manager;
 
 PBRDrawableNode::PBRDrawableNode() = default;
 
@@ -53,7 +56,9 @@ void PBRDrawableNode::draw() {
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
     const glm::mat4 mvp = rs.get_current_camera_node().get_view_proj_matrix() * model_matrix;
-    rs.get_shader_holder().get_pbr_shader_manager().use_shader(
+    
+    
+    pbr_shader_manager.use_shader(
         rs, *material, mvp, model_matrix, rs.get_current_camera_node().get_global_position()
     );
 
@@ -75,7 +80,7 @@ void PBRDrawableNode::draw_to_shadow_map() {
 
 GLuint PBRDrawableNode::get_program_id() const {
     RenderingServer& rs = get_rendering_server();
-    return rs.get_shader_holder().get_pbr_shader_manager().get_program_id(rs, *material);
+    return pbr_shader_manager.get_program_id(rs, *material);
 }
 
 void PBRDrawableNode::set_mesh(const std::shared_ptr<const Mesh>& mesh) {
