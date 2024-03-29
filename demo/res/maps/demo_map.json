@@ -22,7 +22,9 @@
 		{
 			"id": 3,
 			"parent_id": 0,
-			"type": "main_camera"
+			"type": "main_camera",
+			"translation": [7.5, 2.0, 7.5],
+			"rotation": [0.0, 0.9238797, 0.0, -0.3826837]
 		},
 		{
 			"id": 4,
@@ -36,8 +38,8 @@
 			"type": "fps_text_node",
 			"font": {
 				"type": "font",
-				"path": "res/fonts/Ubuntu-Regular.ttf",
-				"size": 32
+				"path": "res/fonts/gohufont-14.pcf",
+				"size": 28
 			}
 		},
 		{
@@ -47,8 +49,8 @@
 			"text": "Press Q or ALT+F4 to quit.",
 			"font": {
 				"type": "font",
-				"path": "res/fonts/Ubuntu-Regular.ttf",
-				"size": 32
+				"path": "res/fonts/gohufont-14.pcf",
+				"size": 28
 			},
 			"transform": {
 				"type": "gui_transform",
@@ -62,14 +64,30 @@
 			"type": "exposure_text_node",
 			"font": {
 				"type": "font",
-				"path": "res/fonts/Ubuntu-Regular.ttf",
-				"size": 32
+				"path": "res/fonts/gohufont-14.pcf",
+				"size": 28
 			},
 			"transform": {
 				"type": "gui_transform",
 				"position_anchor": [0.0, 0.0],
 				"origin": ["left", "top"],
 				"position_offset": [0.0, 32.0]
+			}
+		},
+		{
+			"id": 9,
+			"parent_id": 4,
+			"type": "resolution_text_node",
+			"font": {
+				"type": "font",
+				"path": "res/fonts/gohufont-14.pcf",
+				"size": 28
+			},
+			"transform": {
+				"type": "gui_transform",
+				"position_anchor": [0.0, 0.0],
+				"origin": ["left", "top"],
+				"position_offset": [0.0, 64.0]
 			}
 		}
 	]
