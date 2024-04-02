@@ -116,7 +116,7 @@ void Node::register_properties() {
     return cached_bullet_physics_server;
 }
 
-void Node::on_attachment_to_tree() {
+void Node::_on_attachment_to_tree() {
     on_attachment_to_tree_without_start();
 
     try {

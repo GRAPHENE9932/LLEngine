@@ -65,7 +65,7 @@ public:
 
     virtual void draw() {};
 
-    void internal_update() override;
+    void _update() override;
 
     /**
      * @brief Get the parent GUI node if exists.

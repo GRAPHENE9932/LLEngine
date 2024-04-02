@@ -14,7 +14,7 @@ SpatialNode::~SpatialNode() {}
 
 void SpatialNode::update_children() {
     for (const auto& child : children) {
-        child->internal_update();
+        child->_update();
     }
 }
 
@@ -96,7 +96,7 @@ void SpatialNode::copy_to(Node& node) const {
     }
 }
 
-void SpatialNode::internal_update() {
+void SpatialNode::_update() {
     if (is_enabled()) {
         add_children_from_queue();
         remove_children_from_queue();
@@ -120,7 +120,7 @@ void SpatialNode::on_attachment_to_tree_without_start() {
     std::for_each(
         children.begin(), children.end(),
         [] (const auto& child) {
-            child->on_attachment_to_tree();
+            child->_on_attachment_to_tree();
         }
     );
 }
@@ -154,7 +154,7 @@ void SpatialNode::add_children_from_queue() {
         children_queued_to_add[i]->parent = this;
         children.emplace_back(std::move(children_queued_to_add[i]));
         if (attached_to_tree) {
-            children.back()->on_attachment_to_tree();
+            children.back()->_on_attachment_to_tree();
         }
     }
 

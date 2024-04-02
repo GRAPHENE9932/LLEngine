@@ -17,7 +17,7 @@ public:
     float x_angle = 0.0f;
     float y_angle = 0.0f;
 
-    void internal_update() override;
+    void _update() override;
 
     void unlock_mouse();
     void lock_mouse();

@@ -56,7 +56,7 @@ public:
 
     void set_screen_overlayed_property(const NodeProperty& property);
 
-    void internal_update() override final;
+    void _update() override final;
 
     static void register_properties();
 

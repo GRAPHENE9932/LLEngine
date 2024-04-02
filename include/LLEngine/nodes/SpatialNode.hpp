@@ -53,7 +53,7 @@ public:
 
     virtual void copy_to(Node& node) const override;
 
-    virtual void internal_update() override;
+    virtual void _update() override;
 
     virtual void on_attachment_to_tree_without_start() override;
 

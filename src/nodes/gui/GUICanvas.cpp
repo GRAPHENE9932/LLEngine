@@ -36,7 +36,7 @@ void GUICanvas::on_attachment_to_tree_without_start() {
     std::for_each(
         gui_nodes.begin(), gui_nodes.end(),
         [] (const auto& child) {
-            child->on_attachment_to_tree();
+            child->_on_attachment_to_tree();
         }
     );
 }
@@ -121,7 +121,7 @@ void GUICanvas::set_screen_overlayed_property(const NodeProperty& property) {
     set_screen_overlayed(property.get<bool>());
 }
 
-void GUICanvas::internal_update() {
+void GUICanvas::_update() {
     if (!is_enabled()) {
         return;
     }
@@ -132,7 +132,7 @@ void GUICanvas::internal_update() {
     try {
         update_children();
         for (auto& gui_node : gui_nodes) {
-            gui_node->internal_update();
+            gui_node->_update();
         }
 
         update();
@@ -176,7 +176,7 @@ void GUICanvas::add_gui_nodes_from_queue() {
         gui_node_in_queue->parent = this;
         gui_nodes.emplace_back(std::move(gui_node_in_queue));
         if (attached_to_tree) {
-            gui_nodes.back()->on_attachment_to_tree();
+            gui_nodes.back()->_on_attachment_to_tree();
         }
     }
 

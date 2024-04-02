@@ -77,7 +77,7 @@ void GUINode::queue_add_child(std::unique_ptr<GUINode>&& child) {
     children_queued_to_add.push_back(std::move(child));
 }
 
-void GUINode::internal_update() {
+void GUINode::_update() {
     if (is_enabled()) {
         add_children_from_queue();
         remove_children_from_queue();
@@ -196,7 +196,7 @@ void GUINode::on_attachment_to_tree_without_start() {
     std::for_each(
         children.begin(), children.end(),
         [] (const auto& child) {
-            child->on_attachment_to_tree();
+            child->_on_attachment_to_tree();
         }
     );
 }
@@ -282,7 +282,7 @@ void GUINode::add_children_from_queue() {
         child_in_queue->parent = this;
         children.emplace_back(std::move(child_in_queue));
         if (attached_to_tree) {
-            children.back()->on_attachment_to_tree();
+            children.back()->_on_attachment_to_tree();
         }
     }
 
