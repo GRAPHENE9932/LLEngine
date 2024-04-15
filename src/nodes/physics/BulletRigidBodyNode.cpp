@@ -441,8 +441,8 @@ std::unique_ptr<Node> BulletRigidBodyNode::copy() const {
     return result;
 }
 
-void BulletRigidBodyNode::on_attachment_to_tree_without_start() {
-    SpatialNode::on_attachment_to_tree_without_start();
+void BulletRigidBodyNode::_on_attachment_to_tree_without_start() {
+    SpatialNode::_on_attachment_to_tree_without_start();
     get_bullet_physics_server().register_rigid_body(this);
 }
 

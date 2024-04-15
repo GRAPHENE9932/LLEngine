@@ -172,8 +172,8 @@ void ExplosionParticlesNode::copy_to(Node& node) const {
     return shader.is_initialized() ? shader->get_program_id() : 0;
 }
 
-void ExplosionParticlesNode::on_attachment_to_tree_without_start() {
-    DrawableCompleteSpatialNode::on_attachment_to_tree_without_start();
+void ExplosionParticlesNode::_on_attachment_to_tree_without_start() {
+    DrawableCompleteSpatialNode::_on_attachment_to_tree_without_start();
 
     initialize_vao();
     reinitialize_target_positions_buffer();

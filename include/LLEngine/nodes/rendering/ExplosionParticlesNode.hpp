@@ -68,7 +68,7 @@ public:
     [[nodiscard]] ShaderID get_program_id() const override;
 
 protected:
-    void on_attachment_to_tree_without_start() override;
+    void _on_attachment_to_tree_without_start() override;
 
 private:
     std::shared_ptr<const Mesh> particle_mesh = nullptr;

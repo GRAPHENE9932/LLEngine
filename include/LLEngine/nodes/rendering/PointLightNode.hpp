@@ -26,7 +26,7 @@ struct PointLightNode : public CompleteSpatialNode {
     PointLightNode& operator=(PointLightNode&& other) = delete;
     ~PointLightNode();
 
-    void on_attachment_to_tree_without_start() final override;
+    void _on_attachment_to_tree_without_start() final override;
 
     static Uniforms get_uniforms_id(ShaderID program_id, const std::string& var_name, std::uint32_t index);
     void set_uniforms(const Uniforms& uniforms) const;

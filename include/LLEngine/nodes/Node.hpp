@@ -59,7 +59,7 @@ public:
 
 protected:
     void _on_attachment_to_tree();
-    virtual void on_attachment_to_tree_without_start();
+    virtual void _on_attachment_to_tree_without_start();
     virtual void start() {};
     virtual void update() {};
     virtual void _update() {};

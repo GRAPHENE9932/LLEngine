@@ -117,7 +117,7 @@ void Node::register_properties() {
 }
 
 void Node::_on_attachment_to_tree() {
-    on_attachment_to_tree_without_start();
+    _on_attachment_to_tree_without_start();
 
     try {
         start();
@@ -130,7 +130,7 @@ void Node::_on_attachment_to_tree() {
     }
 }
 
-void Node::on_attachment_to_tree_without_start() {
+void Node::_on_attachment_to_tree_without_start() {
     cached_rendering_server = nullptr;
     cached_bullet_physics_server = nullptr;
 }

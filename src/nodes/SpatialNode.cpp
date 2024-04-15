@@ -114,8 +114,8 @@ void SpatialNode::_update() {
     }
 }
 
-void SpatialNode::on_attachment_to_tree_without_start() {
-    Node::on_attachment_to_tree_without_start();
+void SpatialNode::_on_attachment_to_tree_without_start() {
+    Node::_on_attachment_to_tree_without_start();
 
     std::for_each(
         children.begin(), children.end(),

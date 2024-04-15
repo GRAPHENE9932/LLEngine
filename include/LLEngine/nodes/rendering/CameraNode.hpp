@@ -55,7 +55,7 @@ public:
     [[nodiscard]] Frustum get_frustum() const;
 
 protected:
-    void on_attachment_to_tree_without_start() override final;
+    void _on_attachment_to_tree_without_start() override final;
 
 private:
     float field_of_view = glm::radians(90.0f);

@@ -88,7 +88,7 @@ public:
     virtual void copy_to(Node& node) const override;
     virtual std::unique_ptr<Node> copy() const override;
 
-    void on_attachment_to_tree_without_start() override;
+    void _on_attachment_to_tree_without_start() override;
 
 private:
     Transform previous_parent_transform;
