@@ -107,8 +107,8 @@ protected:
     void draw_rectangle(const GUITexture& texture);
     void on_attachment_to_tree_without_start() override final;
     virtual void on_attachment_to_canvas();
-    virtual void internal_on_enable() override;
-    virtual void internal_on_disable() override;
+    virtual void _on_enable() override;
+    virtual void _on_disable() override;
 
 private:
     using ShaderType = Shader<"mvp", "uv_scale", "uv_offset", "color_factor">;

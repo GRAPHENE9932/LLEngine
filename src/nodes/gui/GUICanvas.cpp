@@ -149,19 +149,19 @@ void GUICanvas::register_properties() {
     register_custom_property<GUICanvas>("gui_canvas", "screen_overlayed", &GUICanvas::set_screen_overlayed_property);
 }
 
-void GUICanvas::internal_on_enable() {
-    SpatialNode::internal_on_enable();
+void GUICanvas::_on_enable() {
+    SpatialNode::_on_enable();
 
     for (const auto& gui_node : gui_nodes) {
-        gui_node->on_parent_enable_disable(true);
+        gui_node->_on_parent_enable_disable(true);
     }
 }
 
-void GUICanvas::internal_on_disable() {
-    SpatialNode::internal_on_disable();
+void GUICanvas::_on_disable() {
+    SpatialNode::_on_disable();
 
     for (const auto& gui_node : gui_nodes) {
-        gui_node->on_parent_enable_disable(true);
+        gui_node->_on_parent_enable_disable(true);
     }
 }
 

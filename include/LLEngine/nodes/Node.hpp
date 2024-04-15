@@ -65,9 +65,9 @@ protected:
     virtual void _update() {};
     virtual void on_keyboard_key_press(Key key) {};
     virtual void on_keyboard_key_release(Key key) {};
-    void on_parent_enable_disable(bool enabled);
-    virtual void internal_on_enable() {};
-    virtual void internal_on_disable() {};
+    void _on_parent_enable_disable(bool enabled);
+    virtual void _on_enable() {};
+    virtual void _on_disable() {};
 
 private:
     std::string name;

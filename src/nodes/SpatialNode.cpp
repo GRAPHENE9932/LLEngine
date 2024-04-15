@@ -131,15 +131,15 @@ void SpatialNode::register_properties() {
     register_custom_property<SpatialNode>("spatial_node", "rotation", &SpatialNode::set_rotation_property);
 }
 
-void SpatialNode::internal_on_enable() {
+void SpatialNode::_on_enable() {
     for (const auto& child : children) {
-        child->on_parent_enable_disable(true);
+        child->_on_parent_enable_disable(true);
     }
 }
 
-void SpatialNode::internal_on_disable() {
+void SpatialNode::_on_disable() {
     for (const auto& child : children) {
-        child->on_parent_enable_disable(false);
+        child->_on_parent_enable_disable(false);
     }
 }
 

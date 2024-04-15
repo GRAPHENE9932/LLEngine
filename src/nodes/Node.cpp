@@ -21,7 +21,7 @@ void Node::enable_on_keyboard_key(bool enable) {
 void Node::enable() {
     enabled = true;
     if (!was_enabled_before) {
-        internal_on_enable();
+        _on_enable();
     }
 
     was_enabled_before = is_enabled();
@@ -30,7 +30,7 @@ void Node::enable() {
 void Node::disable() {
     enabled = false;
     if (was_enabled_before) {
-        internal_on_disable();
+        _on_disable();
     }
 
     was_enabled_before = is_enabled();
@@ -135,14 +135,14 @@ void Node::on_attachment_to_tree_without_start() {
     cached_bullet_physics_server = nullptr;
 }
 
-void Node::on_parent_enable_disable(bool enabled) {
+void Node::_on_parent_enable_disable(bool enabled) {
     parent_enabled = enabled;
 
     if (was_enabled_before && !enabled) {
-        internal_on_disable();
+        _on_disable();
     }
     else if (!was_enabled_before && enabled) {
-        internal_on_enable();
+        _on_enable();
     }
 
     was_enabled_before = is_enabled();
