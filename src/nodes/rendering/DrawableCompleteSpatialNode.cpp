@@ -10,7 +10,7 @@ DrawableCompleteSpatialNode::~DrawableCompleteSpatialNode() {
     }
 }
 
-void DrawableCompleteSpatialNode::on_attachment_to_tree_without_start() {
-    SpatialNode::on_attachment_to_tree_without_start();
+void DrawableCompleteSpatialNode::_on_attachment_to_tree_without_start() {
+    SpatialNode::_on_attachment_to_tree_without_start();
     get_rendering_server().register_drawable(this);
 }
