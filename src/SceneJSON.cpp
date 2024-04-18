@@ -20,6 +20,47 @@ constexpr std::uint64_t CURRENT_VERSION = 1;
     return property_name == "id" || property_name == "parent_id" || property_name == "type";
 }
 
+NodeProperty node_property_from_array_of_arrays_json(std::string_view key, const nlohmann::json& value) {
+    if (value[0].size() == 2) {
+        if (value[0][0].is_number_integer()) {
+            return NodeProperty(key, value.get<std::vector<glm::i32vec2>>());
+        }
+        else if (value[0][0].is_number_float()) {
+            return NodeProperty(key, value.get<std::vector<glm::vec2>>());
+        }
+        else {
+            throw std::runtime_error("Invalid vec2 type.");
+        }
+    }
+    else if (value[0].size() == 3) {
+        return NodeProperty(key, value.get<std::vector<glm::vec3>>());
+    }
+    else if (value[0].size() == 4) {
+        return NodeProperty(key, value.get<std::vector<glm::vec4>>());
+    }
+    else {
+        throw std::runtime_error("Invalid subvector size.");
+    }
+}
+
+NodeProperty node_property_from_array_json(std::string_view key, const nlohmann::json& value) {
+    if (value.size() == 0 || value[0].is_number_integer()) {
+        return NodeProperty(key, value.get<std::vector<std::int64_t>>());
+    }
+    else if (value[0].is_number_float()) {
+        return NodeProperty(key, value.get<std::vector<float>>());
+    }
+    else if (value[0].is_string()) {
+        return NodeProperty(key, value.get<std::vector<std::string>>());
+    }
+    else if (value[0].is_array()) {
+        return node_property_from_array_of_arrays_json(key, value);
+    }
+    else {
+        throw std::runtime_error("Unknown element type of the JSON array property.");
+    }
+}
+
 NodeProperty node_property_from_json(std::string_view key, const nlohmann::json& value) {
     if (value.is_number_integer()) {
         return NodeProperty(key, value.get<std::int64_t>());
@@ -41,40 +82,7 @@ NodeProperty node_property_from_json(std::string_view key, const nlohmann::json&
         return NodeProperty(key, std::move(sub_properties));
     }
     else if (value.is_array()) {
-        if (value.size() == 0 || value[0].is_number_integer()) {
-            return NodeProperty(key, value.get<std::vector<std::int64_t>>());
-        }
-        else if (value[0].is_number_float()) {
-            return NodeProperty(key, value.get<std::vector<float>>());
-        }
-        else if (value[0].is_string()) {
-            return NodeProperty(key, value.get<std::vector<std::string>>());
-        }
-        else if (value[0].is_array()) {
-            if (value[0].size() == 2) {
-                if (value[0][0].is_number_integer()) {
-                    return NodeProperty(key, value.get<std::vector<glm::i32vec2>>());
-                }
-                else if (value[0][0].is_number_float()) {
-                    return NodeProperty(key, value.get<std::vector<glm::vec2>>());
-                }
-                else {
-                    throw std::runtime_error("Invalid vec2 type.");
-                }
-            }
-            else if (value[0].size() == 3) {
-                return NodeProperty(key, value.get<std::vector<glm::vec3>>());
-            }
-            else if (value[0].size() == 4) {
-                return NodeProperty(key, value.get<std::vector<glm::vec4>>());
-            }
-            else {
-                throw std::runtime_error("Invalid subvector size.");
-            }
-        }
-        else {
-            throw std::runtime_error("Unknown element type of the JSON array property.");
-        }
+        return node_property_from_array_json(key, value);
     }
     else {
         throw std::runtime_error("Unknown JSON property type.");
