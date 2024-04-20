@@ -6,6 +6,7 @@
 #include "nodes/rendering/Drawable.hpp"
 #include "nodes/gui/GUICanvas.hpp"
 #include "MainFramebuffer.hpp"
+#include "utils/texture_utils.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -229,7 +230,7 @@ RenderingServer::get_irradiance_map(const glm::vec3& obj_position) {
     }
     if (!irradiance_map) {
         logger::info("Starting computing the irradiance map.");
-        irradiance_map = env_cubemap->get().compute_irradiance_map();
+        irradiance_map = tex_utils::compute_irradiance_map(env_cubemap->get());
         logger::info("Finished computing the irradiance map.");
     }
     return *irradiance_map;
@@ -244,7 +245,7 @@ RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
     }
     if (!prefiltered_specular_map) {
         logger::info("Starting computing the prefiltered specular map.");
-        prefiltered_specular_map = env_cubemap->get().compute_prefiltered_specular_map();
+        prefiltered_specular_map = tex_utils::compute_prefiltered_specular_map(env_cubemap->get());
         logger::info("Finished computing the prefiltered specular map.");
     }
     return *prefiltered_specular_map;
@@ -253,7 +254,7 @@ RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
 const Texture& RenderingServer::get_brdf_integration_map() {
     if (!brdf_integration_map) {
         logger::info("Starting computing the BRDF integration map.");
-        brdf_integration_map = Texture::compute_brdf_integration_map();
+        brdf_integration_map = tex_utils::compute_brdf_integration_map();
         logger::info("Finished computing the BRDF integration map.");
     }
     return *brdf_integration_map;

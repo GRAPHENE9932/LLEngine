@@ -55,6 +55,7 @@ set(SOURCES
     src/rendering/ExposureController.cpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/shader_loader.cpp
+    src/utils/texture_utils.cpp
     src/structs/shapes/SphereShape.cpp
     src/structs/shapes/CylinderShape.cpp
     src/structs/shapes/BoxShape.cpp

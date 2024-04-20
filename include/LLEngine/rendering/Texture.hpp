@@ -146,11 +146,6 @@ public:
 
     [[nodiscard]] static Texture from_property(const NodeProperty& property);
 
-    [[nodiscard]] Texture panorama_to_cubemap() const;
-    [[nodiscard]] Texture compute_irradiance_map() const; // TODO: Move this to another class.
-    [[nodiscard]] Texture compute_prefiltered_specular_map() const; // TODO: Move this to another class.
-    [[nodiscard]] static Texture compute_brdf_integration_map(); // TODO: Move this to another class.
-
 protected:
     ManagedTextureID texture_id = 0; // ID of value 0 implies that there are no texture.
     glm::u32vec2 tex_size {0, 0};

@@ -4,6 +4,7 @@
 #include "nodes/RootNode.hpp"
 #include "rendering/RenderingServer.hpp"
 #include "physics/BulletPhysicsServer.hpp"
+#include "utils/texture_utils.hpp"
 
 #include <memory>
 
@@ -24,7 +25,7 @@ GameInstance::GameInstance(const GameSettings& settings) {
 
     if (!settings.skybox_path.empty()) {
         auto sky_panorama = Texture::from_file(settings.skybox_path);
-        auto sky_cubemap = sky_panorama.panorama_to_cubemap();
+        auto sky_cubemap = tex_utils::panorama_to_cubemap(sky_panorama);
         rendering_server->set_cubemap(std::make_shared<Texture>(std::move(sky_cubemap)));
     }
 
