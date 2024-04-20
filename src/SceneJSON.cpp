@@ -89,6 +89,31 @@ NodeProperty node_property_from_json(std::string_view key, const nlohmann::json&
     }
 }
 
+std::vector<NodeProperty> json_to_node_properties(const nlohmann::json& node_json) {
+    std::vector<NodeProperty> properties;
+
+    for (const auto& element : node_json.items()) {
+        if (is_basic_property(element.key())) {
+            continue;
+        }
+
+        try {
+            properties.emplace_back(node_property_from_json(element.key(), element.value()));
+        }
+        catch (const std::exception& e) {
+            throw std::runtime_error(fmt::format(
+                "Failed to read a node property from a JSON piece because: \"{}\".",
+                e.what()
+            ));
+        }
+        catch (...) {
+            throw std::runtime_error("Failed to read a node property from a JSON piece.");
+        }
+    }
+
+    return properties;
+}
+
 std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>
 create_nodes_map(const nlohmann::json& json) {
     std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>> nodes;
@@ -98,27 +123,7 @@ create_nodes_map(const nlohmann::json& json) {
         std::optional<std::uint64_t> parent_id = get_optional<std::uint64_t>(node_json, "parent_id");
         std::string type = node_json.at("type");
 
-        std::vector<NodeProperty> properties;
-        for (const auto& element : node_json.items()) {
-            if (is_basic_property(element.key())) {
-                continue;
-            }
-
-            try {
-                properties.emplace_back(node_property_from_json(element.key(), element.value()));
-            }
-            catch (const std::exception& e) {
-                throw std::runtime_error(fmt::format(
-                    "Failed to read a node property from a JSON piece because: \"{}\".",
-                    e.what()
-                ));
-            }
-            catch (...) {
-                throw std::runtime_error("Failed to read a node property from a JSON piece.");
-            }
-        }
-
-        nodes[id] = {{type, std::move(properties), {}}, parent_id};
+        nodes[id] = {{type, std::move(json_to_node_properties(node_json)), {}}, parent_id};
     }
 
     return nodes;
@@ -196,6 +201,22 @@ SceneJSON::SceneJSON(std::string_view json_path) {
     root_node_data = initialize_root_node_data(root_json.at("nodes"));
 }
 
+void set_properties_to_scene_file_root_node(const std::vector<NodeProperty>& properties, Node& node) {
+    auto node_name = find_node_type_name(node);
+
+    if (!node_name.has_value()) {
+        return;
+    }
+
+    for (const auto& property : properties) {
+        if (is_basic_property(property.get_name()) || property.get_name() == "scene_file_path") {
+            continue;
+        }
+
+        call_setter(*node_name, property, node);
+    }
+}
+
 std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data, const CustomNodeType* node_type) {
     std::unique_ptr<Node> result = nullptr;
 
@@ -213,16 +234,7 @@ std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data, const CustomNodeT
 
         result = SceneFile::load_from_file(scene_file_path)->to_node({}, node_type);
 
-        auto node_name = find_node_type_name(*result);
-        if (node_name.has_value()) {
-            for (const auto& property : data.properties) {
-                if (is_basic_property(property.get_name()) || property.get_name() == "scene_file_path") {
-                    continue;
-                }
-
-                call_setter(*node_name, property, *result);
-            }
-        }
+        set_properties_to_scene_file_root_node(data.properties, *result);
     }
     else {
         if (node_type == nullptr) {
