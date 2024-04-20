@@ -10,7 +10,7 @@
 
 using namespace llengine;
 
-Transform get_relative_transform(const BulletRigidBodyNode& node,
+static Transform get_relative_transform(const BulletRigidBodyNode& node,
                                  const Transform& parent_transform) {
     const auto global_transform {node.get_global_transform()};
 

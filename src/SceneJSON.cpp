@@ -20,7 +20,7 @@ constexpr std::uint64_t CURRENT_VERSION = 1;
     return property_name == "id" || property_name == "parent_id" || property_name == "type";
 }
 
-NodeProperty node_property_from_array_of_arrays_json(std::string_view key, const nlohmann::json& value) {
+static NodeProperty node_property_from_array_of_arrays_json(std::string_view key, const nlohmann::json& value) {
     if (value[0].size() == 2) {
         if (value[0][0].is_number_integer()) {
             return NodeProperty(key, value.get<std::vector<glm::i32vec2>>());
@@ -43,7 +43,7 @@ NodeProperty node_property_from_array_of_arrays_json(std::string_view key, const
     }
 }
 
-NodeProperty node_property_from_array_json(std::string_view key, const nlohmann::json& value) {
+static NodeProperty node_property_from_array_json(std::string_view key, const nlohmann::json& value) {
     if (value.size() == 0 || value[0].is_number_integer()) {
         return NodeProperty(key, value.get<std::vector<std::int64_t>>());
     }
@@ -61,7 +61,7 @@ NodeProperty node_property_from_array_json(std::string_view key, const nlohmann:
     }
 }
 
-NodeProperty node_property_from_json(std::string_view key, const nlohmann::json& value) {
+static NodeProperty node_property_from_json(std::string_view key, const nlohmann::json& value) {
     if (value.is_number_integer()) {
         return NodeProperty(key, value.get<std::int64_t>());
     }
@@ -89,7 +89,7 @@ NodeProperty node_property_from_json(std::string_view key, const nlohmann::json&
     }
 }
 
-std::vector<NodeProperty> json_to_node_properties(const nlohmann::json& node_json) {
+static std::vector<NodeProperty> json_to_node_properties(const nlohmann::json& node_json) {
     std::vector<NodeProperty> properties;
 
     for (const auto& element : node_json.items()) {
@@ -114,7 +114,7 @@ std::vector<NodeProperty> json_to_node_properties(const nlohmann::json& node_jso
     return properties;
 }
 
-std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>
+static std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>
 create_nodes_map(const nlohmann::json& json) {
     std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>> nodes;
 
@@ -129,7 +129,7 @@ create_nodes_map(const nlohmann::json& json) {
     return nodes;
 }
 
-bool take_children_for(
+static bool take_children_for(
     SceneJSON::NodeData& local_root,
     std::uint64_t local_root_id,
     std::map<std::uint64_t, std::pair<SceneJSON::NodeData, std::optional<std::uint64_t>>>& all_nodes
@@ -201,7 +201,7 @@ SceneJSON::SceneJSON(std::string_view json_path) {
     root_node_data = initialize_root_node_data(root_json.at("nodes"));
 }
 
-void set_properties_to_scene_file_root_node(const std::vector<NodeProperty>& properties, Node& node) {
+static void set_properties_to_scene_file_root_node(const std::vector<NodeProperty>& properties, Node& node) {
     auto node_name = find_node_type_name(node);
 
     if (!node_name.has_value()) {
@@ -217,7 +217,7 @@ void set_properties_to_scene_file_root_node(const std::vector<NodeProperty>& pro
     }
 }
 
-std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data, const CustomNodeType* node_type) {
+static std::unique_ptr<Node> to_node(const SceneJSON::NodeData& data, const CustomNodeType* node_type) {
     std::unique_ptr<Node> result = nullptr;
 
     if (data.type == "scene_file") {

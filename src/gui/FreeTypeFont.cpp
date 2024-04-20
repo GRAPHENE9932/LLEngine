@@ -26,7 +26,7 @@ void destroy_freetype() {
     }
 }
 
-void initialize_freetype() {
+static void initialize_freetype() {
     const auto init_result {FT_Init_FreeType(&ft_lib)};
     if (init_result != 0) {
         throw std::runtime_error(fmt::format(

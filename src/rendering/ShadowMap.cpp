@@ -48,7 +48,7 @@ void ShadowMap::link_to_camera(const CameraNode& camera) {
     return *view_proj_matrix_cache;
 }
 
-[[nodiscard]] std::array<glm::vec4, 8> get_camera_frustum_corners(const CameraNode& camera, float max_distance) {
+[[nodiscard]] static std::array<glm::vec4, 8> get_camera_frustum_corners(const CameraNode& camera, float max_distance) {
     const glm::mat4 proj_inverse = glm::inverse(camera.get_proj_matrix());
     const glm::mat4 view_inverse = glm::inverse(camera.get_view_matrix());
     const float far_corners_coeff = std::min(max_distance / camera.get_far_distance(), 1.0f);
@@ -77,7 +77,7 @@ void ShadowMap::link_to_camera(const CameraNode& camera) {
     return result;
 }
 
-[[nodiscard]] glm::vec4 compute_average_vector(const std::array<glm::vec4, 8>& vectors) {
+[[nodiscard]] static glm::vec4 compute_average_vector(const std::array<glm::vec4, 8>& vectors) {
     glm::vec4 result {0.0f, 0.0f, 0.0f, 0.0f};
     for (const glm::vec4 cur_vec : vectors) {
         result += cur_vec * (1.0f / 8.0f);

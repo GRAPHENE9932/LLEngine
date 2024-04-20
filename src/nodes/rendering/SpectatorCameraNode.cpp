@@ -32,7 +32,7 @@ void SpectatorCameraNode::lock_mouse() {
 /// Angle axis to quaternion conversion, but only around the
 /// X axis (1.0, 0.0, 0.0).
 /// More performant than angle axis with arbitrary axis.
-glm::quat angle_axis_x(float angle) {
+static glm::quat angle_axis_x(float angle) {
     // Angle-axis to quaternion formula:
     // qw = cos(angle / 2)
     // qx = x * sin(angle / 2)
@@ -54,7 +54,7 @@ glm::quat angle_axis_x(float angle) {
 /// Angle axis to quaternion conversion, but only around the
 /// Y axis (0.0, 1.0, 0.0).
 /// More performant than angle axis with arbitrary axis.
-glm::quat angle_axis_y(float angle) {
+static glm::quat angle_axis_y(float angle) {
     // Angle-axis to quaternion formula:
     // qw = cos(angle / 2)
     // qx = x * sin(angle / 2)
@@ -75,14 +75,14 @@ glm::quat angle_axis_y(float angle) {
 
 /// Moves arbitrary angle in range [-PI; PI] without
 /// changing the angle.
-void move_angle_in_bounds(float& angle) {
+static void move_angle_in_bounds(float& angle) {
     if (angle > std::numbers::pi_v<float>)
         angle -= 2.0f * std::numbers::pi_v<float>;
     else if (angle < -std::numbers::pi_v<float>)
         angle += 2.0f * std::numbers::pi_v<float>;
 }
 
-void clamp_x_angle(float& x_angle) {
+static void clamp_x_angle(float& x_angle) {
     move_angle_in_bounds(x_angle);
 
     if (x_angle > glm::radians(90.0f))

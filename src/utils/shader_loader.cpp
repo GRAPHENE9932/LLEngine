@@ -8,7 +8,7 @@
 
 using namespace llengine;
 
-[[nodiscard]] std::stringstream read_file_to_ss(const std::string& file_path) {
+[[nodiscard]] static std::stringstream read_file_to_ss(const std::string& file_path) {
     std::ifstream file_stream;
     file_stream.open(file_path, std::ios::in);
     if (!file_stream) {

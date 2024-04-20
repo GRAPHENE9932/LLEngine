@@ -107,7 +107,7 @@ const Material& PBRDrawableNode::get_material() const {
     return *material;
 }
 
-[[nodiscard]] AABB model_space_to_world_space_aabb(const AABB& model_space_aabb, const glm::mat4& model_matrix) {
+[[nodiscard]] static AABB model_space_to_world_space_aabb(const AABB& model_space_aabb, const glm::mat4& model_matrix) {
     AABB result {
         {
             std::numeric_limits<float>::lowest(),

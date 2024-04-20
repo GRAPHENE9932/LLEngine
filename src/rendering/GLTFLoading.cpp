@@ -40,7 +40,7 @@ struct Header {
 };
 
 /// Returns true in case of success.
-bool check_asset_version(std::string_view version) {
+static bool check_asset_version(std::string_view version) {
     const size_t point_pos = version.find('.');
     if (point_pos == std::string_view::npos)
         return false;
@@ -65,7 +65,7 @@ inline std::string append_paths(std::string_view path_1,
     return (std::filesystem::path(path_1) / std::filesystem::path(path_2)).string();
 }
 
-void construct_texture_params(GLTF& gltf, const json& gltf_json,
+static void construct_texture_params(GLTF& gltf, const json& gltf_json,
         std::string_view gltf_path, std::streamsize bin_buffer_offset) {
     gltf.textures.clear();
 
@@ -131,7 +131,7 @@ void construct_texture_params(GLTF& gltf, const json& gltf_json,
     }
 }
 
-BasicMaterial<uint32_t>::TextureInfo
+static BasicMaterial<uint32_t>::TextureInfo
 handle_texture_info(const json& tex_info_json) {
     BasicMaterial<uint32_t>::TextureInfo result;
     uint32_t tex_coord;
@@ -172,7 +172,7 @@ handle_texture_info(const json& tex_info_json) {
     return result;
 }
 
-BasicMaterial<uint32_t>::NormalMap
+static BasicMaterial<uint32_t>::NormalMap
 handle_normal_texture_info(const json& tex_info_json) {
     return {
         handle_texture_info(tex_info_json),
@@ -180,7 +180,7 @@ handle_normal_texture_info(const json& tex_info_json) {
     };
 }
 
-void construct_material_params(GLTF& gltf, const json& gltf_json) {
+static void construct_material_params(GLTF& gltf, const json& gltf_json) {
     if (!gltf_json.contains("materials"))
         return;
 
@@ -257,7 +257,7 @@ template<glm::length_t C, glm::length_t R, typename T>
 struct is_glm_mat<glm::mat<C, R, T>> : std::true_type {};
 
 template<typename T>
-constexpr GLenum get_component_type() {
+static constexpr GLenum get_component_type() {
     if constexpr (std::is_same<T, int8_t>())
         return GL_BYTE;
     else if constexpr (std::is_same<T, uint8_t>())
@@ -277,7 +277,7 @@ constexpr GLenum get_component_type() {
 }
 
 template<typename T>
-constexpr std::string_view get_accessor_type() {
+static constexpr std::string_view get_accessor_type() {
     if constexpr (std::is_arithmetic<T>()) {
         return "SCALAR";
     }
@@ -314,7 +314,7 @@ struct CommonBufferArgs {
 };
 
 template<typename T>
-std::vector<T> read_from_fine_buffer_view(
+static std::vector<T> read_from_fine_buffer_view(
     const CommonBufferArgs& args,
     const uint32_t buf_view_index,
     const std::uint64_t count,
@@ -361,7 +361,7 @@ std::vector<T> read_from_fine_buffer_view(
 }
 
 template<typename IDX_T, typename VAL_T>
-std::vector<VAL_T> read_from_sparse_buffer_view(
+static std::vector<VAL_T> read_from_sparse_buffer_view(
     const CommonBufferArgs& args,
     const json& sparse_json,
     const std::streamoff offset_in_buffer_view
@@ -398,7 +398,7 @@ std::vector<VAL_T> read_from_sparse_buffer_view(
 }
 
 template<typename T>
-std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& accessor_json) {
+static std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& accessor_json) {
     // Check type and componentType.
     if (accessor_json.at("type").get<std::string_view>() != get_accessor_type<T>())
         throw std::runtime_error("Unexpected accessor type.");
@@ -443,7 +443,7 @@ std::vector<T> read_from_accessor(const CommonBufferArgs& args, const json& acce
 }
 
 template<typename T>
-std::optional<std::vector<T>> load_primitive_attribute(const CommonBufferArgs& args, const json& attributes_json,
+static std::optional<std::vector<T>> load_primitive_attribute(const CommonBufferArgs& args, const json& attributes_json,
         const std::string_view attribute_name) {
     if (!attributes_json.contains(attribute_name))
         return std::nullopt;
@@ -454,7 +454,7 @@ std::optional<std::vector<T>> load_primitive_attribute(const CommonBufferArgs& a
     return read_from_accessor<T>(args, accessor_json);
 }
 
-void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view gltf_path,
+static void construct_mesh_params(GLTF& gltf, const json& gltf_json, std::string_view gltf_path,
                            const std::streamsize bin_chunk_offset) {
     gltf.meshes.clear();
 
@@ -589,7 +589,7 @@ GLTF::Node::Node(
     }
 }
 
-void construct_node_params(GLTF& gltf, const json& gltf_json) {
+static void construct_node_params(GLTF& gltf, const json& gltf_json) {
     if (!gltf_json.contains("nodes"))
         return;
 
@@ -623,7 +623,7 @@ struct ChunkMetadata {
     uint32_t type;
 };
 
-void align_stream(std::istream& stream, const std::streamsize boundary) {
+static void align_stream(std::istream& stream, const std::streamsize boundary) {
     if (boundary <= 1)
         return;
 

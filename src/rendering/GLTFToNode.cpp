@@ -31,13 +31,13 @@ bool GLTF::Node::is_rigid_body() const {
     return extras.has_value() && extras->contains("collider_type");
 }
 
-std::unique_ptr<SpatialNode> to_node(
+static std::unique_ptr<SpatialNode> to_node(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
     const CustomNodeType* node_type
 );
 
 template<bool with_children = true>
-std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
+static std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
     const CustomNodeType* node_type
 ) {
@@ -68,7 +68,7 @@ std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
     return result;
 }
 
-std::unique_ptr<CompleteSpatialNode> construct_complete_spatial(
+static std::unique_ptr<CompleteSpatialNode> construct_complete_spatial(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
     const CustomNodeType* node_type
 ) {
@@ -91,7 +91,7 @@ std::unique_ptr<CompleteSpatialNode> construct_complete_spatial(
 }
 
 // May return a shape from pool.
-std::shared_ptr<Shape>& extract_shape(
+static std::shared_ptr<Shape>& extract_shape(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node
 ) {
     const std::string& collider_type {
@@ -139,7 +139,7 @@ std::shared_ptr<Shape>& extract_shape(
     }
 }
 
-std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
+static std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
     const CustomNodeType* node_type
 ) {
@@ -175,7 +175,7 @@ std::unique_ptr<BulletRigidBodyNode> construct_bullet_rigid_body(
     return result;
 }
 
-std::unique_ptr<SpatialNode> to_node(
+static std::unique_ptr<SpatialNode> to_node(
     ConstructionEnvironment& constr_env, const GLTF::Node& gltf_node,
     const CustomNodeType* node_type
 ) {
@@ -190,7 +190,7 @@ std::unique_ptr<SpatialNode> to_node(
     }
 }
 
-std::shared_ptr<Mesh> construct_mesh(const GLTF::MeshParameters& mesh_params) {
+static std::shared_ptr<Mesh> construct_mesh(const GLTF::MeshParameters& mesh_params) {
     std::shared_ptr<Mesh> result = std::make_shared<Mesh>();
 
     if (std::holds_alternative<std::vector<uint16_t>>(mesh_params.indices)) {
@@ -217,7 +217,7 @@ std::shared_ptr<Mesh> construct_mesh(const GLTF::MeshParameters& mesh_params) {
     return result;
 }
 
-std::optional<Material::TextureInfo>
+static std::optional<Material::TextureInfo>
 construct_texture_info(const std::optional<BasicMaterial<uint32_t>::TextureInfo>& tex_info_params,
         const std::vector<std::shared_ptr<Texture>>& textures) {
     if (!tex_info_params.has_value())
@@ -230,7 +230,7 @@ construct_texture_info(const std::optional<BasicMaterial<uint32_t>::TextureInfo>
     });
 }
 
-std::optional<Material::SingleChannelTextureInfo>
+static std::optional<Material::SingleChannelTextureInfo>
 construct_texture_info(const std::optional<BasicMaterial<uint32_t>::SingleChannelTextureInfo>& tex_info_params,
         const std::vector<std::shared_ptr<Texture>>& textures) {
     if (!tex_info_params.has_value())
@@ -244,7 +244,7 @@ construct_texture_info(const std::optional<BasicMaterial<uint32_t>::SingleChanne
     });
 }
 
-std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_params,
+static std::shared_ptr<Material> construct_material(const BasicMaterial<uint32_t>& mat_params,
         const std::vector<std::shared_ptr<Texture>>& textures) {
     std::shared_ptr<Material> result = std::make_shared<Material>();
 

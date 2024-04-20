@@ -32,7 +32,7 @@ private:
     ktxTexture* ptr = nullptr;
 };
 
-std::string ktx_error_to_string(KTX_error_code error) {
+static std::string ktx_error_to_string(KTX_error_code error) {
     switch (error) {
     case KTX_SUCCESS:
         return "KTX_SUCCESS";
@@ -77,7 +77,7 @@ std::string ktx_error_to_string(KTX_error_code error) {
     }
 }
 
-[[nodiscard]] std::unique_ptr<std::uint8_t[]> read_to_memory(const TexLoadingParams& params, std::streamsize& size_out) {
+[[nodiscard]] static std::unique_ptr<std::uint8_t[]> read_to_memory(const TexLoadingParams& params, std::streamsize& size_out) {
     if (params.size == 0) {
         size_out = std::filesystem::file_size(params.file_path) - params.offset;
     }

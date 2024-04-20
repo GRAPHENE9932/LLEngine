@@ -20,7 +20,7 @@ std::atomic<logger::Severity> minimum_file_log_severity {logger::WARNING};
 
 std::mutex io_mutex;
 
-[[nodiscard]] std::string severity_to_string(logger::Severity severity) {
+[[nodiscard]] static std::string severity_to_string(logger::Severity severity) {
     switch (severity) {
     case logger::Severity::INFO:
         return "INFO ";

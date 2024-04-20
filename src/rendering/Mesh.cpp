@@ -52,7 +52,7 @@ void Mesh::unbind_vao(bool unbind_uv, bool unbind_normals, bool unbind_tangents)
 }
 
 template<typename T, GLenum TARGET>
-BufferID handle_buffer(std::vector<T>& buffer) {
+static BufferID handle_buffer(std::vector<T>& buffer) {
     BufferID buffer_id;
 
     glGenBuffers(1, &buffer_id);
@@ -278,7 +278,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
     return *this;
 }
 
-void bind_vertex_attrib_pointer(GLuint buffer_id, GLuint vertex_attrib_index, GLint size) {
+static void bind_vertex_attrib_pointer(GLuint buffer_id, GLuint vertex_attrib_index, GLint size) {
     if (buffer_id != 0) {
         glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
         glVertexAttribPointer(vertex_attrib_index, size, GL_FLOAT, GL_FALSE, 0, 0);

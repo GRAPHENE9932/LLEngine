@@ -462,7 +462,7 @@ constexpr std::array<std::uint8_t, 10> RADIANCE_RGBE_IDENTIFIER {
 };
 
 template<std::size_t ArraySize>
-[[nodiscard]] bool stream_starts_with(std::istream& stream, const std::array<std::uint8_t, ArraySize> data) {
+[[nodiscard]] static bool stream_starts_with(std::istream& stream, const std::array<std::uint8_t, ArraySize> data) {
     std::array<std::uint8_t, ArraySize> read_data;
     stream.read(reinterpret_cast<char*>(read_data.data()), ArraySize);
     stream.seekg(-static_cast<std::istream::off_type>(ArraySize), std::ios_base::cur);

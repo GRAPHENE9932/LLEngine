@@ -26,7 +26,7 @@ using namespace llengine;
     return {result_vec2, z_coordinate};
 }
 
-[[nodiscard]] GUITransform::OriginX origin_x_from_string(std::string_view string) {
+[[nodiscard]] static GUITransform::OriginX origin_x_from_string(std::string_view string) {
     if (string == "left") {
         return GUITransform::OriginX::LEFT;
     }
@@ -44,7 +44,7 @@ using namespace llengine;
     }
 }
 
-[[nodiscard]] GUITransform::OriginY origin_y_from_string(std::string_view string) {
+[[nodiscard]] static GUITransform::OriginY origin_y_from_string(std::string_view string) {
     if (string == "bottom") {
         return GUITransform::OriginY::BOTTOM;
     }
@@ -62,7 +62,7 @@ using namespace llengine;
     }
 }
 
-[[nodiscard]] GUITransform::SizeMode size_mode_from_string(std::string_view string) {
+[[nodiscard]] static GUITransform::SizeMode size_mode_from_string(std::string_view string) {
     if (string == "absolute") {
         return GUITransform::SizeMode::ABSOLUTE;
     }

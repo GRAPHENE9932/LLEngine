@@ -15,7 +15,7 @@ namespace llengine {
 constexpr std::string_view RGBE_IDENTIFIER {"#?RADIANCE"};
 
 template<typename InputIter, typename OutputIter>
-void rgbe_to_rgb(
+static void rgbe_to_rgb(
     InputIter rgbe_data_begin, InputIter rgbe_data_end,
     OutputIter rgb_data_begin
 ) {
@@ -33,7 +33,7 @@ void rgbe_to_rgb(
     }
 }
 
-std::vector<float> read_run_length_encoded_data(
+static std::vector<float> read_run_length_encoded_data(
     std::uint32_t width,
     std::uint32_t height,
     std::ifstream& stream
@@ -100,7 +100,7 @@ std::vector<float> read_run_length_encoded_data(
     return result;
 }
 
-std::vector<float> get_rgb_data(
+static std::vector<float> get_rgb_data(
     std::uint32_t width,
     std::uint32_t height,
     std::ifstream& stream
@@ -130,7 +130,7 @@ std::vector<float> get_rgb_data(
     }
 }
 
-GLuint initialize_opengl_texture(
+static GLuint initialize_opengl_texture(
     std::uint32_t width,
     std::uint32_t height,
     const TexLoadingParams& params,
@@ -157,7 +157,7 @@ GLuint initialize_opengl_texture(
     return texture_id;
 }
 
-std::optional<std::pair<std::string_view, std::string_view>>
+static std::optional<std::pair<std::string_view, std::string_view>>
 parse_header_variable(std::string_view line_with_variable) {
     std::size_t equal_sign_index = line_with_variable.find('=');
     if (equal_sign_index == std::string_view::npos) {

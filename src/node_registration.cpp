@@ -29,7 +29,7 @@ void llengine::begin_nodes_registration() {
     register_builtin_nodes();
 }
 
-void find_parents_for_every_type() {
+static void find_parents_for_every_type() {
     for (auto& current : custom_nodes_map) {
         auto iter_to_parent = std::find_if(
             custom_nodes_map.begin(), custom_nodes_map.end(),

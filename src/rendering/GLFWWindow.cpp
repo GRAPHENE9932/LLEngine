@@ -63,7 +63,7 @@ static void initialize_opengl() {
 #endif
 }
 
-void terminate_glfw() {
+static void terminate_glfw() {
     glfwTerminate();
 }
 
