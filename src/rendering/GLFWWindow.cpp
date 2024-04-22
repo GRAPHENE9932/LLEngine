@@ -43,11 +43,6 @@ static void initialize_glew() {
 }
 
 static void initialize_opengl() {
-    // Create the VAO.
-    GLuint vertex_array_id;
-    glGenVertexArrays(1, &vertex_array_id);
-    glBindVertexArray(vertex_array_id);
-
     // Enable depth test.
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
