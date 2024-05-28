@@ -11,10 +11,10 @@
 using namespace llengine;
 
 constexpr std::string_view VERTEX_SHADOW_MAPPING_SHADER_TEXT =
-    #include "shaders/shadow_mapping.vert"
+    #include "shaders/misc/shadow_mapping.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADOW_MAPPING_SHADER_TEXT =
-    #include "shaders/shadow_mapping.frag"
+    #include "shaders/misc/shadow_mapping.frag"
 ;
 
 static PBRShaderManager pbr_shader_manager;

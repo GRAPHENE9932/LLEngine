@@ -8,10 +8,10 @@
 using namespace llengine;
 
 constexpr std::string_view VERTEX_SHADER_TEXT =
-    #include "shaders/skybox.vert"
+    #include "shaders/misc/skybox.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/skybox.frag"
+    #include "shaders/misc/skybox.frag"
 ;
 
 LazyShader<Skybox::ShaderType> Skybox::shader = {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};

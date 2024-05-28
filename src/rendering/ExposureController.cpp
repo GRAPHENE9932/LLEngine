@@ -56,9 +56,9 @@ ExposureController::ExposureController(glm::u32vec2 luminance_fb_size) {
 
 void ExposureController::render_to_luminance_fb(const Texture& main_color_texture) const {
     static Shader<"source_texture"> shader(
-        #include "shaders/luminance_computation_shader.vert"
+        #include "shaders/postprocessing/luminance_computation_shader.vert"
         ,
-        #include "shaders/luminance_computation_shader.frag"
+        #include "shaders/postprocessing/luminance_computation_shader.frag"
     );
 
     shader.use_shader();

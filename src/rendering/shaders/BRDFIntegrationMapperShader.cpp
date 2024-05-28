@@ -4,10 +4,10 @@
 using namespace llengine;
 
 constexpr std::string_view VERTEX_SHADER_TEXT = 
-    #include "shaders/brdf_integration_mapper.vert"
+    #include "shaders/objects/pbr/brdf_integration_mapper.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/brdf_integration_mapper.frag"
+    #include "shaders/objects/pbr/brdf_integration_mapper.frag"
 ;
 
 BRDFIntegrationMapperShader::BRDFIntegrationMapperShader() {

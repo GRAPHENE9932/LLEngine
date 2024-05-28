@@ -14,10 +14,10 @@ using ExplosionParticlesShader = Shader<
 >;
 
 constexpr std::string_view VERTEX_SHADER_TEXT =
-    #include "shaders/explosion_particles.vert"
+    #include "shaders/particles/explosion_particles.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/explosion_particles.frag"
+    #include "shaders/particles/explosion_particles.frag"
 ;
 
 static LazyShader<ExplosionParticlesShader> shader = {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};

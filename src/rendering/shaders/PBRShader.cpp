@@ -11,10 +11,10 @@
 using namespace llengine;
 
 constexpr std::string_view VERTEX_SHADER_TEXT =
-    #include "shaders/pbr_shader.vert"
+    #include "shaders/objects/pbr/pbr_shader.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/pbr_shader.frag"
+    #include "shaders/objects/pbr/pbr_shader.frag"
 ;
 
 PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {

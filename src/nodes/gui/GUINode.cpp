@@ -16,10 +16,10 @@
 using namespace llengine;
 
 constexpr std::string_view VERTEX_SHADER_TEXT =
-    #include "shaders/gui_rectangle.vert"
+    #include "shaders/gui/gui_rectangle.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/gui_rectangle.frag"
+    #include "shaders/gui/gui_rectangle.frag"
 ;
 
 LazyShader<GUINode::ShaderType> GUINode::shader {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};

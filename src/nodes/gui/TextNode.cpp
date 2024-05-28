@@ -9,10 +9,10 @@
 using namespace llengine;
 
 constexpr std::string_view VERTEX_SHADER_TEXT =
-    #include "shaders/colored_text.vert"
+    #include "shaders/gui/colored_text.vert"
 ;
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
-    #include "shaders/colored_text.frag"
+    #include "shaders/gui/colored_text.frag"
 ;
 
 LazyShader<TextNode::ShaderType> TextNode::shader = {VERTEX_SHADER_TEXT, FRAGMENT_SHADER_TEXT};

@@ -83,10 +83,10 @@ auto draw_to_cubemap(
 }
 
 constexpr std::string_view EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT =
-    #include "shaders/equirectangular_mapper.vert"
+    #include "shaders/misc/equirectangular_mapper.vert"
 ;
 constexpr std::string_view EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT =
-    #include "shaders/equirectangular_mapper.frag"
+    #include "shaders/misc/equirectangular_mapper.frag"
 ;
 static LazyShader<Shader<"mvp">> equirectangular_mapper_shader {EQUIRECTANGULAR_MAPPER_VERTEX_SHADER_TEXT, EQUIRECTANGULAR_MAPPER_FRAGMENT_SHADER_TEXT};
 
@@ -114,10 +114,10 @@ static LazyShader<Shader<"mvp">> equirectangular_mapper_shader {EQUIRECTANGULAR_
 }
 
 constexpr std::string_view IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT =
-    #include "shaders/irradiance_precomputer.vert"
+    #include "shaders/objects/pbr/irradiance_precomputer.vert"
 ;
 constexpr std::string_view IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT =
-    #include "shaders/irradiance_precomputer.frag"
+    #include "shaders/objects/pbr/irradiance_precomputer.frag"
 ;
 static LazyShader<Shader<"mvp">> irradiance_precomputer_shader {IRRADIANCE_PRECOMPUTER_VERTEX_SHADER_TEXT, IRRADIANCE_PRECOMPUTER_FRAGMENT_SHADER_TEXT};
 
@@ -146,10 +146,10 @@ constexpr glm::u32vec2 IRRADIANCE_MAP_SIZE {16u, 16u};
 }
 
 constexpr std::string_view SPECULAR_PREFILTER_VERTEX_SHADER_TEXT =
-    #include "shaders/specular_prefilter.vert"
+    #include "shaders/objects/pbr/specular_prefilter.vert"
 ;
 constexpr std::string_view SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT =
-    #include "shaders/specular_prefilter.frag"
+    #include "shaders/objects/pbr/specular_prefilter.frag"
 ;
 static LazyShader<Shader<"mvp", "roughness">> specular_prefilter_shader {SPECULAR_PREFILTER_VERTEX_SHADER_TEXT, SPECULAR_PREFILTER_FRAGMENT_SHADER_TEXT};
 
@@ -181,10 +181,10 @@ constexpr std::int32_t SPECULAR_MAP_MIPMAP_LEVELS = 9; // log2(256) + 1. Also ch
 }
 
 constexpr std::string_view BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT =
-    #include "shaders/brdf_integration_mapper.vert"
+    #include "shaders/objects/pbr/brdf_integration_mapper.vert"
 ;
 constexpr std::string_view BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT =
-    #include "shaders/brdf_integration_mapper.frag"
+    #include "shaders/objects/pbr/brdf_integration_mapper.frag"
 ;
 static LazyShader<Shader<>> brdf_integration_mapper_shader {BRDF_INTEGRATION_MAPPER_VERTEX_SHADER_TEXT, BRDF_INTEGRATION_MAPPER_FRAGMENT_SHADER_TEXT};
 

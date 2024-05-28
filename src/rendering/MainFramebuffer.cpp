@@ -54,9 +54,9 @@ void MainFramebuffer::render_to_window(float delta_time) {
 
     glDisable(GL_DEPTH_TEST);
     static Shader<"main_image", "bloom_image", "exposure"> postprocessing_shader(
-        #include "shaders/postprocessing.vert"
+        #include "shaders/postprocessing/postprocessing.vert"
         ,
-        #include "shaders/postprocessing.frag"
+        #include "shaders/postprocessing/postprocessing.frag"
     );
     postprocessing_shader.use_shader();
     postprocessing_shader.bind_2d_texture<"main_image">(get_color_texture().get_id(), 0);
@@ -141,9 +141,9 @@ static glm::vec3 compute_average_color(const std::vector<Texture>& color_attachm
 void MainFramebuffer::generate_lods_for_color_attachment() {
     glDisable(GL_DEPTH_TEST);
     static Shader<"previous_lod"> main_fb_color_downsample_shader(
-        #include "shaders/main_fb_color_downsample.vert"
+        #include "shaders/postprocessing/main_fb_color_downsample.vert"
         ,
-        #include "shaders/main_fb_color_downsample.frag"
+        #include "shaders/postprocessing/main_fb_color_downsample.frag"
     );
 
     main_fb_color_downsample_shader.use_shader();

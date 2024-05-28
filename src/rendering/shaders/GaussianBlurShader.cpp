@@ -7,10 +7,10 @@
 
 namespace llengine {
 constexpr std::string_view VERT_SHADER_TEXT =
-    #include "shaders/gaussian_blur.vert"
+    #include "shaders/postprocessing/gaussian_blur.vert"
 ;
 constexpr std::string_view FRAG_SHADER_TEXT =
-    #include "shaders/gaussian_blur.frag"
+    #include "shaders/postprocessing/gaussian_blur.frag"
 ;
 
 std::array<float, 128> GAUSS_BLUR_KERNEL = {
