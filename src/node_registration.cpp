@@ -4,6 +4,7 @@
 #include <logger.hpp>
 
 #include <map>
+#include <algorithm>
 
 using namespace llengine;
 using namespace llengine::internal;
