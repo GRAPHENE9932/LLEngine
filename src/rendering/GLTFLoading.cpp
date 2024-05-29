@@ -5,9 +5,11 @@
 
 #include <glm/vec3.hpp>
 #include <nlohmann/json.hpp>
+#include <fmt/format.h>
 
 #include <GL/glew.h>
 #include "GLTF.hpp"
+#include "logger.hpp"
 #include "utils/json_conversion.hpp"
 
 using namespace llengine;
@@ -29,8 +31,8 @@ constexpr glm::quat DEFAULT_ROTATION = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
 constexpr std::string_view TEXTURES_LOCATION = "res/textures";
 
-constexpr std::array<std::string_view, 2> SUPPORTED_EXTENSIONS {
-    "KHR_texture_transform", "KHR_texture_basisu"
+constexpr std::array<std::string_view, 3> SUPPORTED_EXTENSIONS {
+    "KHR_texture_transform", "KHR_texture_basisu", "KHR_materials_emissive_strength"
 };
 
 struct Header {
@@ -238,7 +240,11 @@ static void construct_material_params(GLTF& gltf, const json& gltf_json) {
             result.emissive_texture = std::nullopt;
         }
 
-        result.emissive_factor = get_optional<glm::vec3>(cur_json, "emissiveFactor", {0.0f, 0.0f, 0.0f});
+        float emissive_strength = 1.0f;
+        if (cur_json.contains("extensions") && cur_json["extensions"].contains("KHR_materials_emissive_strength")) {
+            emissive_strength = cur_json["extensions"]["KHR_materials_emissive_strength"].at("emissiveStrength").get<float>();
+        }
+        result.emissive_factor = get_optional<glm::vec3>(cur_json, "emissiveFactor", {0.0f, 0.0f, 0.0f}) * emissive_strength;
 
         gltf.materials.push_back(result);
     }
