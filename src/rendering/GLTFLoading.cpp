@@ -669,6 +669,24 @@ GLTF::GLTF(std::string_view file_path) {
         }
     }
 
+    // Check for unrequired unsupported extensions.
+    if (json_chunk.contains("extensionsUsed")) {
+        for (const json& cur_extension : json_chunk["extensionsUsed"]) {
+            const bool is_extension_supported {
+                std::find(SUPPORTED_EXTENSIONS.begin(), SUPPORTED_EXTENSIONS.end(), cur_extension.get<std::string_view>()) !=
+                SUPPORTED_EXTENSIONS.end()
+            };
+
+            if (!is_extension_supported) {
+                logger::warning(fmt::format(
+                    "Unsupported unrequired extension \"{}\" in the \"{}\" glTF file.",
+                    cur_extension.get<std::string_view>(),
+                    file_path
+                ));
+            }
+        }
+    }
+
     // Parse the binary chunk metadata.
     if (stream.peek() != std::ifstream::traits_type::eof()) {
         align_stream(stream, 4);
