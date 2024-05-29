@@ -67,7 +67,9 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
         (flags & PBRShader::USING_NORMAL_TEXTURE) ||
         (flags & PBRShader::USING_AO_TEXTURE) ||
         (flags & PBRShader::USING_METALLIC_TEXTURE) ||
-        (flags & PBRShader::USING_ROUGHNESS_TEXTURE)) {
+        (flags & PBRShader::USING_ROUGHNESS_TEXTURE) ||
+        (flags & PBRShader::USING_EMISSIVE_TEXTURE)
+        ) {
         flags |= PBRShader::USING_UV;
     }
     if (material.has_offsets_and_scales()) {
