@@ -329,7 +329,11 @@ void main() {
     #ifdef USING_IBL
     {
         // Diffuse part.
-        vec3 reflection_ratio = fresnel_schlick_considering_roughness(max(dot(get_normal(), view_direction), 0.0), refl_ratio_at_zero_inc, get_roughness());
+        vec3 reflection_ratio = fresnel_schlick_considering_roughness(
+            max(dot(get_normal(), view_direction), 0.0),
+            refl_ratio_at_zero_inc,
+            get_roughness()
+        );
         vec3 refraction_ratio = (vec3(1.0) - reflection_ratio) * (1.0 - get_metallic());
         vec3 ambient_irradiance = texture(irradiance_map, get_normal()).rgb;
         vec3 diffuse = ambient_irradiance * get_base_color().rgb;
@@ -337,7 +341,10 @@ void main() {
         // Specular part.
         vec3 reflection = reflect(-view_direction, get_normal());
         vec3 prefiltered_color = textureLod(prefiltered_specular_map, reflection, get_roughness() * LAST_PREFILTERED_MIPMAP_LEVEL).rgb;
-        vec2 env_brdf = texture(brdf_integration_map, vec2(max(dot(get_normal(), view_direction), 0.0))).rg;
+        vec2 env_brdf = texture(brdf_integration_map, vec2(
+            get_roughness(),
+            max(dot(get_normal(), view_direction), 0.0)
+        )).rg;
         vec3 specular = prefiltered_color * (reflection_ratio * env_brdf.x + env_brdf.y);
 
         // Combine diffuse part, specular part and ambient occlusion.
