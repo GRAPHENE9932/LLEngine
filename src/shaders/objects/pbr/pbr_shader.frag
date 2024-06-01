@@ -183,7 +183,7 @@ float get_metallic() {
         #ifdef USING_METALLIC_FACTOR
             return metallic_factor;
         #else
-            return 0.0;
+            return 1.0;
         #endif
     #endif
 }
