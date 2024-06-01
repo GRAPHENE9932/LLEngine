@@ -37,7 +37,6 @@ set(SOURCES
     src/rendering/Skybox.cpp
     src/rendering/shaders/PBRShaderManager.cpp
     src/rendering/shaders/PBRShader.cpp
-    src/rendering/shaders/BRDFIntegrationMapperShader.cpp
     src/rendering/shaders/GaussianBlurShader.cpp
     src/rendering/GLTFLoading.cpp
     src/rendering/RenderingServer.cpp
@@ -152,6 +151,9 @@ set(PUBLIC_HEADERS
 find_package(Threads)
 add_library(llengine SHARED ${SOURCES})
 set_target_properties(llengine PROPERTIES PUBLIC_HEADER PUBLIC_HEADERS)
+
+#target_compile_options(llengine PUBLIC -fsanitize=address)
+#target_link_options(llengine PUBLIC -fsanitize=address)
 
 # Enable warnings.
 if (MSVC)
