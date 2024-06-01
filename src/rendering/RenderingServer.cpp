@@ -32,7 +32,9 @@ void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
     }
 
     this->skybox = std::make_unique<Skybox>(cubemap);
+    this->global_lighting_environment.set_base_cubemap(cubemap);
 }
+
 void RenderingServer::main_loop() {
     glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 
@@ -211,46 +213,6 @@ void RenderingServer::unregister_point_light(PointLightNode* point_light) noexce
     return main_framebuffer->get_exposure();
 }
 
-std::optional<std::reference_wrapper<const Texture>>
-RenderingServer::get_environment_cubemap(const glm::vec3& camera_position) {
-    if (skybox) {
-        return skybox->get_texture();
-    }
-    else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::reference_wrapper<const Texture>>
-RenderingServer::get_irradiance_map(const glm::vec3& obj_position) {
-    auto env_cubemap {get_environment_cubemap(obj_position)};
-
-    if (!env_cubemap.has_value()) {
-        return std::nullopt;
-    }
-    if (!irradiance_map) {
-        logger::info("Starting computing the irradiance map.");
-        irradiance_map = tex_utils::compute_irradiance_map(env_cubemap->get());
-        logger::info("Finished computing the irradiance map.");
-    }
-    return *irradiance_map;
-}
-
-std::optional<std::reference_wrapper<const Texture>>
-RenderingServer::get_prefiltered_specular_map(const glm::vec3& obj_position) {
-    auto env_cubemap {get_environment_cubemap(obj_position)};
-
-    if (!env_cubemap.has_value()) {
-        return std::nullopt;
-    }
-    if (!prefiltered_specular_map) {
-        logger::info("Starting computing the prefiltered specular map.");
-        prefiltered_specular_map = tex_utils::compute_prefiltered_specular_map(env_cubemap->get());
-        logger::info("Finished computing the prefiltered specular map.");
-    }
-    return *prefiltered_specular_map;
-}
-
 const Texture& RenderingServer::get_brdf_integration_map() {
     if (!brdf_integration_map) {
         logger::info("Starting computing the BRDF integration map.");
@@ -263,10 +225,6 @@ const Texture& RenderingServer::get_brdf_integration_map() {
 [[nodiscard]] FramebufferID RenderingServer::get_current_default_framebuffer_id() {
     assert(current_default_framebuffer != nullptr);
     return current_default_framebuffer->get_framebuffer_id();
-}
-
-bool RenderingServer::has_environment_cubemap() {
-    return skybox != nullptr;
 }
 
 void RenderingServer::draw_non_overlay_objects() {

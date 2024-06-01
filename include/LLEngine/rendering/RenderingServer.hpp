@@ -10,6 +10,7 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 
 #include "QualitySettings.hpp"
+#include "rendering/LightingEnvironment.hpp"
 #include "rendering/ShadowMap.hpp"
 #include "rendering/Window.hpp" // Window
 #include "rendering/Skybox.hpp" // Skybox
@@ -141,15 +142,9 @@ public:
         return window;
     }
 
-    [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
-    get_environment_cubemap(const glm::vec3& obj_position);
-    [[nodiscard]] bool has_environment_cubemap();
-
-    [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
-    get_irradiance_map(const glm::vec3& obj_position);
-
-    [[nodiscard]] std::optional<std::reference_wrapper<const Texture>>
-    get_prefiltered_specular_map(const glm::vec3& obj_position);
+    [[nodiscard]] LightingEnvironment& get_global_lighting_environment() {
+        return global_lighting_environment;
+    }
 
     [[nodiscard]] const Texture& get_brdf_integration_map();
 
@@ -174,10 +169,11 @@ private:
 
     // Non-owning pointer to the current camera node.
     CameraNode* camera = nullptr;
+
     std::unique_ptr<Skybox> skybox = nullptr;
-    std::optional<Texture> irradiance_map = std::nullopt;
-    std::optional<Texture> prefiltered_specular_map = std::nullopt;
+    LightingEnvironment global_lighting_environment;
     std::optional<Texture> brdf_integration_map = std::nullopt;
+
     std::vector<Drawable*> drawables;
     std::vector<GUICanvas*> gui_canvases;
     std::vector<PointLightNode*> point_lights;

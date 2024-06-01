@@ -52,6 +52,7 @@ set(SOURCES
     src/rendering/BloomFramebuffer.cpp
     src/rendering/ShadowMap.cpp
     src/rendering/ExposureController.cpp
+    src/rendering/LightingEnvironment.cpp
     src/physics/BulletPhysicsServer.cpp
     src/utils/shader_loader.cpp
     src/utils/texture_utils.cpp

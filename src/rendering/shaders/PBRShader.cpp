@@ -57,7 +57,7 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     if (material.emissive_factor != glm::vec3(0.0f, 0.0f, 0.0f)) {
         flags |= PBRShader::USING_EMISSIVE_FACTOR;
     }
-    if (rs.has_environment_cubemap()) {
+    if (rs.get_global_lighting_environment().get_base_cubemap() != nullptr) {
         flags |= PBRShader::USING_IBL;
     }
     if (!rs.get_point_lights().empty() || flags & PBRShader::USING_IBL) {
@@ -301,12 +301,12 @@ void PBRShader::use_shader(
         shader->bind_2d_texture<"emissive_texture">(material.emissive_texture.value().texture->get_id(), texture_unit++);
     }
     if (shader->is_uniform_initialized<"prefiltered_specular_map">()) {
-        auto prefiltered_specular_map_id = rs.get_prefiltered_specular_map(camera_position).value().get().get_id();
+        auto prefiltered_specular_map_id = rs.get_global_lighting_environment().get_prefiltered_specular_map().value().get_id();
         shader->use_shader();
         shader->bind_cubemap_texture<"prefiltered_specular_map">(prefiltered_specular_map_id, texture_unit++);
     }
     if (shader->is_uniform_initialized<"irradiance_map">()) {
-        auto irradiance_map_id = rs.get_irradiance_map(camera_position).value().get().get_id();
+        auto irradiance_map_id = rs.get_global_lighting_environment().get_irradiance_map().value().get_id();
         shader->use_shader();
         shader->bind_cubemap_texture<"irradiance_map">(irradiance_map_id, texture_unit++);
     }
