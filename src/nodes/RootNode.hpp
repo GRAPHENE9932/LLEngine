@@ -8,7 +8,7 @@ class BulletPhysicsServer;
 
 class RootNode : public SpatialNode {
 public:
-    RootNode(RenderingServer& rs, BulletPhysicsServer& bps) : rendering_server(rs), bullet_physics_server(bps) {}
+    RootNode(BulletPhysicsServer& bps) : bullet_physics_server(bps) {}
 
     void set_translation(const glm::vec3& new_trans) final override {};
     void translate(const glm::vec3& translation) final override {};
@@ -47,9 +47,6 @@ public:
         return Transform().calculate_matrix();
     }
 
-    [[nodiscard]] RenderingServer& get_rendering_server() const noexcept {
-        return rendering_server;
-    }
     [[nodiscard]] BulletPhysicsServer& get_bullet_physics_server() const noexcept {
         return bullet_physics_server;
     }
@@ -59,7 +56,6 @@ public:
     }
 
 private:
-    RenderingServer& rendering_server;
     BulletPhysicsServer& bullet_physics_server;
 };
 }

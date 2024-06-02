@@ -26,25 +26,23 @@ void MainCamera::start() {
     glowing_cube->set_name("Glowing cube");
     get_parent()->queue_add_child(std::move(llengine::node_cast<llengine::SpatialNode>(std::move(glowing_cube))));
 
-    get_rendering_server().get_window().disable_cursor();
+    llengine::rs().get_window().disable_cursor();
 }
 
 void MainCamera::update() {
-    auto& rs = get_rendering_server();
-
-    if (rs.is_mouse_button_pressed(0) && !clicked_before) {
+    if (llengine::rs().is_mouse_button_pressed(0) && !clicked_before) {
         spawn_barrel();
         clicked_before = true;
     }
 
-    if (!rs.is_mouse_button_pressed(0)) {
+    if (!llengine::rs().is_mouse_button_pressed(0)) {
         clicked_before = false;
     }
 }
 
 void MainCamera::on_keyboard_key_press(llengine::Key key) {
     if (key == llengine::Key::Q) {
-        get_rendering_server().stop();
+        llengine::rs().stop();
     }
     else if (key == llengine::Key::ESCAPE) {
         if (is_mouse_locked()) {

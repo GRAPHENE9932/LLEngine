@@ -17,7 +17,7 @@ constexpr std::string_view FRAGMENT_SHADER_TEXT =
     #include "shaders/objects/pbr/pbr_shader.frag"
 ;
 
-PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
+PBRShader::Flags compute_flags(const Material& material) {
     PBRShader::Flags flags = PBRShader::NO_FLAGS;
 
     if (material.base_color_texture.has_value()) {
@@ -57,10 +57,10 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
     if (material.emissive_factor != glm::vec3(0.0f, 0.0f, 0.0f)) {
         flags |= PBRShader::USING_EMISSIVE_FACTOR;
     }
-    if (rs.get_global_lighting_environment().get_base_cubemap() != nullptr) {
+    if (rs().get_global_lighting_environment().get_base_cubemap() != nullptr) {
         flags |= PBRShader::USING_IBL;
     }
-    if (!rs.get_point_lights().empty() || flags & PBRShader::USING_IBL) {
+    if (!rs().get_point_lights().empty() || flags & PBRShader::USING_IBL) {
         flags |= PBRShader::USING_FRAGMENT_POSITION;
     }
     if ((flags & PBRShader::USING_BASE_COLOR_TEXTURE) ||
@@ -84,7 +84,7 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
             flags |= PBRShader::USING_AO_UV_TRANSFORM;
         }
     }
-    if (rs.is_shadow_mapping_enabled()) {
+    if (rs().is_shadow_mapping_enabled()) {
         flags |= PBRShader::USING_SHADOW_MAP;
     }
 
@@ -92,10 +92,10 @@ PBRShader::Flags compute_flags(RenderingServer& rs, const Material& material) {
 }
 
 PBRShader::Parameters
-PBRShader::to_parameters(RenderingServer& rs, const Material& material) noexcept {
+PBRShader::to_parameters(const Material& material) noexcept {
     Parameters result {
-        static_cast<uint32_t>(rs.get_point_lights().size()),
-        compute_flags(rs, material)
+        static_cast<uint32_t>(rs().get_point_lights().size()),
+        compute_flags(material)
     };
 
     result.metallic_channel = material.metallic_texture.has_value() ?
@@ -197,12 +197,13 @@ void PBRShader::initialize(const Parameters& params) {
 }
 
 void PBRShader::use_shader(
-    RenderingServer& rs,
     const Material& material, const glm::mat4& mvp_matrix,
     const glm::mat4& model_matrix, const glm::vec3& camera_position
 ) const {
     assert(is_initialized());
     assert(shader.has_value());
+
+    RenderingServer& rs = RenderingServer::current();
 
     shader->use_shader();
     shader->set_mat4<"mvp">(mvp_matrix);

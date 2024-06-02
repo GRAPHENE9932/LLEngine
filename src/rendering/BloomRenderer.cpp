@@ -65,7 +65,7 @@ void BloomRenderer::render_to_bloom_texture(std::span<const Texture> source_text
     do_horizontal_blur(source_texture_lods, bloom_radius);
     do_vertical_blur(bloom_radius);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
+    glBindFramebuffer(GL_FRAMEBUFFER, rs()._get_main_framebuffer_id());
     glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
 }
 

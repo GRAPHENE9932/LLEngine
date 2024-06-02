@@ -10,10 +10,10 @@ using namespace llengine;
 
 void Node::enable_on_keyboard_key(bool enable) {
     if (!on_key_press_release_listening && enable) {
-        get_rendering_server().get_window().subscribe_to_keyboard_key_event(*this);
+        rs().get_window().subscribe_to_keyboard_key_event(*this);
     }
     else if (on_key_press_release_listening && !enable) {
-        get_rendering_server().get_window().unsubscribe_from_keyboard_key_event(*this);
+        rs().get_window().unsubscribe_from_keyboard_key_event(*this);
     }
     on_key_press_release_listening = enable;
 }
@@ -58,28 +58,6 @@ void Node::copy_to(Node& node) const {
 void Node::register_properties() {
     register_custom_property<Node>("node", "name", &Node::set_name_property);
     register_custom_property<Node>("node", "enabled", &Node::set_enabled_property);
-}
-
-[[nodiscard]] RenderingServer& Node::get_rendering_server() const {
-    if (auto result = get_rendering_server_optional()) {
-        return *result;
-    }
-    else {
-        throw std::runtime_error(fmt::format(
-            "Failed to get rendering server for a node \"{}\".",
-            get_name()
-        ));
-    }
-}
-
-[[nodiscard]] RenderingServer* Node::get_rendering_server_optional() const {
-    if (cached_rendering_server == nullptr) {
-        if (RootNode* root = get_root_node_optional()) {
-            cached_rendering_server = &root->get_rendering_server();
-        }
-    }
-
-    return cached_rendering_server;
 }
 
 [[nodiscard]] RootNode& Node::get_root_node() const {

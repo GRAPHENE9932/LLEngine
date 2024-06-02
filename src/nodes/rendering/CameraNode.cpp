@@ -133,7 +133,7 @@ void CameraNode::set_near_distance(float near_distance) {
 
 void CameraNode::_on_attachment_to_tree_without_start() {
     SpatialNode::_on_attachment_to_tree_without_start();
-    get_rendering_server().register_camera_node(this);
+    rs().register_camera_node(this);
 }
 
 void CameraNode::recompute_view_matrix() const noexcept {
@@ -171,6 +171,6 @@ void CameraNode::invalidate_proj_matrix_cache() const noexcept {
         return *manual_aspect_ratio;
     }
 
-    const glm::ivec2 framebuffer_size = get_rendering_server().get_window().get_framebuffer_size();
+    const glm::ivec2 framebuffer_size = rs().get_window().get_framebuffer_size();
     return static_cast<float>(framebuffer_size.x) / framebuffer_size.y;
 }

@@ -26,7 +26,7 @@ PBRDrawableNode::PBRDrawableNode(
     const std::shared_ptr<const Mesh>& mesh
 ) : DrawableCompleteSpatialNode(), mesh(mesh), material(material) {}
 
-static void draw_mesh(const Mesh& mesh, RenderingServer& rs) {
+static void draw_mesh(const Mesh& mesh) {
     mesh.bind_vao();
 
     if (mesh.is_indexed()) {
@@ -42,8 +42,6 @@ static void draw_mesh(const Mesh& mesh, RenderingServer& rs) {
 }
 
 void PBRDrawableNode::draw() {
-    RenderingServer& rs = get_rendering_server();
-
     // Do some checks.
     if (material->normal_map.has_value() &&
         (mesh->get_normals_id() == 0 || mesh->get_tangents_id() == 0)) {
@@ -55,32 +53,29 @@ void PBRDrawableNode::draw() {
 
     // Use the shader.
     const glm::mat4 model_matrix = get_global_matrix();
-    const glm::mat4 mvp = rs.get_current_camera_node().get_view_proj_matrix() * model_matrix;
+    const glm::mat4 mvp = rs().get_current_camera_node().get_view_proj_matrix() * model_matrix;
     
     
     pbr_shader_manager.use_shader(
-        rs, *material, mvp, model_matrix, rs.get_current_camera_node().get_global_position()
+        *material, mvp, model_matrix, rs().get_current_camera_node().get_global_position()
     );
 
-    draw_mesh(*mesh, rs);
+    draw_mesh(*mesh);
 }
 
 void PBRDrawableNode::draw_to_shadow_map() {
-    RenderingServer& rs = get_rendering_server();
-
     const glm::mat4 model_matrix = get_global_matrix();
-    const glm::mat4 mvp = rs.get_shadow_map().get_view_proj_matrix() * model_matrix;
+    const glm::mat4 mvp = rs().get_shadow_map().get_view_proj_matrix() * model_matrix;
 
     static Shader<"mvp"> shadow_mapping_shader(VERTEX_SHADOW_MAPPING_SHADER_TEXT, FRAGMENT_SHADOW_MAPPING_SHADER_TEXT);
     shadow_mapping_shader.use_shader();
     shadow_mapping_shader.set_mat4<"mvp">(mvp);
 
-    draw_mesh(*mesh, rs);
+    draw_mesh(*mesh);
 }
 
 GLuint PBRDrawableNode::get_program_id() const {
-    RenderingServer& rs = get_rendering_server();
-    return pbr_shader_manager.get_program_id(rs, *material);
+    return pbr_shader_manager.get_program_id(*material);
 }
 
 void PBRDrawableNode::set_mesh(const std::shared_ptr<const Mesh>& mesh) {

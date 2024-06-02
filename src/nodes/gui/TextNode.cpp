@@ -131,7 +131,7 @@ void TextNode::set_max_width_property(const NodeProperty& property) {
 void TextNode::draw() {
     draw_children();
 
-    const glm::vec2 window_size {get_rendering_server().get_window().get_window_size()};
+    const glm::vec2 window_size {rs().get_window().get_window_size()};
     glm::vec3 absolute_position_in_pixels {get_screen_space_position()};
     absolute_position_in_pixels.y += max_y - min_y;
     const glm::vec3 absolute_position_opengl {math_utils::scr_space_pos_to_gl_space(absolute_position_in_pixels, window_size)};

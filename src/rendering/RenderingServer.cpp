@@ -16,14 +16,34 @@
 
 using namespace llengine;
 
+static RenderingServer* current_rendering_server = nullptr;
+static std::uint32_t next_context_id = 0;
+
 RenderingServer::RenderingServer(glm::ivec2 window_size, std::string_view window_title) :
     window(GLFWWindow(window_size, window_title, 3, 3)) {
     main_framebuffer = std::make_unique<MainFramebuffer>(window_size);
-    current_default_framebuffer = main_framebuffer.get();
+    current_rendering_server = this;
+    context_id = next_context_id++;
 }
 
 RenderingServer::~RenderingServer() {
 
+}
+
+[[nodiscard]] RenderingServer& RenderingServer::current() {
+    if (current_rendering_server == nullptr) {
+        throw std::runtime_error("There is no current rendering server.");
+    }
+
+    return *current_rendering_server;
+}
+
+[[nodiscard]] RenderingServer* RenderingServer::current_optional() {
+    return current_rendering_server;
+}
+
+[[nodiscard]] std::uint32_t RenderingServer::current_context_id() {
+    return current().context_id;
 }
 
 void RenderingServer::set_cubemap(const std::shared_ptr<Texture>& cubemap) {
@@ -99,6 +119,10 @@ void RenderingServer::stop() {
 
 void RenderingServer::block_mouse_press() {
     mouse_button_blocked = true;
+}
+
+[[nodiscard]] FramebufferID RenderingServer::_get_main_framebuffer_id() const {
+    return main_framebuffer->get_framebuffer_id();
 }
 
 void RenderingServer::unblock_mouse_press() {
@@ -222,11 +246,6 @@ const Texture& RenderingServer::get_brdf_integration_map() {
     return *brdf_integration_map;
 }
 
-[[nodiscard]] FramebufferID RenderingServer::get_current_default_framebuffer_id() {
-    assert(current_default_framebuffer != nullptr);
-    return current_default_framebuffer->get_framebuffer_id();
-}
-
 void RenderingServer::draw_non_overlay_objects() {
     const Frustum frustum = get_current_camera_node().get_frustum();
 
@@ -248,7 +267,8 @@ void RenderingServer::update_shadow_map() {
             cur_drawable->draw_to_shadow_map();
         }
     }
+
     shadow_map->finish_drawing(
-        face_culling_enabled, get_current_default_framebuffer_id(), get_window().get_framebuffer_size()
+        face_culling_enabled, _get_main_framebuffer_id(), get_window().get_framebuffer_size()
     );
 }

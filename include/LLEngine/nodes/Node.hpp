@@ -50,8 +50,6 @@ public:
 
     static void register_properties();
 
-    [[nodiscard]] RenderingServer& get_rendering_server() const;
-    [[nodiscard]] RenderingServer* get_rendering_server_optional() const;
     [[nodiscard]] BulletPhysicsServer& get_bullet_physics_server() const;
     [[nodiscard]] BulletPhysicsServer* get_bullet_physics_server_optional() const;
     [[nodiscard]] RootNode& get_root_node() const;

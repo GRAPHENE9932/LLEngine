@@ -1,8 +1,6 @@
 #pragma once
 
-#include "nodes/rendering/PointLightNode.hpp" // PointLightNode
 #include "rendering/Material.hpp"
-#include "rendering/Skybox.hpp"
 #include "rendering/Shader.hpp"
 #include "datatypes.hpp"
 
@@ -59,7 +57,7 @@ public:
         auto operator<=>(const Parameters& other) const noexcept = default;
     };
 
-    static Parameters to_parameters(RenderingServer& rs, const Material& material) noexcept;
+    static Parameters to_parameters(const Material& material) noexcept;
 
     explicit PBRShader(const Parameters& params);
     // Make the object non-copyable.
@@ -73,7 +71,6 @@ public:
 
     void initialize(const Parameters& params);
     void use_shader(
-        RenderingServer& rs,
         const Material& material, const glm::mat4& mvp_matrix,
         const glm::mat4& model_matrix, const glm::vec3& camera_position
     ) const;

@@ -20,7 +20,7 @@ void ButtonNode::draw() {
 void ButtonNode::update() {
     if (is_pressed()) {
         was_pressed_in_last_update = true;
-        get_rendering_server().block_mouse_press();
+        rs().block_mouse_press();
     }
     else {
         was_pressed_in_last_update = false;
@@ -28,8 +28,8 @@ void ButtonNode::update() {
 }
 
 [[nodiscard]] bool ButtonNode::is_pressed() const {
-    const auto& cursor_pos = get_rendering_server().get_cursor_position();
-    return get_rendering_server().is_mouse_button_pressed(0) && contains_point(cursor_pos);
+    const auto& cursor_pos = rs().get_cursor_position();
+    return rs().is_mouse_button_pressed(0) && contains_point(cursor_pos);
 }
 
 void ButtonNode::register_properties() {

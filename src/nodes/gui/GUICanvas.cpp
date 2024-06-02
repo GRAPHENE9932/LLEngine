@@ -13,7 +13,7 @@
 using namespace llengine;
 
 GUICanvas::~GUICanvas() {
-    if (auto rendering_server = get_rendering_server_optional()) {
+    if (auto rendering_server = rs_opt()) {
         rendering_server->unregister_gui_canvas(this);
     }
 }
@@ -31,7 +31,7 @@ void GUICanvas::draw() {
 void GUICanvas::_on_attachment_to_tree_without_start() {
     SpatialNode::_on_attachment_to_tree_without_start();
 
-    get_rendering_server().register_gui_canvas(this);
+    rs().register_gui_canvas(this);
 
     std::for_each(
         gui_nodes.begin(), gui_nodes.end(),
@@ -104,7 +104,7 @@ void GUICanvas::unregister_gui_node(GUINode* gui_node) {
         return *canvas_size;
     }
     else {
-        return get_rendering_server().get_window().get_window_size();
+        return rs().get_window().get_window_size();
     }
 }
 
@@ -113,7 +113,7 @@ void GUICanvas::unregister_gui_node(GUINode* gui_node) {
         return glm::mat4(1.0f);
     }
     else {
-        return get_rendering_server().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
+        return rs().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
     }
 }
 

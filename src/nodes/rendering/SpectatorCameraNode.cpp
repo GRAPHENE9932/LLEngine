@@ -20,12 +20,12 @@ void SpectatorCameraNode::_update() {
 }
 
 void SpectatorCameraNode::unlock_mouse() {
-    get_rendering_server().get_window().enable_cursor();
+    rs().get_window().enable_cursor();
     mouse_locked = false;
 }
 
 void SpectatorCameraNode::lock_mouse() {
-    get_rendering_server().get_window().disable_cursor();
+    rs().get_window().disable_cursor();
     mouse_locked = true;
 }
 
@@ -96,7 +96,7 @@ void SpectatorCameraNode::update_rotation() {
         return;
     }
 
-    auto& window {get_rendering_server().get_window()};
+    auto& window {rs().get_window()};
 
     // Get the current cursor position.
     glm::dvec2 cursor_pos = window.get_cursor_position();
@@ -116,15 +116,13 @@ void SpectatorCameraNode::update_rotation() {
 }
 
 void SpectatorCameraNode::update_position() {
-    RenderingServer& rs = get_rendering_server();
-
     // Compute directions.
     const glm::vec3 forward_dir = get_rotation() * FORWARD;
     const glm::vec3 right_dir = get_rotation() * RIGHT;
 
     // Some aliases.
-    const auto& window {rs.get_window()};
-    const auto& delta {rs.get_delta_time()};
+    const auto& window {rs().get_window()};
+    const auto& delta {rs().get_delta_time()};
 
     if (window.is_key_pressed(FORWARD_KEY)) {
         translate(forward_dir * delta * speed);

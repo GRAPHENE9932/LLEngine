@@ -119,7 +119,7 @@ void ExplosionParticlesNode::draw() {
         return;
     }
 
-    const glm::mat4 mvp = get_rendering_server().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
+    const glm::mat4 mvp = rs().get_current_camera_node().get_view_proj_matrix() * get_global_matrix();
 
     shader->use_shader();
     shader->set_mat4<"center_mvp">(mvp);
@@ -142,7 +142,7 @@ void ExplosionParticlesNode::draw() {
     glDisableVertexAttribArray(0);
     glBindVertexArray(0);
 
-    phase += get_rendering_server().get_delta_time() / duration;
+    phase += rs().get_delta_time() / duration;
 
     if (phase >= 1.0f) {
         get_parent()->queue_remove_child(this);

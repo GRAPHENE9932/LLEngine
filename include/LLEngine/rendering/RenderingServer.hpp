@@ -40,6 +40,10 @@ public:
     RenderingServer& operator=(const RenderingServer& other) = delete;
     RenderingServer& operator=(RenderingServer&& other) = delete;
 
+    [[nodiscard]] static RenderingServer& current();
+    [[nodiscard]] static RenderingServer* current_optional();
+    [[nodiscard]] static std::uint32_t current_context_id();
+
     void set_cubemap(const std::shared_ptr<Texture>& cubemap);
     void set_update_callback(const std::function<void(float)> callback) {
         this->update_callback = callback;
@@ -148,10 +152,11 @@ public:
 
     [[nodiscard]] const Texture& get_brdf_integration_map();
 
-    [[nodiscard]] static FramebufferID get_current_default_framebuffer_id();
+    [[nodiscard]] FramebufferID _get_main_framebuffer_id() const;
 
 private:
     Window window;
+    std::uint32_t context_id;
     std::function<void(float)> update_callback;
 
     bool mouse_button_blocked = false;
@@ -162,7 +167,6 @@ private:
     float delta_time = 1.0f;
 
     std::unique_ptr<MainFramebuffer> main_framebuffer;
-    inline static MainFramebuffer* current_default_framebuffer = nullptr;
 
     std::optional<ShadowMap> shadow_map;
     bool face_culling_enabled = true;
@@ -184,4 +188,12 @@ private:
     void initialize_shadow_map();
     void update_shadow_map();
 };
+
+[[nodiscard]] inline RenderingServer& rs() {
+    return RenderingServer::current();
+}
+
+[[nodiscard]] inline RenderingServer* rs_opt() {
+    return RenderingServer::current_optional();
+}
 }

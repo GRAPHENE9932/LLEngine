@@ -16,7 +16,7 @@ GameInstance::GameInstance(const GameSettings& settings) {
     rendering_server = std::make_unique<RenderingServer>(settings.window_resolution, settings.window_title);
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
-    root_node = std::make_unique<RootNode>(*rendering_server, *bullet_physics_server);
+    root_node = std::make_unique<RootNode>(*bullet_physics_server);
 
     if (!settings.json_scene_path.empty()) {
         SceneJSON scene(settings.json_scene_path);

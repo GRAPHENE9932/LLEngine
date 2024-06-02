@@ -6,7 +6,7 @@
 constexpr float INTERVAL = 0.5f;
 
 void FPSTextNode::update() {
-    accumulated_time += get_rendering_server().get_delta_time();
+    accumulated_time += llengine::rs().get_delta_time();
     counted_frames++;
 
     set_text(fmt::format(

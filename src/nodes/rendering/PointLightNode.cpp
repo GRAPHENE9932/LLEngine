@@ -9,14 +9,14 @@
 using namespace llengine;
 
 PointLightNode::~PointLightNode() {
-    if (auto rendering_server = get_rendering_server_optional()) {
+    if (auto rendering_server = rs_opt()) {
         rendering_server->unregister_point_light(this);
     }
 }
 
 void PointLightNode::_on_attachment_to_tree_without_start() {
     SpatialNode::_on_attachment_to_tree_without_start();
-    get_rendering_server().register_point_light(this);
+    rs().register_point_light(this);
 }
 
 PointLightNode::Uniforms PointLightNode::get_uniforms_id(

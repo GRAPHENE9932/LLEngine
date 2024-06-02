@@ -71,7 +71,7 @@ auto draw_to_cubemap(
         }
         cur_cubemap_size /= 2;
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
+    glBindFramebuffer(GL_FRAMEBUFFER, rs()._get_main_framebuffer_id());
 
     // Return viewport to the original state.
     glViewport(
@@ -232,7 +232,7 @@ constexpr glm::u32vec2 BRDF_INTEGRATION_MAP_SIZE = SPECULAR_MAP_SIZE;
     quad_mesh->unbind_vao(true, false, false);
 
     // Clean up.
-    glBindFramebuffer(GL_FRAMEBUFFER, RenderingServer::get_current_default_framebuffer_id());
+    glBindFramebuffer(GL_FRAMEBUFFER, rs()._get_main_framebuffer_id());
 
     // Return viewport to the original state.
     glViewport(
