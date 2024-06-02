@@ -167,7 +167,7 @@ static GLenum opengl_type() {
 
 template<typename T>
 [[nodiscard]] Texture Texture::from_pixel_data(
-    T* pixel_data, glm::u32vec2 resolution, Type type, Format format
+    T* pixel_data, glm::u32vec2 resolution, Type type, Format format, float anisotropy_override
 ) {
     GLenum target = opengl_target(type);
     throw_if_invalid_format<T>(format);
@@ -208,12 +208,17 @@ template<typename T>
     glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(
+        target,
+        GL_TEXTURE_MAX_ANISOTROPY,
+        anisotropy_override == 0.0f ? rs().get_quality_settings().anisotropy : anisotropy_override
+    );
 
     return Texture(texture_id, resolution, type);
 }
 
-template Texture Texture::from_pixel_data<float>(float* pixel_data, glm::u32vec2 resolution, Type type, Format format);
-template Texture Texture::from_pixel_data<char>(char* pixel_data, glm::u32vec2 resolution, Type type, Format format);
+template Texture Texture::from_pixel_data<float>(float* pixel_data, glm::u32vec2 resolution, Type type, Format format, float anisotropy_override);
+template Texture Texture::from_pixel_data<char>(char* pixel_data, glm::u32vec2 resolution, Type type, Format format, float anisotropy_override);
 
 constexpr std::array<std::uint8_t, 12> KTX1_IDENTIFIER {
     0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A

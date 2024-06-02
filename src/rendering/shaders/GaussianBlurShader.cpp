@@ -51,7 +51,7 @@ std::array<float, 128> GAUSS_BLUR_KERNEL = {
 GaussianBlurShader::GaussianBlurShader() :
     shader(VERT_SHADER_TEXT, FRAG_SHADER_TEXT),
     gauss_weights(Texture::from_pixel_data<float>(
-        GAUSS_BLUR_KERNEL.data(), glm::u32vec2(128, 1), Texture::Type::TEX_1D, Texture::Format::R16F
+        GAUSS_BLUR_KERNEL.data(), glm::u32vec2(128, 1), Texture::Type::TEX_1D, Texture::Format::R16F, 1.0f
     )) {}
 
 void GaussianBlurShader::use_shader(const Texture& source, const Texture* texture_to_add, float radius, bool vertical) const {

@@ -14,6 +14,7 @@ GameInstance::GameInstance(const GameSettings& settings) {
     logger::enable_console_logging();
 
     rendering_server = std::make_unique<RenderingServer>(settings.window_resolution, settings.window_title);
+    rendering_server->apply_quality_settings(settings.quality_settings);
     bullet_physics_server = std::make_unique<BulletPhysicsServer>();
 
     root_node = std::make_unique<RootNode>(*bullet_physics_server);
@@ -28,8 +29,6 @@ GameInstance::GameInstance(const GameSettings& settings) {
         auto sky_cubemap = tex_utils::panorama_to_cubemap(sky_panorama);
         rendering_server->set_cubemap(std::make_shared<Texture>(std::move(sky_cubemap)));
     }
-
-    rendering_server->apply_quality_settings(settings.quality_settings);
 
     rendering_server->set_update_callback([&] (float delta) {
         if (bullet_physics_server) {

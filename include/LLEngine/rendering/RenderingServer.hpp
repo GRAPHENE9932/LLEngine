@@ -57,6 +57,7 @@ public:
     void block_mouse_press();
 
     void apply_quality_settings(const QualitySettings& settings);
+    [[nodiscard]] const QualitySettings& get_quality_settings() const;
     void enable_face_culling();
     void disable_face_culling();
 
@@ -155,6 +156,7 @@ public:
 private:
     Window window;
     std::uint32_t context_id;
+    QualitySettings quality_settings;
     std::function<void(float)> update_callback;
 
     bool mouse_button_blocked = false;

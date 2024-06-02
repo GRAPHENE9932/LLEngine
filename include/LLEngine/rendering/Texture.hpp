@@ -93,10 +93,12 @@ public:
      * @tparam T Input component type. Must be either char or float.
      * @param resolution Texture resolution. If the type parameter is TEX_1D, then the
      * resolution's y component is ignored.
+     * @param anisotropy_override Override of the anisotropy quality setting. If set to 0.0f, then
+     * the anisotropy value is taken from the current rendering server quality settings.
      */
     template<typename T>
     [[nodiscard]] static Texture from_pixel_data(
-        T* pixel_data, glm::u32vec2 resolution, Type type, Format format
+        T* pixel_data, glm::u32vec2 resolution, Type type, Format format, float anisotropy_override = 0.0f
     );
     [[nodiscard]] static Texture from_rgbe(const TexLoadingParams& params);
     [[nodiscard]] static inline Texture from_rgbe(const std::string& rgbe_texture_path) {

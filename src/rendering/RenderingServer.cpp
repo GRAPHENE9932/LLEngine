@@ -128,6 +128,8 @@ void RenderingServer::unblock_mouse_press() {
 }
 
 void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
+    this->quality_settings = settings;
+    
     if (settings.shadow_mapping_enabled) {
         shadow_map = ShadowMap(settings.shadow_map_size);
         shadow_map->set_drawing_distance(settings.shadow_map_drawing_distance);
@@ -140,6 +142,10 @@ void RenderingServer::apply_quality_settings(const QualitySettings& settings) {
     }
 
     main_framebuffer->apply_postprocessing_settings(settings);
+}
+
+[[nodiscard]] const QualitySettings& RenderingServer::get_quality_settings() const {
+    return quality_settings;
 }
 
 void RenderingServer::enable_face_culling() {

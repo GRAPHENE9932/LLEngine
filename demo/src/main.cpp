@@ -25,6 +25,7 @@ int main() {
     settings.window_resolution = {1600, 1000};
     settings.quality_settings.shadow_mapping_enabled = true;
     settings.quality_settings.shadow_map_size = {2048, 2048};
+    settings.quality_settings.anisotropy = 16.0f;
 
     register_nodes();
 

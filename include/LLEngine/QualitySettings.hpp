@@ -9,5 +9,7 @@ struct QualitySettings {
     float shadow_map_drawing_distance = 20.0f;
 
     bool enable_bloom = true;
+
+    float anisotropy = 1.0f;
 };
 }

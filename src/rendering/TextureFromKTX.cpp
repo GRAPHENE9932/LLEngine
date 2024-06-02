@@ -1,3 +1,4 @@
+#include "rendering/RenderingServer.hpp"
 #include "rendering/Texture.hpp"
 
 #include <ktx.h>
@@ -165,6 +166,11 @@ Texture Texture::from_ktx(const TexLoadingParams& params) {
     if (ktx_texture.get()->isCubemap) {
         glTexParameteri(tex_target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
-
+    glTexParameterf(
+        tex_target,
+        GL_TEXTURE_MAX_ANISOTROPY,
+        rs().get_quality_settings().anisotropy
+    );
+    
     return texture;
 }
