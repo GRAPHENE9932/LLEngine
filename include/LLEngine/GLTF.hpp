@@ -55,7 +55,7 @@ public:
     *  - KTX2 textures only.
     *  - Base64 data is not supported.
     *  - Remote (network) data is not supported.
-    *  - Only KHR_texture_transform extension is supported.
+    *  - Only KHR_texture_transform extension, KHR_texture_basisu and KHR_materials_emissive_strength are supported.
     *
     * Rigid bodies:
     *    You can make node a rigid body using custom properties (extras).
