@@ -17,7 +17,7 @@ constexpr std::string_view FRAGMENT_SHADER_TEXT =
     #include "shaders/objects/pbr/pbr_shader.frag"
 ;
 
-PBRShader::Flags compute_flags(const Material& material) {
+static PBRShader::Flags compute_flags(const Material& material) {
     PBRShader::Flags flags = PBRShader::NO_FLAGS;
 
     if (material.base_color_texture.has_value()) {
