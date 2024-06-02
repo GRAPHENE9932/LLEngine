@@ -150,8 +150,6 @@ public:
         return global_lighting_environment;
     }
 
-    [[nodiscard]] const Texture& get_brdf_integration_map();
-
     [[nodiscard]] FramebufferID _get_main_framebuffer_id() const;
 
 private:
@@ -176,7 +174,6 @@ private:
 
     std::unique_ptr<Skybox> skybox = nullptr;
     LightingEnvironment global_lighting_environment;
-    std::optional<Texture> brdf_integration_map = std::nullopt;
 
     std::vector<Drawable*> drawables;
     std::vector<GUICanvas*> gui_canvases;

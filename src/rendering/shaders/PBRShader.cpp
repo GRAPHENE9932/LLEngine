@@ -6,6 +6,7 @@
 #include "rendering/Material.hpp"
 #include "utils/shader_loader.hpp" // load_shaders
 #include "rendering/RenderingServer.hpp" // RenderingServer
+#include "utils/texture_utils.hpp"
 #include "PBRShader.hpp" // TexturedShared
 
 using namespace llengine;
@@ -16,6 +17,16 @@ constexpr std::string_view VERTEX_SHADER_TEXT =
 constexpr std::string_view FRAGMENT_SHADER_TEXT =
     #include "shaders/objects/pbr/pbr_shader.frag"
 ;
+
+static std::optional<Texture> brdf_integration_map = std::nullopt;
+
+static Texture& get_brdf_integration_map() {
+    if (!brdf_integration_map.has_value()) {
+        brdf_integration_map = tex_utils::compute_brdf_integration_map();
+    }
+
+    return *brdf_integration_map;
+}
 
 static PBRShader::Flags compute_flags(const Material& material) {
     PBRShader::Flags flags = PBRShader::NO_FLAGS;
@@ -312,7 +323,7 @@ void PBRShader::use_shader(
         shader->bind_cubemap_texture<"irradiance_map">(irradiance_map_id, texture_unit++);
     }
     if (shader->is_uniform_initialized<"brdf_integration_map">()) {
-        auto brdf_integration_map_id = rs.get_brdf_integration_map().get_id();
+        auto brdf_integration_map_id = get_brdf_integration_map().get_id();
         shader->use_shader();
         shader->bind_2d_texture<"brdf_integration_map">(brdf_integration_map_id, texture_unit++);
     }

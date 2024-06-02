@@ -1,12 +1,10 @@
 #include "rendering/RenderingServer.hpp" // RenderingServer
 #include "rendering/Skybox.hpp"
 #include "rendering/GLFWWindow.hpp" // GLFWWindow
-#include "logger.hpp"
 #include "nodes/rendering/CameraNode.hpp"
 #include "nodes/rendering/Drawable.hpp"
 #include "nodes/gui/GUICanvas.hpp"
 #include "MainFramebuffer.hpp"
-#include "utils/texture_utils.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -235,15 +233,6 @@ void RenderingServer::unregister_point_light(PointLightNode* point_light) noexce
 
 [[nodiscard]] float RenderingServer::get_exposure() const {
     return main_framebuffer->get_exposure();
-}
-
-const Texture& RenderingServer::get_brdf_integration_map() {
-    if (!brdf_integration_map) {
-        logger::info("Starting computing the BRDF integration map.");
-        brdf_integration_map = tex_utils::compute_brdf_integration_map();
-        logger::info("Finished computing the BRDF integration map.");
-    }
-    return *brdf_integration_map;
 }
 
 void RenderingServer::draw_non_overlay_objects() {
