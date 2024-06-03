@@ -271,14 +271,17 @@ vec3 fresnel_schlick_considering_roughness(float cosine, vec3 refl_ratio_at_zero
     * pow(clamp(1.0 - cosine, 0.0, 1.0), 5.0);
 }
 
-float normal_distribution_ggx(float roughness, vec3 normal, vec3 halfway) {
+float normal_distribution_ggx(float roughness, vec3 normal, vec3 halfway, vec3 view) {
     float alpha = roughness * roughness;
+    float alpha_2 = alpha * alpha;
+    float v_dot_n = dot(view, normal);
+    float v_dot_n_2 = v_dot_n * v_dot_n;
 
-    float normal_dot_halfway = dot(normal, halfway);
-    float denominator = (normal_dot_halfway * normal_dot_halfway) * (alpha * alpha - 1) + 1;
-    denominator = PI * (denominator * denominator);
+    float numerator = alpha_2 * clamp(dot(halfway, normal), 0.0, 1.0);
+    float denominator = v_dot_n_2 * (alpha_2 + ((1.0 - v_dot_n_2) / v_dot_n_2));
+    denominator = PI * denominator * denominator;
 
-    return (alpha * alpha) / denominator;
+    return min(numerator / denominator, 200.0);
 }
 
 float geometric_shadowing_schlick_ggx(float n_dot_v, float roughness) {
@@ -370,7 +373,7 @@ void main() {
             // Compute surface reflection ratio.
             vec3 reflection_ratio = fresnel_schlick(max(dot(halfway, view_direction), 0.0), refl_ratio_at_zero_inc);
             // Compute results of the normal distribution function and the geometric shadowing function.
-            float ndf = normal_distribution_ggx(get_roughness(), get_normal(), halfway);
+            float ndf = normal_distribution_ggx(get_roughness(), get_normal(), halfway, view_direction);
             float gsf = geometric_shadowing_smith(get_normal(), view_direction, light_direction, get_roughness());
 
             // Compute specular using Cook-Torrance BRDF.
