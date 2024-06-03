@@ -197,7 +197,7 @@ public:
 
     template<ConstUniformName Name>
     [[nodiscard]] constexpr ShaderUniformID get_uniform_id(std::size_t index) const {
-        if (arrays[get_index_of_array<Name>()].at(index) == -1) {
+        if (arrays[get_index_of_array<Name>()].size() <= index || arrays[get_index_of_array<Name>()].at(index) == -1) {
             assign_uniform_id_to_array_element<Name>(index);
         }
         return arrays[get_index_of_array<Name>()].at(index);
