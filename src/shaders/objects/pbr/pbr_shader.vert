@@ -15,8 +15,6 @@ layout(location = 0) in vec3 vertex_pos;
 struct PointLight {
     vec3 position;
     vec3 color;
-    float diffuse_strength;
-    float const_coeff, linear_coeff, quadratic_coeff;
 };
 struct SpotLight {
     vec3 position;
