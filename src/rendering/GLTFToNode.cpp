@@ -52,6 +52,9 @@ static std::unique_ptr<PBRDrawableNode> construct_pbr_drawable(
     }
     else {
         result = node_cast<PBRDrawableNode>(node_type->construct_node());
+        if (result == nullptr) {
+            throw std::runtime_error("The custom node type can not be casted into the PBRDrawableNode type.");
+        }
         result->set_material(constr_env.materials.at(constr_env.gltf.meshes.at(gltf_node.mesh_index.value()).material_index));
         result->set_mesh(constr_env.meshes.at(*gltf_node.mesh_index));
     }
