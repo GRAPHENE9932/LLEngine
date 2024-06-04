@@ -28,6 +28,9 @@ struct PointLightNode : public CompleteSpatialNode {
 
     void _on_attachment_to_tree_without_start() final override;
 
+    virtual void copy_to(Node& node) const override;
+    virtual std::unique_ptr<Node> copy() const override;
+
     static Uniforms get_uniforms_id(ShaderID program_id, const std::string& var_name, std::uint32_t index);
     void set_uniforms(const Uniforms& uniforms) const;
 };
