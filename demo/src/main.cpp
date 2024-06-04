@@ -3,6 +3,7 @@
 #include "BulletNode.hpp"
 #include "ExposureTextNode.hpp"
 #include "ResolutionTextNode.hpp"
+#include "FadingPointLightNode.hpp"
 
 #include <LLEngine/GameInstance.hpp>
 #include <LLEngine/node_registration.hpp>
@@ -14,6 +15,7 @@ void register_nodes() {
     llengine::register_node_type<BulletNode, llengine::BulletRigidBodyNode>("bullet_node");
     llengine::register_node_type<ExposureTextNode, llengine::TextNode>("exposure_text_node");
     llengine::register_node_type<ResolutionTextNode, llengine::TextNode>("resolution_text_node");
+    llengine::register_node_type<FadingPointLightNode, llengine::PointLightNode>("fading_point_light_node");
     llengine::end_nodes_registration();
 }
 

@@ -5,6 +5,7 @@ add_executable(llengine_demo
     src/BulletNode.cpp
     src/ExposureTextNode.cpp
     src/ResolutionTextNode.cpp
+    src/FadingPointLightNode.cpp
 )
 
 target_link_libraries(llengine_demo llengine)
