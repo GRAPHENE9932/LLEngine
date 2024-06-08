@@ -383,7 +383,7 @@ void main() {
 
             // Calculate the outgoing radiance (result contribution).
             float n_dot_l = dot(get_normal(), light_direction);
-            lightning_result += (refraction_ratio * vec3(get_base_color()) / PI + specular) * radiance * n_dot_l;
+            lightning_result += max((refraction_ratio * vec3(get_base_color()) / PI + specular) * radiance * n_dot_l, 0.0);
         }
     #endif
     color_out = vec4(lightning_result + get_emissive() * 10.0, 1.0);
