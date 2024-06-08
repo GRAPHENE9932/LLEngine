@@ -96,56 +96,61 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 set(PUBLIC_HEADERS
-    include/LLEngine/rendering/RenderingServer.hpp
-    include/LLEngine/rendering/Skybox.hpp
-    include/LLEngine/rendering/Texture.hpp
-    include/LLEngine/rendering/Mesh.hpp
-    include/LLEngine/rendering/GLFWWindow.hpp
-    include/LLEngine/rendering/Material.hpp
-    include/LLEngine/rendering/Window.hpp
-    include/LLEngine/rendering/ManagedFramebufferID.hpp
-    include/LLEngine/rendering/Shader.hpp
-    include/LLEngine/rendering/ShadowMap.hpp
-    include/LLEngine/Transform.hpp
-    include/LLEngine/GameInstance.hpp
-    include/LLEngine/physics/shapes/BoxShape.hpp
-    include/LLEngine/physics/shapes/SphereShape.hpp
-    include/LLEngine/physics/shapes/Shape.hpp
-    include/LLEngine/physics/shapes/CylinderShape.hpp
-    include/LLEngine/physics/BulletPhysicsServer.hpp
-    include/LLEngine/node_cast.hpp
-    include/LLEngine/SceneJSON.hpp
     include/LLEngine/CustomNodeType.hpp
-    include/LLEngine/node_registration.hpp
     include/LLEngine/Event.hpp
-    include/LLEngine/SceneFile.hpp
+    include/LLEngine/GameInstance.hpp
     include/LLEngine/GameSettings.hpp
-    include/LLEngine/QualitySettings.hpp
+    include/LLEngine/Key.hpp
+    include/LLEngine/NodeProperty.hpp
+    include/LLEngine/SceneFile.hpp
+    include/LLEngine/SceneJSON.hpp
+    include/LLEngine/Transform.hpp
+    include/LLEngine/datatypes.hpp
     include/LLEngine/gui/FreeTypeFont.hpp
     include/LLEngine/gui/GUITexture.hpp
     include/LLEngine/gui/GUITransform.hpp
-    include/LLEngine/GLTF.hpp
     include/LLEngine/logger.hpp
-    include/LLEngine/NodeProperty.hpp
-    include/LLEngine/Key.hpp
-    include/LLEngine/nodes/rendering/PBRDrawableNode.hpp
-    include/LLEngine/nodes/rendering/CameraNode.hpp
-    include/LLEngine/nodes/rendering/PointLightNode.hpp
-    include/LLEngine/nodes/rendering/Drawable.hpp
-    include/LLEngine/nodes/rendering/DrawableCompleteSpatialNode.hpp
-    include/LLEngine/nodes/rendering/SpectatorCameraNode.hpp
-    include/LLEngine/nodes/rendering/SpotLight.hpp
-    include/LLEngine/nodes/rendering/ExplosionParticlesNode.hpp
-    include/LLEngine/nodes/physics/BulletRigidBodyNode.hpp
-    include/LLEngine/nodes/SpatialNode.hpp
+    include/LLEngine/math/AABB.hpp
+    include/LLEngine/math/Frustum.hpp
+    include/LLEngine/math/Plane.hpp
+    include/LLEngine/node_cast.hpp
+    include/LLEngine/node_registration.hpp
     include/LLEngine/nodes/CompleteSpatialNode.hpp
+    include/LLEngine/nodes/Node.hpp
+    include/LLEngine/nodes/SpatialNode.hpp
+    include/LLEngine/nodes/gui/ButtonNode.hpp
+    include/LLEngine/nodes/gui/CompleteGUINode.hpp
     include/LLEngine/nodes/gui/GUICanvas.hpp
     include/LLEngine/nodes/gui/GUINode.hpp
-    include/LLEngine/nodes/gui/CompleteGUINode.hpp
     include/LLEngine/nodes/gui/TextNode.hpp
-    include/LLEngine/nodes/gui/ButtonNode.hpp
-    include/LLEngine/nodes/Node.hpp
+    include/LLEngine/nodes/physics/BulletRigidBodyNode.hpp
+    include/LLEngine/nodes/rendering/CameraNode.hpp
+    include/LLEngine/nodes/rendering/Drawable.hpp
+    include/LLEngine/nodes/rendering/DrawableCompleteSpatialNode.hpp
+    include/LLEngine/nodes/rendering/ExplosionParticlesNode.hpp
+    include/LLEngine/nodes/rendering/PBRDrawableNode.hpp
+    include/LLEngine/nodes/rendering/PointLightNode.hpp
+    include/LLEngine/nodes/rendering/SpectatorCameraNode.hpp
+    include/LLEngine/physics/BulletPhysicsServer.hpp
+    include/LLEngine/physics/shapes/BoxShape.hpp
+    include/LLEngine/physics/shapes/CylinderShape.hpp
+    include/LLEngine/physics/shapes/Shape.hpp
+    include/LLEngine/physics/shapes/SphereShape.hpp
     include/LLEngine/random.hpp
+    include/LLEngine/rendering/LazyShader.hpp
+    include/LLEngine/rendering/ManagedFramebufferID.hpp
+    include/LLEngine/rendering/Material.hpp
+    include/LLEngine/rendering/RenderingServer.hpp
+    include/LLEngine/rendering/Shader.hpp
+    include/LLEngine/rendering/ShadowMap.hpp
+    include/LLEngine/rendering/Skybox.hpp
+    include/LLEngine/rendering/Window.hpp
+    include/LLEngine/rendering/GLFWWindow.hpp
+    include/LLEngine/rendering/LightingEnvironment.hpp
+    include/LLEngine/rendering/Texture.hpp
+    include/LLEngine/rendering/Mesh.hpp
+    include/LLEngine/GLTF.hpp
+    include/LLEngine/QualitySettings.hpp
 )
 
 find_package(Threads)
