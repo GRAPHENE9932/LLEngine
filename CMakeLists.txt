@@ -72,7 +72,6 @@ set(SOURCES
     src/nodes/rendering/DrawableCompleteSpatialNode.cpp
     src/nodes/rendering/PointLightNode.cpp
     src/nodes/rendering/CameraNode.cpp
-    src/nodes/rendering/SpotLight.cpp
     src/nodes/rendering/ExplosionParticlesNode.cpp
     src/nodes/physics/BulletRigidBodyNode.cpp
     src/nodes/SpatialNode.cpp
