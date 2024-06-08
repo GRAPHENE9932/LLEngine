@@ -120,9 +120,37 @@ private:
         BufferID buffer_id;
     };
 
+    class ManagedVertexArrayID {
+    public:
+        ManagedVertexArrayID();
+        ManagedVertexArrayID(VertexArrayID vao_id);
+        ManagedVertexArrayID(const ManagedVertexArrayID& other) = delete;
+        ManagedVertexArrayID(ManagedVertexArrayID&& other) noexcept;
+        ~ManagedVertexArrayID();
+
+        operator VertexArrayID() const {
+            return get();
+        }
+
+        [[nodiscard]] const VertexArrayID& get() const {
+            return vao_id;
+        }
+
+        [[nodiscard]] VertexArrayID& get() {
+            return vao_id;
+        }
+
+        ManagedVertexArrayID& operator=(const ManagedVertexArrayID& other) = delete;
+        ManagedVertexArrayID& operator=(ManagedVertexArrayID&& other) noexcept;
+        ManagedVertexArrayID& operator=(VertexArrayID vao_id);
+    
+    private:
+        VertexArrayID vao_id;
+    };
+
     HandledBufferID indices_id = 0, vertices_id = 0, uvs_id = 0,
            normals_id = 0, tangents_id = 0;
-    mutable VertexArrayID vao_id = 0;
+    mutable ManagedVertexArrayID vao_id = 0;
 
     std::variant<std::vector<uint16_t>, std::vector<uint32_t>> indices;
     std::vector<glm::vec3> vertices;

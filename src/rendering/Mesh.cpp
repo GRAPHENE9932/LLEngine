@@ -41,7 +41,6 @@ void Mesh::bind_vao(bool enable_uv, bool enable_normals, bool enable_tangents) c
 }
 
 void Mesh::unbind_vao(bool unbind_uv, bool unbind_normals, bool unbind_tangents) const {
-    return;
     if (vao_id != 0) {
         glBindVertexArray(0);
         if (vertices_id != 0) glDisableVertexAttribArray(0);
@@ -131,10 +130,50 @@ Mesh::HandledBufferID& Mesh::HandledBufferID::operator=(Mesh::HandledBufferID&& 
 
 Mesh::HandledBufferID& Mesh::HandledBufferID::operator=(BufferID buffer_id) {
     if (this->buffer_id != 0) {
-        glDeleteBuffers(1, &buffer_id);
+        glDeleteBuffers(1, &this->buffer_id);
     }
 
     this->buffer_id = buffer_id;
+
+    return *this;
+}
+
+Mesh::ManagedVertexArrayID::ManagedVertexArrayID() : vao_id(0){
+
+}
+
+Mesh::ManagedVertexArrayID::ManagedVertexArrayID(VertexArrayID vao_id) : vao_id(vao_id) {
+
+}
+
+Mesh::ManagedVertexArrayID::ManagedVertexArrayID(ManagedVertexArrayID&& other) noexcept {
+    this->vao_id = other.get();
+    other.vao_id = 0;
+}
+
+Mesh::ManagedVertexArrayID::~ManagedVertexArrayID() {
+    if (vao_id != 0) {
+        glDeleteVertexArrays(1, &vao_id);
+    }
+}
+
+Mesh::ManagedVertexArrayID& Mesh::ManagedVertexArrayID::operator=(ManagedVertexArrayID&& other) noexcept {
+    if (this->vao_id != 0) {
+        glDeleteVertexArrays(1, &this->vao_id);
+    }
+
+    this->vao_id = other.get();
+    other.vao_id = 0;
+
+    return *this;
+}
+
+Mesh::ManagedVertexArrayID& Mesh::ManagedVertexArrayID::operator=(VertexArrayID vao_id) {
+    if (this->vao_id != 0) {
+        glDeleteVertexArrays(1, &this->vao_id);
+    }
+
+    this->vao_id = vao_id;
 
     return *this;
 }
@@ -237,7 +276,7 @@ Mesh::Mesh(Mesh&& other) noexcept :
     uvs(std::move(other.uvs)),
     normals(std::move(other.normals)),
     tangents(std::move(other.tangents)),
-    vao_id(other.vao_id),
+    vao_id(std::move(other.vao_id)),
     indices_id(std::move(other.indices_id)),
     vertices_id(std::move(other.vertices_id)),
     uvs_id(std::move(other.uvs_id)),
@@ -245,9 +284,7 @@ Mesh::Mesh(Mesh&& other) noexcept :
     tangents_id(std::move(other.tangents_id)) {}
 
 Mesh::~Mesh() {
-    if (vao_id) {
-        glDeleteVertexArrays(1, &vao_id);
-    }
+
 }
 
 Mesh& Mesh::operator=(const Mesh& other) {
@@ -269,6 +306,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
     normals = std::move(other.normals);
     tangents = std::move(other.tangents);
 
+    vao_id = std::move(other.vao_id);
     indices_id = std::move(other.indices_id);
     vertices_id = std::move(other.vertices_id);
     uvs_id = std::move(other.uvs_id);
@@ -286,14 +324,16 @@ static void bind_vertex_attrib_pointer(GLuint buffer_id, GLuint vertex_attrib_in
 }
 
 void Mesh::reset_vao_if_needed() const {
-    if (vao_id != 0) {
-        glDeleteVertexArrays(1, &vao_id);
-        initialize_vao();
+    if (vao_id == 0) {
+        return;
     }
+
+    initialize_vao();
 }
 
 void Mesh::initialize_vao() const {
-    glGenVertexArrays(1, &vao_id);
+    vao_id = ManagedVertexArrayID();
+    glGenVertexArrays(1, &vao_id.get());
     glBindVertexArray(vao_id);
 
     bind_vertex_attrib_pointer(vertices_id, 0, 3);
