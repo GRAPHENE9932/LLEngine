@@ -23,7 +23,7 @@ void BulletNode::start() {
     particles->set_scale_decline_curvature(1.0f);
     particles->set_scale({0.05f, 0.05f, 0.05f});
     particles->set_spreading_distance_deviation(0.35f);
-    particles->set_spreading_distance(10.0f);
+    particles->set_spreading_distance(1.0f);
 
     auto particle_light = std::make_unique<FadingPointLightNode>();
     particle_light->set_transform(llengine::Transform());

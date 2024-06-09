@@ -205,7 +205,8 @@ static void compute_target_positions(
 
     for (glm::vec3& point : result) {
         point = generate_random_point_on_sphere() *
-            random::float_in_range(1.0f - spreading_distance_deviation, 1.0f + spreading_distance_deviation);
+            random::float_in_range(1.0f - spreading_distance_deviation, 1.0f + spreading_distance_deviation) *
+            spreading_distance;
     }
 }
 
