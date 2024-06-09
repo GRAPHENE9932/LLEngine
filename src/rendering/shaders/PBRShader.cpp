@@ -272,7 +272,7 @@ void PBRShader::use_shader(
     }
     if (
         (shader->is_uniform_initialized<"ao_uv_offset">() || shader->is_uniform_initialized<"ao_uv_scale">()) &&
-        material.roughness_texture.has_value()
+        material.ambient_occlusion_texture.has_value()
     ) {
         shader->set_vec2<"ao_uv_offset">(material.ambient_occlusion_texture->uv_offset);
         shader->set_vec2<"ao_uv_scale">(material.ambient_occlusion_texture->uv_scale);
