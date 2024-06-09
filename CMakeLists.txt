@@ -188,11 +188,11 @@ target_link_libraries(llengine nlohmann_json::nlohmann_json)
 
 # glm.
 find_package(glm REQUIRED)
-target_link_libraries(llengine glm)
+target_link_libraries(llengine glm::glm)
 
 # fmtlib.
 find_package(fmt REQUIRED)
-target_link_libraries(llengine fmt)
+target_link_libraries(llengine fmt::fmt)
 
 # libktx.
 find_package(Ktx REQUIRED)
