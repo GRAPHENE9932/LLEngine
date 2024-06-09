@@ -1,5 +1,7 @@
 #include "nodes/gui/CompleteGUINode.hpp"
 
+#include <stdexcept>
+
 using namespace llengine;
 
 [[nodiscard]] GUITransform CompleteGUINode::get_transform() const {

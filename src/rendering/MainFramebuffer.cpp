@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <cmath>
+#include <algorithm>
 
 namespace llengine {
 static std::size_t calculate_amount_of_lods(glm::u32vec2 size) {
@@ -21,7 +22,7 @@ static std::size_t calculate_amount_of_lods(glm::u32vec2 size) {
 }
 
 static std::uint32_t calculate_lod_for_exposure_controller(glm::u32vec2 main_fb_size) {
-    return std::min(4ul, calculate_amount_of_lods(main_fb_size) - 1ul);
+    return std::min<std::size_t>(4ul, calculate_amount_of_lods(main_fb_size) - 1ul);
 }
 
 static glm::u32vec2 calculate_size_for_exposure_controller(glm::u32vec2 main_fb_size) {

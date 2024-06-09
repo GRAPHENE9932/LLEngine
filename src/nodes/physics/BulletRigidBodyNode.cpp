@@ -7,6 +7,7 @@
 #include <bullet/btBulletDynamicsCommon.h>
 
 #include <cmath>
+#include <stdexcept>
 
 using namespace llengine;
 

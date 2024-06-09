@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <utility>
 #include <limits>
+#include <stdexcept>
 
 #include <GL/glew.h>
 
