@@ -91,9 +91,7 @@ set(SOURCES
     src/random.cpp
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    list(APPEND SOURCES src/rendering/OpenGLDebug.cpp)
-endif()
+list(APPEND SOURCES $<$<CONFIG:Debug>:src/rendering/OpenGLDebug.cpp>)
 
 set(PUBLIC_HEADERS
     include/LLEngine/CustomNodeType.hpp
