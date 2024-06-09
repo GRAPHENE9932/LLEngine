@@ -190,7 +190,7 @@ target_link_libraries(llengine glm::glm)
 
 # fmtlib.
 find_package(fmt REQUIRED)
-target_link_libraries(llengine fmt::fmt)
+target_link_libraries(llengine fmt::fmt-header-only)
 
 # libktx.
 find_package(Ktx REQUIRED)
