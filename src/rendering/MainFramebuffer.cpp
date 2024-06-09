@@ -64,6 +64,8 @@ void MainFramebuffer::render_to_window(float delta_time) {
     if (bloom_enabled) {
         postprocessing_shader.bind_2d_texture<"bloom_image">(bloom_renderer->get_bloom_texture_id(), 1);
     }
+    
+    glViewport(0, 0, framebuffer_size.x, framebuffer_size.y);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     Mesh::get_quad()->bind_vao(true, false, false);
     glDrawArrays(GL_TRIANGLES, 0, Mesh::get_quad()->get_amount_of_vertices());
