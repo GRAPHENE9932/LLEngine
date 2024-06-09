@@ -19,10 +19,14 @@ static Texture initialize_color_attachment(glm::u32vec2 size) {
     glGenTextures(1, &texture_id.get_ref());
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_R16, size.x,
-        size.y, 0, GL_RED, GL_FLOAT, nullptr
+    glTexStorage2D(
+        GL_TEXTURE_2D,
+        calculate_last_mipmap(size) + 1,
+        GL_R16,
+        size.x,
+        size.y
     );
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, calculate_last_mipmap(size));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
