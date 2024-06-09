@@ -1,4 +1,4 @@
-add_executable(llengine_demo
+set(SOURCES
     src/main.cpp
     src/FPSTextNode.cpp
     src/MainCamera.cpp
@@ -7,6 +7,14 @@ add_executable(llengine_demo
     src/ResolutionTextNode.cpp
     src/FadingPointLightNode.cpp
 )
+
+# Disable the command line window on Windows.
+if (WIN32)
+    add_executable(llengine_demo WIN32 ${SOURCES})
+    target_link_options(llengine_demo PRIVATE "/SUBSYSTEM:WINDOWS;/ENTRY:mainCRTStartup")
+else()
+    add_executable(llengine_demo ${SOURCES})
+endif()
 
 target_link_libraries(llengine_demo llengine)
 
