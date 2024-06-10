@@ -92,7 +92,7 @@ float ExposureController::extract_average_luminance() const {
     return result.r;
 }
 
-constexpr float EXPOSURE_KEY_VALUE = 0.18f;
+constexpr float EXPOSURE_KEY_VALUE = 0.5f;
 constexpr float DECAY_RATE = 0.75f;
 
 void ExposureController::recompute_exposure(const Texture& main_color_texture, float delta_time) {
