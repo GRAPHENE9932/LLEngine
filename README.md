@@ -32,6 +32,30 @@ Contents:
 
 ## Build from source <a name="build-from-source"/>
 ### Linux <a name="linux-build"/>
+#### Prerequisites
+There are several dependencies that are most likely easily installable from yours distribution repositories.
+ - [GLFW](https://www.glfw.org/)
+ - [GLEW](https://glew.sourceforge.net/)
+ - [Bullet](https://pybullet.org/)
+ - [nlohmann-json](https://json.nlohmann.me/)
+ - [GLM](https://github.com/g-truc/glm)
+ - [fmt](https://fmt.dev/)
+ - [libktx](https://github.com/KhronosGroup/KTX-Software)
+ - [FreeType](https://freetype.org/)
+
+##### Install dependencies on Arch Linux
+
+`$ sudo pacman -S git cmake gcc ninja glfw glew bullet nlohmann-json glm fmt freetype2`
+
+libktx must be installed manually. Refer to the [KTX-Software GitHub page](https://github.com/KhronosGroup/KTX-Software).
+
+##### Install dependencies on Fedora Linux
+
+`$ sudo dnf install git cmake gcc-c++ glfw-devel glew-devel bullet-devel json-devel glm-devel fmt-devel freetype-devel`
+
+libktx must be installed manually. Refer to the [KTX-Software releases page](https://github.com/KhronosGroup/KTX-Software/releases) and seek for the `KTX-Software-*.*.*-Linux-arm64.rpm` installation file. Manual building is an option too.
+
+#### Building
 ```
 $ git clone https://github.com/GRAPHENE9932/LLEngine.git
 $ cd LLEngine
